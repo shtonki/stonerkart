@@ -68,7 +68,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="src\controller\Console.cs" />
+    <Compile Include="src\controller\Controller.cs" />
+    <Compile Include="src\model\GameState.cs" />
     <Compile Include="src\model\Map.cs" />
+    <Compile Include="src\model\Tile.cs" />
     <Compile Include="src\view\ConsolePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

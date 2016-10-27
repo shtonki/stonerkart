@@ -10,10 +10,10 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
-    public class GamePanel : UserControl
+    class GamePanel : UserControl
     {
         private SplitContainer splitContainer1;
-        private ConsolePanel consolePanel1;
+        public ConsolePanel consolePanel { get; private set; }
         private HexPanel hexPanel3;
 
         public GamePanel()
@@ -25,7 +25,7 @@ namespace stonerkart
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.hexPanel3 = new stonerkart.HexPanel();
-            this.consolePanel1 = new stonerkart.ConsolePanel();
+            this.consolePanel = new stonerkart.ConsolePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -47,7 +47,7 @@ namespace stonerkart
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.BackColor = System.Drawing.Color.Crimson;
-            this.splitContainer1.Panel2.Controls.Add(this.consolePanel1);
+            this.splitContainer1.Panel2.Controls.Add(this.consolePanel);
             this.splitContainer1.Size = new System.Drawing.Size(672, 537);
             this.splitContainer1.SplitterDistance = 518;
             this.splitContainer1.TabIndex = 0;
@@ -65,13 +65,13 @@ namespace stonerkart
             // 
             // consolePanel1
             // 
-            this.consolePanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.consolePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.consolePanel1.Location = new System.Drawing.Point(3, 0);
-            this.consolePanel1.Name = "consolePanel1";
-            this.consolePanel1.Size = new System.Drawing.Size(144, 534);
-            this.consolePanel1.TabIndex = 0;
+            this.consolePanel.Location = new System.Drawing.Point(3, 0);
+            this.consolePanel.Name = "consolePanel1";
+            this.consolePanel.Size = new System.Drawing.Size(144, 534);
+            this.consolePanel.TabIndex = 0;
             // 
             // GamePanel
             // 

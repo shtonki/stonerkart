@@ -13,25 +13,12 @@ namespace stonerkart
     class HexPanel : Panel
     {
         private Map map = new Map(null);
-        private List<Tuple<int, int, PointF[]>> hexes;
-        public bool xd;
+        private List<Tuple<Tile, PointF[]>> hexes;
+
         public HexPanel()
         {
-            xd = true;
             DoubleBuffered = true;
             BackColor = Color.Aqua;
-            Timer t = new Timer();
-            t.Interval = 20;
-
-            Random r = new Random();
-            float f = 0;
-            t.Tick += (_, __) =>
-            {
-                f += 0.1f;
-                e = (int)(Math.Round(Math.Cos(f)*7)) + 14;
-                Refresh();
-            };
-            t.Start();
         }
 
         protected override void OnResize(EventArgs eventargs)
@@ -43,33 +30,44 @@ namespace stonerkart
             int dw = (W / (map.width));
             int dh = (int)Math.Floor(H / (1 + (-1 + map.height) * 0.75));
 
-            PointF[] hexagon = xd ? generateHexagon(dw, dh) : generateHexagon(dw, dh);
+            PointF[] hexagon = generateHexagon(dw, dh);
             int to = dw / 2;
 
-            hexes = new List<Tuple<int, int, PointF[]>>();
+            hexes = new List<Tuple<Tile, PointF[]>>();
             for (int y = 0; y < map.height; y++)
             {
-                for (int x = 0; x < map.xds[y].Length; x++)
+                for (int x = 0; x < map.widthAt(y); x++)
                 {
-                    int ox = ((map.width - map.xds[y].Length) / 2 + x) * dw + to;
+                    int ox = ((map.width - map.widthAt(y)) / 2 + x) * dw + to;
                     int oy = (int)Math.Floor(0.75 * y * dh);
 
                     var v = hexagon.Select(a => new PointF(a.X + ox, a.Y + oy)).ToArray();
-                    hexes.Add(new Tuple<int, int, PointF[]>(x, y, v));
+                    hexes.Add(new Tuple<Tile, PointF[]>(map.tileAt(x, y), v));
                 }
                 to = to == 0 ? dw / 2 : 0;
             }
         }
 
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+        }
+
         protected override void OnMouseClick(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            xd(e, Controller.clicked);
+        }
+
+        private void xd(MouseEventArgs e, Action<Tile> a)
         {
             base.OnMouseClick(e);
             PointF clickPoint = new PointF(e.X, e.Y);
             foreach (var hex in hexes)
             {
-                if (pip(hex.Item3, clickPoint))
+                if (pip(hex.Item2, clickPoint))
                 {
-                    Console.WriteLine(hex.Item1 + @" " + hex.Item2);
+                    a(hex.Item1);
                 }
             }
         }
@@ -104,7 +102,7 @@ namespace stonerkart
             int dw = (W / (map.width));
             int dh = (int)Math.Floor(H / (1 + (-1+map.height)*0.75));
 
-            PointF[] hexagon = xd ? generateHexagon(dw, dh) : generateHexagon(dw, dh);
+            PointF[] hexagon = generateHexagon(dw, dh);
             int to = dw/2;
             using (Brush b = new SolidBrush(Color.Aqua))
             using (Pen pen = new Pen(Color.Red, 4))
@@ -113,21 +111,27 @@ namespace stonerkart
 
                 for (int y = 0; y < map.height; y++)
                 {
-                    for (int x = 0; x < map.xds[y].Length; x++)
+                    for (int x = 0; x < map.widthAt(y); x++)
                     {
-                        int ox = ((map.width - map.xds[y].Length)/2 + x)*dw + to;
+                        int ox = ((map.width - map.widthAt(y))/2 + x)*dw + to;
                         int oy = (int)Math.Floor(0.75*y*dh);
 
                         var v = hexagon.Select(a => new PointF(a.X + ox, a.Y + oy)).ToArray();
-                        using (Pen p = new Pen(map.xds[y][x], 4))
+
+                        using (Brush p = new SolidBrush(Color.DarkSlateBlue))
+                            g.FillPolygon(p, v);
+                        using (Pen p = new Pen(Color.Indigo, 4))
+                        {
                             g.DrawPolygon(p, v);
+                            g.DrawString(-(y/2 + x) + " " + (-(y + 1)/2 - x) + " " + y, DefaultFont, Brushes.Black, ox + dw/2, oy + dh/2);
+                        }
                     }
                     to = to == 0 ? dw/2 : 0;
                 }
             }
         }
 
-        public static int e = 2;
+        public static int e = 1;
 
         private static PointF[] generateHexagon(int w, int h)
         {
@@ -145,5 +149,16 @@ namespace stonerkart
             return ps;
         }
 
+
+        private class TileView
+        {
+            public Tile tile { get; }
+            public bool highlighted;
+
+            public TileView(Tile tile)
+            {
+                this.tile = tile;
+            }
+        }
     }
 }

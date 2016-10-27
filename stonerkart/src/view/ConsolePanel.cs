@@ -10,12 +10,16 @@ namespace stonerkart
         private TextBox inputBox;
         private Button button1;
         private SplitContainer splitContainer3;
-        private TrackBar trackBar1;
         private SplitContainer splitContainer1;
 
         public ConsolePanel()
         {
             InitializeComponent();
+        }
+
+        public void print(string s)
+        {
+            outputBox.AppendText(s);
         }
 
         private void InitializeComponent()
@@ -25,7 +29,6 @@ namespace stonerkart
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.inputBox = new System.Windows.Forms.TextBox();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -37,9 +40,7 @@ namespace stonerkart
             this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
-            this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -99,10 +100,6 @@ namespace stonerkart
             // splitContainer3.Panel1
             // 
             this.splitContainer3.Panel1.Controls.Add(this.inputBox);
-            // 
-            // splitContainer3.Panel2
-            // 
-            this.splitContainer3.Panel2.Controls.Add(this.trackBar1);
             this.splitContainer3.Size = new System.Drawing.Size(317, 117);
             this.splitContainer3.SplitterDistance = 29;
             this.splitContainer3.TabIndex = 0;
@@ -118,18 +115,6 @@ namespace stonerkart
             this.inputBox.TabIndex = 0;
             this.inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
-            // trackBar1
-            // 
-            this.trackBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackBar1.Location = new System.Drawing.Point(0, 21);
-            this.trackBar1.Maximum = 100;
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(309, 45);
-            this.trackBar1.TabIndex = 0;
-            this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
-            // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -141,7 +126,6 @@ namespace stonerkart
             this.button1.TabIndex = 0;
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // ConsolePanel
             // 
@@ -158,11 +142,8 @@ namespace stonerkart
             this.splitContainer2.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel1.PerformLayout();
-            this.splitContainer3.Panel2.ResumeLayout(false);
-            this.splitContainer3.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -174,17 +155,6 @@ namespace stonerkart
                 outputBox.Text += inputBox.Text + Environment.NewLine;
                 inputBox.Text = "";
             }
-        }
-
-        private void trackBar1_Scroll(object sender, EventArgs e)
-        {
-            HexPanel.e = trackBar1.Value;
-            Parent.Parent.Parent.Refresh();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Console.WriteLine(trackBar1.Value);
         }
     }
 }
