@@ -8,12 +8,12 @@ namespace stonerkart
 {
     static class Console
     {
-        public static void print(params object[] o)
+        public static void Write(params object[] o)
         {
             printEx(false, o);
         }
 
-        public static void printLine(params object[] o)
+        public static void WriteLine(params object[] o)
         {
             printEx(true, o);
         }

@@ -19,51 +19,64 @@ namespace stonerkart
         {
             DoubleBuffered = true;
             BackColor = Color.Aqua;
-
-            map = new Map(4, 4, false, false);
+            map = new Map(5, 5, false, true);
+            hexes = new TileView[map.size];
+            for (int i = 0; i < map.size; i++) hexes[i] = new TileView(map.tileAt(i));
         }
 
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
 
+            int HACK1 = 2, HACK2 = 7; /* todo unhack */
             int W = Size.Width;
             int H = Size.Height;
-            int dw = 2*(W / (map.widthEx));
+            int dw = 2*(W / (map.widthEx)) - HACK1;
             int dh = (int)Math.Floor(H / (1 + (-1 + map.height) * 0.75));
 
             PointF[] hexagon = generateHexagon(dw, dh, 1);
-            int to = 0;
-            hexes = new TileView[map.size];
+            bool indent = map.fatLeft;
             int c = 0;
             for (int y = 0; y < map.height; y++)
             {
                 for (int x = 0; x < map[y].Length; x++)
                 {
-                    int ox = ((map.width - map[y].Length) / 2 + x) * dw + to;
+                    int ox = ((map.width - map[y].Length) / 2 + x) * dw
+                             + (indent ? dw/2 : 0)
+                             + HACK2;
                     int oy = (int)Math.Floor(0.75 * y * dh);
 
                     var v = hexagon.Select(a => new PointF(a.X + ox, a.Y + oy)).ToArray();
-                    hexes[c++] = (new TileView(map.tileAt(x, y), v));
+                    hexes[c++].poly = v;
                 }
-                to = to == 0 ? dw / 2 : 0;
+                indent = !indent;
             }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
+            if (!xd(e, Controller.entered)) Controller.entered(null);
         }
 
-        protected override void OnMouseClick(MouseEventArgs e)
+        protected override void OnMouseDown(MouseEventArgs e)
         {
-            base.OnMouseMove(e);
             xd(e, Controller.clicked);
         }
 
-        private void xd(MouseEventArgs e, Action<Tile> a)
+        private bool xd(MouseEventArgs e, Action<TileView> a)
         {
             base.OnMouseClick(e);
+            PointF clickPoint = new PointF(e.X, e.Y);
+            foreach (var hex in hexes)
+            {
+                if (pip(hex.poly, clickPoint))
+                {
+                    a(hex);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static bool pip(PointF[] polygon, PointF testPoint)
@@ -87,7 +100,6 @@ namespace stonerkart
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
 
@@ -95,35 +107,16 @@ namespace stonerkart
             int H = Size.Height;
             int dw = (int)Math.Round(((float)W / (map.width)));
             int dh = (int)Math.Round(H / (1 + (-1+map.height)*0.75));
-
             int to = dw/2;
-            using (Brush b = new SolidBrush(Color.Aqua))
-            using (Pen pen = new Pen(Color.Red, 4))
+            using (Brush b = new SolidBrush(Color.Firebrick))
+            using (Brush bh = new SolidBrush(Color.DeepPink))
+            using (Pen pen = new Pen(Color.Black, 4))
             {
                 foreach (var tv in hexes)
                 {
                     g.DrawPolygon(pen, tv.poly);
+                    g.FillPolygon(tv.highlighted ? bh : b, tv.poly);
                 }
-                /*
-                for (int y = 0; y < hexes.height; y++)
-                {
-                    for (int x = 0; x < hexes[y].Length; x++)
-                    {
-                        int ox = (map.paddingAt(y) + x)*dw + (1-2*(y%2)*map.width)*to;
-                        int oy = (int)Math.Floor(0.75*y*dh);
-
-                        var v = hexagon.Select(a => new PointF(a.X + ox, a.Y + oy)).ToArray();
-
-                        using (Brush p = new SolidBrush(Color.DarkSlateBlue))
-                            g.FillPolygon(p, v);
-                        using (Pen p = new Pen(Color.Indigo, 4))
-                        {
-                            g.DrawPolygon(p, v);
-                            g.DrawString(-(y/2 + x) + " " + (-(y + 1)/2 - x) + " " + y, DefaultFont, Brushes.Black, ox + dw/2, oy + dh/2);
-                        }
-                    }
-                    to = to == 0 ? dw/2 : 0;
-                    */
             }
         }
 
@@ -142,20 +135,6 @@ namespace stonerkart
             ps[4] = new PointF(wm, h-e);
             ps[5] = new PointF(e, h2);
             return ps;
-        }
-
-
-        private class TileView
-        {
-            public Tile tile { get; }
-            public PointF[] poly { get; }
-            public bool highlighted;
-
-            public TileView(Tile tile, PointF[] poly)
-            {
-                this.tile = tile;
-                this.poly = poly;
-            }
         }
     }
 }

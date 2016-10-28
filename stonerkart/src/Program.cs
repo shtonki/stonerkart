@@ -5,7 +5,7 @@ namespace stonerkart
     {
         static void Main(string[] args)
         {
-            Controller.start();
+            Controller.start(new Map(4, 4, true, true));
         }
     }
 }

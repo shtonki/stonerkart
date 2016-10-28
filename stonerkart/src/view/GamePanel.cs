@@ -13,8 +13,9 @@ namespace stonerkart
     class GamePanel : UserControl
     {
         private SplitContainer splitContainer1;
-        public ConsolePanel consolePanel { get; private set; }
-        private HexPanel hexPanel3;
+        public HexPanel hexPanel1;
+        public ConsolePanel consolePanel;
+
 
         public GamePanel()
         {
@@ -24,7 +25,7 @@ namespace stonerkart
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.hexPanel3 = new stonerkart.HexPanel();
+            this.hexPanel1 = new stonerkart.HexPanel();
             this.consolePanel = new stonerkart.ConsolePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -37,40 +38,38 @@ namespace stonerkart
             this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.Location = new System.Drawing.Point(3, 4);
+            this.splitContainer1.CausesValidation = false;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.hexPanel3);
+            this.splitContainer1.Panel1.Controls.Add(this.hexPanel1);
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.BackColor = System.Drawing.Color.Crimson;
             this.splitContainer1.Panel2.Controls.Add(this.consolePanel);
-            this.splitContainer1.Size = new System.Drawing.Size(672, 537);
-            this.splitContainer1.SplitterDistance = 518;
+            this.splitContainer1.Size = new System.Drawing.Size(678, 544);
+            this.splitContainer1.SplitterDistance = 463;
             this.splitContainer1.TabIndex = 0;
             // 
-            // hexPanel3
+            // hexPanel1
             // 
-            this.hexPanel3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.hexPanel3.BackColor = System.Drawing.Color.Aqua;
-            this.hexPanel3.Location = new System.Drawing.Point(3, 3);
-            this.hexPanel3.Name = "hexPanel3";
-            this.hexPanel3.Size = new System.Drawing.Size(512, 531);
-            this.hexPanel3.TabIndex = 0;
+            this.hexPanel1.BackColor = System.Drawing.Color.Aqua;
+            this.hexPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.hexPanel1.Location = new System.Drawing.Point(0, 0);
+            this.hexPanel1.Name = "hexPanel1";
+            this.hexPanel1.Size = new System.Drawing.Size(463, 544);
+            this.hexPanel1.TabIndex = 0;
             // 
-            // consolePanel1
+            // consolePanel
             // 
             this.consolePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.consolePanel.Location = new System.Drawing.Point(3, 0);
-            this.consolePanel.Name = "consolePanel1";
-            this.consolePanel.Size = new System.Drawing.Size(144, 534);
+            this.consolePanel.Location = new System.Drawing.Point(3, 3);
+            this.consolePanel.Name = "consolePanel";
+            this.consolePanel.Size = new System.Drawing.Size(205, 538);
             this.consolePanel.TabIndex = 0;
             // 
             // GamePanel

@@ -20,6 +20,7 @@ namespace stonerkart
         public void print(string s)
         {
             outputBox.AppendText(s);
+            outputBox.ScrollToCaret();
         }
 
         private void InitializeComponent()
@@ -66,9 +67,9 @@ namespace stonerkart
             this.outputBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.outputBox.Enabled = false;
             this.outputBox.Location = new System.Drawing.Point(3, 3);
             this.outputBox.Name = "outputBox";
+            this.outputBox.ReadOnly = true;
             this.outputBox.Size = new System.Drawing.Size(349, 383);
             this.outputBox.TabIndex = 0;
             this.outputBox.Text = "";
