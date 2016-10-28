@@ -12,13 +12,15 @@ namespace stonerkart
 {
     class HexPanel : Panel
     {
-        private Map map = new Map(null);
-        private List<Tuple<Tile, PointF[]>> hexes;
+        private Map map;
+        private TileView[] hexes;
 
         public HexPanel()
         {
             DoubleBuffered = true;
             BackColor = Color.Aqua;
+
+            map = new Map(4, 4, false, false);
         }
 
         protected override void OnResize(EventArgs eventargs)
@@ -27,22 +29,22 @@ namespace stonerkart
 
             int W = Size.Width;
             int H = Size.Height;
-            int dw = (W / (map.width));
+            int dw = 2*(W / (map.widthEx));
             int dh = (int)Math.Floor(H / (1 + (-1 + map.height) * 0.75));
 
-            PointF[] hexagon = generateHexagon(dw, dh);
-            int to = dw / 2;
-
-            hexes = new List<Tuple<Tile, PointF[]>>();
+            PointF[] hexagon = generateHexagon(dw, dh, 1);
+            int to = 0;
+            hexes = new TileView[map.size];
+            int c = 0;
             for (int y = 0; y < map.height; y++)
             {
-                for (int x = 0; x < map.widthAt(y); x++)
+                for (int x = 0; x < map[y].Length; x++)
                 {
-                    int ox = ((map.width - map.widthAt(y)) / 2 + x) * dw + to;
+                    int ox = ((map.width - map[y].Length) / 2 + x) * dw + to;
                     int oy = (int)Math.Floor(0.75 * y * dh);
 
                     var v = hexagon.Select(a => new PointF(a.X + ox, a.Y + oy)).ToArray();
-                    hexes.Add(new Tuple<Tile, PointF[]>(map.tileAt(x, y), v));
+                    hexes[c++] = (new TileView(map.tileAt(x, y), v));
                 }
                 to = to == 0 ? dw / 2 : 0;
             }
@@ -62,14 +64,6 @@ namespace stonerkart
         private void xd(MouseEventArgs e, Action<Tile> a)
         {
             base.OnMouseClick(e);
-            PointF clickPoint = new PointF(e.X, e.Y);
-            foreach (var hex in hexes)
-            {
-                if (pip(hex.Item2, clickPoint))
-                {
-                    a(hex.Item1);
-                }
-            }
         }
 
         private static bool pip(PointF[] polygon, PointF testPoint)
@@ -99,21 +93,23 @@ namespace stonerkart
 
             int W = Size.Width;
             int H = Size.Height;
-            int dw = (W / (map.width));
-            int dh = (int)Math.Floor(H / (1 + (-1+map.height)*0.75));
+            int dw = (int)Math.Round(((float)W / (map.width)));
+            int dh = (int)Math.Round(H / (1 + (-1+map.height)*0.75));
 
-            PointF[] hexagon = generateHexagon(dw, dh);
             int to = dw/2;
             using (Brush b = new SolidBrush(Color.Aqua))
             using (Pen pen = new Pen(Color.Red, 4))
             {
-                //drawHexagon(g, pen, new Rectangle(0, 0, 50, 50));
-
-                for (int y = 0; y < map.height; y++)
+                foreach (var tv in hexes)
                 {
-                    for (int x = 0; x < map.widthAt(y); x++)
+                    g.DrawPolygon(pen, tv.poly);
+                }
+                /*
+                for (int y = 0; y < hexes.height; y++)
+                {
+                    for (int x = 0; x < hexes[y].Length; x++)
                     {
-                        int ox = ((map.width - map.widthAt(y))/2 + x)*dw + to;
+                        int ox = (map.paddingAt(y) + x)*dw + (1-2*(y%2)*map.width)*to;
                         int oy = (int)Math.Floor(0.75*y*dh);
 
                         var v = hexagon.Select(a => new PointF(a.X + ox, a.Y + oy)).ToArray();
@@ -127,13 +123,12 @@ namespace stonerkart
                         }
                     }
                     to = to == 0 ? dw/2 : 0;
-                }
+                    */
             }
         }
 
-        public static int e = 1;
 
-        private static PointF[] generateHexagon(int w, int h)
+        private static PointF[] generateHexagon(int w, int h, int e)
         {
             Rectangle area = new Rectangle(e, e, w - e, h - e);
             PointF[] ps = new PointF[6];
@@ -153,11 +148,13 @@ namespace stonerkart
         private class TileView
         {
             public Tile tile { get; }
+            public PointF[] poly { get; }
             public bool highlighted;
 
-            public TileView(Tile tile)
+            public TileView(Tile tile, PointF[] poly)
             {
                 this.tile = tile;
+                this.poly = poly;
             }
         }
     }

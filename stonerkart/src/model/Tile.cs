@@ -5,13 +5,11 @@ namespace stonerkart
 {
     class Tile
     {
-        public int x { get; }
-        public int y { get; }
+        public Map map { get; }
 
-        public Tile(int x, int y)
+        public Tile(Map map)
         {
-            this.x = x;
-            this.y = y;
+            this.map = map;
         }
     }
 }

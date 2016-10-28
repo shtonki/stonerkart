@@ -17,8 +17,6 @@ namespace stonerkart
         #region Game
         public static void clicked(Tile t)
         {
-            int x = t.x, y = t.y;
-            Console.printLine(y/2+x, (y+1)/2-x, y);
         }
         #endregion
 
