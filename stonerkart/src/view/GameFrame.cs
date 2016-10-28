@@ -28,15 +28,15 @@ namespace stonerkart
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gamePanel.BackColor = System.Drawing.Color.Fuchsia;
-            this.gamePanel.Location = new System.Drawing.Point(-2, 0);
+            this.gamePanel.Location = new System.Drawing.Point(2, 1);
             this.gamePanel.Name = "gamePanel1";
-            this.gamePanel.Size = new System.Drawing.Size(1004, 826);
+            this.gamePanel.Size = new System.Drawing.Size(597, 413);
             this.gamePanel.TabIndex = 0;
             // 
             // GameFrame
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.ClientSize = new System.Drawing.Size(1004, 827);
+            this.ClientSize = new System.Drawing.Size(596, 414);
             this.Controls.Add(this.gamePanel);
             this.Name = "GameFrame";
             this.ResumeLayout(false);

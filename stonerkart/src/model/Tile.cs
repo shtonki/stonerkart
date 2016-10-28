@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System;
+using System.Collections.Generic;
 
 namespace stonerkart
 {
@@ -11,6 +12,7 @@ namespace stonerkart
         public int a => abcCoord.a;
         public int b => abcCoord.b;
         public int c => abcCoord.c;
+        public int ord => map.ord(this);
 
         private readonly XYCoord xyCoord;
         private readonly ABCCoord abcCoord;

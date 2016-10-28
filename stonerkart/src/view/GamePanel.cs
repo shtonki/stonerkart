@@ -13,7 +13,7 @@ namespace stonerkart
     class GamePanel : UserControl
     {
         private SplitContainer splitContainer1;
-        public HexPanel hexPanel1;
+        public HexPanel hexPanel;
         public ConsolePanel consolePanel;
 
 
@@ -25,7 +25,7 @@ namespace stonerkart
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.hexPanel1 = new stonerkart.HexPanel();
+            this.hexPanel = new stonerkart.HexPanel();
             this.consolePanel = new stonerkart.ConsolePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -44,7 +44,7 @@ namespace stonerkart
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.hexPanel1);
+            this.splitContainer1.Panel1.Controls.Add(this.hexPanel);
             // 
             // splitContainer1.Panel2
             // 
@@ -53,14 +53,14 @@ namespace stonerkart
             this.splitContainer1.SplitterDistance = 463;
             this.splitContainer1.TabIndex = 0;
             // 
-            // hexPanel1
+            // hexPanel
             // 
-            this.hexPanel1.BackColor = System.Drawing.Color.Aqua;
-            this.hexPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.hexPanel1.Location = new System.Drawing.Point(0, 0);
-            this.hexPanel1.Name = "hexPanel1";
-            this.hexPanel1.Size = new System.Drawing.Size(463, 544);
-            this.hexPanel1.TabIndex = 0;
+            this.hexPanel.BackColor = System.Drawing.Color.Aqua;
+            this.hexPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.hexPanel.Location = new System.Drawing.Point(0, 0);
+            this.hexPanel.Name = "hexPanel";
+            this.hexPanel.Size = new System.Drawing.Size(463, 544);
+            this.hexPanel.TabIndex = 0;
             // 
             // consolePanel
             // 

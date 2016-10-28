@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CFC26B37-6090-4492-A003-E558D8324FDE}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>stonerkart</RootNamespace>
     <AssemblyName>stonerkart</AssemblyName>
@@ -79,6 +79,7 @@
     <Compile Include="src\view\ConsolePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="src\view\G.cs" />
     <Compile Include="src\view\GameFrame.cs">
       <SubType>Form</SubType>
     </Compile>

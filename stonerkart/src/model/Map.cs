@@ -83,9 +83,19 @@ namespace stonerkart
 
         public Tile[] neighboursOf(Tile t)
         {
-            Tile[] ts = new Tile[1];
+            Tile[] ts = new Tile[6];
             ts[0] = getFromABC(t.a, t.b - 1, t.c + 1);
+            ts[1] = getFromABC(t.a + 1, t.b, t.c - 1);
+            ts[2] = getFromABC(t.a + 1, t.b - 1, t.c);
+            ts[3] = getFromABC(t.a, t.b + 1, t.c - 1);
+            ts[4] = getFromABC(t.a - 1, t.b, t.c + 1);
+            ts[5] = getFromABC(t.a - 1, t.b + 1, t.c);
             return ts;
+        }
+
+        public int ord(Tile t)
+        {
+            return t.x + t.y*width + t.y/2*gpr;
         }
     }
 }

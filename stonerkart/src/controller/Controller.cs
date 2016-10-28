@@ -1,33 +1,52 @@
-﻿using System.Windows.Forms;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace stonerkart
 {
     static class Controller
     {
         private static GameFrame gameFrame;
-        private static Map m;
+        private static HexPanel hexPanel;
+        private static Map map;
 
         #region Control
         public static void start(Map m)
         {
+            map = m;
+
+            G.load(map);
             gameFrame = new GameFrame();
+            G.unload();
+
+            hexPanel = gameFrame.gamePanel.hexPanel;
+
             Application.Run(gameFrame);
         }
         #endregion
 
         #region Game
-        public static void clicked(TileView t)
+        public static void clicked(TileView tv)
         {
-            //Console.WriteLine(t.tile.a, t.tile.b, t.tile.c);
-            //Console.WriteLine(t.tile.x, t.tile.y);
         }
 
-        private static TileView en;
-        public static void entered(TileView t)
+        private static List<TileView> lit = new List<TileView>();
+        public static void entered(TileView tv)
         {
-            if (en != null) en.highlighted = false;
-            en = t;
-            if (en != null) en.highlighted = true;
+            foreach (var x in lit)
+            {
+                x.highlight = false;
+            }
+            lit.Clear();
+            Tile t = tv.tile;
+            Tile[] tx = map.neighboursOf(t);
+            foreach (Tile x in tx.Concat(new Tile[] {t}))
+            {
+                if (x == null) continue;
+                var v = hexPanel.viewOf(x);
+                lit.Add(v);
+                v.highlight = true;
+            }
             redraw();
         }
         #endregion
@@ -36,7 +55,7 @@ namespace stonerkart
 
         public static void redraw()
         {
-            gameFrame?.gamePanel?.hexPanel1?.Refresh();
+            gameFrame?.gamePanel?.hexPanel?.Refresh();
         }
         #endregion
 

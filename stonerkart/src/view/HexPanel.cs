@@ -13,21 +13,25 @@ namespace stonerkart
     class HexPanel : Panel
     {
         private Map map;
-        private TileView[] hexes;
+        private TileView[] tileViews;
 
         public HexPanel()
         {
             DoubleBuffered = true;
             BackColor = Color.Aqua;
-            map = new Map(5, 5, false, true);
-            hexes = new TileView[map.size];
-            for (int i = 0; i < map.size; i++) hexes[i] = new TileView(map.tileAt(i));
+
+            map = new Map(1, 1, false, false);
+            tileViews = new [] {new TileView(new Tile(map, 0, 0)) };
+            tileViews[0].poly = generateHexagon(10, 10, 1);
+
+            map = G.map;
+            tileViews = new TileView[map.size];
+            for (int i = 0; i < map.size; i++) tileViews[i] = new TileView(map.tileAt(i));
         }
 
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
-
             int HACK1 = 2, HACK2 = 7; /* todo unhack */
             int W = Size.Width;
             int H = Size.Height;
@@ -47,7 +51,7 @@ namespace stonerkart
                     int oy = (int)Math.Floor(0.75 * y * dh);
 
                     var v = hexagon.Select(a => new PointF(a.X + ox, a.Y + oy)).ToArray();
-                    hexes[c++].poly = v;
+                    tileViews[c++].poly = v;
                 }
                 indent = !indent;
             }
@@ -56,7 +60,7 @@ namespace stonerkart
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            if (!xd(e, Controller.entered)) Controller.entered(null);
+            xd(e, Controller.entered);
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -68,7 +72,7 @@ namespace stonerkart
         {
             base.OnMouseClick(e);
             PointF clickPoint = new PointF(e.X, e.Y);
-            foreach (var hex in hexes)
+            foreach (var hex in tileViews)
             {
                 if (pip(hex.poly, clickPoint))
                 {
@@ -109,17 +113,21 @@ namespace stonerkart
             int dh = (int)Math.Round(H / (1 + (-1+map.height)*0.75));
             int to = dw/2;
             using (Brush b = new SolidBrush(Color.Firebrick))
-            using (Brush bh = new SolidBrush(Color.DeepPink))
+            using (Brush bh = new TextureBrush(Properties.Resources.jordanno))
             using (Pen pen = new Pen(Color.Black, 4))
             {
-                foreach (var tv in hexes)
+                foreach (var tv in tileViews)
                 {
                     g.DrawPolygon(pen, tv.poly);
-                    g.FillPolygon(tv.highlighted ? bh : b, tv.poly);
+                    g.FillPolygon(tv.highlight ? bh : b, tv.poly);
                 }
             }
         }
 
+        public TileView viewOf(Tile t)
+        {
+            return tileViews[t.ord];
+        }
 
         private static PointF[] generateHexagon(int w, int h, int e)
         {
