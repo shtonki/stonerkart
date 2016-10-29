@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,16 +29,20 @@ namespace stonerkart
             tileViews = new TileView[map.size];
             for (int i = 0; i < map.size; i++) tileViews[i] = new TileView(map.tileAt(i));
         }
+        int HACK1 = 2, HACK2 = 7; /* todo unhack */
+        private void getDwDh(out int dw, out int dh)
+        {
+            
+            dw = 2 * (Size.Width / (map.widthEx)) - HACK1;
+            dh = (int)Math.Floor(Size.Height/(1 + (-1 + map.height)*0.75));
+        }
 
+        private static int dw, dh;
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
-            int HACK1 = 2, HACK2 = 7; /* todo unhack */
-            int W = Size.Width;
-            int H = Size.Height;
-            int dw = 2*(W / (map.widthEx)) - HACK1;
-            int dh = (int)Math.Floor(H / (1 + (-1 + map.height) * 0.75));
-
+            
+            getDwDh(out dw, out dh);
             PointF[] hexagon = generateHexagon(dw, dh, 1);
             bool indent = map.fatLeft;
             int c = 0;
@@ -60,12 +65,10 @@ namespace stonerkart
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            xd(e, Controller.entered);
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            xd(e, Controller.clicked);
         }
 
         private bool xd(MouseEventArgs e, Action<TileView> a)
@@ -101,25 +104,50 @@ namespace stonerkart
             return result;
         }
 
+        public static Bitmap ResizeImage(Image image, int width, int height)
+        {
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            return destImage;
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
-
-            int W = Size.Width;
-            int H = Size.Height;
-            int dw = (int)Math.Round(((float)W / (map.width)));
-            int dh = (int)Math.Round(H / (1 + (-1+map.height)*0.75));
-            int to = dw/2;
+            
             using (Brush b = new SolidBrush(Color.Firebrick))
-            using (Brush bh = new TextureBrush(Properties.Resources.jordanno))
+            using (TextureBrush bh = new TextureBrush(ResizeImage(Properties.Resources.jordanno, dw, dh)))
             using (Pen pen = new Pen(Color.Black, 4))
             {
                 foreach (var tv in tileViews)
                 {
+                    var x = tv.poly[0].X;
+                    var y = tv.poly[0].Y;
+                    var m = new Matrix();
+                    m.Translate(x+dw*((float)75/78), y+dh*((float)35/51));
+                    bh.Transform = m;
                     g.DrawPolygon(pen, tv.poly);
-                    g.FillPolygon(tv.highlight ? bh : b, tv.poly);
+                    g.FillPolygon(tv.highlight || true ? bh : b, tv.poly);
                 }
             }
         }

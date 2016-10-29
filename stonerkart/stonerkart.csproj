@@ -73,15 +73,24 @@
     </Compile>
     <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />
-    <Compile Include="src\model\GameState.cs" />
+    <Compile Include="src\model\Card.cs" />
+    <Compile Include="src\model\Game.cs" />
     <Compile Include="src\model\Map.cs" />
+    <Compile Include="src\model\Pile.cs" />
+    <Compile Include="src\model\Player.cs" />
     <Compile Include="src\model\Tile.cs" />
+    <Compile Include="src\view\CardView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="src\view\ConsolePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\G.cs" />
     <Compile Include="src\view\GameFrame.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="src\view\HandPanel.cs">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\HexPanel.cs">
       <SubType>Component</SubType>
@@ -115,6 +124,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="codemap.dgml" />
     <None Include="Resources\14691083_189944301454153_378468379668925571_n.jpg" />
   </ItemGroup>
   <ItemGroup>

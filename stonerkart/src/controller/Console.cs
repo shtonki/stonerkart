@@ -6,26 +6,42 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
+    /// <summary>
+    /// 
+    /// </summary>
     static class Console
     {
-        public static void Write(params object[] o)
+        /// <summary>
+        /// Prints each element in the given array the Console intersperced with a ' '.
+        /// </summary>
+        /// <param name="os">List of objects to print</param>
+        public static void Write(params object[] os)
         {
-            printEx(false, o);
+            printEx(false, os);
         }
 
-        public static void WriteLine(params object[] o)
+        /// <summary>
+        /// Prints each element in the given array the Console intersperced with a ' ' and terminating with a new line.
+        /// </summary>
+        /// <param name="os">List of objects to print</param>
+        public static void WriteLine(params object[] os)
         {
-            printEx(true, o);
+            printEx(true, os);
         }
 
-        public static void printEx(bool newLine, params object[] o)
+        /// <summary>
+        /// Used internally to format each input and then print it to the console.
+        /// </summary>
+        /// <param name="newLine">Whether to append a new line at the end of the string.</param>
+        /// <param name="os">List of objects to print</param>
+        private static void printEx(bool newLine, params object[] os)
         {
-            if (o == null || o.Length == 0)
+            if (os == null || os.Length == 0)
             {
                 throw new Exception();
             }
             StringBuilder sb = new StringBuilder();
-            foreach (object s in o)
+            foreach (object s in os)
             {
                 sb.Append(s.ToString());
                 sb.Append(" ");

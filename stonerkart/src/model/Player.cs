@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class GameState
+    class Player
     {
-        public Map map { get; }
     }
 }
