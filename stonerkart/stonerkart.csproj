@@ -89,7 +89,7 @@
     <Compile Include="src\view\GameFrame.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="src\view\HandPanel.cs">
+    <Compile Include="src\view\CardsPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\HexPanel.cs">
