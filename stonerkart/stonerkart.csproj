@@ -110,6 +110,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="src\view\CardView.resx">
+      <DependentUpon>CardView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="src\view\ConsolePanel.resx">
       <DependentUpon>ConsolePanel.cs</DependentUpon>
     </EmbeddedResource>

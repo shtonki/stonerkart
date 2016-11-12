@@ -20,19 +20,15 @@ namespace stonerkart
             Application.Run(gameFrame);
         }
         
-        #region GUI
         public static void redraw()
         {
             gameFrame?.gamePanel?.hexPanel?.Refresh();
         }
-        #endregion
 
-        #region Console
 
         public static void print(string s)
         {
             gameFrame?.gamePanel?.consolePanel?.print(s);
         }
-        #endregion
     }
 }

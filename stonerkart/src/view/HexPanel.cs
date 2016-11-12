@@ -24,10 +24,10 @@ namespace stonerkart
             map = new Map(1, 1, false, false);
             tileViews = new [] {new TileView(new Tile(map, 0, 0)) };
             tileViews[0].poly = generateHexagon(10, 10, 1);
-
             map = G.map;
             tileViews = new TileView[map.size];
             for (int i = 0; i < map.size; i++) tileViews[i] = new TileView(map.tileAt(i));
+            getDwDh(out dw, out dh);
         }
         int HACK1 = 2, HACK2 = 7; /* todo unhack */
         private void getDwDh(out int dw, out int dh)
@@ -37,7 +37,7 @@ namespace stonerkart
             dh = (int)Math.Floor(Size.Height/(1 + (-1 + map.height)*0.75));
         }
 
-        private static int dw, dh;
+        private int dw, dh;
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
@@ -103,32 +103,7 @@ namespace stonerkart
             }
             return result;
         }
-
-        public static Bitmap ResizeImage(Image image, int width, int height)
-        {
-            var destRect = new Rectangle(0, 0, width, height);
-            var destImage = new Bitmap(width, height);
-
-            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-            
-            using (var graphics = Graphics.FromImage(destImage))
-            {
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                using (var wrapMode = new ImageAttributes())
-                {
-                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
-                }
-            }
-
-            return destImage;
-        }
-
+        
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -136,7 +111,7 @@ namespace stonerkart
             g.SmoothingMode = SmoothingMode.HighQuality;
             
             using (Brush b = new SolidBrush(Color.Firebrick))
-            using (TextureBrush bh = new TextureBrush(ResizeImage(Properties.Resources.jordanno, dw, dh)))
+            using (TextureBrush bh = new TextureBrush(G.ResizeImage(Properties.Resources.jordanno, dw, dh)))
             using (Pen pen = new Pen(Color.Black, 4))
             {
                 foreach (var tv in tileViews)
