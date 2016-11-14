@@ -19,7 +19,12 @@ namespace stonerkart
 
             Application.Run(gameFrame);
         }
-        
+
+        public static void clicked(Clickable c)
+        {
+            Console.WriteLine("clicked");
+        }
+
         public static void redraw()
         {
             gameFrame?.gamePanel?.hexPanel?.Refresh();

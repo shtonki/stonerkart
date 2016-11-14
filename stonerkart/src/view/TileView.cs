@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace stonerkart
 {
-    class TileView
+    class TileView : Clickable
     {
         public Tile tile { get; }
         public PointF[] poly { get; set; }

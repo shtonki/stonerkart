@@ -79,9 +79,11 @@
     <Compile Include="src\model\Pile.cs" />
     <Compile Include="src\model\Player.cs" />
     <Compile Include="src\model\Tile.cs" />
+    <Compile Include="src\Observable.cs" />
     <Compile Include="src\view\CardView.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="src\view\Clickable.cs" />
     <Compile Include="src\view\ConsolePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -98,6 +100,9 @@
     <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\view\GamePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="src\view\MainMenuPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\TileView.cs" />

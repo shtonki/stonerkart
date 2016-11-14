@@ -4,33 +4,26 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
-    class CardView : UserControl
+    class CardView : UserControl, Clickable, Observer<CardChangedMessage>
     {
         private PictureBox pictureBox1;
-        private static Random r = new Random();
-
+        
         public CardView()
         {
             InitializeComponent();
-
-            var v = new Color[]
-            {
-                Color.DimGray, Color.Gold,      Color.Gainsboro,
-                Color.Wheat,   Color.Red,       Color.Violet,
-                Color.Yellow,  Color.IndianRed, Color.ForestGreen,
-            };
-
-
-            BackColor = v[r.Next(8)];
             DoubleBuffered = true;
-
-            Resize += (_, __) => layout();
-            layout();
+            BackColor = Color.ForestGreen;
+            MouseDown += (_, __) => { Controller.clicked(this); };
         }
 
-        private void layout()
+        public CardView(Card c) : base()
         {
-            pictureBox1.Image = G.ResizeImage(pictureBox1.Image, Size.Width, Size.Height);
+            c.addObserver(this);
+        }
+
+        public void notify(CardChangedMessage t)
+        {
+            throw new NotImplementedException();
         }
 
         private void InitializeComponent()
@@ -41,11 +34,14 @@ namespace stonerkart
             // 
             // pictureBox1
             // 
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox1.Enabled = false;
             this.pictureBox1.Image = global::stonerkart.Properties.Resources.jordanno;
             this.pictureBox1.InitialImage = null;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(144, 144);
+            this.pictureBox1.Size = new System.Drawing.Size(741, 616);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
@@ -53,6 +49,7 @@ namespace stonerkart
             // 
             this.Controls.Add(this.pictureBox1);
             this.Name = "CardView";
+            this.Size = new System.Drawing.Size(741, 616);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 

@@ -69,22 +69,22 @@ namespace stonerkart
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
+            Controller.clicked(clickToTile(e));
         }
 
-        private bool xd(MouseEventArgs e, Action<TileView> a)
+        private TileView clickToTile(MouseEventArgs e)
         {
-            base.OnMouseClick(e);
             PointF clickPoint = new PointF(e.X, e.Y);
             foreach (var hex in tileViews)
             {
                 if (pip(hex.poly, clickPoint))
                 {
-                    a(hex);
-                    return true;
+                    return hex;
                 }
             }
-            return false;
+            return null;
         }
+        
 
         private static bool pip(PointF[] polygon, PointF testPoint)
         {
