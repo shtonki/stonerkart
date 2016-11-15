@@ -51,8 +51,8 @@ namespace stonerkart
             {
                 int cards = cardViews.Count;
                 if (cards == 0) return;
-                int cardWidth = Math.Min(Size.Width/5, (Size.Width - 0)/cards);
                 int cardHeight = Size.Height - 0;
+                int cardWidth = Math.Min((int)(cardHeight*0.773f), (Size.Width - 0)/cards);
 
                 for (int i = 0; i < cards; i++)
                 {

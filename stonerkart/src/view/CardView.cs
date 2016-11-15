@@ -78,30 +78,37 @@ namespace stonerkart
             this.autoFontTextBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
             this.autoFontTextBox1.Location = new System.Drawing.Point(41, 394);
             this.autoFontTextBox1.Name = "autoFontTextBox1";
+            this.autoFontTextBox1.Opacity = 100;
             this.autoFontTextBox1.Size = new System.Drawing.Size(400, 150);
             this.autoFontTextBox1.TabIndex = 1;
             // 
             // nameBox
             // 
+            this.nameBox.BackColor = System.Drawing.Color.Transparent;
             this.nameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-            this.nameBox.Location = new System.Drawing.Point(31, 10);
+            this.nameBox.Location = new System.Drawing.Point(31, 15);
             this.nameBox.Name = "nameBox";
-            this.nameBox.Size = new System.Drawing.Size(391, 40);
+            this.nameBox.Opacity = 100;
+            this.nameBox.Size = new System.Drawing.Size(391, 33);
             this.nameBox.TabIndex = 2;
             // 
             // toughnessBox
             // 
+            this.toughnessBox.BackColor = System.Drawing.Color.Transparent;
             this.toughnessBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
             this.toughnessBox.Location = new System.Drawing.Point(407, 545);
             this.toughnessBox.Name = "toughnessBox";
+            this.toughnessBox.Opacity = 100;
             this.toughnessBox.Size = new System.Drawing.Size(53, 57);
             this.toughnessBox.TabIndex = 3;
             // 
             // powerBox
             // 
+            this.powerBox.BackColor = System.Drawing.Color.Transparent;
             this.powerBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
             this.powerBox.Location = new System.Drawing.Point(21, 545);
             this.powerBox.Name = "powerBox";
+            this.powerBox.Opacity = 100;
             this.powerBox.Size = new System.Drawing.Size(53, 57);
             this.powerBox.TabIndex = 4;
             // 

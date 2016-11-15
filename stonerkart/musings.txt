@@ -1,0 +1,8 @@
+﻿start
+draw
+main1
+move
+attack
+endcombat
+main2
+end

@@ -100,7 +100,7 @@ namespace stonerkart
                 g.FillRectangle(bckColor, bounds);
             }
 
-            g.DrawString(txt, DefaultFont,Brushes.Black, new Rectangle(new Point(), Size), new StringFormat(StringFormatFlags.FitBlackBox));
+            g.DrawString(txt, f,Brushes.Black, new Rectangle(new Point(), Size), new StringFormat(StringFormatFlags.FitBlackBox));
             
             
             bckColor.Dispose();
@@ -131,6 +131,7 @@ namespace stonerkart
         protected override void OnSizeChanged(EventArgs e)
         {
             base.OnSizeChanged(e);
+            txt = Text;
             fix();
         }
 
@@ -162,7 +163,7 @@ namespace stonerkart
                 }
             }
 
-            Font = testFont;
+            f = testFont;
         }
     }
 }
