@@ -22,7 +22,6 @@ namespace stonerkart
         public GameFrame()
         {
             Size = new Size(1200, 900);
-
             mainMenuPanel = new MainMenuPanel();
         }
 

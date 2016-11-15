@@ -121,4 +121,7 @@
   <data name="jordanno" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\14691083_189944301454153_378468379668925571_n.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="white3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\white3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
