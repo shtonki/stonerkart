@@ -16,19 +16,30 @@ namespace stonerkart
         private Map map;
         private TileView[] tileViews;
 
-        public HexPanel()
+        public HexPanel(Map m)
         {
             DoubleBuffered = true;
             BackColor = Color.Aqua;
 
             map = new Map(1, 1, false, false);
-            tileViews = new [] {new TileView(new Tile(map, 0, 0)) };
-            tileViews[0].poly = generateHexagon(10, 10, 1);
-            map = G.map;
-            tileViews = new TileView[map.size];
-            for (int i = 0; i < map.size; i++) tileViews[i] = new TileView(map.tileAt(i));
+
+            setMap(m);
+
             getDwDh(out dw, out dh);
         }
+
+        public HexPanel() : this(new Map(2, 2, false, false))
+        {
+            
+        }
+
+        public void setMap(Map m)
+        {
+            map = m;
+            tileViews = new TileView[map.size];
+            for (int i = 0; i < map.size; i++) tileViews[i] = new TileView(map.tileAt(i));
+        }
+
         int HACK1 = 2, HACK2 = 7; /* todo unhack */
         private void getDwDh(out int dw, out int dh)
         {

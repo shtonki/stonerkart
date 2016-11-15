@@ -13,28 +13,40 @@ namespace stonerkart
 
     abstract class Observable<T>
     {
-        private List<Observer<T>> observers = new List<Observer<T>>();
+        private List<WeakReference<Observer<T>>> observers = new List<WeakReference<Observer<T>>>();
 
         public void addObserver(Observer<T> o)
         {
-            if (!observers.Contains(o))
+            foreach (var v in observers)
             {
-                observers.Add(o);
+                Observer<T> w = null;
+                v.TryGetTarget(out w);
+                if (w != null && w == o) throw new Exception("kappapride");
             }
+            observers.Add(new WeakReference<Observer<T>>(o));
         }
 
         public void unsubscribe(Observer<T> o)
         {
-            if (observers.Contains(o))
+            WeakReference<Observer<T>> a = null;
+            foreach (var v in observers)
             {
-                observers.Remove(o);
+                Observer<T> w = null;
+                v.TryGetTarget(out w);
+                if (w != null && w == o) a = v;
             }
+            if (a == null) throw new Exception();
+            observers.Remove(a);
         }
 
         protected void notify(T t)
         {
-            foreach (var o in observers)
-                o.notify(t);
+            foreach (var v in observers)
+            {
+                Observer<T> w = null;
+                v.TryGetTarget(out w);
+                w?.notify(t);
+            }
         }
     }
 }

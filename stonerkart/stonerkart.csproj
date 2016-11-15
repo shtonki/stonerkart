@@ -71,6 +71,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="src\controller\Clickable.cs" />
     <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />
     <Compile Include="src\model\Card.cs" />
@@ -83,7 +84,6 @@
     <Compile Include="src\view\CardView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="src\view\Clickable.cs" />
     <Compile Include="src\view\ConsolePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -105,6 +105,12 @@
     <Compile Include="src\view\MainMenuPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="src\view\ShiButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="src\view\StickyPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="src\view\TileView.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -114,6 +120,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="src\view\CardsPanel.resx">
+      <DependentUpon>CardsPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\CardView.resx">
       <DependentUpon>CardView.cs</DependentUpon>
@@ -129,6 +138,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\GamePanel.resx">
       <DependentUpon>GamePanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="src\view\MainMenuPanel.resx">
+      <DependentUpon>MainMenuPanel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

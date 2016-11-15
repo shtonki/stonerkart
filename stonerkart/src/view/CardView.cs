@@ -4,9 +4,12 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
+
+
     class CardView : UserControl, Clickable, Observer<CardChangedMessage>
     {
         private PictureBox pictureBox1;
+        private Card card;
         
         public CardView()
         {
@@ -16,14 +19,20 @@ namespace stonerkart
             MouseDown += (_, __) => { Controller.clicked(this); };
         }
 
-        public CardView(Card c) : base()
+        public CardView(Card c) : this()
         {
             c.addObserver(this);
+            card = c;
         }
 
         public void notify(CardChangedMessage t)
         {
             throw new NotImplementedException();
+        }
+
+        public object getStuff()
+        {
+            return card;
         }
 
         private void InitializeComponent()
@@ -54,5 +63,10 @@ namespace stonerkart
             this.ResumeLayout(false);
 
         }
+    }
+
+    struct CardChangedMessage
+    {
+
     }
 }

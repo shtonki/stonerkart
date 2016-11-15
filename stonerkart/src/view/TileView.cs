@@ -22,5 +22,10 @@ namespace stonerkart
         {
             
         }
+
+        public object getStuff()
+        {
+            return tile;
+        }
     }
 }

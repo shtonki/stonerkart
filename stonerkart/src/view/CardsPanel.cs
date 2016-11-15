@@ -11,43 +11,45 @@ namespace stonerkart
         public CardsPanel()
         {
             cardViews = new List<CardView>();
-            
             BackColor = Color.Navy;
             DoubleBuffered = true;
             Resize += (_, __) => layoutCards(); //todo unhack
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        public void setPile(Pile p)
         {
-            base.OnResize(e);
-            layoutCards();
+            p.addObserver(this);
+            foreach (var v in p.cards) addCardView(v);
         }
 
         private void addCardView(Card c)
         {
             CardView cv = new CardView(c);
             cardViews.Add(cv);
-            Controls.Add(cv);
+            this.memeout(() => Controls.Add(cv), true);
         }
 
         private void removeCardView(Card c)
         {
             CardView cv = new CardView(c);
             cardViews.Remove(cv);
-            Controls.Remove(cv);
+            this.memeout(() => Controls.Remove(cv));
         }
 
         private void layoutCards()
         {
-            int cards = cardViews.Count;
-            if (cards == 0) return;
-            int cardWidth = (Size.Width - 0)/cards;
-            int cardHeight = Size.Height - 0;
-
-            for (int i = 0; i < cards; i++)
+            this.memeout(() =>
             {
-                cardViews[i].SetBounds(i*cardWidth, 0, cardWidth, cardHeight);
-            }
+                int cards = cardViews.Count;
+                if (cards == 0) return;
+                int cardWidth = Math.Min(Size.Width/5, (Size.Width - 0)/cards);
+                int cardHeight = Size.Height - 0;
+
+                for (int i = 0; i < cards; i++)
+                {
+                    cardViews[i].SetBounds(i*cardWidth, 0, cardWidth, cardHeight);
+                }
+            });
         }
 
         public void notify(PileChangedMessage t)
@@ -60,6 +62,7 @@ namespace stonerkart
             {
                 removeCardView(t.card);
             }
+            layoutCards();
         }
     }
 }

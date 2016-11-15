@@ -24,6 +24,12 @@ namespace stonerkart
             abcCoord = new ABCCoord(x, y);
         }
 
+        public override string ToString()
+        {
+            return String.Format("Tile at {0} {1}", x, y);
+        }
+
+        #region Coordnonsense
         class XYCoord
         {
             public readonly int x;
@@ -64,5 +70,6 @@ namespace stonerkart
             }
             
         }
+        #endregion
     }
 }

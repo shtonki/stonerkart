@@ -1,47 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
-
 namespace stonerkart
 {
+    
+
     class GameFrame : Form
     {
-        public GamePanel gamePanel { get; private set; }
+        
+
+        public Screen mainMenuPanel { get; private set; }
+        public GamePanel gamePanel;
+
+
+        public Control active;
 
         public GameFrame()
         {
-            InitializeComponent();
+            Size = new Size(1200, 900);
+
+            mainMenuPanel = new MainMenuPanel();
         }
 
-
-        private void InitializeComponent()
+        public void toGame(Game g)
         {
-            this.gamePanel = new stonerkart.GamePanel();
-            this.SuspendLayout();
-            // 
-            // gamePanel1
-            // 
-            this.gamePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gamePanel.BackColor = System.Drawing.Color.Fuchsia;
-            this.gamePanel.Location = new System.Drawing.Point(2, 1);
-            this.gamePanel.Name = "gamePanel1";
-            this.gamePanel.Size = new System.Drawing.Size(597, 413);
-            this.gamePanel.TabIndex = 0;
-            // 
-            // GameFrame
-            // 
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.ClientSize = new System.Drawing.Size(596, 414);
-            this.Controls.Add(this.gamePanel);
-            this.Name = "GameFrame";
-            this.ResumeLayout(false);
-
+            gamePanel = new GamePanel(g);
+            transitionTo(gamePanel);
         }
-        
+
+        public void transitionTo(Screen s)
+        {
+            this.memeout(() =>
+            {
+                if (active != null)
+                {
+                    Controls.Remove(active);
+                }
+                active = (Control)s;
+                active.Dock = DockStyle.Fill;
+                Controls.Add(active);
+            });
+        }
+    }
+
+    interface Screen
+    {
+    }
+
+    public static class xd
+    {
+        public static void memeout(this Control uc, Action a, bool wait = false)
+        {
+            if (uc.InvokeRequired)
+            {
+                uc.Invoke(a);
+            }
+            else
+            {
+                a();
+            }
+        }
     }
 }

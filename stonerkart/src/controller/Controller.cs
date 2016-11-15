@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace stonerkart
@@ -10,24 +13,83 @@ namespace stonerkart
     static class Controller
     {
         private static GameFrame gameFrame;
-        public static void start(Map m)
+        public static void startup()
         {
+            gameFrame = launchUI();
+            gameFrame.transitionTo(gameFrame.mainMenuPanel);
+        }
 
-            G.load(m);
-            gameFrame = new GameFrame();
-            G.unload();
+        public static void newGame()
+        {
+            Game g = new Game(new Map(10, 10, false, false));
+            gameFrame.toGame(g);
+            g.startGame();
+        }
 
-            Application.Run(gameFrame);
+        private static GameFrame launchUI()
+        {
+            GameFrame r = new GameFrame();
+            ManualResetEvent e = new ManualResetEvent(false);
+            EventHandler a = (x, y) => e.Set();
+            r.Load += a;
+            Thread t = new Thread(() => Application.Run(r));
+            t.Start();
+            e.WaitOne();
+            r.Load -= a;
+            return r;
         }
 
         public static void clicked(Clickable c)
         {
-            Console.WriteLine("clicked");
+            if (callerBacker != null && callerBacker.filter.filter(c))
+            {
+                callerBacker.val = c.getStuff();
+                callerBacker.e.Set();
+                return;
+            }
+
+            if (debugFilter.filter(c))
+            {
+                System.Console.WriteLine(c.GetType());
+                System.Console.WriteLine(c.getStuff().GetType());
+                System.Console.WriteLine(c.getStuff());
+                System.Console.WriteLine();
+            }
+            
+        }
+        private static ClickableFilter debugFilter = new ClickableFilter(
+            new Type[] { },
+            new Type[] { }
+            );
+        class CallerBacker
+        {
+            public readonly ClickableFilter filter;
+            public readonly ManualResetEventSlim e;
+            public object val;
+
+            public CallerBacker(ClickableFilter filter)
+            {
+                this.filter = filter;
+                e = new ManualResetEventSlim(false);
+            }
+        }
+
+        private static CallerBacker callerBacker;
+
+        public static object waitFor(ClickableFilter f)
+        {
+            if (callerBacker != null) throw new Exception();
+            callerBacker = new CallerBacker(f);
+            callerBacker.e.Wait();
+            var r = callerBacker.val;
+            callerBacker = null;
+            return r;
         }
 
         public static void redraw()
         {
-            gameFrame?.gamePanel?.hexPanel?.Refresh();
+            var v = gameFrame.gamePanel;
+            v.memeout(v.Refresh);
         }
 
 

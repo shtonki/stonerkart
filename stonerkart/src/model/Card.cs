@@ -11,8 +11,4 @@ namespace stonerkart
         
     }
 
-    struct CardChangedMessage
-    {
-        
-    }
 }

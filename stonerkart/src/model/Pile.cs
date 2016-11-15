@@ -8,7 +8,7 @@ namespace stonerkart
 {
     class Pile : Observable<PileChangedMessage>
     {
-        public IEnumerable<Card> cards => cards;
+        public IEnumerable<Card> cards => cardList;
 
         private List<Card> cardList;
 
