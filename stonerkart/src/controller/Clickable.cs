@@ -11,23 +11,48 @@ namespace stonerkart
         object getStuff();
     }
 
-    class ClickableFilter
+    interface ClickableFilter
+    {
+        bool filter(Clickable c);
+    }
+
+    class Retard : ClickableFilter
+    {
+        public bool filter(Clickable c)
+        {
+            return true;
+        }
+    }
+
+    class SourceFilter : ClickableFilter
+    {
+        private Type clickableType;
+
+        public SourceFilter(Type clickableType)
+        {
+            this.clickableType = clickableType;
+        }
+
+        public bool filter(Clickable c)
+        {
+            return (c.GetType() == clickableType);
+        }
+    }
+
+    class FullFilter : ClickableFilter
     {
         private List<Type> clickableType;
         private List<Type> stuffType;
         private Func<object, bool> f;
+        
 
-        public ClickableFilter()
-        {
-        }
-
-        public ClickableFilter(Type clickableType, Type stuffType)
+        public FullFilter(Type clickableType, Type stuffType)
         {
             if (clickableType != null) this.clickableType = new List<Type>(new Type[] {clickableType});
             if (stuffType != null)     this.stuffType = new List<Type>(new Type[] {stuffType});
         }
 
-        public ClickableFilter(IEnumerable<Type> clickableTypes, IEnumerable<Type> stuffTypes)
+        public FullFilter(IEnumerable<Type> clickableTypes, IEnumerable<Type> stuffTypes)
         {
             this.clickableType = new List<Type>(clickableTypes);
             this.stuffType = new List<Type>(stuffTypes);

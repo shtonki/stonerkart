@@ -10,6 +10,7 @@ namespace stonerkart
     {
         void notify(T t);
     }
+    
 
     abstract class Observable<T>
     {

@@ -24,15 +24,18 @@ namespace stonerkart
                 cardList.Add(c);
                 notify(new PileChangedMessage(true, c));
             }
+            else
+            {
+                throw new Exception();
+            }
 
         }
 
-        public bool remove(Card c)
+        public void remove(Card c)
         {
-            if (!cardList.Contains(c)) return false;
+            if (!cardList.Contains(c)) throw new Exception();
             cardList.Remove(c);
             notify(new PileChangedMessage(false, c));
-            return true;
         }
     }
 

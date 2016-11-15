@@ -71,12 +71,16 @@ namespace stonerkart
                 }
                 indent = !indent;
             }
+
+            Invalidate();
         }
         
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            Controller.clicked(clickToTile(e));
+            var v = clickToTile(e);
+            if (v != null)
+                Controller.clicked(clickToTile(e));
         }
 
         private TileView clickToTile(MouseEventArgs e)
@@ -110,28 +114,40 @@ namespace stonerkart
             }
             return result;
         }
+
         
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
             
-            using (Brush b = new SolidBrush(Color.Firebrick))
-            using (TextureBrush bh = new TextureBrush(G.ResizeImage(Properties.Resources.jordanno, dw, dh)))
             using (Pen pen = new Pen(Color.Black, 4))
             {
                 foreach (var tv in tileViews)
                 {
-                    var x = tv.poly[0].X;
-                    var y = tv.poly[0].Y;
-                    var m = new Matrix();
-                    m.Translate(x+dw*((float)75/78), y+dh*((float)35/51));
-                    bh.Transform = m;
+                    Brush b;
+                    if (tv.tile.image != null)
+                    {
+                        TextureBrush bh = new TextureBrush(G.ResizeImage(Properties.Resources.jordanno, dw, dh));
+                        var x = tv.poly[0].X;
+                        var y = tv.poly[0].Y;
+                        var m = new Matrix();
+                        m.Translate(x + dw * ((float)75 / 78), y + dh * ((float)35 / 51));
+                        bh.Transform = m;
+                        b = bh;
+                    }
+                    else
+                    {
+                        b = new SolidBrush(Color.Firebrick);
+                    }
+
                     g.DrawPolygon(pen, tv.poly);
-                    g.FillPolygon(tv.highlight || true ? bh : b, tv.poly);
+                    g.FillPolygon(b, tv.poly);
                 }
             }
+
         }
 
         public TileView viewOf(Tile t)

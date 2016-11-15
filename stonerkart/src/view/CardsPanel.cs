@@ -13,8 +13,9 @@ namespace stonerkart
             cardViews = new List<CardView>();
             BackColor = Color.Navy;
             DoubleBuffered = true;
-            Resize += (_, __) => layoutCards(); //todo unhack
+            Resize += (_, __) => layoutCards();
         }
+        
 
         public void setPile(Pile p)
         {
@@ -26,13 +27,21 @@ namespace stonerkart
         {
             CardView cv = new CardView(c);
             cardViews.Add(cv);
-            this.memeout(() => Controls.Add(cv), true);
+            this.memeout(() => Controls.Add(cv));
         }
 
         private void removeCardView(Card c)
         {
-            CardView cv = new CardView(c);
-            cardViews.Remove(cv);
+            CardView cv = null;
+            for (int i = 0; i < cardViews.Count; i++)
+            {
+                if (cardViews[i].card == c)
+                {
+                    cv = cardViews[i];
+                    cardViews.RemoveAt(i);
+                    break;
+                }
+            }
             this.memeout(() => Controls.Remove(cv));
         }
 

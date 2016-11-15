@@ -14,6 +14,8 @@ namespace stonerkart
         public int c => abcCoord.c;
         public int ord => map.ord(this);
 
+        public Image image { get; private set; }
+
         private readonly XYCoord xyCoord;
         private readonly ABCCoord abcCoord;
 
@@ -27,6 +29,11 @@ namespace stonerkart
         public override string ToString()
         {
             return String.Format("Tile at {0} {1}", x, y);
+        }
+
+        public void play(Card c)
+        {
+            image = c.image;
         }
 
         #region Coordnonsense

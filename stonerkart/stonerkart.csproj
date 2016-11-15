@@ -81,6 +81,9 @@
     <Compile Include="src\model\Player.cs" />
     <Compile Include="src\model\Tile.cs" />
     <Compile Include="src\Observable.cs" />
+    <Compile Include="src\view\AutoFontTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="src\view\CardView.cs">
       <SubType>UserControl</SubType>
     </Compile>

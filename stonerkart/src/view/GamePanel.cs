@@ -13,8 +13,10 @@ namespace stonerkart
     class GamePanel : StickyPanel, Screen
     {
         private CardsPanel cardsPanel1;
-        private ConsolePanel consolePanel1;
-        private HexPanel hexPanel;
+        public ConsolePanel consolePanel;
+        private Shibbutton shibbutton1;
+        public AutoFontTextBox promtText;
+        public HexPanel hexPanel;
 
         public GamePanel(Game g)
         {
@@ -33,7 +35,9 @@ namespace stonerkart
         {
             this.hexPanel = new stonerkart.HexPanel();
             this.cardsPanel1 = new stonerkart.CardsPanel();
-            this.consolePanel1 = new stonerkart.ConsolePanel();
+            this.consolePanel = new stonerkart.ConsolePanel();
+            this.shibbutton1 = new stonerkart.Shibbutton();
+            this.promtText = new stonerkart.AutoFontTextBox();
             this.SuspendLayout();
             // 
             // hexPanel
@@ -52,17 +56,37 @@ namespace stonerkart
             this.cardsPanel1.Size = new System.Drawing.Size(866, 150);
             this.cardsPanel1.TabIndex = 1;
             // 
-            // consolePanel1
+            // consolePanel
             // 
-            this.consolePanel1.Location = new System.Drawing.Point(911, 3);
-            this.consolePanel1.Name = "consolePanel1";
-            this.consolePanel1.Size = new System.Drawing.Size(172, 507);
-            this.consolePanel1.TabIndex = 2;
+            this.consolePanel.Location = new System.Drawing.Point(911, 3);
+            this.consolePanel.Name = "consolePanel";
+            this.consolePanel.Size = new System.Drawing.Size(172, 507);
+            this.consolePanel.TabIndex = 2;
+            // 
+            // shibbutton1
+            // 
+            this.shibbutton1.Location = new System.Drawing.Point(3, 87);
+            this.shibbutton1.Name = "shibbutton1";
+            this.shibbutton1.Size = new System.Drawing.Size(208, 47);
+            this.shibbutton1.TabIndex = 3;
+            this.shibbutton1.Text = "shibbutton1";
+            this.shibbutton1.UseVisualStyleBackColor = true;
+            // 
+            // promtText
+            // 
+            this.promtText.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
+            this.promtText.Location = new System.Drawing.Point(0, 0);
+            this.promtText.Name = "promtText";
+            this.promtText.Size = new System.Drawing.Size(211, 84);
+            this.promtText.TabIndex = 4;
+            this.promtText.Text = "asd asd asd asd asd asd asd asd asd asd asd asd asd asd asd asd ";
             // 
             // GamePanel
             // 
             this.BackColor = System.Drawing.Color.Fuchsia;
-            this.Controls.Add(this.consolePanel1);
+            this.Controls.Add(this.promtText);
+            this.Controls.Add(this.shibbutton1);
+            this.Controls.Add(this.consolePanel);
             this.Controls.Add(this.cardsPanel1);
             this.Controls.Add(this.hexPanel);
             this.Name = "GamePanel";
