@@ -127,27 +127,43 @@ namespace stonerkart
             {
                 foreach (var tv in tileViews)
                 {
-                    Brush b;
-                    if (tv.tile.image != null)
+                    g.DrawPolygon(pen, tv.poly);
+                    if (tv.tile.card != null)
                     {
+                        Card card = tv.tile.card;
                         TextureBrush bh = new TextureBrush(G.ResizeImage(Properties.Resources.jordanno, dw, dh));
                         var x = tv.poly[0].X;
                         var y = tv.poly[0].Y;
                         var m = new Matrix();
                         m.Translate(x + dw * ((float)75 / 78), y + dh * ((float)35 / 51));
                         bh.Transform = m;
-                        b = bh;
+                        
+                        g.FillPolygon(bh, tv.poly);
+
+                        int b = (int)((tv.poly[3].Y - tv.poly[0].Y)/2);
+                        int a = (int)((tv.poly[2].X - tv.poly[0].X)/4);
+                        Font f = new Font("Ariel Black", (b+a) / 3, FontStyle.Bold);
+                        float vxR = tv.poly[0].X;
+                        float vxL = tv.poly[2].X - a;
+                        float vy = (4*tv.poly[0].Y + 6*tv.poly[3].Y)/10;
+                        float vxM = tv.poly[4].X - a/2;
+                        float vyB = tv.poly[4].Y - b;
+
+                        g.FillEllipse(Brushes.Crimson, vxR, vy, a, b);
+                        g.DrawString(card.power.ToString(), f, Brushes.Black, vxR+1, vy+1);
+
+                        g.FillEllipse(Brushes.LightSeaGreen, vxL, vy, a, b);
+                        g.DrawString(card.toughness.ToString(), f, Brushes.Black, vxL + 1, vy + 1);
+                        
+                        g.FillEllipse(Brushes.LightGray, vxM, vyB, a, b);
+                        g.DrawString(card.movement.ToString(), f, Brushes.Black, vxM + 1, vyB + 1);
                     }
                     else
                     {
-                        b = new SolidBrush(Color.Firebrick);
+                        g.FillPolygon(Brushes.Firebrick, tv.poly);
                     }
-
-                    g.DrawPolygon(pen, tv.poly);
-                    g.FillPolygon(b, tv.poly);
                 }
             }
-
         }
 
         public TileView viewOf(Tile t)

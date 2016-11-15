@@ -14,7 +14,7 @@ namespace stonerkart
         public int c => abcCoord.c;
         public int ord => map.ord(this);
 
-        public Image image { get; private set; }
+        public Card card { get; private set; }
 
         private readonly XYCoord xyCoord;
         private readonly ABCCoord abcCoord;
@@ -33,7 +33,7 @@ namespace stonerkart
 
         public void play(Card c)
         {
-            image = c.image;
+            card = c;
         }
 
         #region Coordnonsense

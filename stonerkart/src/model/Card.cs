@@ -13,10 +13,16 @@ namespace stonerkart
         public Image image { get; }
         public Pile pile { get; private set; }
 
+        public int power;
+        public int toughness;
+        public int movement;
+
         public Card()
         {
             name = "Kappa Pride";
             image = Properties.Resources.jordanno;
+            power = toughness = 1;
+            movement = 2;
         }
 
         public void moveTo(Pile p)
