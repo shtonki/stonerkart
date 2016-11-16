@@ -43,7 +43,7 @@ namespace stonerkart
             throw new NotImplementedException();
         }
 
-        public object getStuff()
+        public Stuff getStuff()
         {
             return card;
         }

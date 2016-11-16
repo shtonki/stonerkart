@@ -14,8 +14,11 @@ namespace stonerkart
     {
         private CardsPanel cardsPanel1;
         public ConsolePanel consolePanel;
-        private Shibbutton shibbutton1;
         public AutoFontTextBox promtText;
+        public Shibbutton shibbutton2;
+        public Shibbutton shibbutton3;
+        public Shibbutton shibbutton4;
+        public Shibbutton shibbutton5;
         public HexPanel hexPanel;
 
         public GamePanel(Game g)
@@ -23,21 +26,23 @@ namespace stonerkart
             InitializeComponent();
             if (g == null) return;
             hexPanel.setMap(g.map);
-            cardsPanel1.setPile(g.test);
+            cardsPanel1.setPile(g.hero.hand);
         }
 
         public GamePanel() : this(null)
         {
         }
 
-
         private void InitializeComponent()
         {
             this.hexPanel = new stonerkart.HexPanel();
             this.cardsPanel1 = new stonerkart.CardsPanel();
             this.consolePanel = new stonerkart.ConsolePanel();
-            this.shibbutton1 = new stonerkart.Shibbutton();
             this.promtText = new stonerkart.AutoFontTextBox();
+            this.shibbutton2 = new stonerkart.Shibbutton();
+            this.shibbutton3 = new stonerkart.Shibbutton();
+            this.shibbutton4 = new stonerkart.Shibbutton();
+            this.shibbutton5 = new stonerkart.Shibbutton();
             this.SuspendLayout();
             // 
             // hexPanel
@@ -63,29 +68,61 @@ namespace stonerkart
             this.consolePanel.Size = new System.Drawing.Size(172, 507);
             this.consolePanel.TabIndex = 2;
             // 
-            // shibbutton1
-            // 
-            this.shibbutton1.Location = new System.Drawing.Point(3, 87);
-            this.shibbutton1.Name = "shibbutton1";
-            this.shibbutton1.Size = new System.Drawing.Size(208, 47);
-            this.shibbutton1.TabIndex = 3;
-            this.shibbutton1.Text = "shibbutton1";
-            this.shibbutton1.UseVisualStyleBackColor = true;
-            // 
             // promtText
             // 
+            this.promtText.BackColor = System.Drawing.Color.Transparent;
             this.promtText.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
-            this.promtText.Location = new System.Drawing.Point(0, 0);
+            this.promtText.Location = new System.Drawing.Point(3, 6);
             this.promtText.Name = "promtText";
+            this.promtText.Opacity = 100;
             this.promtText.Size = new System.Drawing.Size(211, 84);
             this.promtText.TabIndex = 4;
             this.promtText.Text = "asd asd asd asd asd asd asd asd asd asd asd asd asd asd asd asd ";
             // 
+            // shibbutton2
+            // 
+            this.shibbutton2.Location = new System.Drawing.Point(3, 96);
+            this.shibbutton2.Name = "shibbutton2";
+            this.shibbutton2.Size = new System.Drawing.Size(105, 34);
+            this.shibbutton2.TabIndex = 5;
+            this.shibbutton2.Text = "shibbutton2";
+            this.shibbutton2.UseVisualStyleBackColor = true;
+            // 
+            // shibbutton3
+            // 
+            this.shibbutton3.Location = new System.Drawing.Point(109, 96);
+            this.shibbutton3.Name = "shibbutton3";
+            this.shibbutton3.Size = new System.Drawing.Size(105, 34);
+            this.shibbutton3.TabIndex = 6;
+            this.shibbutton3.Text = "shibbutton3";
+            this.shibbutton3.UseVisualStyleBackColor = true;
+            // 
+            // shibbutton4
+            // 
+            this.shibbutton4.Location = new System.Drawing.Point(3, 136);
+            this.shibbutton4.Name = "shibbutton4";
+            this.shibbutton4.Size = new System.Drawing.Size(105, 34);
+            this.shibbutton4.TabIndex = 8;
+            this.shibbutton4.Text = "shibbutton4";
+            this.shibbutton4.UseVisualStyleBackColor = true;
+            // 
+            // shibbutton5
+            // 
+            this.shibbutton5.Location = new System.Drawing.Point(109, 136);
+            this.shibbutton5.Name = "shibbutton5";
+            this.shibbutton5.Size = new System.Drawing.Size(102, 34);
+            this.shibbutton5.TabIndex = 7;
+            this.shibbutton5.Text = "shibbutton5";
+            this.shibbutton5.UseVisualStyleBackColor = true;
+            // 
             // GamePanel
             // 
             this.BackColor = System.Drawing.Color.Fuchsia;
+            this.Controls.Add(this.shibbutton4);
+            this.Controls.Add(this.shibbutton5);
+            this.Controls.Add(this.shibbutton3);
+            this.Controls.Add(this.shibbutton2);
             this.Controls.Add(this.promtText);
-            this.Controls.Add(this.shibbutton1);
             this.Controls.Add(this.consolePanel);
             this.Controls.Add(this.cardsPanel1);
             this.Controls.Add(this.hexPanel);
@@ -94,6 +131,5 @@ namespace stonerkart
             this.ResumeLayout(false);
 
         }
-        
     }
 }

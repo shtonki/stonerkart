@@ -13,6 +13,9 @@ namespace stonerkart
     static class Controller
     {
         private static GameFrame gameFrame;
+
+        private static HexPanel hexPanel => gameFrame.gamePanel.hexPanel;
+
         public static void startup()
         {
             gameFrame = launchUI();
@@ -21,10 +24,11 @@ namespace stonerkart
 
         public static void newGame()
         {
-            Game g = new Game(new Map(11, 12, false, false));
+            Game g = new Game(new Map(21, 13, false, false));
             gameFrame.toGame(g);
             g.startGame();
         }
+
 
         private static GameFrame launchUI()
         {
@@ -39,65 +43,116 @@ namespace stonerkart
             return r;
         }
 
-        public static void setPromt(string s)
+        public static void setPrompt(string s, params string[] ss)
         {
-            var v = gameFrame.gamePanel.promtText;
-            v.memeout(() => v.Text = s);
+            gameFrame.setPrompt(s, ss);
         }
+
+        public static void mouseEntered(TileView tv)
+        {
+            /*
+            if (highlightColor == null) return;
+            if (hled.Count == 1 && hled[0] == tv) return;
+            clearHighlights();
+            if (tv != null)
+            {
+                highlight(tv, highlightColor.Value);
+            }
+            redraw();
+            */
+        }
+
 
         public static void clicked(Clickable c)
         {
-            if (callerBacker != null && callerBacker.filter.filter(c))
+            var stuff = c.getStuff();
+            InputEvent e = new InputEvent(c, stuff);
+            if (filter != null && filter.filter(e))
             {
-                callerBacker.val = c.getStuff();
-                callerBacker.source = c;
-                callerBacker.e.Set();
+                s = stuff;
+                callerBacker.Set();
             }
-
-            System.Console.WriteLine(c.GetType());
-            System.Console.WriteLine(c.getStuff().GetType());
-            System.Console.WriteLine(c.getStuff());
-            System.Console.WriteLine();
-        }
-
-        public class CallerBacker
-        {
-            public readonly ClickableFilter filter;
-            public readonly ManualResetEventSlim e;
-            public object val;
-            public Clickable source;
-
-            public CallerBacker(ClickableFilter filter)
+            if (c is TileView)
             {
-                this.filter = filter;
-                e = new ManualResetEventSlim(false);
+                Tile t = (Tile)stuff;
             }
         }
+    
+        private static ManualResetEventSlim callerBacker;
+        private static InputEventFilter filter;
+        private static Stuff s;
 
-        private static CallerBacker callerBacker;
-
-        public static CallerBacker waitFor(ClickableFilter f)
+        public static Stuff waitForButtonOr<T>() where T : Stuff
         {
-            if (callerBacker != null) throw new Exception();
-            callerBacker = new CallerBacker(f);
-            callerBacker.e.Wait();
-            var r = callerBacker;
+            InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton ||o is T);
+            return waitFor(f);
+        }
+
+        public static T waitFor<T>() where T : Stuff
+        {
+            InputEventFilter f = new InputEventFilter((clickable, o) => o is T);
+            return (T)waitFor(f);
+        }
+
+        private static Stuff waitFor(InputEventFilter f)
+        {
+            if (callerBacker != null || filter != null) throw new Exception();
+            callerBacker = new ManualResetEventSlim();
+            filter = f;
+            callerBacker.Wait();
+            var r = s;
+            s = null;
             callerBacker = null;
+            filter = null;
             return r;
+        }
+
+        private static List<TileView> hled = new List<TileView>();
+        public static Color? highlightColor;
+
+        public static void clearHighlights(bool rd = true)
+        {
+            foreach (var v in hled) v.color = Color.Firebrick;
+            hled.Clear();
+            if (rd) redraw();
+        }
+
+        private static void highlight(TileView tv, Color c)
+        {
+            tv.color = c;
+            hled.Add(tv);
+        }
+
+        private static void highlight(Color c, params Tile[] tvs)
+        {
+            highlight(tvs.Select(v => new Tuple<Color, Tile>(c, v)));
+        }
+
+        public static void highlight(IEnumerable<Tuple<Color, Tile>> l, bool rd = true)
+        {
+            foreach (var v in l)
+            {
+                highlight(hexPanel.viewOf(v.Item2), v.Item1);
+            }
+            if (rd) redraw();
         }
 
         public static void redraw()
         {
             Control v = gameFrame.gamePanel;
-            v.memeout(v.Refresh);
+            //v.memeout(v.Refresh);
             v = gameFrame.gamePanel.hexPanel;
             v.memeout(v.Invalidate);
         }
 
-
         public static void print(string s)
         {
             gameFrame?.gamePanel?.consolePanel?.print(s);
+        }
+
+        private static TileView getView(Tile t)
+        {
+            return gameFrame.gamePanel.hexPanel.viewOf(t);
         }
     }
 }

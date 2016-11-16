@@ -1,4 +1,6 @@
-﻿start
+﻿if we lose inputs it's because we don't buffer inputevents
+
+start
 draw
 main1
 move

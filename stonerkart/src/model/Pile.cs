@@ -31,6 +31,15 @@ namespace stonerkart
 
         }
 
+        public Card draw()
+        {
+            int c = cardList.Count;
+            if (c == 0) throw new Exception();
+            Card r = cardList[c - 1];
+            cardList.RemoveAt(c - 1);
+            return r;
+        }
+
         public void remove(Card c)
         {
             if (!cardList.Contains(c)) throw new Exception();

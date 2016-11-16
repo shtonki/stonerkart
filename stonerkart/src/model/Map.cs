@@ -47,11 +47,11 @@ namespace stonerkart
         
         public Tile[] this[int r] => rows[r];
 
-        private Tile getFromABC(int a, int b, int c)
+        public Tile tileAt(int a, int b, int c)
         {
-            var v = ABCtoXY(a, b, c);
-            int x = v.Item1;
-            int y = v.Item2;
+            if (a + b + c != 0) throw new Exception();
+            int y = c;
+            int x = a + c / 2;
             if (y < 0 || y >= height || x < 0 || x >= rows[y].Length) return null;
             return rows[y][x];
         }
@@ -62,6 +62,11 @@ namespace stonerkart
             int x = a + c/2;
             return Tuple.Create<int, int>(x, y);
         }
+
+        public Tuple<Tile, int>[] within()
+        {
+            return null;
+        } 
 
         public int paddingAt(int r)
         {
@@ -81,18 +86,7 @@ namespace stonerkart
             return tiles[p];
         }
 
-        public Tile[] neighboursOf(Tile t)
-        {
-            Tile[] ts = new Tile[6];
-            ts[0] = getFromABC(t.a, t.b - 1, t.c + 1);
-            ts[1] = getFromABC(t.a + 1, t.b, t.c - 1);
-            ts[2] = getFromABC(t.a + 1, t.b - 1, t.c);
-            ts[3] = getFromABC(t.a, t.b + 1, t.c - 1);
-            ts[4] = getFromABC(t.a - 1, t.b, t.c + 1);
-            ts[5] = getFromABC(t.a - 1, t.b + 1, t.c);
-            return ts;
-        }
-
+        
         public int ord(Tile t)
         {
             return t.x + t.y*width + t.y/2*gpr;

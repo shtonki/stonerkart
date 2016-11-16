@@ -19,9 +19,19 @@ namespace stonerkart
             this.f = f;
         }
 
-        public object getStuff()
+        public Stuff getStuff()
         {
-            return hackEx();
+            return new ShibbuttonStuff(Text);
+        }
+    }
+
+    class ShibbuttonStuff : Stuff
+    {
+        public string text { get; }
+
+        public ShibbuttonStuff(string text)
+        {
+            this.text = text;
         }
     }
 }

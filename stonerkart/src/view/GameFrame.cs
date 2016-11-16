@@ -25,6 +25,33 @@ namespace stonerkart
             mainMenuPanel = new MainMenuPanel();
         }
 
+        public void setPrompt(string message, string[] buttons)
+        {
+            this.memeout(() =>
+            {
+                gamePanel.promtText.Text = message;
+                Shibbutton[] bs = new[] {
+                    gamePanel.shibbutton2,
+                    gamePanel.shibbutton3,
+                    gamePanel.shibbutton4,
+                    gamePanel.shibbutton5,
+                };
+                for (int i = 0; i < bs.Length; i++)
+                {
+                    if (buttons.Length > i)
+                    {
+                        bs[i].Visible = true;
+                        bs[i].Text = buttons[i];
+                    }
+                    else
+                    {
+                        bs[i].Visible = false;
+                    }
+                }
+                gamePanel.Invalidate();
+            });
+        }
+
         public void toGame(Game g)
         {
             gamePanel = new GamePanel(g);

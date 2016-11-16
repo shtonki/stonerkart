@@ -11,19 +11,15 @@ namespace stonerkart
         public int x => tile.x;
         public int y => tile.y;
 
-        public bool highlight { get; set; }
+        public Color color { get; set; }
 
         public TileView(Tile tile)
         {
             this.tile = tile;
+            color = Color.Firebrick;
         }
 
-        public void update(Tile t)
-        {
-            
-        }
-
-        public object getStuff()
+        public Stuff getStuff()
         {
             return tile;
         }

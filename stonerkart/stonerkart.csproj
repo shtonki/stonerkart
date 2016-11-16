@@ -40,6 +40,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -74,6 +75,8 @@
     <Compile Include="src\controller\Clickable.cs" />
     <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />
+    <Compile Include="src\controller\GameEvent.cs" />
+    <Compile Include="src\controller\InputEvent.cs" />
     <Compile Include="src\model\Card.cs" />
     <Compile Include="src\model\Game.cs" />
     <Compile Include="src\model\Map.cs" />
