@@ -20,7 +20,7 @@ namespace stonerkart
         public void setPile(Pile p)
         {
             p.addObserver(this);
-            foreach (var v in p.cards) addCardView(v);
+            foreach (var v in p) addCardView(v);
         }
 
         private void addCardView(Card c)

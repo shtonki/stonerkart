@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class Pile : Observable<PileChangedMessage>
+    class Pile : Observable<PileChangedMessage>, IEnumerable<Card>
     {
-        public IEnumerable<Card> cards => cardList;
-
         private List<Card> cardList;
 
         public Pile()
@@ -45,6 +44,16 @@ namespace stonerkart
             if (!cardList.Contains(c)) throw new Exception();
             cardList.Remove(c);
             notify(new PileChangedMessage(false, c));
+        }
+
+        public IEnumerator<Card> GetEnumerator()
+        {
+            return cardList.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 

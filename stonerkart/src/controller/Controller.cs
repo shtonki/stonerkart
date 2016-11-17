@@ -29,6 +29,21 @@ namespace stonerkart
             g.startGame();
         }
 
+        public static void addArrow(Tile from, Tile to)
+        {
+            hexPanel.ts.Add(new Tuple<TileView, TileView>(hexPanel.viewOf(from), hexPanel.viewOf(to)));
+        }
+
+        public static void removeArrow(Tile from, Tile to)
+        {
+            hexPanel.ts.Remove(hexPanel.ts.First(tuple => tuple.Item1.tile == from));
+        }
+
+        public static void clearArrows()
+        {
+            hexPanel.ts.Clear();
+            redraw();
+        }
 
         private static GameFrame launchUI()
         {

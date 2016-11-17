@@ -14,6 +14,8 @@ namespace stonerkart
         public Pile pile { get; private set; }
         public Tile tile { get; set; }
 
+        public Tile path;
+
         public int power;
         public int toughness;
         public int baseMovement;
@@ -22,22 +24,23 @@ namespace stonerkart
         public Card(CardTemplate ct)
         {
             name = ct.ToString();
+            power = toughness = 1;
+            baseMovement = 2;
 
             switch (ct)
             {
                 case CardTemplate.Hero:
                 {
                     image = Properties.Resources.pepeman;
+                    baseMovement = 1;
                 } break;
 
                 case CardTemplate.Jordan:
                 {
                     image = Properties.Resources.jordanno;
+                    baseMovement = 2;
                 } break;
             }
-
-            power = toughness = 1;
-            baseMovement = 2;
         }
 
         public void moveTo(Pile p)

@@ -172,7 +172,7 @@ namespace stonerkart
                         g.DrawString(card.toughness.ToString().PadLeft(2), f, Brushes.Black, vxL + xp, vy + yp);
                         
                         g.FillEllipse(Brushes.LightGray, vxM, vyB, a, b);
-                        g.DrawString(card.baseMovement.ToString().PadLeft(2),  f, Brushes.Black, vxM + xp, vyB + yp);
+                        g.DrawString(card.movement.ToString().PadLeft(2),  f, Brushes.Black, vxM + xp, vyB + yp);
                     }
                     else
                     {
@@ -180,8 +180,16 @@ namespace stonerkart
                             g.FillPolygon(b, tv.poly);
                     }
                 }
+                foreach (var t in ts)
+                {
+                    TileView from = t.Item1;
+                    TileView to = t.Item2;
+                    g.DrawLine(new Pen(Color.ForestGreen, 4), from.centre, to.centre);
+                }
             }
         }
+
+        public List<Tuple<TileView, TileView>> ts { get; private set; } = new List<Tuple<TileView, TileView>>();
 
         public TileView viewOf(Tile t)
         {
