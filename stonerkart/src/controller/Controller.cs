@@ -82,9 +82,15 @@ namespace stonerkart
         private static InputEventFilter filter;
         private static Stuff s;
 
+        public static Stuff waitForButtonOr<T>(Func<T, bool> fn) where T : Stuff
+        {
+            InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || (o is T && fn((T)o)));
+            return waitFor(f);
+        }
+
         public static Stuff waitForButtonOr<T>() where T : Stuff
         {
-            InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton ||o is T);
+            InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || o is T);
             return waitFor(f);
         }
 

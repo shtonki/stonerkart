@@ -101,27 +101,18 @@ namespace stonerkart
                     Tile from = (Tile)v;
                     if (from.card != null)
                     {
-                        var ns = from.withinDistance(2);
+                        var ns = from.withinDistance(4, 3);
                         Controller.highlight(ns.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
                         Controller.setPrompt("Move to what tile?");
-                        Tile moveTo = null;
-                        while (true)
+                        var o = Controller.waitForButtonOr<Tile>(tile => (tile.card == null || tile == from) && ns.Contains(tile));
+                        if (o is ShibbuttonStuff)
                         {
-                            var o = Controller.waitForButtonOr<Tile>();
-                            if (o is ShibbuttonStuff)
-                            {
-                                break;
-                            }
-                            Tile to = (Tile)o;
-                            if (to.card == null && ns.Contains(to))
-                            {
-                                moveTo = to;
-                                break;
-                            }
+                            break;
                         }
-                        if (moveTo != null)
+                        Tile to = (Tile)o;
+                        if (to != from)
                         {
-                            moveTo.place(from.removeCard());
+                            to.place(from.removeCard());
                         }
                         Controller.setPrompt("");
                         Controller.clearHighlights();
