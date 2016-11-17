@@ -19,10 +19,23 @@ namespace stonerkart
         public int baseMovement;
         public int movement;
 
-        public Card()
+        public Card(CardTemplate ct)
         {
-            name = "Kappa Pride";
-            image = Properties.Resources.jordanno;
+            name = ct.ToString();
+
+            switch (ct)
+            {
+                case CardTemplate.Hero:
+                {
+                    image = Properties.Resources.pepeman;
+                } break;
+
+                case CardTemplate.Jordan:
+                {
+                    image = Properties.Resources.jordanno;
+                } break;
+            }
+
             power = toughness = 1;
             baseMovement = 2;
         }
@@ -38,5 +51,17 @@ namespace stonerkart
         {
             
         }
+    }
+
+    enum CardTemplate
+    {
+        Hero,
+        Jordan,
+    }
+
+    enum CardType
+    {
+        Hero,
+        Creature,
     }
 }

@@ -145,7 +145,7 @@ namespace stonerkart
                     if (tv.tile.card != null)
                     {
                         Card card = tv.tile.card;
-                        TextureBrush bh = new TextureBrush(G.ResizeImage(Properties.Resources.jordanno, dw, dh));
+                        TextureBrush bh = new TextureBrush(G.ResizeImage(card.image, dw, dh));
                         var x = tv.poly[0].X;
                         var y = tv.poly[0].Y;
                         var m = new Matrix();

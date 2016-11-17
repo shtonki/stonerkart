@@ -19,7 +19,8 @@ namespace stonerkart
         public Game(Map map)
         {
             this.map = map;
-            hero = new Player();
+            Card herpo = new Card(CardTemplate.Hero);
+            hero = new Player(herpo);
 
             geFilters.Add(new GameEventHandler<DrawEvent>(
                 (de) => de.player.deck.draw().moveTo(de.player.hand)
@@ -40,8 +41,15 @@ namespace stonerkart
             t.Start();
         }
 
+        private void init()
+        {
+            map.tileAt(4, 4).place(hero.heroCard);
+        }
+
         private void loopEx()
         {
+            init();
+
             while (true)
             {
                 gameLoop();
@@ -71,12 +79,15 @@ namespace stonerkart
                 if (v is Card)
                 {
                     Controller.setPrompt("Play to what tile?");
-                    var o = Controller.waitForButtonOr<Tile>();
+                    var ns = hero.heroCard.tile.withinDistance(2);
+                    Controller.highlight(ns.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
+                    var o = Controller.waitForButtonOr<Tile>(tile => tile.card == null && ns.Contains(tile));
                     Tile t = (Tile)o;
                     Card c = (Card)v;
                     c.moveTo(hero.field);
                     t.place((Card)v);
                     Controller.setPrompt("");
+                    Controller.clearHighlights();
                 }
                 else
                 {
@@ -101,7 +112,7 @@ namespace stonerkart
                     Tile from = (Tile)v;
                     if (from.card != null)
                     {
-                        var ns = from.withinDistance(4, 3);
+                        var ns = from.withinDistance(from.card.movement, 0);
                         Controller.highlight(ns.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
                         Controller.setPrompt("Move to what tile?");
                         var o = Controller.waitForButtonOr<Tile>(tile => (tile.card == null || tile == from) && ns.Contains(tile));

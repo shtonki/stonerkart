@@ -111,6 +111,9 @@
     <Compile Include="src\view\MainMenuPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="src\view\MapEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="src\view\ShiButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -148,6 +151,9 @@
     <EmbeddedResource Include="src\view\MainMenuPanel.resx">
       <DependentUpon>MainMenuPanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="src\view\MapEditor.resx">
+      <DependentUpon>MapEditor.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="codemap.dgml" />
@@ -165,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="musings.txt" />
+    <None Include="Resources\1473797210360.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
