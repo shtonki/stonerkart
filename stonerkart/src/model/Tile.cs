@@ -30,7 +30,7 @@ namespace stonerkart
 
         public override string ToString()
         {
-            return String.Format("Tile containing {0}",card == null ? "nothing" : card.ToString());
+            return x + " " + y;
         }
 
         public void place(Card c)

@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 
-
 namespace stonerkart
 {
     class Game
@@ -115,18 +114,13 @@ namespace stonerkart
 
         private void moveStep()
         {
-            List<List<Tile>> paths = new List<List<Tile>>();
+            List<Path> paths = new List<Path>();
             while (true)
             {
                 var from = getTile(tile => tile.card != null && tile.card.movement > 0, "Move your cards nigra");
                 if (from == null) break;
 
                 Card card = from.card;
-                var options = from.withinDistance(card.movement, 1).Where(possibleDestination => 
-                  possibleDestination.card == null && 
-                  (card.path?.Last() == possibleDestination || paths.Count(l => l.Last() == possibleDestination) == 0) &&
-                  map.path(from, possibleDestination).Count - 1 <= card.movement
-                ).ToArray();
 
                 if (card.path != null)
                 {
@@ -135,14 +129,20 @@ namespace stonerkart
                     card.path = null;
                 }
 
-                Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
-                var to = getTile(tile => tile == from || (tile.card == null && options.Contains(tile)), "Move to where?");
+                var options = map.dijkstra(from).Where(t =>
+                    t.length <= card.movement &&
+                    t.to.card == null &&
+                    !paths.Select(p => p.to).Contains(t.to)
+                    ).ToList();
+
+                Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.to)));
+                var to = getTile(tile => tile == from || (tile.card == null && options.Select(p => p.to).Contains(tile)), "Move to where?");
                 Controller.clearHighlights();
                 if (to == null) break;
                 
                 if (to != from)
                 {
-                    var path = map.path(from, to);
+                    var path = options.First(p => p.to == to);
                     Controller.addArrow(path);
                     card.path = path;
                     paths.Add(path);
@@ -155,7 +155,7 @@ namespace stonerkart
             {
                 if (c.path != null)
                 {
-                    raiseEvent(new MoveEvent(c, c.path.Last()));
+                    raiseEvent(new MoveEvent(c, c.path.to));
                     c.path = null;
                 }
             }

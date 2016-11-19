@@ -86,32 +86,32 @@ namespace stonerkart
             return tiles[p];
         }
 
-        
-
-        public List<Tile> path(Tile startTile, Tile endTile)
+        public Path path(Tile startTile, Tile endTile)
         {
-            if (startTile == endTile)
-            {
-                return new List<Tile>(new[] {startTile});
-            }
+            List<Path> v = dijkstra(startTile);
+            return v.First(t => t.to == endTile);
+        }
+
+        public List<Path> dijkstra(Tile startTile)
+        {
             Dictionary<Tile,Tuple<int, Tile>> dict = new Dictionary<Tile, Tuple<int, Tile>>();
             List<Tile> Q = new List<Tile>();
 
             foreach (Tile t in tiles)
             {
                 Q.Add(t);
-                dict[t] = Tuple.Create<int, Tile>(Int32.MaxValue, null);
+                dict[t] = Tuple.Create<int, Tile>(Int32.MaxValue/2, null);
             }
             dict[startTile] = Tuple.Create<int, Tile>(0, null);
 
-            while (dict[endTile].Item2 == null)
+            while (Q.Count > 0)
             {
                 Tile u = null;
-                int w = Int32.MaxValue;
+                int w = Int32.MaxValue/2;
 
                 foreach (Tile t in Q)
                 {
-                    if (dict[t].Item1 < w)
+                    if (dict[t].Item1 <= w)
                     {
                         w = dict[t].Item1;
                         u = t;
@@ -126,20 +126,47 @@ namespace stonerkart
                 Q.Remove(u);
             }
 
-            List<Tile> r = new List<Tile>();
-            Tile c = endTile;
-            while (c != null)
+            var r = new List<Path>();
+
+            foreach (KeyValuePair<Tile, Tuple<int, Tile>> v in dict)
             {
-                r.Add(c);
-                c = dict[c].Item2;
+                List<Tile> l = new List<Tile>();
+                Tile c = v.Key;
+                while (c != null)
+                {
+                    l.Add(c);
+                    c = dict[c].Item2;
+                }
+                l.Reverse();
+                r.Add(new Path(l, v.Value.Item1));
             }
-            r.Reverse();
             return r;
         }
 
         public int ord(Tile t)
         {
             return t.x + t.y*width + t.y/2*gpr;
+        }
+    }
+
+    class Path
+    {
+        public readonly int length;
+        public Tile from => tiles[0];
+        public Tile to => tiles[tiles.Count() - 1];
+        private readonly List<Tile> tiles;
+
+        public Path(List<Tile> tiles, int length)
+        {
+            if (tiles == null || tiles.Count == 0) throw new Exception();
+            if (length < 0) throw new Exception();
+            this.tiles = tiles;
+            this.length = length;
+        }
+
+        public static implicit operator List<Tile>(Path p)
+        {
+            return p.tiles;
         }
     }
 }
