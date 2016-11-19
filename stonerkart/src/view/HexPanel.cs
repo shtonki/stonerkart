@@ -145,7 +145,7 @@ namespace stonerkart
                     if (tv.tile.card != null)
                     {
                         Card card = tv.tile.card;
-                        TextureBrush bh = new TextureBrush(G.ResizeImage(card.image, dw, dh));
+                        TextureBrush bh = new TextureBrush(Shiva.ResizeImage(card.image, dw, dh));
                         var x = tv.poly[0].X;
                         var y = tv.poly[0].Y;
                         var m = new Matrix();
@@ -182,14 +182,17 @@ namespace stonerkart
                 }
                 foreach (var t in ts)
                 {
-                    TileView from = t.Item1;
-                    TileView to = t.Item2;
-                    g.DrawLine(new Pen(Color.ForestGreen, 4), from.centre, to.centre);
+                    for (int i = 0; i < t.Count - 1; i++)
+                    {
+                        TileView from = viewOf(t[i]);
+                        TileView to = viewOf(t[i+1]);
+                        g.DrawLine(new Pen(Color.ForestGreen, 4), from.centre, to.centre);
+                    }
                 }
             }
         }
 
-        public List<Tuple<TileView, TileView>> ts { get; private set; } = new List<Tuple<TileView, TileView>>();
+        public List<List<Tile>> ts { get; } = new List<List<Tile>>();
 
         public TileView viewOf(Tile t)
         {

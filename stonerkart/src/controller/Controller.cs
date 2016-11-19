@@ -29,14 +29,14 @@ namespace stonerkart
             g.startGame();
         }
 
-        public static void addArrow(Tile from, Tile to)
+        public static void addArrow(List<Tile> l)
         {
-            hexPanel.ts.Add(new Tuple<TileView, TileView>(hexPanel.viewOf(from), hexPanel.viewOf(to)));
+            hexPanel.ts.Add(l);
         }
 
-        public static void removeArrow(Tile from, Tile to)
+        public static void removeArrow(List<Tile> l)
         {
-            hexPanel.ts.Remove(hexPanel.ts.First(tuple => tuple.Item1.tile == from));
+            hexPanel.ts.Remove(l);
         }
 
         public static void clearArrows()
@@ -65,16 +65,6 @@ namespace stonerkart
 
         public static void mouseEntered(TileView tv)
         {
-            /*
-            if (highlightColor == null) return;
-            if (hled.Count == 1 && hled[0] == tv) return;
-            clearHighlights();
-            if (tv != null)
-            {
-                highlight(tv, highlightColor.Value);
-            }
-            redraw();
-            */
         }
 
 

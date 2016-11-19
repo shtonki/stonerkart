@@ -13,34 +13,57 @@ namespace stonerkart
         public Image image { get; }
         public Pile pile { get; private set; }
         public Tile tile { get; set; }
+        public List<Tile> path { get; set; }
 
-        public Tile path;
+        public readonly Modifiable<int> power;
+        public readonly Modifiable<int> toughness;
+        public readonly Modifiable<int> movement;
 
-        public int power;
-        public int toughness;
-        public int baseMovement;
-        public int movement;
+        private Modifiable[] ms;
 
         public Card(CardTemplate ct)
         {
             name = ct.ToString();
-            power = toughness = 1;
-            baseMovement = 2;
 
+            int basePower;
+            int baseToughness;
+            int baseMovement;
+
+            #region oophell
             switch (ct)
             {
                 case CardTemplate.Hero:
                 {
                     image = Properties.Resources.pepeman;
                     baseMovement = 1;
+                    basePower = 1;
+                    baseToughness = 10;
                 } break;
 
                 case CardTemplate.Jordan:
                 {
                     image = Properties.Resources.jordanno;
                     baseMovement = 2;
+                    basePower = 1;
+                    baseToughness = 2;
                 } break;
+
+                default:
+                    throw new Exception();
             }
+
+            #endregion
+
+            power = new Modifiable<int>(basePower);
+            toughness = new Modifiable<int>(baseToughness);
+            movement = new Modifiable<int>(baseMovement);
+
+            ms = new Modifiable[]
+            {
+                power,
+                toughness,
+                movement,
+            };
         }
 
         public void moveTo(Pile p)
@@ -50,9 +73,12 @@ namespace stonerkart
             p.add(this);
         }
 
-        public void walkTo(Tile t)
+        public void reherp(GameEvent e)
         {
-            
+            foreach (var v in ms)
+            {
+                v.check(e);
+            }
         }
     }
 

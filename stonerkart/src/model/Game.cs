@@ -13,11 +13,12 @@ namespace stonerkart
     {
         public readonly Map map;
         public readonly Player hero;
-        public readonly Player villain;
 
         public Player activePlayer => hero;
 
         private List<GameEventHandler> geFilters = new List<GameEventHandler>();
+
+        private IEnumerable<Card> herpable => hero.field;
 
         public Game(Map map)
         {
@@ -35,6 +36,11 @@ namespace stonerkart
             foreach (var v in geFilters)
             {
                 v.handle(e);
+            }
+
+            foreach (var v in herpable)
+            {
+                v.reherp(e);
             }
         }
 
@@ -62,15 +68,24 @@ namespace stonerkart
 
         private void gameLoop()
         {
+            untapStep();
+            drawStep();
+            mainStep();
+            moveStep();
+        }
 
-            upkeepStep();
+        private void untapStep()
+        {
+            raiseEvent(new StartOfStepEvent(Steps.Untap));
+        }
 
-            #region draw
+        private void drawStep()
+        {
             raiseEvent(new DrawEvent(hero, 1));
-            #endregion
+        }
 
-            #region main1
-
+        private void mainStep()
+        {
             while (true)
             {
                 Controller.setPrompt("Play a card?", "No");
@@ -97,75 +112,81 @@ namespace stonerkart
                     throw new ConstraintException();
                 }
             }
-
-            #endregion
-
-            moveStep();
-        }
-
-        private void upkeepStep()
-        {
-            foreach (Card c in activePlayer.field)
-            {
-                c.movement = c.baseMovement;
-            }
         }
 
         private void moveStep()
         {
+            List<List<Tile>> paths = new List<List<Tile>>();
             while (true)
             {
                 Controller.setPrompt("Move a card?", "No");
-                var v = Controller.waitForButtonOr<Tile>(tile => tile.card.movement > 0);
+                var v = Controller.waitForButtonOr<Tile>(tile => tile.card != null && tile.card.movement > 0);
+
                 if (v is ShibbuttonStuff)
                 {
                     break;
                 }
+
                 Tile from = (Tile)v;
-                if (from.card != null)
+                Card card = from.card;
+
+                var options = from.withinDistance(card.movement, 1).Where(possibleDestination => 
+                  possibleDestination.card == null && 
+                  (card.path?.Last() == possibleDestination || paths.Count(l => l.Last() == possibleDestination) == 0) &&
+                  map.path(from, possibleDestination).Count - 1 <= card.movement
+                ).ToArray();
+
+                Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
+                Controller.setPrompt("Move to what tile?");
+                var o = Controller.waitForButtonOr<Tile>(tile => tile == from || (tile.card == null && options.Contains(tile)));
+
+                if (o is ShibbuttonStuff)
                 {
-                    Card card = from.card;
-
-                    if (card.path != null)
-                    {
-                        Controller.removeArrow(card.tile, card.path);
-                        card.path = null;
-                    }
-
-                    var ns = from.withinDistance(card.movement, 0);
-                    Controller.highlight(ns.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
-                    Controller.setPrompt("Move to what tile?");
-                    var o =
-                        Controller.waitForButtonOr<Tile>(
-                            tile => (tile.card == null || tile == from) && ns.Contains(tile));
-                    if (o is ShibbuttonStuff)
-                    {
-                        break;
-                    }
-                    Tile to = (Tile)o;
-                    if (to != from)
-                    {
-                        Controller.addArrow(from, to);
-                        card.path = to;
-                        /*
-                        
-                        */
-                    }
-                    Controller.setPrompt("");
-                    Controller.clearHighlights();
+                    break;
                 }
+
+                Tile to = (Tile)o;
+                if (card.path != null)
+                {
+                    Controller.removeArrow(card.path);
+                    paths.Remove(card.path);
+                    card.path = null;
+                }
+                if (to != from)
+                {
+                    var path = map.path(from, to);
+                    Controller.addArrow(path);
+                    card.path = path;
+                    paths.Add(path);
+                }
+
+                Controller.setPrompt("");
+                Controller.clearHighlights();
             }
+
             Controller.clearArrows();
+
             foreach (Card c in activePlayer.field)
             {
                 if (c.path != null)
                 {
                     c.tile.removeCard();
-                    c.path.place(c);
-                    c.movement = 0;
+                    c.path.Last().place(c);
+                    c.movement.modify(1-c.path.Count, Modifiable.intAdd, new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.Untap));
+                    c.path = null;
                 }
-                c.path = null;
             }
         }
+    }
+
+    enum Steps
+    {
+        Untap,
+        Draw,
+        Main1,
+        Combat,
+        Damage,
+        Main2,
+        End
     }
 }

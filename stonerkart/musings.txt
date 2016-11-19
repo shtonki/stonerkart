@@ -1,10 +1,5 @@
 ﻿if we lose inputs it's because we don't buffer inputevents
 
-start
-draw
-main1
-move
-attack
-endcombat
-main2
-end
+things that are fucked:
+martin
+this game in general

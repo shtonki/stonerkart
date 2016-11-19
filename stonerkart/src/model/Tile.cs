@@ -38,7 +38,6 @@ namespace stonerkart
             if (card != null) throw new Exception();
             card = c;
             card.tile = this;
-            Controller.redraw();
         }
 
         public Card removeCard()
@@ -46,7 +45,6 @@ namespace stonerkart
             if (card == null) throw new Exception();
             var r = card;
             card = null;
-            Controller.redraw();
             return r;
         }
 

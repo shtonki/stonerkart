@@ -76,10 +76,13 @@
     <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />
     <Compile Include="src\controller\GameEvent.cs" />
+    <Compile Include="src\controller\GameEventFilter.cs" />
+    <Compile Include="src\controller\GameEventHandler.cs" />
     <Compile Include="src\controller\InputEvent.cs" />
     <Compile Include="src\model\Card.cs" />
     <Compile Include="src\model\Game.cs" />
     <Compile Include="src\model\Map.cs" />
+    <Compile Include="src\model\Modifiable.cs" />
     <Compile Include="src\model\Pile.cs" />
     <Compile Include="src\model\Player.cs" />
     <Compile Include="src\model\Tile.cs" />
@@ -93,7 +96,7 @@
     <Compile Include="src\view\ConsolePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="src\view\G.cs" />
+    <Compile Include="src\G.cs" />
     <Compile Include="src\view\GameFrame.cs">
       <SubType>Form</SubType>
     </Compile>
