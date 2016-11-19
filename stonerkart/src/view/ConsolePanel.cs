@@ -156,6 +156,8 @@ namespace stonerkart
             {
                 outputBox.Text += inputBox.Text + Environment.NewLine;
                 inputBox.Text = "";
+                e.Handled = true;
+                e.SuppressKeyPress = true;
             }
         }
 

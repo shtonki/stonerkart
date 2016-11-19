@@ -29,6 +29,21 @@ namespace stonerkart
             g.startGame();
         }
 
+        public static void addArrow(List<Tile> l)
+        {
+            hexPanel.ts.Add(l);
+        }
+
+        public static void removeArrow(List<Tile> l)
+        {
+            hexPanel.ts.Remove(l);
+        }
+
+        public static void clearArrows()
+        {
+            hexPanel.ts.Clear();
+            redraw();
+        }
 
         private static GameFrame launchUI()
         {
@@ -50,16 +65,6 @@ namespace stonerkart
 
         public static void mouseEntered(TileView tv)
         {
-            /*
-            if (highlightColor == null) return;
-            if (hled.Count == 1 && hled[0] == tv) return;
-            clearHighlights();
-            if (tv != null)
-            {
-                highlight(tv, highlightColor.Value);
-            }
-            redraw();
-            */
         }
 
 
@@ -81,25 +86,19 @@ namespace stonerkart
         private static ManualResetEventSlim callerBacker;
         private static InputEventFilter filter;
         private static Stuff s;
-
+        
         public static Stuff waitForButtonOr<T>(Func<T, bool> fn) where T : Stuff
         {
             InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || (o is T && fn((T)o)));
             return waitFor(f);
         }
-
+        
         public static Stuff waitForButtonOr<T>() where T : Stuff
         {
             InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || o is T);
             return waitFor(f);
         }
-
-        public static T waitFor<T>() where T : Stuff
-        {
-            InputEventFilter f = new InputEventFilter((clickable, o) => o is T);
-            return (T)waitFor(f);
-        }
-
+        
         private static Stuff waitFor(InputEventFilter f)
         {
             if (callerBacker != null || filter != null) throw new Exception();
@@ -154,11 +153,6 @@ namespace stonerkart
         public static void print(string s)
         {
             gameFrame?.gamePanel?.consolePanel?.print(s);
-        }
-
-        private static TileView getView(Tile t)
-        {
-            return gameFrame.gamePanel.hexPanel.viewOf(t);
         }
     }
 }

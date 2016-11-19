@@ -30,7 +30,7 @@ namespace stonerkart
 
         public override string ToString()
         {
-            return String.Format("Tile containing {0}",card == null ? "nothing" : card.ToString());
+            return x + " " + y;
         }
 
         public void place(Card c)
@@ -38,7 +38,6 @@ namespace stonerkart
             if (card != null) throw new Exception();
             card = c;
             card.tile = this;
-            Controller.redraw();
         }
 
         public Card removeCard()
@@ -46,8 +45,12 @@ namespace stonerkart
             if (card == null) throw new Exception();
             var r = card;
             card = null;
-            Controller.redraw();
             return r;
+        }
+
+        public bool enterableBy(Card c)
+        {
+            return card == null || card.owner != c.owner;
         }
 
         public List<Tile> withinDistance(int distance, int mindistance = 0)

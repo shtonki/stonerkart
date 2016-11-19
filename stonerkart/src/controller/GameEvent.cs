@@ -6,8 +6,71 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    abstract class GameEvent
+    interface GameEvent
     {
+    }
+
+    class DamageEvent : GameEvent
+    {
+        public Card source;
+        public Card target;
+        public int amount;
+
+        public DamageEvent(Card source, Card target, int amount)
+        {
+            this.source = source;
+            this.target = target;
+            this.amount = amount;
+        }
+    }
+
+    class AttackEvent : GameEvent
+    {
+        public Card attacker;
+        public Card defender;
+        public Path path;
+        public Tile attackFrom;
+
+        public AttackEvent(Path path)
+        {
+            this.attacker = path.from.card;
+            this.defender = path.to.card;
+            this.path = path;
+            List<Tile> t = path;
+            attackFrom = t[t.Count - 2];
+        }
+    }
+
+    class MoveEvent : GameEvent
+    {
+        public Card card { get; }
+        public Tile tile { get; }
+
+        public MoveEvent(Card card, Tile tile)
+        {
+            this.card = card;
+            this.tile = tile;
+        }
+    }
+
+    class CastEvent : GameEvent
+    {
+        public StackWrapper wrapper { get; }
+
+        public CastEvent(StackWrapper wrapper)
+        {
+            this.wrapper = wrapper;
+        }
+    }
+
+    class StartOfStepEvent : GameEvent
+    {
+        public Steps step { get; }
+
+        public StartOfStepEvent(Steps step)
+        {
+            this.step = step;
+        }
     }
 
     class DrawEvent : GameEvent
@@ -19,57 +82,6 @@ namespace stonerkart
         {
             this.player = player;
             this.cards = cards;
-        }
-    }
-
-    abstract class GameEventHandler
-    {
-        public abstract void handle(GameEvent ge);
-    }
-
-    class GameEventHandler<T> : GameEventHandler where T : GameEvent
-    {
-        public GameEventFilter filter { get; }
-        public Action<T> act { get; }
-
-        public GameEventHandler(Action<T> act) : this(new TypedGameEventFilter<T>(), act)
-        {
-
-        }
-
-        public GameEventHandler(GameEventFilter filter, Action<T> act)
-        {
-            this.filter = filter;
-            this.act = act;
-        }
-
-        public override void handle(GameEvent ge)
-        {
-            if (filter.filter(ge)) act((T)ge);
-        }
-    }
-
-    interface GameEventFilter
-    {
-        bool filter(GameEvent e);
-    }
-
-    class TypedGameEventFilter<T> : GameEventFilter where T : GameEvent
-    {
-        private Func<T, bool> f;
-
-        public TypedGameEventFilter()
-        {
-            f = (_) => true;
-        }
-
-        public bool filter(GameEvent e)
-        {
-            if (e is T)
-            {
-                return f((T)e);
-            }
-            return false;
         }
     }
 }

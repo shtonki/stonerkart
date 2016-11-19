@@ -10,6 +10,7 @@ namespace stonerkart
         public PointF[] poly { get; set; }
         public int x => tile.x;
         public int y => tile.y;
+        public Point centre => new Point((int)poly[1].X, (int)((poly[0].Y + poly[3].Y)/2));
 
         public Color color { get; set; }
 

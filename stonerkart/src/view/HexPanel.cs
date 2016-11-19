@@ -145,7 +145,7 @@ namespace stonerkart
                     if (tv.tile.card != null)
                     {
                         Card card = tv.tile.card;
-                        TextureBrush bh = new TextureBrush(G.ResizeImage(Properties.Resources.jordanno, dw, dh));
+                        TextureBrush bh = new TextureBrush(Shiva.ResizeImage(card.image, dw, dh));
                         var x = tv.poly[0].X;
                         var y = tv.poly[0].Y;
                         var m = new Matrix();
@@ -156,23 +156,25 @@ namespace stonerkart
 
                         int b = (int)((tv.poly[3].Y - tv.poly[0].Y)/2);
                         int a = (int)((tv.poly[2].X - tv.poly[0].X)/4);
-                        Font f = new Font("Ariel Black", (b+a) / 5, FontStyle.Bold);
+                        Font f = new Font("Ariel Black", 1 + (b+a) / 5, FontStyle.Bold);
                         float vxR = tv.poly[0].X;
                         float vxL = tv.poly[2].X - a;
                         float vy = (4*tv.poly[0].Y + 6*tv.poly[3].Y)/10;
                         float vxM = tv.poly[4].X - a/2;
                         float vyB = tv.poly[4].Y - b;
                         int yp = 5;
-                        int xp = 1;
+                        int xp = -1;
 
-                        g.FillEllipse(Brushes.Crimson, vxR, vy, a, b);
+                        Brush filler = card.owner.isHero ? Brushes.Green : Brushes.Red;
+
+                        g.FillEllipse(filler, vxR, vy, a, b);
                         g.DrawString(card.power.ToString().PadLeft(2), f, Brushes.Black, vxR + xp, vy + yp);
 
-                        g.FillEllipse(Brushes.LightSeaGreen, vxL, vy, a, b);
+                        g.FillEllipse(filler, vxL, vy, a, b);
                         g.DrawString(card.toughness.ToString().PadLeft(2), f, Brushes.Black, vxL + xp, vy + yp);
                         
-                        g.FillEllipse(Brushes.LightGray, vxM, vyB, a, b);
-                        g.DrawString(card.baseMovement.ToString().PadLeft(2),  f, Brushes.Black, vxM + xp, vyB + yp);
+                        g.FillEllipse(filler, vxM, vyB, a, b);
+                        g.DrawString(card.movement.ToString().PadLeft(2),  f, Brushes.Black, vxM + xp, vyB + yp);
                     }
                     else
                     {
@@ -180,8 +182,19 @@ namespace stonerkart
                             g.FillPolygon(b, tv.poly);
                     }
                 }
+                foreach (var t in ts)
+                {
+                    for (int i = 0; i < t.Count - 1; i++)
+                    {
+                        TileView from = viewOf(t[i]);
+                        TileView to = viewOf(t[i+1]);
+                        g.DrawLine(new Pen(Color.ForestGreen, 4), from.centre, to.centre);
+                    }
+                }
             }
         }
+
+        public List<List<Tile>> ts { get; } = new List<List<Tile>>();
 
         public TileView viewOf(Tile t)
         {

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    static class G
+    static class Shiva
     {
         public static Bitmap ResizeImage(Image image, int width, int height)
         {
@@ -34,31 +34,6 @@ namespace stonerkart
             }
 
             return destImage;
-        }
-
-        public static Map map
-        {
-            get
-            {
-                if (!valid) return new Map(2, 2, false, false);
-                else return _map;
-            }
-        }
-
-        private static bool valid;
-        private static Map _map;
-
-        public static void load(Map m)
-        {
-            if (valid) throw new Exception();
-            _map = m;
-            valid = true;
-        }
-
-        public static void unload()
-        {
-            valid = false;
-            _map = null;
         }
     }
 }
