@@ -15,6 +15,7 @@ namespace stonerkart
     {
         private Map map;
         private TileView[] tileViews;
+        public readonly List<Action<TileView>> callbacks = new List<Action<TileView>>();
 
         public HexPanel(Map m)
         {
@@ -29,7 +30,7 @@ namespace stonerkart
         }
 
 
-        public HexPanel() : this(new Map(2, 2, false, false))
+        public HexPanel() : this(new Map(3, 3, false, true))
         {
         }
 
@@ -94,7 +95,11 @@ namespace stonerkart
         {
             var v = clickToTile(e);
             if (v != null)
-                Controller.clicked(clickToTile(e));
+            {
+                TileView tv = clickToTile(e);
+                Controller.clicked(tv);
+                foreach (var c in callbacks) c(tv);
+            }
         }
 
         private TileView clickToTile(MouseEventArgs e)

@@ -16,13 +16,14 @@ namespace stonerkart
 
         public Screen mainMenuPanel { get; private set; }
         public GamePanel gamePanel;
-
+        public Screen mapEditorScreen { get; private set; }
 
         public Control active;
 
         public GameFrame()
         {
             mainMenuPanel = new MainMenuPanel();
+            mapEditorScreen = new MapEditor();
             Closed += (_, __) => Environment.Exit(1);
         }
 

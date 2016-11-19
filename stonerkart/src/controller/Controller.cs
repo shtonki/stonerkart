@@ -29,6 +29,16 @@ namespace stonerkart
             g.startGame();
         }
 
+        public static void transitionToMapEditor()
+        {
+            gameFrame.transitionTo(gameFrame.mapEditorScreen);
+        }
+
+        public static void transitionToMainMenu()
+        {
+            gameFrame.transitionTo(gameFrame.mainMenuPanel);
+        }
+
         public static void addArrow(List<Tile> l)
         {
             hexPanel.ts.Add(l);

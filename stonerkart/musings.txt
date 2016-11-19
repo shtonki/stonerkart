@@ -4,3 +4,4 @@ things that are fucked:
 martin
 this code base
 Map.dijkstra using Int32.MaxValue/2 to denote an uninitialized node
+we up and load every fucking screen when loading the form
