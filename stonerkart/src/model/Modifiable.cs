@@ -20,6 +20,9 @@ namespace stonerkart
         {
             return i2;
         }
+
+        public static TypedGameEventFilter<StartOfStepEvent> startOfEndStep = new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.End); 
+        public static TypedGameEventFilter<GameEvent> never = new TypedGameEventFilter<GameEvent>(e => false);
     }
 
     class Modifiable<T> : Modifiable

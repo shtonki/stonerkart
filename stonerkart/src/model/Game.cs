@@ -11,6 +11,7 @@ namespace stonerkart
     {
         public readonly Map map;
         public readonly Player hero;
+        public readonly Player villain;
 
         public Player activePlayer => hero;
 
@@ -21,8 +22,8 @@ namespace stonerkart
         public Game(Map map)
         {
             this.map = map;
-            Card herpo = new Card(CardTemplate.Hero);
-            hero = new Player(herpo);
+            hero = new Player(this, CardTemplate.Hero);
+            villain = new Player(this, CardTemplate.Hero);
 
             setupHandlers();
         }
@@ -46,6 +47,18 @@ namespace stonerkart
             geFilters.Add(new GameEventHandler<MoveEvent>(e =>
             {
                 e.card.moveTo(e.tile);
+            }));
+
+            geFilters.Add(new GameEventHandler<AttackEvent>(e =>
+            {
+                raiseEvent(new MoveEvent(e.attacker, e.attackFrom));
+                raiseEvent(new DamageEvent(e.attacker, e.defender, e.attacker.power));
+                if (e.defender.cardType != CardType.Hero) raiseEvent(new DamageEvent(e.attacker, e.defender, e.attacker.power));
+            }));
+
+            geFilters.Add(new GameEventHandler<DamageEvent>(e =>
+            {
+                e.target.toughness.modify(-e.amount, Modifiable.intAdd, Modifiable.startOfEndStep);
             }));
         }
 
@@ -71,7 +84,7 @@ namespace stonerkart
         private void init()
         {
             map.tileAt(4, 4).place(hero.heroCard);
-            hero.field.add(hero.heroCard);
+            map.tileAt(6, 6).place(villain.heroCard);
         }
 
         private void loopEx()
@@ -129,14 +142,14 @@ namespace stonerkart
                     card.path = null;
                 }
 
-                var options = map.dijkstra(from).Where(t =>
-                    t.length <= card.movement &&
-                    t.to.card == null &&
-                    !paths.Select(p => p.to).Contains(t.to)
+                var options = map.dijkstra(from).Where(too =>
+                    too.length <= card.movement &&
+                    too.to.enterableBy(card) &&
+                    (too.to.card != null || !paths.Select(p => p.to).Contains(too.to))
                     ).ToList();
 
                 Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.to)));
-                var to = getTile(tile => tile == from || (tile.card == null && options.Select(p => p.to).Contains(tile)), "Move to where?");
+                var to = getTile(tile => tile == from || options.Select(p => p.to).Contains(tile), "Move to where?");
                 Controller.clearHighlights();
                 if (to == null) break;
                 
@@ -155,7 +168,14 @@ namespace stonerkart
             {
                 if (c.path != null)
                 {
-                    raiseEvent(new MoveEvent(c, c.path.to));
+                    if (c.path.to.card == null)
+                    {
+                        raiseEvent(new MoveEvent(c, c.path.to));
+                    }
+                    else
+                    {
+                        raiseEvent(new AttackEvent(c.path));
+                    }
                     c.path = null;
                 }
             }

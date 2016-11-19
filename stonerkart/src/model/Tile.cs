@@ -48,6 +48,11 @@ namespace stonerkart
             return r;
         }
 
+        public bool enterableBy(Card c)
+        {
+            return card == null || card.owner != c.owner;
+        }
+
         public List<Tile> withinDistance(int distance, int mindistance = 0)
         {
             IEnumerable<Tile> r = new List<Tile>(3*(distance*(distance + 1)) + 1);

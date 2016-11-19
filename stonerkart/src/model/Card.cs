@@ -15,7 +15,7 @@ namespace stonerkart
         public Tile tile { get; set; }
         public Path path { get; set; }
         public Player owner { get; }
-
+        public CardType cardType { get; }
 
         public readonly Modifiable<int> power;
         public readonly Modifiable<int> toughness;
@@ -23,10 +23,8 @@ namespace stonerkart
 
         private Modifiable[] ms;
 
-        public Card(CardTemplate ct, Player owner = null)
+        public Card(CardTemplate ct, Player owner)
         {
-            
-
             int basePower;
             int baseToughness;
             int baseMovement;
@@ -40,6 +38,7 @@ namespace stonerkart
                     baseMovement = 1;
                     basePower = 1;
                     baseToughness = 10;
+                    cardType = CardType.Hero;
                 } break;
 
                 case CardTemplate.Jordan:
@@ -48,6 +47,7 @@ namespace stonerkart
                     baseMovement = 2;
                     basePower = 1;
                     baseToughness = 2;
+                    cardType = CardType.Creature;
                 } break;
 
                 default:

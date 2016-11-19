@@ -94,6 +94,7 @@ namespace stonerkart
 
         public List<Path> dijkstra(Tile startTile)
         {
+            Card traveller = startTile.card;
             Dictionary<Tile,Tuple<int, Tile>> dict = new Dictionary<Tile, Tuple<int, Tile>>();
             List<Tile> Q = new List<Tile>();
 
@@ -117,10 +118,9 @@ namespace stonerkart
                         u = t;
                     }
                 }
-                int a = dict[u].Item1 + 1;
                 foreach (Tile v in u.atDistance(1))
                 {
-                    if (v.card != null) continue;
+                    int a = dict[u].Item1 + cost(u, v, traveller);
                     if (a < dict[v].Item1) dict[v] = new Tuple<int, Tile>(a, u);
                 }
                 Q.Remove(u);
@@ -141,6 +141,17 @@ namespace stonerkart
                 r.Add(new Path(l, v.Value.Item1));
             }
             return r;
+        }
+
+        private int cost(Tile from, Tile to, Card card)
+        {
+            if (card == null) return 1;
+            if ((to.card != null && to.card.owner == card.owner) ||
+                from.card != null && from.card != card)
+            {
+                    return 10000;
+            }
+            return 1;
         }
 
         public int ord(Tile t)

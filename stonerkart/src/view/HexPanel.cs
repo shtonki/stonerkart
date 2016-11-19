@@ -156,22 +156,24 @@ namespace stonerkart
 
                         int b = (int)((tv.poly[3].Y - tv.poly[0].Y)/2);
                         int a = (int)((tv.poly[2].X - tv.poly[0].X)/4);
-                        Font f = new Font("Ariel Black", (b+a) / 5, FontStyle.Bold);
+                        Font f = new Font("Ariel Black", 1 + (b+a) / 5, FontStyle.Bold);
                         float vxR = tv.poly[0].X;
                         float vxL = tv.poly[2].X - a;
                         float vy = (4*tv.poly[0].Y + 6*tv.poly[3].Y)/10;
                         float vxM = tv.poly[4].X - a/2;
                         float vyB = tv.poly[4].Y - b;
                         int yp = 5;
-                        int xp = 1;
+                        int xp = -1;
 
-                        g.FillEllipse(Brushes.Crimson, vxR, vy, a, b);
+                        Brush filler = card.owner.isHero ? Brushes.Green : Brushes.Red;
+
+                        g.FillEllipse(filler, vxR, vy, a, b);
                         g.DrawString(card.power.ToString().PadLeft(2), f, Brushes.Black, vxR + xp, vy + yp);
 
-                        g.FillEllipse(Brushes.LightSeaGreen, vxL, vy, a, b);
+                        g.FillEllipse(filler, vxL, vy, a, b);
                         g.DrawString(card.toughness.ToString().PadLeft(2), f, Brushes.Black, vxL + xp, vy + yp);
                         
-                        g.FillEllipse(Brushes.LightGray, vxM, vyB, a, b);
+                        g.FillEllipse(filler, vxM, vyB, a, b);
                         g.DrawString(card.movement.ToString().PadLeft(2),  f, Brushes.Black, vxM + xp, vyB + yp);
                     }
                     else

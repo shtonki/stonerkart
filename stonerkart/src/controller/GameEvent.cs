@@ -10,6 +10,37 @@ namespace stonerkart
     {
     }
 
+    class DamageEvent : GameEvent
+    {
+        public Card source;
+        public Card target;
+        public int amount;
+
+        public DamageEvent(Card source, Card target, int amount)
+        {
+            this.source = source;
+            this.target = target;
+            this.amount = amount;
+        }
+    }
+
+    class AttackEvent : GameEvent
+    {
+        public Card attacker;
+        public Card defender;
+        public Path path;
+        public Tile attackFrom;
+
+        public AttackEvent(Path path)
+        {
+            this.attacker = path.from.card;
+            this.defender = path.to.card;
+            this.path = path;
+            List<Tile> t = path;
+            attackFrom = t[t.Count - 2];
+        }
+    }
+
     class MoveEvent : GameEvent
     {
         public Card card { get; }
