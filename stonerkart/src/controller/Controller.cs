@@ -86,25 +86,19 @@ namespace stonerkart
         private static ManualResetEventSlim callerBacker;
         private static InputEventFilter filter;
         private static Stuff s;
-
+        
         public static Stuff waitForButtonOr<T>(Func<T, bool> fn) where T : Stuff
         {
             InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || (o is T && fn((T)o)));
             return waitFor(f);
         }
-
+        
         public static Stuff waitForButtonOr<T>() where T : Stuff
         {
             InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || o is T);
             return waitFor(f);
         }
-
-        public static T waitFor<T>() where T : Stuff
-        {
-            InputEventFilter f = new InputEventFilter((clickable, o) => o is T);
-            return (T)waitFor(f);
-        }
-
+        
         private static Stuff waitFor(InputEventFilter f)
         {
             if (callerBacker != null || filter != null) throw new Exception();

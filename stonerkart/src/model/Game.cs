@@ -4,7 +4,6 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
-//using hackery = System.Tuple<>;
 
 
 namespace stonerkart
@@ -26,9 +25,29 @@ namespace stonerkart
             Card herpo = new Card(CardTemplate.Hero);
             hero = new Player(herpo);
 
-            geFilters.Add(new GameEventHandler<DrawEvent>(
-                (de) => de.player.deck.draw().moveTo(de.player.hand)
-                ));
+            setupHandlers();
+        }
+
+        private void setupHandlers()
+        {
+            geFilters.Add(new GameEventHandler<DrawEvent>(e =>
+            {
+                e.player.deck.draw().moveTo(e.player.hand);
+            }));
+
+            geFilters.Add(new GameEventHandler<CastEvent>(e =>
+            {
+                Card c = e.wrapper.card;
+                Tile t = e.wrapper.tile;
+                c.moveTo(hero.field);
+                c.moveTo(t);
+                Controller.redraw();
+            }));
+
+            geFilters.Add(new GameEventHandler<MoveEvent>(e =>
+            {
+                e.card.moveTo(e.tile);
+            }));
         }
 
         private void raiseEvent(GameEvent e)
@@ -88,29 +107,9 @@ namespace stonerkart
         {
             while (true)
             {
-                Controller.setPrompt("Play a card?", "No");
-                var v = Controller.waitForButtonOr<Card>();
-                if (v is ShibbuttonStuff)
-                {
-                    break;
-                }
-                if (v is Card)
-                {
-                    Controller.setPrompt("Play to what tile?");
-                    var ns = hero.heroCard.tile.withinDistance(2);
-                    Controller.highlight(ns.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
-                    var o = Controller.waitForButtonOr<Tile>(tile => tile.card == null && ns.Contains(tile));
-                    Tile t = (Tile)o;
-                    Card c = (Card)v;
-                    c.moveTo(hero.field);
-                    t.place((Card)v);
-                    Controller.setPrompt("");
-                    Controller.clearHighlights();
-                }
-                else
-                {
-                    throw new ConstraintException();
-                }
+                var v = getCast();
+                if (v == null) break;
+                raiseEvent(new CastEvent(v.Value));
             }
         }
 
@@ -119,39 +118,28 @@ namespace stonerkart
             List<List<Tile>> paths = new List<List<Tile>>();
             while (true)
             {
-                Controller.setPrompt("Move a card?", "No");
-                var v = Controller.waitForButtonOr<Tile>(tile => tile.card != null && tile.card.movement > 0);
+                var from = getTile(tile => tile.card != null && tile.card.movement > 0, "Move your cards nigra");
+                if (from == null) break;
 
-                if (v is ShibbuttonStuff)
-                {
-                    break;
-                }
-
-                Tile from = (Tile)v;
                 Card card = from.card;
-
                 var options = from.withinDistance(card.movement, 1).Where(possibleDestination => 
                   possibleDestination.card == null && 
                   (card.path?.Last() == possibleDestination || paths.Count(l => l.Last() == possibleDestination) == 0) &&
                   map.path(from, possibleDestination).Count - 1 <= card.movement
                 ).ToArray();
 
-                Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
-                Controller.setPrompt("Move to what tile?");
-                var o = Controller.waitForButtonOr<Tile>(tile => tile == from || (tile.card == null && options.Contains(tile)));
-
-                if (o is ShibbuttonStuff)
-                {
-                    break;
-                }
-
-                Tile to = (Tile)o;
                 if (card.path != null)
                 {
                     Controller.removeArrow(card.path);
                     paths.Remove(card.path);
                     card.path = null;
                 }
+
+                Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
+                var to = getTile(tile => tile == from || (tile.card == null && options.Contains(tile)), "Move to where?");
+                Controller.clearHighlights();
+                if (to == null) break;
+                
                 if (to != from)
                 {
                     var path = map.path(from, to);
@@ -159,9 +147,6 @@ namespace stonerkart
                     card.path = path;
                     paths.Add(path);
                 }
-
-                Controller.setPrompt("");
-                Controller.clearHighlights();
             }
 
             Controller.clearArrows();
@@ -170,9 +155,7 @@ namespace stonerkart
             {
                 if (c.path != null)
                 {
-                    c.tile.removeCard();
-                    c.path.Last().place(c);
-                    c.movement.modify(1-c.path.Count, Modifiable.intAdd, new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.Untap));
+                    raiseEvent(new MoveEvent(c, c.path.Last()));
                     c.path = null;
                 }
             }
@@ -189,22 +172,44 @@ namespace stonerkart
             return (Card)v;
         }
 
+        private Tile getTile(Func<Tile, bool> f, string prompt)
+        {
+            Controller.setPrompt(prompt, "nigra");
+            var v = Controller.waitForButtonOr<Tile>(f);
+            if (v is ShibbuttonStuff)
+            {
+                return null;
+            }
+            return (Tile)v;
+        }
+
         private StackWrapper? getCast()
         {
-            Card c = getCard((crd) => true, "xd");
-            if (c == null) return null; 
+            while (true)
+            {
+                Card c = getCard((crd) => true, "Cast a card");
+                if (c == null) return null;
 
-            return new StackWrapper(c); ;
+                var ns = hero.heroCard.tile.withinDistance(2);
+                Controller.highlight(ns.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
+                Tile t = getTile(tile => tile.card == null && ns.Contains(tile), "To what tile");
+                Controller.clearHighlights();
+                if (t == null) continue;
+
+                return new StackWrapper(c, t);
+            }
         }
     }
 
     struct StackWrapper
     {
         public readonly Card card;
+        public readonly Tile tile;
 
-        public StackWrapper(Card card)
+        public StackWrapper(Card card, Tile tile)
         {
             this.card = card;
+            this.tile = tile;
         }
     }
 

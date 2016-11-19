@@ -14,6 +14,8 @@ namespace stonerkart
         public Pile pile { get; private set; }
         public Tile tile { get; set; }
         public List<Tile> path { get; set; }
+        public Player owner { get; }
+
 
         public readonly Modifiable<int> power;
         public readonly Modifiable<int> toughness;
@@ -21,9 +23,9 @@ namespace stonerkart
 
         private Modifiable[] ms;
 
-        public Card(CardTemplate ct)
+        public Card(CardTemplate ct, Player owner = null)
         {
-            name = ct.ToString();
+            
 
             int basePower;
             int baseToughness;
@@ -64,6 +66,9 @@ namespace stonerkart
                 toughness,
                 movement,
             };
+
+            this.owner = owner;
+            name = ct.ToString();
         }
 
         public void moveTo(Pile p)
@@ -71,6 +76,13 @@ namespace stonerkart
             pile?.remove(this);
             pile = p;
             p.add(this);
+        }
+
+        public void moveTo(Tile t)
+        {
+            tile?.removeCard();
+            tile = t;
+            t.place(this);
         }
 
         public void reherp(GameEvent e)

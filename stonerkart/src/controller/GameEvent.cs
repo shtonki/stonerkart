@@ -10,6 +10,28 @@ namespace stonerkart
     {
     }
 
+    class MoveEvent : GameEvent
+    {
+        public Card card { get; }
+        public Tile tile { get; }
+
+        public MoveEvent(Card card, Tile tile)
+        {
+            this.card = card;
+            this.tile = tile;
+        }
+    }
+
+    class CastEvent : GameEvent
+    {
+        public StackWrapper wrapper { get; }
+
+        public CastEvent(StackWrapper wrapper)
+        {
+            this.wrapper = wrapper;
+        }
+    }
+
     class StartOfStepEvent : GameEvent
     {
         public Steps step { get; }
