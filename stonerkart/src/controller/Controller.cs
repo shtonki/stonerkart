@@ -160,10 +160,5 @@ namespace stonerkart
         {
             gameFrame?.gamePanel?.consolePanel?.print(s);
         }
-
-        private static TileView getView(Tile t)
-        {
-            return gameFrame.gamePanel.hexPanel.viewOf(t);
-        }
     }
 }

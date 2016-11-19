@@ -2,4 +2,4 @@
 
 things that are fucked:
 martin
-this game in general
+this code base

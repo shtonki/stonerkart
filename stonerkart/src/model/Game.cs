@@ -177,6 +177,35 @@ namespace stonerkart
                 }
             }
         }
+
+        private Card getCard(Func<Card, bool> f, string prompt)
+        {
+            Controller.setPrompt(prompt, "nigra");
+            var v = Controller.waitForButtonOr<Card>(f);
+            if (v is ShibbuttonStuff)
+            {
+                return null;
+            }
+            return (Card)v;
+        }
+
+        private StackWrapper? getCast()
+        {
+            Card c = getCard((crd) => true, "xd");
+            if (c == null) return null; 
+
+            return new StackWrapper(c); ;
+        }
+    }
+
+    struct StackWrapper
+    {
+        public readonly Card card;
+
+        public StackWrapper(Card card)
+        {
+            this.card = card;
+        }
     }
 
     enum Steps
