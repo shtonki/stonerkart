@@ -19,6 +19,7 @@ namespace stonerkart
         public Shibbutton shibbutton3;
         public Shibbutton shibbutton4;
         public Shibbutton shibbutton5;
+        private ManaPanel manaPanel1;
         public HexPanel hexPanel;
 
         public GamePanel(Game g)
@@ -43,6 +44,7 @@ namespace stonerkart
             this.shibbutton3 = new stonerkart.Shibbutton();
             this.shibbutton4 = new stonerkart.Shibbutton();
             this.shibbutton5 = new stonerkart.Shibbutton();
+            this.manaPanel1 = new stonerkart.ManaPanel();
             this.SuspendLayout();
             // 
             // hexPanel
@@ -115,9 +117,18 @@ namespace stonerkart
             this.shibbutton5.Text = "shibbutton5";
             this.shibbutton5.UseVisualStyleBackColor = true;
             // 
+            // manaPanel1
+            // 
+            this.manaPanel1.BackColor = System.Drawing.Color.DarkGray;
+            this.manaPanel1.Location = new System.Drawing.Point(3, 176);
+            this.manaPanel1.Name = "manaPanel1";
+            this.manaPanel1.Size = new System.Drawing.Size(208, 158);
+            this.manaPanel1.TabIndex = 9;
+            // 
             // GamePanel
             // 
             this.BackColor = System.Drawing.Color.Fuchsia;
+            this.Controls.Add(this.manaPanel1);
             this.Controls.Add(this.shibbutton4);
             this.Controls.Add(this.shibbutton5);
             this.Controls.Add(this.shibbutton3);

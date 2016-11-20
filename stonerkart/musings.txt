@@ -5,3 +5,4 @@ martin
 this code base
 Map.dijkstra using Int32.MaxValue/2 to denote an uninitialized node
 we up and load every fucking screen when loading the form
+hexpanel has an event handler but we hardcode it's calls to controller because we're lazy and autistic

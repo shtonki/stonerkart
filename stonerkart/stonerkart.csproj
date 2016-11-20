@@ -81,6 +81,7 @@
     <Compile Include="src\controller\InputEvent.cs" />
     <Compile Include="src\model\Card.cs" />
     <Compile Include="src\model\Game.cs" />
+    <Compile Include="src\model\ManaOrb.cs" />
     <Compile Include="src\model\Map.cs" />
     <Compile Include="src\model\Modifiable.cs" />
     <Compile Include="src\model\Pile.cs" />
@@ -112,6 +113,9 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\MainMenuPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="src\view\ManaPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\MapEditor.cs">
@@ -154,6 +158,9 @@
     <EmbeddedResource Include="src\view\MainMenuPanel.resx">
       <DependentUpon>MainMenuPanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="src\view\ManaPanel.resx">
+      <DependentUpon>ManaPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="src\view\MapEditor.resx">
       <DependentUpon>MapEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -174,6 +181,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="musings.txt" />
+    <None Include="Resources\order.png" />
+    <None Include="Resources\nature.png" />
+    <None Include="Resources\might.png" />
+    <None Include="Resources\life.png" />
+    <None Include="Resources\death.png" />
+    <None Include="Resources\chaos.png" />
+    <None Include="Resources\Image1.bmp" />
     <None Include="Resources\1473797210360.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

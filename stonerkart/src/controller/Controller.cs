@@ -87,10 +87,6 @@ namespace stonerkart
                 s = stuff;
                 callerBacker.Set();
             }
-            if (c is TileView)
-            {
-                Tile t = (Tile)stuff;
-            }
         }
     
         private static ManualResetEventSlim callerBacker;
