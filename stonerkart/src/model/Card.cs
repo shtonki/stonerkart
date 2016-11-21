@@ -17,6 +17,11 @@ namespace stonerkart
         public Player owner { get; }
         public CardType cardType { get; }
 
+        public Location location => pile.location;
+        public IEnumerable<ActivatedAbility> activatableHere => activatedAbilities.Where(a => a.castableFrom == location.pile);
+
+        public List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
+
         public readonly Modifiable<int> power;
         public readonly Modifiable<int> toughness;
         public readonly Modifiable<int> movement;
@@ -28,6 +33,8 @@ namespace stonerkart
             int basePower;
             int baseToughness;
             int baseMovement;
+
+            int castCost = 0; 
 
             #region oophell
             switch (ct)
@@ -48,6 +55,7 @@ namespace stonerkart
                     basePower = 1;
                     baseToughness = 2;
                     cardType = CardType.Creature;
+                    castCost = 1;
                 } break;
 
                 default:
@@ -67,6 +75,11 @@ namespace stonerkart
                 movement,
             };
 
+            activatedAbilities.Add(new ActivatedAbility(
+                new Cost(new ManaCost(castCost)), 
+                PileLocation.Hand, 
+                new List<TargetRule>()));
+
             this.owner = owner;
             name = ct.ToString();
         }
@@ -75,7 +88,7 @@ namespace stonerkart
         {
             pile?.remove(this);
             pile = p;
-            p.add(this);
+            p.addTop(this);
         }
 
         public void moveTo(Tile t)

@@ -20,6 +20,7 @@ namespace stonerkart
         public Shibbutton shibbutton4;
         public Shibbutton shibbutton5;
         private ManaPanel manaPanel1;
+        private CardsPanel stackPanel;
         public HexPanel hexPanel;
 
         public GamePanel(Game g)
@@ -28,12 +29,19 @@ namespace stonerkart
             if (g == null) return;
             hexPanel.setMap(g.map);
             hexPanel.tileClicked.Add(g.clicked);
+
             cardsPanel1.setPile(g.hero.hand);
+            cardsPanel1.callbacks.Add(g.clicked);
+
+            stackPanel.vertical = true;
+            stackPanel.setPile(g.stack);
+            stackPanel.callbacks.Add(g.clicked);
+
             shibbutton2.MouseDown += (_, __) => g.clicked(shibbutton2);
             shibbutton3.MouseDown += (_, __) => g.clicked(shibbutton3);
             shibbutton4.MouseDown += (_, __) => g.clicked(shibbutton4);
             shibbutton5.MouseDown += (_, __) => g.clicked(shibbutton5);
-            cardsPanel1.callbacks.Add(g.clicked);
+
         }
 
         public GamePanel() : this(null)
@@ -51,6 +59,7 @@ namespace stonerkart
             this.shibbutton4 = new stonerkart.Shibbutton();
             this.shibbutton5 = new stonerkart.Shibbutton();
             this.manaPanel1 = new stonerkart.ManaPanel();
+            this.stackPanel = new stonerkart.CardsPanel();
             this.SuspendLayout();
             // 
             // hexPanel
@@ -131,9 +140,18 @@ namespace stonerkart
             this.manaPanel1.Size = new System.Drawing.Size(208, 158);
             this.manaPanel1.TabIndex = 9;
             // 
+            // stackPanel
+            // 
+            this.stackPanel.BackColor = System.Drawing.Color.Navy;
+            this.stackPanel.Location = new System.Drawing.Point(4, 341);
+            this.stackPanel.Name = "stackPanel";
+            this.stackPanel.Size = new System.Drawing.Size(207, 235);
+            this.stackPanel.TabIndex = 10;
+            // 
             // GamePanel
             // 
             this.BackColor = System.Drawing.Color.Fuchsia;
+            this.Controls.Add(this.stackPanel);
             this.Controls.Add(this.manaPanel1);
             this.Controls.Add(this.shibbutton4);
             this.Controls.Add(this.shibbutton5);

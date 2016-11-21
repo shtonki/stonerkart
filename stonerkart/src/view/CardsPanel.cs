@@ -5,10 +5,11 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
-    class CardsPanel : UserControl, Observer<PileChangedMessage>
+    internal class CardsPanel : UserControl, Observer<PileChangedMessage>
     {
         private List<CardView> cardViews;
         public readonly List<Action<Clickable>> callbacks = new List<Action<Clickable>>();
+        public bool vertical;
 
         public CardsPanel()
         {
@@ -45,7 +46,7 @@ namespace stonerkart
                 if (cardViews[i].card == c)
                 {
                     cv = cardViews[i];
-                    cardViews.RemoveAt(i);  //todo i'm pretty sure this straight up breaks
+                    cardViews.RemoveAt(i); //todo i'm pretty sure this straight up breaks
                     break;
                 }
             }
@@ -54,16 +55,46 @@ namespace stonerkart
 
         private void layoutCards()
         {
+            if (vertical)
+            {
+                layoutVertical();
+            }
+            else
+            {
+                layoutHorizontal();
+            }
+        }
+
+        //todo unhack these
+
+        private void layoutVertical()
+        {
+            this.memeout(() =>
+            {
+                int cards = cardViews.Count;
+                if (cards == 0) return;
+                int cardHeight = Size.Height/cards;
+                int cardWidth = Size.Width;
+
+                for (int i = 0; i < cards; i++)
+                {
+                    cardViews[i].SetBounds(0, i*cardHeight, cardWidth, cardHeight);
+                }
+            });
+        }
+
+        private void layoutHorizontal()
+        {
             this.memeout(() =>
             {
                 int cards = cardViews.Count;
                 if (cards == 0) return;
                 int cardHeight = Size.Height - 0;
-                int cardWidth = Math.Min((int)(cardHeight*0.773f), (Size.Width - 0)/cards);
+                int cardWidth = Math.Min((int)(cardHeight * 0.773f), (Size.Width - 0) / cards);
 
                 for (int i = 0; i < cards; i++)
                 {
-                    cardViews[i].SetBounds(i*cardWidth, 0, cardWidth, cardHeight);
+                    cardViews[i].SetBounds(i * cardWidth, 0, cardWidth, cardHeight);
                 }
             });
         }

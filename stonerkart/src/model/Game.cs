@@ -13,9 +13,12 @@ namespace stonerkart
         public readonly Player hero;
         public readonly Player villain;
 
+        public readonly Pile stack = new Pile(new Location(null, PileLocation.Stack));
+
         public Player activePlayer => hero;
 
         private List<GameEventHandler> geFilters = new List<GameEventHandler>();
+        private Stack<StackWrapper> wrapperStack = new Stack<StackWrapper>();
 
         private IEnumerable<Card> herpable => hero.field;
 
@@ -32,15 +35,16 @@ namespace stonerkart
         {
             geFilters.Add(new GameEventHandler<DrawEvent>(e =>
             {
-                e.player.deck.draw().moveTo(e.player.hand);
+                e.player.deck.removeTop().moveTo(e.player.hand);
             }));
 
             geFilters.Add(new GameEventHandler<CastEvent>(e =>
             {
                 Card c = e.wrapper.card;
-                Tile t = e.wrapper.tile;
-                c.moveTo(hero.field);
-                c.moveTo(t);
+
+                wrapperStack.Push(e.wrapper);
+                c.moveTo(stack);
+
                 Controller.redraw();
             }));
 
@@ -120,8 +124,25 @@ namespace stonerkart
             while (true)
             {
                 var v = getCast();
-                if (v == null) break;
-                raiseEvent(new CastEvent(v.Value));
+                if (v != null)
+                {
+                    raiseEvent(new CastEvent(v.Value));
+                }
+                else  //someone passed
+                {
+                    if (wrapperStack.Count == 0)
+                    {
+                        break;
+                    }
+
+                    StackWrapper wrapper = wrapperStack.Pop();
+                    Card c = wrapper.card;
+                    
+                    c.moveTo(hero.field);
+                    c.moveTo(wrapper.tile);
+
+                    Controller.redraw();
+                }
             }
         }
 

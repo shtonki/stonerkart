@@ -20,25 +20,26 @@ namespace stonerkart
         public Player(Game g, CardTemplate hc)
         {
             game = g;
-            deck = new Pile();
-            field = new Pile();
-            hand = new Pile();
+
+            deck = new Pile(new Location(this, PileLocation.Deck));
+            field = new Pile(new Location(this, PileLocation.Field));
+            hand = new Pile(new Location(this, PileLocation.Hand));
 
             heroCard = new Card(hc, this);
-            field.add(heroCard);
+            field.addTop(heroCard);
 
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
-            deck.add(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
         }
     }
 }

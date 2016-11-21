@@ -9,14 +9,17 @@ namespace stonerkart
 {
     class Pile : Observable<PileChangedMessage>, IEnumerable<Card>
     {
+        public readonly Location location;
+
         private List<Card> cardList;
 
-        public Pile()
+        public Pile(Location location)
         {
             cardList = new List<Card>();
+            this.location = location;
         }
 
-        public void add(Card c)
+        public void addTop(Card c)
         {
             if (!cardList.Contains(c))
             {
@@ -30,7 +33,7 @@ namespace stonerkart
 
         }
 
-        public Card draw()
+        public Card removeTop()
         {
             int c = cardList.Count;
             if (c == 0) throw new Exception();
@@ -54,6 +57,27 @@ namespace stonerkart
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+    }
+
+    enum PileLocation
+    {
+        Hand,
+        Field,
+        Stack,
+        Deck,
+        Graveyard,
+    }
+
+    struct Location
+    {
+        public readonly PileLocation pile;
+        public readonly Player player;
+
+        public Location(Player player, PileLocation pile)
+        {
+            this.pile = pile;
+            this.player = player;
         }
     }
 
