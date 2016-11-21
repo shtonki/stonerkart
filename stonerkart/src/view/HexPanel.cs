@@ -15,7 +15,9 @@ namespace stonerkart
     {
         private Map map;
         private TileView[] tileViews;
-        public readonly List<Action<TileView>> callbacks = new List<Action<TileView>>();
+        public readonly List<Action<Clickable>> tileClicked = new List<Action<Clickable>>();
+        public readonly List<Action<Clickable>> tileEntered = new List<Action<Clickable>>();
+        //public readonly List<Action<Clickable>> tileClicked = new List<Action<Clickable>>();
 
         public HexPanel(Map m)
         {
@@ -80,13 +82,13 @@ namespace stonerkart
         {
             base.OnMouseMove(e);
             var v = clickToTile(e);
-            Controller.mouseEntered(v);
+            foreach (var c in tileEntered) c(v);
         }
 
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
-            Controller.mouseEntered(null);
+            foreach (var c in tileEntered) c(null);
         }
 
 
@@ -97,8 +99,7 @@ namespace stonerkart
             if (v != null)
             {
                 TileView tv = clickToTile(e);
-                Controller.clicked(tv);
-                foreach (var c in callbacks) c(tv);
+                foreach (var c in tileClicked) c(tv);
             }
         }
 

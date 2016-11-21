@@ -11,7 +11,6 @@ namespace stonerkart
         public Shibbutton()
         {
             f = hackEx;
-            Click += (sender, args) => Controller.clicked(this);
         }
 
         public void setStuffer(Func<object> f)

@@ -72,51 +72,7 @@ namespace stonerkart
         {
             gameFrame.setPrompt(s, ss);
         }
-
-        public static void mouseEntered(TileView tv)
-        {
-        }
-
-
-        public static void clicked(Clickable c)
-        {
-            var stuff = c.getStuff();
-            InputEvent e = new InputEvent(c, stuff);
-            if (filter != null && filter.filter(e))
-            {
-                s = stuff;
-                callerBacker.Set();
-            }
-        }
-    
-        private static ManualResetEventSlim callerBacker;
-        private static InputEventFilter filter;
-        private static Stuff s;
         
-        public static Stuff waitForButtonOr<T>(Func<T, bool> fn) where T : Stuff
-        {
-            InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || (o is T && fn((T)o)));
-            return waitFor(f);
-        }
-        
-        public static Stuff waitForButtonOr<T>() where T : Stuff
-        {
-            InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || o is T);
-            return waitFor(f);
-        }
-        
-        private static Stuff waitFor(InputEventFilter f)
-        {
-            if (callerBacker != null || filter != null) throw new Exception();
-            callerBacker = new ManualResetEventSlim();
-            filter = f;
-            callerBacker.Wait();
-            var r = s;
-            s = null;
-            callerBacker = null;
-            filter = null;
-            return r;
-        }
 
         private static List<TileView> hled = new List<TileView>();
         public static Color? highlightColor;

@@ -27,7 +27,13 @@ namespace stonerkart
             InitializeComponent();
             if (g == null) return;
             hexPanel.setMap(g.map);
+            hexPanel.tileClicked.Add(g.clicked);
             cardsPanel1.setPile(g.hero.hand);
+            shibbutton2.MouseDown += (_, __) => g.clicked(shibbutton2);
+            shibbutton3.MouseDown += (_, __) => g.clicked(shibbutton3);
+            shibbutton4.MouseDown += (_, __) => g.clicked(shibbutton4);
+            shibbutton5.MouseDown += (_, __) => g.clicked(shibbutton5);
+            cardsPanel1.callbacks.Add(g.clicked);
         }
 
         public GamePanel() : this(null)

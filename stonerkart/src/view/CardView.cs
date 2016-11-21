@@ -9,7 +9,7 @@ namespace stonerkart
     class CardView : StickyPanel, Clickable, Observer<CardChangedMessage>
     {
         private PictureBox art;
-        private AutoFontTextBox autoFontTextBox1;
+        private AutoFontTextBox breadText;
         private AutoFontTextBox nameBox;
         private AutoFontTextBox toughnessBox;
         private AutoFontTextBox powerBox;
@@ -20,23 +20,29 @@ namespace stonerkart
         {
             InitializeComponent();
             DoubleBuffered = true;
-            MouseDown += (_, __) => { Controller.clicked(this); };
-            autoFontTextBox1.Text = "Bush did it if I do say so myself kappa keepo 420 swag it up ranch all the way";
+            breadText.Text = "Bush did it if I do say so myself kappa keepo 420 swag it up ranch all the way";
+            nameBox.Text = "x";
+            powerBox.Text = "x";
+            toughnessBox.Text = "x";
         }
 
         public CardView(Card c) : this()
         {
             c.addObserver(this);
             card = c;
-            art.Image = card.image;
+            ihavedowns();
+        }
+
+        private void ihavedowns()
+        {
             this.memeout(() =>
             {
                 nameBox.Text = card.name;
-                powerBox.Text = "1";
-                toughnessBox.Text = "1";
+                powerBox.Text = card.power.ToString();
+                toughnessBox.Text = card.toughness.ToString();
+                art.Image = card.image;
             });
         }
-
 
         public void notify(CardChangedMessage t)
         {
@@ -51,7 +57,7 @@ namespace stonerkart
         private void InitializeComponent()
         {
             this.art = new System.Windows.Forms.PictureBox();
-            this.autoFontTextBox1 = new stonerkart.AutoFontTextBox();
+            this.breadText = new stonerkart.AutoFontTextBox();
             this.nameBox = new stonerkart.AutoFontTextBox();
             this.toughnessBox = new stonerkart.AutoFontTextBox();
             this.powerBox = new stonerkart.AutoFontTextBox();
@@ -74,13 +80,13 @@ namespace stonerkart
             // 
             // autoFontTextBox1
             // 
-            this.autoFontTextBox1.BackColor = System.Drawing.Color.Transparent;
-            this.autoFontTextBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-            this.autoFontTextBox1.Location = new System.Drawing.Point(41, 394);
-            this.autoFontTextBox1.Name = "autoFontTextBox1";
-            this.autoFontTextBox1.Opacity = 100;
-            this.autoFontTextBox1.Size = new System.Drawing.Size(400, 150);
-            this.autoFontTextBox1.TabIndex = 1;
+            this.breadText.BackColor = System.Drawing.Color.Transparent;
+            this.breadText.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
+            this.breadText.Location = new System.Drawing.Point(41, 394);
+            this.breadText.Name = "breadText";
+            this.breadText.Opacity = 100;
+            this.breadText.Size = new System.Drawing.Size(400, 150);
+            this.breadText.TabIndex = 1;
             // 
             // nameBox
             // 
@@ -129,7 +135,7 @@ namespace stonerkart
             this.Controls.Add(this.powerBox);
             this.Controls.Add(this.toughnessBox);
             this.Controls.Add(this.nameBox);
-            this.Controls.Add(this.autoFontTextBox1);
+            this.Controls.Add(this.breadText);
             this.Controls.Add(this.art);
             this.Controls.Add(this.pictureBox1);
             this.Name = "CardView";

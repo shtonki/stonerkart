@@ -11,6 +11,7 @@ namespace stonerkart
     class ManaPanel : UserControl
     {
         private ManaButton[][] images;
+        public readonly List<Action<Clickable>> callbacks = new List<Action<Clickable>>();
 
         public ManaPanel()
         {
@@ -24,6 +25,7 @@ namespace stonerkart
                     var p = new ManaButton();
                     images[i][j] = p;
                     Controls.Add(p);
+                    p.MouseDown += (_, __) => { foreach (var c in callbacks) c(p); };
                 }
             }
             layoutPicures();

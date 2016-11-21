@@ -184,7 +184,7 @@ namespace stonerkart
         private Card getCard(Func<Card, bool> f, string prompt)
         {
             Controller.setPrompt(prompt, "nigra");
-            var v = Controller.waitForButtonOr<Card>(f);
+            var v = waitForButtonOr<Card>(f);
             if (v is ShibbuttonStuff)
             {
                 return null;
@@ -195,7 +195,7 @@ namespace stonerkart
         private Tile getTile(Func<Tile, bool> f, string prompt)
         {
             Controller.setPrompt(prompt, "nigra");
-            var v = Controller.waitForButtonOr<Tile>(f);
+            var v = waitForButtonOr<Tile>(f);
             if (v is ShibbuttonStuff)
             {
                 return null;
@@ -218,6 +218,45 @@ namespace stonerkart
 
                 return new StackWrapper(c, t);
             }
+        }
+
+        private ManualResetEventSlim callerBacker;
+        private InputEventFilter filter;
+        private Stuff s;
+
+        public void mouseEntered(Clickable c)
+        {
+        }
+
+
+        public void clicked(Clickable c)
+        {
+            var stuff = c.getStuff();
+            InputEvent e = new InputEvent(c, stuff);
+            if (filter != null && filter.filter(e))
+            {
+                s = stuff;
+                callerBacker.Set();
+            }
+        }
+
+        private Stuff waitForButtonOr<T>(Func<T, bool> fn) where T : Stuff
+        {
+            InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || (o is T && fn((T)o)));
+            return waitFor(f);
+        }
+        
+        private Stuff waitFor(InputEventFilter f)
+        {
+            if (callerBacker != null || filter != null) throw new Exception();
+            callerBacker = new ManualResetEventSlim();
+            filter = f;
+            callerBacker.Wait();
+            var r = s;
+            s = null;
+            callerBacker = null;
+            filter = null;
+            return r;
         }
     }
 

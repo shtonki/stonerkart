@@ -16,7 +16,7 @@ namespace stonerkart
         public MapEditor() 
         {
             InitializeComponent();
-            hexPanel2.callbacks.Add(tileClicked);
+            //hexPanel2.callbacks.Add(tileClicked);
         }
 
         private void tileClicked(TileView tv)

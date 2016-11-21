@@ -5,4 +5,4 @@ martin
 this code base
 Map.dijkstra using Int32.MaxValue/2 to denote an uninitialized node
 we up and load every fucking screen when loading the form
-hexpanel has an event handler but we hardcode it's calls to controller because we're lazy and autistic
+if cardViews start sending their shit twice or to the wrong place it's because we never remove the MouseDown callback because we're autistic

@@ -8,6 +8,8 @@ namespace stonerkart
     class CardsPanel : UserControl, Observer<PileChangedMessage>
     {
         private List<CardView> cardViews;
+        public readonly List<Action<Clickable>> callbacks = new List<Action<Clickable>>();
+
         public CardsPanel()
         {
             cardViews = new List<CardView>();
@@ -15,7 +17,11 @@ namespace stonerkart
             DoubleBuffered = true;
             Resize += (_, __) => layoutCards();
         }
-        
+
+        private void clicked(CardView c)
+        {
+            foreach (var cb in callbacks) cb(c);
+        }
 
         public void setPile(Pile p)
         {
@@ -27,6 +33,7 @@ namespace stonerkart
         {
             CardView cv = new CardView(c);
             cardViews.Add(cv);
+            cv.MouseDown += (_, __) => clicked(cv);
             this.memeout(() => Controls.Add(cv));
         }
 
@@ -38,7 +45,7 @@ namespace stonerkart
                 if (cardViews[i].card == c)
                 {
                     cv = cardViews[i];
-                    cardViews.RemoveAt(i);
+                    cardViews.RemoveAt(i);  //todo i'm pretty sure this straight up breaks
                     break;
                 }
             }
