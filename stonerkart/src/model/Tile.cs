@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace stonerkart
 {
-    internal class Tile : Stuff
+    internal class Tile : Stuff, Targetable
     {
         public Map map { get; }
         public int x => xyCoord.x;

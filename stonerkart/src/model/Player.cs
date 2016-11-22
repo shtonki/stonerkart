@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class Player
+    class Player : Targetable
     {
         public readonly Card heroCard;
         public readonly Game game;

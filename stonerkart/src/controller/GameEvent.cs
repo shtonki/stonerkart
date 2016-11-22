@@ -9,8 +9,20 @@ namespace stonerkart
     interface GameEvent
     {
     }
+    
+    class MoveToPileEvent : GameEvent
+    {
+        public Pile pile;
+        public Card card;
 
-    class DamageEvent : GameEvent
+        public MoveToPileEvent(Pile pile, Card card)
+        {
+            this.pile = pile;
+            this.card = card;
+        }
+    }
+
+    struct DamageEvent : GameEvent
     {
         public Card source;
         public Card target;
@@ -24,7 +36,7 @@ namespace stonerkart
         }
     }
 
-    class AttackEvent : GameEvent
+    struct AttackEvent : GameEvent
     {
         public Card attacker;
         public Card defender;
@@ -41,19 +53,19 @@ namespace stonerkart
         }
     }
 
-    class MoveEvent : GameEvent
+    struct MoveToTileEvent : GameEvent
     {
         public Card card { get; }
         public Tile tile { get; }
 
-        public MoveEvent(Card card, Tile tile)
+        public MoveToTileEvent(Card card, Tile tile)
         {
             this.card = card;
             this.tile = tile;
         }
     }
 
-    class CastEvent : GameEvent
+    struct CastEvent : GameEvent
     {
         public StackWrapper wrapper { get; }
 
@@ -63,7 +75,7 @@ namespace stonerkart
         }
     }
 
-    class StartOfStepEvent : GameEvent
+    struct StartOfStepEvent : GameEvent
     {
         public Steps step { get; }
 
@@ -73,7 +85,7 @@ namespace stonerkart
         }
     }
 
-    class DrawEvent : GameEvent
+    struct DrawEvent : GameEvent
     {
         public Player player { get; }
         public int cards { get; }

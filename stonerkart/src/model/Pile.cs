@@ -36,10 +36,14 @@ namespace stonerkart
         public Card removeTop()
         {
             int c = cardList.Count;
-            if (c == 0) throw new Exception();
             Card r = cardList[c - 1];
             cardList.RemoveAt(c - 1);
             return r;
+        }
+
+        public Card peekTop()
+        {
+            return cardList[cardList.Count - 1];
         }
 
         public void remove(Card c)

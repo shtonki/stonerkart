@@ -48,21 +48,26 @@ namespace stonerkart
                 Controller.redraw();
             }));
 
-            geFilters.Add(new GameEventHandler<MoveEvent>(e =>
+            geFilters.Add(new GameEventHandler<MoveToTileEvent>(e =>
             {
                 e.card.moveTo(e.tile);
             }));
 
             geFilters.Add(new GameEventHandler<AttackEvent>(e =>
             {
-                raiseEvent(new MoveEvent(e.attacker, e.attackFrom));
+                raiseEvent(new MoveToTileEvent(e.attacker, e.attackFrom));
                 raiseEvent(new DamageEvent(e.attacker, e.defender, e.attacker.power));
-                if (e.defender.cardType != CardType.Hero) raiseEvent(new DamageEvent(e.attacker, e.defender, e.attacker.power));
+                if (e.defender.cardType != CardType.Hero) raiseEvent(new DamageEvent(e.defender, e.attacker, e.defender.power));
             }));
 
             geFilters.Add(new GameEventHandler<DamageEvent>(e =>
             {
                 e.target.toughness.modify(-e.amount, Modifiable.intAdd, Modifiable.startOfEndStep);
+            }));
+
+            geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>
+            {
+                e.card.moveTo(e.pile);
             }));
         }
 
@@ -136,10 +141,8 @@ namespace stonerkart
                     }
 
                     StackWrapper wrapper = wrapperStack.Pop();
-                    Card c = wrapper.card;
-                    
-                    c.moveTo(hero.field);
-                    c.moveTo(wrapper.tile);
+                    if (wrapper.card != stack.peekTop()) throw new Exception();
+                    resolve(wrapper);
 
                     Controller.redraw();
                 }
@@ -191,7 +194,7 @@ namespace stonerkart
                 {
                     if (c.path.to.card == null)
                     {
-                        raiseEvent(new MoveEvent(c, c.path.to));
+                        raiseEvent(new MoveToTileEvent(c, c.path.to));
                     }
                     else
                     {
@@ -228,19 +231,66 @@ namespace stonerkart
         {
             while (true)
             {
-                Card c = getCard((crd) => true, "Cast a card");
-                if (c == null) return null;
+                Card card = getCard((crd) => true, "Cast a card");
+                if (card == null) return null;
 
-                var ns = hero.heroCard.tile.withinDistance(2);
-                Controller.highlight(ns.Select(n => new Tuple<Color, Tile>(Color.Green, n)));
-                Tile t = getTile(tile => tile.card == null && ns.Contains(tile), "To what tile");
-                Controller.clearHighlights();
-                if (t == null) continue;
+                Ability ability = chooseAbility(card);
+                if (ability == null) return null;
 
-                return new StackWrapper(c, t);
+                TargetMatrix[] targets = chooseCastTargets(ability);
+                if (targets == null) return null;
+                
+                return new StackWrapper(card, ability, targets);
             }
         }
 
+        private Ability chooseAbility(Card c)
+        {
+            Ability[] v = c.usableHere;
+            if (v.Length > 1) throw new Exception();
+            if (v.Length == 0) return null;
+            return v[0];
+        }
+
+        private TargetMatrix[] chooseCastTargets(Ability a)
+        {
+            TargetMatrix[] ms = new TargetMatrix[a.effects.Length];
+
+            for (int i = 0; i < ms.Length; i++)
+            {
+                ms[i] = a.effects[i].ts.fillCast(generateTargetable);
+            }
+
+            return ms;
+        }
+        
+
+        private void resolve(StackWrapper wrapper)
+        {
+            TargetMatrix[] ts = wrapper.matricies;
+            Effect[] es = wrapper.ability.effects;
+
+            if (ts.Length != es.Length) throw new Exception();
+
+            List<GameEvent> events = new List<GameEvent>();
+
+            for (int i = 0; i < ts.Length; i++)
+            {
+                Effect effect = es[i];
+                TargetMatrix matrix = effect.ts.fillResolve(ts[i], wrapper.card, this);
+
+                events.AddRange(effect.doer.act(matrix.ts));
+            }
+
+            foreach (GameEvent e in events)
+            {
+                raiseEvent(e);
+            }
+
+            raiseEvent(new MoveToPileEvent(wrapper.card.owner.field, wrapper.card));
+
+        }
+        
         private ManualResetEventSlim callerBacker;
         private InputEventFilter filter;
         private Stuff s;
@@ -249,6 +299,28 @@ namespace stonerkart
         {
         }
 
+        private Targetable generateTargetable()
+        {
+            while (true)
+            {
+                Stuff v = waitFor(new InputEventFilter((clickable, o) => true));
+
+                if (v is Tile)
+                {
+                    return (Tile)v;
+                }
+
+                if (v is Card)
+                {
+                    return (Card)v;
+                }
+
+                if (v is ShibbuttonStuff)
+                {
+                    return null;
+                }
+            }
+        }
 
         public void clicked(Clickable c)
         {
@@ -284,12 +356,14 @@ namespace stonerkart
     struct StackWrapper
     {
         public readonly Card card;
-        public readonly Tile tile;
+        public readonly Ability ability;
+        public readonly TargetMatrix[] matricies;
 
-        public StackWrapper(Card card, Tile tile)
+        public StackWrapper(Card card, Ability ability, TargetMatrix[] ms)
         {
             this.card = card;
-            this.tile = tile;
+            this.ability = ability;
+            matricies = ms;
         }
     }
 

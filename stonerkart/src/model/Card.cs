@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class Card : Observable<CardChangedMessage>, Stuff
+    class Card : Observable<CardChangedMessage>, Stuff, Targetable
     {
         public string name { get; }
         public Image image { get; }
@@ -18,9 +18,10 @@ namespace stonerkart
         public CardType cardType { get; }
 
         public Location location => pile.location;
-        public IEnumerable<ActivatedAbility> activatableHere => activatedAbilities.Where(a => a.castableFrom == location.pile);
 
-        public List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
+        public List<Ability> abilities = new List<Ability>();
+        public Ability[] usableHere => abilities.Where(a => a.usableIn == location.pile).ToArray();
+
 
         public readonly Modifiable<int> power;
         public readonly Modifiable<int> toughness;
@@ -35,6 +36,7 @@ namespace stonerkart
             int baseMovement;
 
             int castCost = 0; 
+            List<Effect> castEffects = new List<Effect>();
 
             #region oophell
             switch (ct)
@@ -75,11 +77,12 @@ namespace stonerkart
                 movement,
             };
 
-            activatedAbilities.Add(new ActivatedAbility(
-                new Cost(new ManaCost(castCost)), 
-                PileLocation.Hand, 
-                new List<TargetRule>()));
-
+            Effect e = new Effect(new TargetSet(new ResolveRule(ResolveRule.Rule.CastCard), 
+                new CastRule(targetable => targetable is Tile && ((Tile)targetable).card == null)), 
+                Doer.MoveToTileDoer());
+            Ability castAbility = new Ability(PileLocation.Hand, e);
+            abilities.Add(castAbility);
+            
             this.owner = owner;
             name = ct.ToString();
         }

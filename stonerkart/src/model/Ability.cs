@@ -6,22 +6,16 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    abstract class Ability
+    class Ability
     {
+        public PileLocation usableIn;
+        public Effect[] effects;
 
-    }
-
-    class ActivatedAbility : Ability
-    {
-        public Cost costs;
-        public PileLocation castableFrom;
-        public List<TargetRule> targets;
-
-        public ActivatedAbility(Cost costs, PileLocation castableFrom, List<TargetRule> targets)
+        public Ability(PileLocation usableIn, params Effect[] es)
         {
-            this.costs = costs;
-            this.castableFrom = castableFrom;
-            this.targets = targets;
+            this.usableIn = usableIn;
+            this.effects = es;
         }
     }
+    
 }
