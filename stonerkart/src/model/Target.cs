@@ -59,19 +59,48 @@ namespace stonerkart
 
     class CastRule : TargetRule
     {
-        private Func<Targetable, bool> filter;
+        protected Func<Targetable, bool> filter;
 
         public CastRule(Func<Targetable, bool> filter)
         {
             this.filter = filter;
         }
 
-        public Targetable[] fill(Func<Targetable> t)
+        public virtual Targetable[] fill(Func<Targetable> t)
         {
             while (true)
             {
                 Targetable g = t();
+                if (g == null)
+                {
+                    return null;
+                }
                 if (filter(g)) return new[] {g};
+            }
+        }
+    }
+
+    class PryRule<T> : CastRule where T : Targetable
+    {
+        public PryRule(Func<T, bool> filter) : base(t => t is T && filter((T)t))
+        {
+        }
+
+        public override Targetable[] fill(Func<Targetable> t)
+        {
+            while (true)
+            {
+                Targetable g = t();
+                
+                if (!(g is Tile)) continue;
+
+                Tile tile = (Tile)g;
+                Card c = tile.card;
+                if (c == null) continue;
+                if (filter(c)) return new[] { (Targetable)c };
+                if (c.cardType != CardType.Hero) continue;
+                Player p = c.owner;
+                if (filter(p)) return new[] { (Targetable)p };
             }
         }
     }

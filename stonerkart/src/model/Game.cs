@@ -128,7 +128,7 @@ namespace stonerkart
         {
             while (true)
             {
-                var v = getCast();
+                var v = getCast(hero);
                 if (v != null)
                 {
                     raiseEvent(new CastEvent(v.Value));
@@ -227,17 +227,18 @@ namespace stonerkart
             return (Tile)v;
         }
 
-        private StackWrapper? getCast()
+        private StackWrapper? getCast(Player p)
         {
+            Tile from = p.heroCard.tile;
             while (true)
             {
                 Card card = getCard((crd) => true, "Cast a card");
                 if (card == null) return null;
 
                 Ability ability = chooseAbility(card);
-                if (ability == null) return null;
+                if (ability == null) continue;
 
-                TargetMatrix[] targets = chooseCastTargets(ability);
+                TargetMatrix[] targets = chooseCastTargets(ability, from);
                 if (targets == null) return null;
                 
                 return new StackWrapper(card, ability, targets);
@@ -252,15 +253,18 @@ namespace stonerkart
             return v[0];
         }
 
-        private TargetMatrix[] chooseCastTargets(Ability a)
+        private TargetMatrix[] chooseCastTargets(Ability a, Tile castFrom)
         {
             TargetMatrix[] ms = new TargetMatrix[a.effects.Length];
+            List<Tile> v = castFrom.withinDistance(a.castRange);
 
+            Controller.highlight(v, Color.Green);
+            Controller.setPrompt("target nigra", "Cancel");
             for (int i = 0; i < ms.Length; i++)
             {
-                ms[i] = a.effects[i].ts.fillCast(generateTargetable);
+                ms[i] = a.effects[i].ts.fillCast(generateTargetable(v));
             }
-
+            Controller.clearHighlights();
             return ms;
         }
         
@@ -294,32 +298,34 @@ namespace stonerkart
         private ManualResetEventSlim callerBacker;
         private InputEventFilter filter;
         private Stuff s;
+        
 
-        public void mouseEntered(Clickable c)
+        private Func<Targetable> generateTargetable(IEnumerable<Tile> allowedTiles)
         {
-        }
-
-        private Targetable generateTargetable()
-        {
-            while (true)
+            Tile[] allowed = allowedTiles.ToArray();
+            return () =>
             {
-                Stuff v = waitFor(new InputEventFilter((clickable, o) => true));
-
-                if (v is Tile)
+                while (true)
                 {
-                    return (Tile)v;
-                }
+                    Stuff v = waitFor(new InputEventFilter((clickable, o) => true));
 
-                if (v is Card)
-                {
-                    return (Card)v;
-                }
+                    if (v is Tile)
+                    {
+                        if (!allowed.Contains(v)) continue;
+                        return (Tile)v;
+                    }
 
-                if (v is ShibbuttonStuff)
-                {
-                    return null;
+                    if (v is Card)
+                    {
+                        return (Card)v;
+                    }
+
+                    if (v is ShibbuttonStuff)
+                    {
+                        return null;
+                    }
                 }
-            }
+            };
         }
 
         public void clicked(Clickable c)

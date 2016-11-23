@@ -95,6 +95,12 @@ namespace stonerkart
             highlight(tvs.Select(v => new Tuple<Color, Tile>(c, v)));
         }
 
+        public static void highlight(IEnumerable<Tile> tiles, Color color)
+        {
+            highlight(tiles.Select(t => new Tuple<Color, Tile>(color, t)));
+        }
+
+
         public static void highlight(IEnumerable<Tuple<Color, Tile>> l, bool rd = true)
         {
             foreach (var v in l)

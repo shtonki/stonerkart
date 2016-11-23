@@ -28,18 +28,18 @@ namespace stonerkart
             heroCard = new Card(hc, this);
             field.addTop(heroCard);
 
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Zap, this));
         }
     }
 }

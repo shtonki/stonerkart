@@ -184,6 +184,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="musings.txt" />
+    <None Include="Resources\LightningBolt.png" />
+    <None Include="Resources\AlterTime.png" />
     <None Include="Resources\order.png" />
     <None Include="Resources\nature.png" />
     <None Include="Resources\might.png" />

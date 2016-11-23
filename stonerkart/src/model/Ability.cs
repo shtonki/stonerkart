@@ -10,11 +10,13 @@ namespace stonerkart
     {
         public PileLocation usableIn;
         public Effect[] effects;
+        public int castRange;
 
-        public Ability(PileLocation usableIn, params Effect[] es)
+        public Ability(PileLocation usableIn, int castRange, params Effect[] es)
         {
             this.usableIn = usableIn;
             this.effects = es;
+            this.castRange = castRange;
         }
     }
     

@@ -63,6 +63,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AlterTime {
+            get {
+                object obj = ResourceManager.GetObject("AlterTime", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap chaos {
             get {
                 object obj = ResourceManager.GetObject("chaos", resourceCulture);
@@ -146,6 +156,16 @@ namespace stonerkart.Properties {
         internal static System.Drawing.Bitmap white3 {
             get {
                 object obj = ResourceManager.GetObject("white3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Zap {
+            get {
+                object obj = ResourceManager.GetObject("Zap", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

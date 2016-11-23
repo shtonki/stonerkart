@@ -14,6 +14,8 @@ namespace stonerkart
         private AutoFontTextBox toughnessBox;
         private AutoFontTextBox powerBox;
         private PictureBox pictureBox1;
+        private AutoFontTextBox cardTypeText;
+        private AutoFontTextBox castRangeSlashMovementBox;
         public readonly Card card;
         
         public CardView()
@@ -37,10 +39,24 @@ namespace stonerkart
         {
             this.memeout(() =>
             {
-                nameBox.Text = card.name;
-                powerBox.Text = card.power.ToString();
-                toughnessBox.Text = card.toughness.ToString();
                 art.Image = card.image;
+
+                nameBox.Text = card.name;
+                cardTypeText.Text = card.cardType.ToString();
+                breadText.Text = card.breadText;
+
+                if (card.cardType == CardType.Creature || card.cardType == CardType.Hero)
+                {
+                    powerBox.Text = card.power.ToString();
+                    toughnessBox.Text = card.toughness.ToString();
+                    castRangeSlashMovementBox.Text = card.movement.ToString();
+                }
+                else
+                {
+                    castRangeSlashMovementBox.Text = card.castRange.ToString();
+                    powerBox.Text = "";
+                    toughnessBox.Text = "";
+                }
             });
         }
 
@@ -62,6 +78,8 @@ namespace stonerkart
             this.toughnessBox = new stonerkart.AutoFontTextBox();
             this.powerBox = new stonerkart.AutoFontTextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.cardTypeText = new stonerkart.AutoFontTextBox();
+            this.castRangeSlashMovementBox = new stonerkart.AutoFontTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.art)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -73,12 +91,12 @@ namespace stonerkart
             this.art.InitialImage = null;
             this.art.Location = new System.Drawing.Point(46, 64);
             this.art.Name = "art";
-            this.art.Size = new System.Drawing.Size(376, 287);
+            this.art.Size = new System.Drawing.Size(386, 291);
             this.art.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.art.TabIndex = 0;
             this.art.TabStop = false;
             // 
-            // autoFontTextBox1
+            // breadText
             // 
             this.breadText.BackColor = System.Drawing.Color.Transparent;
             this.breadText.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
@@ -130,8 +148,30 @@ namespace stonerkart
             this.pictureBox1.TabIndex = 5;
             this.pictureBox1.TabStop = false;
             // 
+            // cardTypeText
+            // 
+            this.cardTypeText.BackColor = System.Drawing.Color.Transparent;
+            this.cardTypeText.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
+            this.cardTypeText.Location = new System.Drawing.Point(46, 370);
+            this.cardTypeText.Name = "cardTypeText";
+            this.cardTypeText.Opacity = 100;
+            this.cardTypeText.Size = new System.Drawing.Size(392, 28);
+            this.cardTypeText.TabIndex = 5;
+            // 
+            // castRangeSlashMovementBox
+            // 
+            this.castRangeSlashMovementBox.BackColor = System.Drawing.Color.Transparent;
+            this.castRangeSlashMovementBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
+            this.castRangeSlashMovementBox.Location = new System.Drawing.Point(212, 550);
+            this.castRangeSlashMovementBox.Name = "castRangeSlashMovementBox";
+            this.castRangeSlashMovementBox.Opacity = 100;
+            this.castRangeSlashMovementBox.Size = new System.Drawing.Size(53, 57);
+            this.castRangeSlashMovementBox.TabIndex = 5;
+            // 
             // CardView
             // 
+            this.Controls.Add(this.castRangeSlashMovementBox);
+            this.Controls.Add(this.cardTypeText);
             this.Controls.Add(this.powerBox);
             this.Controls.Add(this.toughnessBox);
             this.Controls.Add(this.nameBox);

@@ -16,7 +16,8 @@ namespace stonerkart
         public Path path { get; set; }
         public Player owner { get; }
         public CardType cardType { get; }
-
+        public int castRange { get; }
+        public string breadText { get; }
         public Location location => pile.location;
 
         public List<Ability> abilities = new List<Ability>();
@@ -31,23 +32,20 @@ namespace stonerkart
 
         public Card(CardTemplate ct, Player owner)
         {
-            int basePower;
-            int baseToughness;
-            int baseMovement;
-
-            int castCost = 0; 
-            List<Effect> castEffects = new List<Effect>();
+            int basePower = -1;
+            int baseToughness = -1;
+            int baseMovement = -1;
 
             #region oophell
             switch (ct)
             {
                 case CardTemplate.Hero:
                 {
+                    cardType = CardType.Hero;
                     image = Properties.Resources.pepeman;
                     baseMovement = 1;
                     basePower = 1;
                     baseToughness = 10;
-                    cardType = CardType.Hero;
                 } break;
 
                 case CardTemplate.Jordan:
@@ -57,7 +55,21 @@ namespace stonerkart
                     basePower = 1;
                     baseToughness = 2;
                     cardType = CardType.Creature;
-                    castCost = 1;
+                } break;
+
+                case CardTemplate.Zap:
+                {
+                    image = Properties.Resources.Zap;
+                    cardType = CardType.Instant;
+                    castRange = 3;
+                    Effect e = new Effect(new TargetSet(new ResolveRule(ResolveRule.Rule.CastCard), new PryRule<Card>(c => true)), Doer.ZepDoer(2));
+                    abilities.Add(new Ability(PileLocation.Hand, castRange, e));
+                    breadText = "Deal 2 damage to target creature";
+                } break;
+
+                case CardTemplate.AlterTime:
+                {
+                    throw new NotImplementedException();
                 } break;
 
                 default:
@@ -77,12 +89,18 @@ namespace stonerkart
                 movement,
             };
 
-            Effect e = new Effect(new TargetSet(new ResolveRule(ResolveRule.Rule.CastCard), 
-                new CastRule(targetable => targetable is Tile && ((Tile)targetable).card == null)), 
-                Doer.MoveToTileDoer());
-            Ability castAbility = new Ability(PileLocation.Hand, e);
-            abilities.Add(castAbility);
+            if (cardType == CardType.Creature)
+            {
+                Effect e = new Effect(new TargetSet(
+                    new ResolveRule(ResolveRule.Rule.CastCard),
+                    new CastRule(targetable => targetable is Tile && ((Tile)targetable).card == null)),
+                    Doer.MoveToTileDoer());
+
+                    Ability castAbility = new Ability(PileLocation.Hand, 2, e);
+                    abilities.Add(castAbility);
+            }
             
+            breadText = breadText ?? "";
             this.owner = owner;
             name = ct.ToString();
         }
@@ -114,11 +132,14 @@ namespace stonerkart
     {
         Hero,
         Jordan,
+        AlterTime,
+        Zap,
     }
 
     enum CardType
     {
         Hero,
         Creature,
+        Instant,
     }
 }

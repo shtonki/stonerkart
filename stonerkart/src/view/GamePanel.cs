@@ -145,7 +145,7 @@ namespace stonerkart
             this.stackPanel.BackColor = System.Drawing.Color.Navy;
             this.stackPanel.Location = new System.Drawing.Point(4, 341);
             this.stackPanel.Name = "stackPanel";
-            this.stackPanel.Size = new System.Drawing.Size(207, 235);
+            this.stackPanel.Size = new System.Drawing.Size(147, 235);
             this.stackPanel.TabIndex = 10;
             // 
             // GamePanel

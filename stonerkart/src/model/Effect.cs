@@ -52,10 +52,15 @@ namespace stonerkart
                 return rt.ToArray();
             });
         }
-
+        
         public static Doer<Card, Tile> MoveToTileDoer()
         {
             return simpleDoer<Card, Tile>((card, tile) => new GameEvent[] {new MoveToTileEvent(card, tile), });
+        }
+
+        public static Doer<Card, Card> ZepDoer(int damage)
+        {
+            return simpleDoer<Card, Card>((source, target) => new GameEvent[] { new DamageEvent(source, target, damage),  });
         }
     }
 
