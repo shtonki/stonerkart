@@ -17,3 +17,4 @@ Card contructor
 ManaButton image caching and how it's nonexistand and how that's fucked
 still martin
 Game.generateTargetable is fucked and we "should" do it differently
+targeting was rotten from the get go
