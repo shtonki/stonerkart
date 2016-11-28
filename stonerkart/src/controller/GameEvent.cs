@@ -53,6 +53,20 @@ namespace stonerkart
         }
     }
 
+    struct PayCostsEvent : GameEvent
+    {
+        public Player player;
+        public Ability ability;
+        public int[][] costs;
+
+        public PayCostsEvent(Player player, Ability ability, int[][] costs)
+        {
+            this.player = player;
+            this.ability = ability;
+            this.costs = costs;
+        }
+    }
+
     struct MoveToTileEvent : GameEvent
     {
         public Card card { get; }

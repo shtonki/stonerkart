@@ -6,17 +6,26 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class Ability
+    abstract class Ability
     {
-        public PileLocation usableIn;
+        public PileLocation activeIn;
         public Effect[] effects;
         public int castRange;
+        public Cost cost;
 
-        public Ability(PileLocation usableIn, int castRange, params Effect[] es)
+        public Ability(PileLocation activeIn, Effect[] effects, int castRange, Cost cost)
         {
-            this.usableIn = usableIn;
-            this.effects = es;
+            this.activeIn = activeIn;
+            this.effects = effects;
             this.castRange = castRange;
+            this.cost = cost;
+        }
+    }
+
+    class ActivatedAbility : Ability
+    {
+        public ActivatedAbility(PileLocation activeIn, int castRange, Cost cost, params Effect[] effects) : base(activeIn, effects, castRange, cost)
+        {
         }
     }
     

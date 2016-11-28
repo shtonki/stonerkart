@@ -16,6 +16,7 @@ namespace stonerkart
         private PictureBox pictureBox1;
         private AutoFontTextBox cardTypeText;
         private AutoFontTextBox castRangeSlashMovementBox;
+        private ManaCostPanel manaCostPanel1;
         public readonly Card card;
         
         public CardView()
@@ -44,6 +45,7 @@ namespace stonerkart
                 nameBox.Text = card.name;
                 cardTypeText.Text = card.cardType.ToString();
                 breadText.Text = card.breadText;
+                manaCostPanel1.setCost(card.castManaCost);
 
                 if (card.cardType == CardType.Creature || card.cardType == CardType.Hero)
                 {
@@ -80,6 +82,7 @@ namespace stonerkart
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.cardTypeText = new stonerkart.AutoFontTextBox();
             this.castRangeSlashMovementBox = new stonerkart.AutoFontTextBox();
+            this.manaCostPanel1 = new stonerkart.ManaCostPanel();
             ((System.ComponentModel.ISupportInitialize)(this.art)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -113,7 +116,7 @@ namespace stonerkart
             this.nameBox.Location = new System.Drawing.Point(31, 15);
             this.nameBox.Name = "nameBox";
             this.nameBox.Opacity = 100;
-            this.nameBox.Size = new System.Drawing.Size(391, 33);
+            this.nameBox.Size = new System.Drawing.Size(242, 33);
             this.nameBox.TabIndex = 2;
             // 
             // toughnessBox
@@ -168,8 +171,16 @@ namespace stonerkart
             this.castRangeSlashMovementBox.Size = new System.Drawing.Size(53, 57);
             this.castRangeSlashMovementBox.TabIndex = 5;
             // 
+            // manaCostPanel1
+            // 
+            this.manaCostPanel1.Location = new System.Drawing.Point(280, 15);
+            this.manaCostPanel1.Name = "manaCostPanel1";
+            this.manaCostPanel1.Size = new System.Drawing.Size(161, 33);
+            this.manaCostPanel1.TabIndex = 6;
+            // 
             // CardView
             // 
+            this.Controls.Add(this.manaCostPanel1);
             this.Controls.Add(this.castRangeSlashMovementBox);
             this.Controls.Add(this.cardTypeText);
             this.Controls.Add(this.powerBox);

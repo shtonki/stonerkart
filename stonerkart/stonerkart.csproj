@@ -81,6 +81,7 @@
     <Compile Include="src\controller\InputEvent.cs" />
     <Compile Include="src\model\Ability.cs" />
     <Compile Include="src\model\Card.cs" />
+    <Compile Include="src\model\Cost.cs" />
     <Compile Include="src\model\Effect.cs" />
     <Compile Include="src\model\Game.cs" />
     <Compile Include="src\model\ManaOrb.cs" />
@@ -118,10 +119,16 @@
     <Compile Include="src\view\MainMenuPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="src\view\ManaCostPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="src\view\ManaPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\MapEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="src\view\PlayerPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\ShiButton.cs">
@@ -131,6 +138,9 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\TileView.cs" />
+    <Compile Include="src\view\TransparentPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -166,6 +176,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\MapEditor.resx">
       <DependentUpon>MapEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="src\view\PlayerPanel.resx">
+      <DependentUpon>PlayerPanel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

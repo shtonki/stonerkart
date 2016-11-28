@@ -33,6 +33,11 @@ namespace stonerkart
 
         private void setupHandlers()
         {
+            geFilters.Add(new GameEventHandler<PayCostsEvent>(e =>
+            { 
+                e.ability.cost.cut(e.player, e.costs);
+            }));
+
             geFilters.Add(new GameEventHandler<DrawEvent>(e =>
             {
                 e.player.deck.removeTop().moveTo(e.player.hand);
@@ -117,23 +122,30 @@ namespace stonerkart
         private void untapStep()
         {
             raiseEvent(new StartOfStepEvent(Steps.Untap));
+            activePlayer.resetMana();
+            int[] r = activePlayer.stuntMana();
+            Controller.setPrompt("Gain mana nerd");
+            ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => r[(int)o.colour] != 6);
+            activePlayer.unstuntMana(r, v.colour);
         }
 
         private void drawStep()
         {
-            raiseEvent(new DrawEvent(hero, 1));
+            raiseEvent(new DrawEvent(activePlayer, 1));
         }
 
         private void mainStep()
         {
             while (true)
             {
-                var v = getCast(hero);
+                StackWrapper? v = getCast(activePlayer);
                 if (v != null)
                 {
-                    raiseEvent(new CastEvent(v.Value));
+                    StackWrapper w = v.Value;
+                    raiseEvent(new PayCostsEvent(activePlayer, w.ability, w.costs));
+                    raiseEvent(new CastEvent(w));
                 }
-                else  //someone passed
+                else //pass
                 {
                     if (wrapperStack.Count == 0)
                     {
@@ -235,19 +247,22 @@ namespace stonerkart
                 Card card = getCard((crd) => true, "Cast a card");
                 if (card == null) return null;
 
-                Ability ability = chooseAbility(card);
+                ActivatedAbility ability = chooseAbility(card);
                 if (ability == null) continue;
 
+                int[][] costs = ability.cost.measure(p);
+                if (costs == null) continue;
+
                 TargetMatrix[] targets = chooseCastTargets(ability, from);
-                if (targets == null) return null;
-                
-                return new StackWrapper(card, ability, targets);
+                if (targets == null) continue;
+
+                return new StackWrapper(card, ability, targets, costs);
             }
         }
 
-        private Ability chooseAbility(Card c)
+        private ActivatedAbility chooseAbility(Card c)
         {
-            Ability[] v = c.usableHere;
+            ActivatedAbility[] v = c.usableHere;
             if (v.Length > 1) throw new Exception();
             if (v.Length == 0) return null;
             return v[0];
@@ -364,12 +379,14 @@ namespace stonerkart
         public readonly Card card;
         public readonly Ability ability;
         public readonly TargetMatrix[] matricies;
+        public readonly int[][] costs;
 
-        public StackWrapper(Card card, Ability ability, TargetMatrix[] ms)
+        public StackWrapper(Card card, Ability ability, TargetMatrix[] matricies, int[][] costs)
         {
             this.card = card;
             this.ability = ability;
-            matricies = ms;
+            this.matricies = matricies;
+            this.costs = costs;
         }
     }
 

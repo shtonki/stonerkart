@@ -22,13 +22,37 @@ namespace stonerkart
                 images[i] = new ManaButton[6];
                 for (int j = 0; j < 6; j++)
                 {
-                    var p = new ManaButton();
+                    var p = new ManaButton((ManaColour)i, 0.3f);
                     images[i][j] = p;
                     Controls.Add(p);
                     p.MouseDown += (_, __) => { foreach (var c in callbacks) c(p); };
                 }
             }
             layoutPicures();
+        }
+
+        public void setLightUp(ManaPool p)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    ManaButton.Visibility v;
+                    if (p.current[i] > j)
+                    {
+                        v = ManaButton.Visibility.Full;
+                    }
+                    else if (p.max[i] > j)
+                    {
+                        v = ManaButton.Visibility.Faded;
+                    }
+                    else
+                    {
+                        v = ManaButton.Visibility.Hidden;
+                    }
+                    images[i][j].setVisibility(v);
+                }
+            }
         }
 
         protected override void OnResize(EventArgs e)
@@ -45,26 +69,11 @@ namespace stonerkart
             int dw = w - 2 * padding;
             int dh = h - 2 * padding;
 
-            Bitmap[] fullColour = new Image[]
-            {
-                Properties.Resources.chaos, 
-                Properties.Resources.death, 
-                Properties.Resources.life, 
-                Properties.Resources.might, 
-                Properties.Resources.nature, 
-                Properties.Resources.order, 
-            }.Select(i => G.ResizeImage(i, dw, dh)).ToArray();
-
-            Image[] halfColour = fullColour.Select(i => G.SetImageOpacity(i, 0.5f)).ToArray();
-
-            Image m = G.ResizeImage(Properties.Resources.might, dw, dh);
-            m = G.SetImageOpacity(m, 0.4f);
             for (int i = 0; i < 6; i++)
             {
                 for (int j = 0; j < 6; j++)
                 {
-                    images[i][j].Bounds = new Rectangle(i * w + padding, j * h + padding, w - padding, h - padding);
-                    images[i][j].Image = i > 2 ? fullColour[j] : halfColour[j];
+                    images[i][j].Bounds = new Rectangle(j * w + padding, i * h + padding,  w - padding, h - padding);
                 }
             }
         }
@@ -72,12 +81,66 @@ namespace stonerkart
 
     class ManaButton : Label, Clickable
     {
-        public ManaOrb orb { get; }
+        public ManaColour orb { get; }
+        public Visibility visibility;
+        private float fade;
+        private Image full, faded;
+
+        public ManaButton(ManaColour orb, float fade)
+        {
+            this.fade = fade;
+            this.orb = orb;
+            Resize += (_, __) => renigra();
+
+        }
+
+        public void setVisibility(Visibility v)
+        {
+            this.memeout(() =>
+            {
+                visibility = v;
+                switch (visibility)
+                {
+                    case Visibility.Full:
+                    {
+                        Visible = true;
+                        Image = full;
+                    }
+                        break;
+
+                    case Visibility.Faded:
+                    {
+                        Visible = true;
+                        Image = faded;
+                    }
+                        break;
+
+                    case Visibility.Hidden:
+                    {
+                        Visible = false;
+                    }
+                        break;
+                }
+            });
+        }
+
+        private void renigra()
+        {
+            full = G.ResizeImage(G.manaImage(orb), Size.Width, Size.Height);
+            faded = G.SetImageOpacity(full, fade);
+            setVisibility(visibility);
+        }
 
         public Stuff getStuff()
         {
-            Console.WriteLine("stuffing");
-            return orb;
+            return new ManaOrb(orb);
+        }
+
+        public enum Visibility
+        {
+            Full,
+            Faded,
+            Hidden
         }
     }
 }

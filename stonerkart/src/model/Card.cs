@@ -16,12 +16,16 @@ namespace stonerkart
         public Path path { get; set; }
         public Player owner { get; }
         public CardType cardType { get; }
-        public int castRange { get; }
         public string breadText { get; }
+
         public Location location => pile.location;
+        public ActivatedAbility castAbility;
+        public int castRange => castAbility.castRange;
+        public int[] castManaCost => castAbility.cost.getSubCost<ManaCost>().costs;
+
 
         public List<Ability> abilities = new List<Ability>();
-        public Ability[] usableHere => abilities.Where(a => a.usableIn == location.pile).ToArray();
+        public ActivatedAbility[] usableHere => abilities.Where(a => a is ActivatedAbility && a.activeIn == location.pile).Cast<ActivatedAbility>().ToArray();
 
 
         public readonly Modifiable<int> power;
@@ -61,9 +65,9 @@ namespace stonerkart
                 {
                     image = Properties.Resources.Zap;
                     cardType = CardType.Instant;
-                    castRange = 3;
                     Effect e = new Effect(new TargetSet(new ResolveRule(ResolveRule.Rule.CastCard), new PryRule<Card>(c => true)), Doer.ZepDoer(2));
-                    abilities.Add(new Ability(PileLocation.Hand, castRange, e));
+                    castAbility = new ActivatedAbility(PileLocation.Hand, 3, new Cost(new ManaCost(ManaColour.Chaos)), e);
+                    abilities.Add(castAbility);
                     breadText = "Deal 2 damage to target creature";
                 } break;
 
@@ -96,7 +100,7 @@ namespace stonerkart
                     new CastRule(targetable => targetable is Tile && ((Tile)targetable).card == null)),
                     Doer.MoveToTileDoer());
 
-                    Ability castAbility = new Ability(PileLocation.Hand, 2, e);
+                    castAbility = new ActivatedAbility(PileLocation.Hand, 2, new Cost(), e);
                     abilities.Add(castAbility);
             }
             
