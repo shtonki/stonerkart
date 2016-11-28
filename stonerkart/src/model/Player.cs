@@ -37,13 +37,9 @@ namespace stonerkart
             deck.addTop(new Card(CardTemplate.Zap, this));
             deck.addTop(new Card(CardTemplate.Zap, this));
             deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+            deck.addTop(new Card(CardTemplate.Jordan, this));
+
         }
 
         public void resetMana()

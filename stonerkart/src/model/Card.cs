@@ -65,7 +65,7 @@ namespace stonerkart
                 {
                     image = Properties.Resources.Zap;
                     cardType = CardType.Instant;
-                    Effect e = new Effect(new TargetSet(new ResolveRule(ResolveRule.Rule.CastCard), new PryRule<Card>(c => true)), Doer.ZepDoer(2));
+                    Effect e = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), new ZepperDoer(2));
                     castAbility = new ActivatedAbility(PileLocation.Hand, 3, new Cost(new ManaCost(ManaColour.Chaos)), e);
                     abilities.Add(castAbility);
                     breadText = "Deal 2 damage to target creature";
@@ -95,12 +95,12 @@ namespace stonerkart
 
             if (cardType == CardType.Creature)
             {
-                Effect e = new Effect(new TargetSet(
-                    new ResolveRule(ResolveRule.Rule.CastCard),
-                    new CastRule(targetable => targetable is Tile && ((Tile)targetable).card == null)),
-                    Doer.MoveToTileDoer());
+                Effect e = new Effect(new TargetRuleSet(
+                    new ResolveRule(ResolveRule.Rule.ResolveCard),
+                    new PryTileRule(t => t.card == null)),
+                    new MoveToTileDoer());
 
-                    castAbility = new ActivatedAbility(PileLocation.Hand, 2, new Cost(), e);
+                    castAbility = new ActivatedAbility(PileLocation.Hand, 2, new Cost(new ManaCost(ManaColour.Chaos)), e);
                     abilities.Add(castAbility);
             }
             
@@ -129,6 +129,11 @@ namespace stonerkart
             {
                 v.check(e);
             }
+        }
+
+        public override string ToString()
+        {
+            return name;
         }
     }
 

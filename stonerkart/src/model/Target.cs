@@ -6,102 +6,126 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class TargetSet
+    class TargetRuleSet
     {
-        public TargetRule[] ts;
+        public TargetRule[] rules;
 
-        public TargetSet(params TargetRule[] ts)
+        public TargetRuleSet(params TargetRule[] rules)
         {
-            this.ts = ts;
+            this.rules = rules;
         }
 
-        public TargetMatrix fillCast(Func<Targetable> generator)
+        public TargetMatrix fillCast(Func<Targetable> f)
         {
-            Targetable[][] rt = new Targetable[ts.Length][];
-            for (int i = 0; i < ts.Length; i++)
+            TargetColumn[] r = new TargetColumn[rules.Length];
+
+            for (int i = 0; i < rules.Length; i++)
             {
-                if (ts[i] is CastRule)
-                {
-                    Targetable[] v = ((CastRule)ts[i]).fill(generator);
-                    if (v == null) return null;
-                    rt[i] = v;
-                }
-                else
-                {
-                    rt[i] = null;
-                }
+                TargetColumn? v = rules[i].fillCastTargets(f);
+                if (v == null) return null;
+                r[i] = v.Value;
             }
-            return new TargetMatrix(rt);
+
+            return new TargetMatrix(r);
         }
 
-        public TargetMatrix fillResolve(TargetMatrix m, Card c, Game g)
+        public TargetMatrix fillResolve(TargetMatrix tm, Card resolveCard, Game g)
         {
-            Targetable[][] rt = m.ts;
-            for (int i = 0; i < ts.Length; i++)
+            TargetColumn[] r = tm.cs;
+
+            for (int i = 0; i < rules.Length; i++)
             {
-                if (ts[i] is CastRule)
-                {
-                    if (rt[i] == null) throw new Exception();
-                }
-                else
-                {
-                    if (rt[i] != null) throw new Exception();
-                    rt[i] = ((ResolveRule)ts[i]).fill(c, g);
-                }
+                r[i] = rules[i].fillResolveTargets(new ResolveEnv(resolveCard), r[i]);
             }
-            return new TargetMatrix(rt);
+
+            return new TargetMatrix(r);
+        }
+
+    }
+
+    class TargetMatrix
+    {
+        public TargetColumn[] cs;
+
+        public TargetMatrix(TargetColumn[] cs)
+        {
+            this.cs = cs;
+        }
+
+        public TargetRow[] generateRows()
+        {
+            int l = cs.Aggregate(1, (current, c) => current*c.ts.Length);
+            TargetRow[] r = new TargetRow[l];
+            if (l != 1) throw new Exception();
+
+            Targetable[] i1 = new Targetable[cs.Length];
+            for (int i = 0; i < cs.Length; i++)
+            {
+                i1[i] = cs[i].ts[0];
+            }
+
+            r[0] = new TargetRow(i1);
+
+            return r;
         }
     }
 
     interface TargetRule
     {
+        TargetColumn? fillCastTargets(Func<Targetable> f);
+        TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c);
     }
 
-    class CastRule : TargetRule
+    class PryTileRule : TargetRule
     {
-        protected Func<Targetable, bool> filter;
+        private Func<Tile, bool> filter;
 
-        public CastRule(Func<Targetable, bool> filter)
+        public PryTileRule(Func<Tile, bool> filter)
         {
             this.filter = filter;
         }
 
-        public virtual Targetable[] fill(Func<Targetable> t)
+        public TargetColumn? fillCastTargets(Func<Targetable> f)
         {
             while (true)
             {
-                Targetable g = t();
-                if (g == null)
-                {
-                    return null;
-                }
-                if (filter(g)) return new[] {g};
+                Targetable v = f();
+                if (!(v is Tile)) continue;
+                Tile t = (Tile)v;
+                if (filter(t)) return new TargetColumn(t);
             }
+        }
+
+        public TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        {
+            return c;
         }
     }
 
-    class PryRule<T> : CastRule where T : Targetable
+    class PryCardRule : TargetRule
     {
-        public PryRule(Func<T, bool> filter) : base(t => t is T && filter((T)t))
+        private Func<Card, bool> filter;
+
+        public PryCardRule(Func<Card, bool> filter)
         {
+            this.filter = filter;
         }
 
-        public override Targetable[] fill(Func<Targetable> t)
+        public TargetColumn? fillCastTargets(Func<Targetable> f)
         {
             while (true)
             {
-                Targetable g = t();
-                
-                if (!(g is Tile)) continue;
-
-                Tile tile = (Tile)g;
-                Card c = tile.card;
-                if (c == null) continue;
-                if (filter(c)) return new[] { (Targetable)c };
-                if (c.cardType != CardType.Hero) continue;
-                Player p = c.owner;
-                if (filter(p)) return new[] { (Targetable)p };
+                Targetable v = f();
+                if (!(v is Tile)) continue;
+                Tile t = (Tile)v;
+                if (t.card == null) continue;
+                if (filter(t.card)) return new TargetColumn(t.card);
             }
+        }
+
+        public TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        {
+            return c;
         }
     }
 
@@ -114,36 +138,61 @@ namespace stonerkart
             this.rule = rule;
         }
 
-        public Targetable[] fill(Card resolvingCard, Game g)
+        public TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
         {
+            if (c.ts.Length != 0) throw new Exception();
             switch (rule)
             {
-                case Rule.CastCard:
+                case Rule.ResolveCard:
                 {
-                    return new Targetable[] {resolvingCard,};
-                } break;
-
-                default:
-                    throw new Exception();
+                    return new TargetColumn(re.resolveCard);
+                }
             }
+            throw new Exception();
+        }
+
+        public TargetColumn? fillCastTargets(Func<Targetable> f)
+        {
+            return new TargetColumn(new Targetable[] {});
         }
 
         public enum Rule
         {
-            CastCard,
-
+            ResolveCard,
         }
     }
-    
-    class TargetMatrix
-    {
-        public Targetable[][] ts;
 
-        public TargetMatrix(Targetable[][] ts)
+    struct ResolveEnv
+    {
+        public Card resolveCard;
+
+        public ResolveEnv(Card resolveCard)
+        {
+            this.resolveCard = resolveCard;
+        }
+    }
+
+    struct TargetRow
+    {
+        public Targetable[] ts;
+
+        public TargetRow(Targetable[] ts)
         {
             this.ts = ts;
         }
     }
+    
+
+    struct TargetColumn
+    {
+        public Targetable[] ts;
+        
+        public TargetColumn(params Targetable[] ts)
+        {
+            this.ts = ts;
+        }
+    }
+    
     
     interface Targetable
     {

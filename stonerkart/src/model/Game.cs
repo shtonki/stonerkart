@@ -298,7 +298,7 @@ namespace stonerkart
                 Effect effect = es[i];
                 TargetMatrix matrix = effect.ts.fillResolve(ts[i], wrapper.card, this);
 
-                events.AddRange(effect.doer.act(matrix.ts));
+                events.AddRange(effect.doer.act(matrix.generateRows()));
             }
 
             foreach (GameEvent e in events)
