@@ -11,22 +11,34 @@ namespace stonerkart
     {
         public readonly Map map;
         public readonly Player hero;
-        public readonly Player villain;
+        public readonly Player[] players;
 
         public readonly Pile stack = new Pile(new Location(null, PileLocation.Stack));
 
-        public Player activePlayer => hero;
+        private int activePlayerIndex;
+        public Player activePlayer => players[activePlayerIndex];
+
+        public StepHandler stepHandler;
 
         private List<GameEventHandler> geFilters = new List<GameEventHandler>();
         private Stack<StackWrapper> wrapperStack = new Stack<StackWrapper>();
 
         private IEnumerable<Card> herpable => hero.field;
 
-        public Game(Map map)
+        private Random random;
+
+        public Game(Map map, int randoSeed)
         {
             this.map = map;
-            hero = new Player(this, CardTemplate.Hero);
-            villain = new Player(this, CardTemplate.Hero);
+
+            random = new Random(randoSeed);
+
+            players = new Player[2];
+            players[0] = new Player(this, CardTemplate.Hero);
+            players[1] = new Player(this, CardTemplate.Hero);
+            hero = players[0];
+
+            stepHandler = new StepHandler();
 
             setupHandlers();
         }
@@ -95,28 +107,58 @@ namespace stonerkart
             t.Start();
         }
 
-        private void init()
+        private void initGame()
         {
-            map.tileAt(4, 4).place(hero.heroCard);
-            map.tileAt(6, 6).place(villain.heroCard);
+            activePlayerIndex = 0;
+            map.tileAt(4, 4).place(players[0].heroCard);
+            map.tileAt(6, 6).place(players[1].heroCard);
         }
 
         private void loopEx()
         {
-            init();
+            initGame();
 
             while (true)
             {
-                gameLoop();
+                doStep(stepHandler.step);
+                stepHandler.nextStep();
             }
         }
 
-        private void gameLoop()
+        private void doStep(Steps step)
         {
-            untapStep();
-            drawStep();
-            mainStep();
-            moveStep();
+            switch (step)
+            {
+                case Steps.Untap:
+                {
+                    untapStep();
+                } break;
+
+                case Steps.Draw:
+                {
+                    drawStep();
+                } break;
+
+                case Steps.Main1:
+                {
+                    mainStep();
+                } break;
+
+                case Steps.Move:
+                {
+                    moveStep();
+                } break;
+                    
+                case Steps.Main2:
+                {
+                    mainStep();
+                } break;
+
+                case Steps.End:
+                {
+                    endStep();
+                } break;
+            }
         }
 
         private void untapStep()
@@ -214,6 +256,19 @@ namespace stonerkart
                     }
                     c.path = null;
                 }
+            }
+        }
+
+        private void endStep()
+        {
+            //activePlayerIndex = (activePlayerIndex + 1)%players.Length;
+        }
+
+        private void castShit()
+        {
+            while (true)
+            {
+                
             }
         }
 
@@ -390,13 +445,24 @@ namespace stonerkart
         }
     }
 
+    class StepHandler : Observable<Steps>
+    {
+        public Steps step { get; private set; }
+
+        public void nextStep()
+        {
+            if (step == Steps.End) step = Steps.Untap;
+            else step = (Steps)(((int)step)+1);
+            notify(step);
+        }
+    }
+
     enum Steps
     {
         Untap,
         Draw,
         Main1,
-        Combat,
-        Damage,
+        Move,
         Main2,
         End
     }

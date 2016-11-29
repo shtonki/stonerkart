@@ -24,7 +24,8 @@ namespace stonerkart
 
         public static void newGame()
         {
-            Game g = new Game(new Map(21, 13, false, false));
+            Map map = new Map(21, 13, false, false);
+            Game g = new Game(map, 420);
             gameFrame.toGame(g);
             g.startGame();
         }

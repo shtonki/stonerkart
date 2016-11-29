@@ -21,6 +21,8 @@ namespace stonerkart
         public Shibbutton shibbutton5;
         private CardsPanel stackPanel;
         private PlayerPanel heroPanel;
+        private PlayerPanel playerPanel1;
+        private StepPanel stepPanel1;
         public HexPanel hexPanel;
 
         public GamePanel(Game g)
@@ -44,6 +46,8 @@ namespace stonerkart
 
             heroPanel.manaPanel1.callbacks.Add(g.clicked);
             g.hero.addObserver(heroPanel);
+
+            g.stepHandler.addObserver(stepPanel1);
         }
 
         public GamePanel() : this(null)
@@ -62,6 +66,8 @@ namespace stonerkart
             this.shibbutton5 = new stonerkart.Shibbutton();
             this.stackPanel = new stonerkart.CardsPanel();
             this.heroPanel = new stonerkart.PlayerPanel();
+            this.playerPanel1 = new stonerkart.PlayerPanel();
+            this.stepPanel1 = new stonerkart.StepPanel();
             this.SuspendLayout();
             // 
             // hexPanel
@@ -137,22 +143,39 @@ namespace stonerkart
             // stackPanel
             // 
             this.stackPanel.BackColor = System.Drawing.Color.Navy;
-            this.stackPanel.Location = new System.Drawing.Point(32, 186);
+            this.stackPanel.Location = new System.Drawing.Point(7, 314);
             this.stackPanel.Name = "stackPanel";
-            this.stackPanel.Size = new System.Drawing.Size(147, 235);
+            this.stackPanel.Size = new System.Drawing.Size(147, 213);
             this.stackPanel.TabIndex = 10;
             // 
             // heroPanel
             // 
             this.heroPanel.BackColor = System.Drawing.Color.DarkViolet;
-            this.heroPanel.Location = new System.Drawing.Point(4, 490);
+            this.heroPanel.Location = new System.Drawing.Point(4, 533);
             this.heroPanel.Name = "heroPanel";
-            this.heroPanel.Size = new System.Drawing.Size(207, 175);
+            this.heroPanel.Size = new System.Drawing.Size(150, 132);
             this.heroPanel.TabIndex = 11;
+            // 
+            // playerPanel1
+            // 
+            this.playerPanel1.BackColor = System.Drawing.Color.DarkViolet;
+            this.playerPanel1.Location = new System.Drawing.Point(7, 176);
+            this.playerPanel1.Name = "playerPanel1";
+            this.playerPanel1.Size = new System.Drawing.Size(147, 132);
+            this.playerPanel1.TabIndex = 12;
+            // 
+            // stepPanel1
+            // 
+            this.stepPanel1.Location = new System.Drawing.Point(161, 314);
+            this.stepPanel1.Name = "stepPanel1";
+            this.stepPanel1.Size = new System.Drawing.Size(53, 213);
+            this.stepPanel1.TabIndex = 13;
             // 
             // GamePanel
             // 
             this.BackColor = System.Drawing.Color.Fuchsia;
+            this.Controls.Add(this.stepPanel1);
+            this.Controls.Add(this.playerPanel1);
             this.Controls.Add(this.heroPanel);
             this.Controls.Add(this.stackPanel);
             this.Controls.Add(this.shibbutton4);
