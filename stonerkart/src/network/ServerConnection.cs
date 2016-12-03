@@ -16,7 +16,7 @@ namespace stonerkart
 
         protected override void handle(Message m)
         {
-            throw new NotImplementedException();
+            Network.handle(m);
         }
 
         protected override void closed()

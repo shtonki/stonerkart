@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace stonerkart
@@ -17,24 +18,57 @@ namespace stonerkart
     static class Network
     {
         public static ServerConnection serverConnection;
+        private const string servername = "_server";
+        private static ManualResetEvent messageReceived = new ManualResetEvent(false);
+        private static Message receivedMessage;
 
         public static bool connectToServer()
         {
             try
             {
                 serverConnection = new ServerConnection();
-                //return true;
+                return true;
             }
             catch (Exception e)
             {
                 return false;
             }
+        }
 
-            while (true)
+        public static void handle(Message m)
+        {
+            receivedMessage = m;
+            if (m.messageType == Message.MessageType.RESPONSE)
             {
-                string s = System.Console.ReadLine();
-                serverConnection.send(new Message("_server", Message.MessageType.ECHO, s));
+                receivedMessage = m;
+                messageReceived.Set();
             }
         }
+
+        private static Message awaitResponseMessage()
+        {
+            messageReceived.WaitOne();
+            Message r = receivedMessage;
+            receivedMessage = null;
+            messageReceived.Reset();
+            return r;
+        }
+
+        public static bool login(string username, string password)
+        {
+            LoginBody b = new LoginBody(username, password);
+            serverConnection.send(new Message(servername, Message.MessageType.LOGIN, b.toBody()));
+            Message m = awaitResponseMessage();
+            ResponseBody rb = new ResponseBody(m.body);
+            return rb.code == ResponseBody.ResponseCode.OK;
+        }
+
+        public static bool register(string username, string password)
+        {
+            LoginBody b = new LoginBody(username, password);
+            serverConnection.send(new Message(servername, Message.MessageType.REGISTER, b.toBody()));
+            return false;
+        }
+
     }
 }

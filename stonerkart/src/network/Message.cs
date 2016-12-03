@@ -50,6 +50,61 @@ namespace stonerkart
             ECHO,
             LOGIN,
             REGISTER,
+            RESPONSE,
+        }
+    }
+
+    class LoginBody
+    {
+        public string username;
+        public string password;
+
+        public LoginBody(string username, string password)
+        {
+            this.username = username;
+            this.password = password;
+        }
+
+        public LoginBody(string s)
+        {
+            var ss = s.Split(',');
+            username = ss[0];
+            password = ss[1];
+        }
+
+        public string toBody()
+        {
+            return username + ',' + password;
+        }
+    }
+
+    class ResponseBody
+    {
+        public ResponseCode code;
+        public string text;
+
+        public ResponseBody(ResponseCode code, string text)
+        {
+            this.code = code;
+            this.text = text;
+        }
+
+        public ResponseBody(string s)
+        {
+            var ss = s.Split('\0');
+            ResponseCode.TryParse(ss[0], out code);
+            text = ss[1];
+        }
+
+        public string toBody()
+        {
+            return code.ToString() + '\0' + text;
+        }
+
+        public enum ResponseCode
+        {
+            OK,
+            FAILEDGENERIC,
         }
     }
 }
