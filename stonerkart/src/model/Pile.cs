@@ -13,6 +13,8 @@ namespace stonerkart
 
         private List<Card> cardList;
 
+        public int Count => cardList.Count;
+
         public Pile(Location location)
         {
             cardList = new List<Card>();

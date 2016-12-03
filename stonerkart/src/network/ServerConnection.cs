@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace stonerkart
+{
+    class ServerConnection : AsyncConnection
+    {
+        public ServerConnection() : base(generateSocket())
+        {
+        }
+
+        protected override void handle(Message m)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void closed()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static Socket generateSocket()
+        {
+            EndPoint endpoint = new IPEndPoint(IPAddress.Parse("46.239.124.155"), 420);
+            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(endpoint);
+            return socket;
+        }
+    }
+}

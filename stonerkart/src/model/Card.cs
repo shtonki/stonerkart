@@ -13,7 +13,6 @@ namespace stonerkart
         public Image image { get; }
         public Pile pile { get; private set; }
         public Tile tile { get; set; }
-        public Path path { get; set; }
         public Player owner { get; }
         public CardType cardType { get; }
         public string breadText { get; }

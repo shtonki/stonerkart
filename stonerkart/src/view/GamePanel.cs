@@ -21,7 +21,7 @@ namespace stonerkart
         public Shibbutton shibbutton5;
         private CardsPanel stackPanel;
         private PlayerPanel heroPanel;
-        private PlayerPanel playerPanel1;
+        private PlayerPanel villainPanel;
         private StepPanel stepPanel1;
         public HexPanel hexPanel;
 
@@ -47,6 +47,8 @@ namespace stonerkart
             heroPanel.manaPanel1.callbacks.Add(g.clicked);
             g.hero.addObserver(heroPanel);
 
+            g.villain.addObserver(villainPanel);
+
             g.stepHandler.addObserver(stepPanel1);
         }
 
@@ -66,7 +68,7 @@ namespace stonerkart
             this.shibbutton5 = new stonerkart.Shibbutton();
             this.stackPanel = new stonerkart.CardsPanel();
             this.heroPanel = new stonerkart.PlayerPanel();
-            this.playerPanel1 = new stonerkart.PlayerPanel();
+            this.villainPanel = new stonerkart.PlayerPanel();
             this.stepPanel1 = new stonerkart.StepPanel();
             this.SuspendLayout();
             // 
@@ -158,11 +160,11 @@ namespace stonerkart
             // 
             // playerPanel1
             // 
-            this.playerPanel1.BackColor = System.Drawing.Color.DarkViolet;
-            this.playerPanel1.Location = new System.Drawing.Point(7, 176);
-            this.playerPanel1.Name = "playerPanel1";
-            this.playerPanel1.Size = new System.Drawing.Size(147, 132);
-            this.playerPanel1.TabIndex = 12;
+            this.villainPanel.BackColor = System.Drawing.Color.DarkViolet;
+            this.villainPanel.Location = new System.Drawing.Point(7, 176);
+            this.villainPanel.Name = "villainPanel";
+            this.villainPanel.Size = new System.Drawing.Size(147, 132);
+            this.villainPanel.TabIndex = 12;
             // 
             // stepPanel1
             // 
@@ -175,7 +177,7 @@ namespace stonerkart
             // 
             this.BackColor = System.Drawing.Color.Fuchsia;
             this.Controls.Add(this.stepPanel1);
-            this.Controls.Add(this.playerPanel1);
+            this.Controls.Add(this.villainPanel);
             this.Controls.Add(this.heroPanel);
             this.Controls.Add(this.stackPanel);
             this.Controls.Add(this.shibbutton4);

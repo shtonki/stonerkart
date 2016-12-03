@@ -11,6 +11,7 @@ namespace stonerkart
     {
         public readonly Map map;
         public readonly Player hero;
+        public readonly Player villain;
         public readonly Player[] players;
 
         public readonly Pile stack = new Pile(new Location(null, PileLocation.Stack));
@@ -26,6 +27,7 @@ namespace stonerkart
         private IEnumerable<Card> herpable => hero.field;
 
         private Random random;
+        private GameConnection connection = new DummyConnection();
 
         public Game(Map map, int randoSeed)
         {
@@ -37,6 +39,7 @@ namespace stonerkart
             players[0] = new Player(this, CardTemplate.Hero);
             players[1] = new Player(this, CardTemplate.Hero);
             hero = players[0];
+            villain = players[1];
 
             stepHandler = new StepHandler();
 
@@ -165,10 +168,26 @@ namespace stonerkart
         {
             raiseEvent(new StartOfStepEvent(Steps.Untap));
             activePlayer.resetMana();
-            int[] r = activePlayer.stuntMana();
-            Controller.setPrompt("Gain mana nerd");
-            ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => r[(int)o.colour] != 6);
-            activePlayer.unstuntMana(r, v.colour);
+
+            ManaOrbSelection selection;
+
+            if (activePlayer == hero)
+            {
+
+                int[] r = activePlayer.stuntMana();
+                Controller.setPrompt("Gain mana nerd");
+                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => r[(int)o.colour] != 6);
+                activePlayer.unstuntMana(r);
+
+                selection = new ManaOrbSelection(v.colour);
+                connection.sendAction(selection);
+            }
+            else
+            {
+                selection = connection.receiveAction<ManaOrbSelection>();
+            }
+
+            activePlayer.gainMana(selection.orb);
         }
 
         private void drawStep()
@@ -178,97 +197,112 @@ namespace stonerkart
 
         private void mainStep()
         {
-            while (true)
-            {
-                StackWrapper? v = getCast(activePlayer);
-                if (v != null)
-                {
-                    StackWrapper w = v.Value;
-                    raiseEvent(new PayCostsEvent(activePlayer, w.ability, w.costs));
-                    raiseEvent(new CastEvent(w));
-                }
-                else //pass
-                {
-                    if (wrapperStack.Count == 0)
-                    {
-                        break;
-                    }
-
-                    StackWrapper wrapper = wrapperStack.Pop();
-                    if (wrapper.card != stack.peekTop()) throw new Exception();
-                    resolve(wrapper);
-
-                    Controller.redraw();
-                }
-            }
+            priority();
         }
 
         private void moveStep()
         {
-            List<Path> paths = new List<Path>();
-            while (true)
+            List<Tuple<Card, Path>> paths;
+
+            if (activePlayer == hero)
             {
-                var from = getTile(tile => tile.card != null && tile.card.movement > 0, "Move your cards nigra");
-                if (from == null) break;
+                paths = new List<Tuple<Card, Path>>();
 
-                Card card = from.card;
-
-                if (card.path != null)
+                while (true)
                 {
-                    Controller.removeArrow(card.path);
-                    paths.Remove(card.path);
-                    card.path = null;
-                }
+                    var from = getTile(tile => tile.card != null && tile.card.movement > 0, "Move your cards nigra");
+                    if (from == null) break;
 
-                var options = map.dijkstra(from).Where(too =>
-                    too.length <= card.movement &&
-                    too.to.enterableBy(card) &&
-                    (too.to.card != null || !paths.Select(p => p.to).Contains(too.to))
-                    ).ToList();
+                    Card card = from.card;
+                    var tpl = paths.Find(tuple => tuple.Item1 == card);
 
-                Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.to)));
-                var to = getTile(tile => tile == from || options.Select(p => p.to).Contains(tile), "Move to where?");
-                Controller.clearHighlights();
-                if (to == null) break;
-                
-                if (to != from)
-                {
-                    var path = options.First(p => p.to == to);
-                    Controller.addArrow(path);
-                    card.path = path;
-                    paths.Add(path);
+                    if (tpl != null)
+                    {
+                        Controller.removeArrow(tpl.Item2);
+                        paths.Remove(tpl);
+                    }
+
+                    var options = map.dijkstra(from).Where(too =>
+                        too.length <= card.movement &&
+                        too.to.enterableBy(card) &&
+                        (too.to.card != null || !paths.Select(p => p.Item2.to).Contains(too.to))
+                        ).ToList();
+
+                    Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.to)));
+                    var to = getTile(tile => tile == from || options.Select(p => p.to).Contains(tile), "Move to where?");
+                    Controller.clearHighlights();
+                    if (to == null) break;
+
+                    if (to != from)
+                    {
+                        var path = options.First(p => p.to == to);
+                        Controller.addArrow(path);
+                        paths.Add(new Tuple<Card, Path>(card, path));
+                    }
                 }
+                Controller.clearArrows();
+
+                connection.sendAction(new MoveSelection(paths));
+            }
+            else
+            {
+                MoveSelection v = connection.receiveAction<MoveSelection>();
+                paths = v.moves;
             }
 
-            Controller.clearArrows();
-
-            foreach (Card c in activePlayer.field)
+            foreach (var v in paths)
             {
-                if (c.path != null)
+                Card c = v.Item1;
+                Path p = v.Item2;
+                if (p.to.card == null)
                 {
-                    if (c.path.to.card == null)
-                    {
-                        raiseEvent(new MoveToTileEvent(c, c.path.to));
-                    }
-                    else
-                    {
-                        raiseEvent(new AttackEvent(c.path));
-                    }
-                    c.path = null;
+                    raiseEvent(new MoveToTileEvent(c, p.to));
+                }
+                else
+                {
+                    raiseEvent(new AttackEvent(p));
                 }
             }
+            Controller.redraw();
         }
 
         private void endStep()
         {
-            //activePlayerIndex = (activePlayerIndex + 1)%players.Length;
+            activePlayerIndex = (activePlayerIndex + 1)%players.Length;
         }
 
-        private void castShit()
+        private void priority()
         {
+            int c = 0;
             while (true)
             {
-                
+                Player fuckboy = players[(activePlayerIndex + c)%players.Length];
+                StackWrapper? w = getCast(fuckboy);
+
+                if (w.HasValue)
+                {
+                    raiseEvent(new PayCostsEvent(activePlayer, w.Value.ability, w.Value.costs));
+                    raiseEvent(new CastEvent(w.Value));
+                    c = 0;
+                }
+                else //pass
+                {
+                    c++;
+                    if (c == players.Length)
+                    {
+                        if (wrapperStack.Count == 0)
+                        {
+                            break;
+                        }
+
+                        StackWrapper wrapper = wrapperStack.Pop();
+                        if (wrapper.card != stack.peekTop()) throw new Exception();
+                        resolve(wrapper);
+                        c = 0;
+
+                        Controller.redraw();
+                    }
+                }
             }
         }
 
@@ -296,23 +330,40 @@ namespace stonerkart
 
         private StackWrapper? getCast(Player p)
         {
-            Tile from = p.heroCard.tile;
-            while (true)
+            StackWrapper? r;
+            if (p == hero)
             {
-                Card card = getCard((crd) => true, "Cast a card");
-                if (card == null) return null;
+                Tile from = p.heroCard.tile;
+                while (true)
+                {
+                    Card card = getCard((crd) => true, "Cast a card");
+                    if (card == null)
+                    {
+                        r = null;
+                        break;
+                    }
 
-                ActivatedAbility ability = chooseAbility(card);
-                if (ability == null) continue;
+                    ActivatedAbility ability = chooseAbility(card);
+                    if (ability == null) continue;
 
-                int[][] costs = ability.cost.measure(p);
-                if (costs == null) continue;
+                    int[][] costs = ability.cost.measure(p);
+                    if (costs == null) continue;
 
-                TargetMatrix[] targets = chooseCastTargets(ability, from);
-                if (targets == null) continue;
+                    TargetMatrix[] targets = chooseCastTargets(ability, from);
+                    if (targets == null) continue;
 
-                return new StackWrapper(card, ability, targets, costs);
+                    r = new StackWrapper(card, ability, targets, costs);
+
+                    break;
+                }
+                connection.sendAction(new CastSelection(r));
             }
+            else
+            {
+                r = connection.receiveAction<CastSelection>().wrapper;
+            }
+
+            return r;
         }
 
         private ActivatedAbility chooseAbility(Card c)

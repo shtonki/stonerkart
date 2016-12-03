@@ -15,6 +15,7 @@ namespace stonerkart
         
 
         public Screen mainMenuPanel { get; private set; }
+        public Screen loginPanel { get; private set; }
         public GamePanel gamePanel;
         public Screen mapEditorScreen { get; private set; }
 
@@ -24,6 +25,7 @@ namespace stonerkart
         {
             mainMenuPanel = new MainMenuPanel();
             mapEditorScreen = new MapEditor();
+            loginPanel = new LoginScreen();
             Closed += (_, __) => Environment.Exit(1);
         }
 

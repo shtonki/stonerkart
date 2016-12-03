@@ -19,8 +19,12 @@ namespace stonerkart
 
         public void print(string s)
         {
-            outputBox.AppendText(s);
-            outputBox.ScrollToCaret();
+            outputBox.memeout(() =>
+            {
+
+                outputBox.AppendText(s);
+                outputBox.ScrollToCaret();
+            });
         }
 
         private void InitializeComponent()

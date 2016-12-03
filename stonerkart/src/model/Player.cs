@@ -57,9 +57,13 @@ namespace stonerkart
             return r;
         }
 
-        public void unstuntMana(int[] r, ManaColour c)
+        public void unstuntMana(int[] r)
         {
             manaPool.max = r;
+        }
+
+        public void gainMana(ManaColour c)
+        {
             manaPool.max[(int)c]++;
             manaPool.current[(int)c]++;
             notify(new PlayerChangedArgs(this));

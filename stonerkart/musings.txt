@@ -3,7 +3,8 @@ canceling targeting
 
 
 thing which are up for debate:
-drawing before selecting which mana orb to gain
+draw step before selecting which mana orb to gain
+
 
 things that are broken:
 martin rectum
@@ -21,3 +22,4 @@ Card contructor
 ManaButton image caching and how it's nonexistant and how that's fucked
 targeting was rotten from the get go, still sort of is xd
 Tile.atDistance should probably be in Map
+Card.path makes me :puke:

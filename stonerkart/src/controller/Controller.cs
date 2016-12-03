@@ -19,7 +19,14 @@ namespace stonerkart
         public static void startup()
         {
             gameFrame = launchUI();
-            gameFrame.transitionTo(gameFrame.mainMenuPanel);
+            if (Network.connectToServer())
+            {
+                gameFrame.transitionTo(gameFrame.loginPanel);
+            }
+            else
+            {
+                gameFrame.transitionTo(gameFrame.mainMenuPanel);
+            }
         }
 
         public static void newGame()

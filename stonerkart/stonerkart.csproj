@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CFC26B37-6090-4492-A003-E558D8324FDE}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>stonerkart</RootNamespace>
     <AssemblyName>stonerkart</AssemblyName>
@@ -75,6 +75,7 @@
     <Compile Include="src\controller\Clickable.cs" />
     <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />
+    <Compile Include="src\controller\GameAction.cs" />
     <Compile Include="src\controller\GameEvent.cs" />
     <Compile Include="src\controller\GameEventFilter.cs" />
     <Compile Include="src\controller\GameEventHandler.cs" />
@@ -91,7 +92,11 @@
     <Compile Include="src\model\Player.cs" />
     <Compile Include="src\model\Target.cs" />
     <Compile Include="src\model\Tile.cs" />
-    <Compile Include="src\Network.cs" />
+    <Compile Include="src\network\GameConnection.cs" />
+    <Compile Include="src\network\Message.cs" />
+    <Compile Include="src\network\Network.cs" />
+    <Compile Include="src\network\AsyncConnection.cs" />
+    <Compile Include="src\network\ServerConnection.cs" />
     <Compile Include="src\Observable.cs" />
     <Compile Include="src\view\AutoFontTextBox.cs">
       <SubType>Component</SubType>
@@ -115,6 +120,9 @@
     <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\view\GamePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="src\view\LoginScreen.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\MainMenuPanel.cs">
@@ -171,6 +179,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\GamePanel.resx">
       <DependentUpon>GamePanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="src\view\LoginScreen.resx">
+      <DependentUpon>LoginScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\MainMenuPanel.resx">
       <DependentUpon>MainMenuPanel.cs</DependentUpon>
