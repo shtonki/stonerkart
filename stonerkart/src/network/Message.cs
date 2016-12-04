@@ -51,6 +51,7 @@ namespace stonerkart
             LOGIN,
             REGISTER,
             RESPONSE,
+            ADDFRIEND,
         }
     }
 
@@ -105,6 +106,21 @@ namespace stonerkart
         {
             OK,
             FAILEDGENERIC,
+        }
+    }
+
+    class AddFriendBody
+    {
+        public string name;
+
+        public AddFriendBody(string name)
+        {
+            this.name = name;
+        }
+
+        public string toBody()
+        {
+            return name;
         }
     }
 }

@@ -16,6 +16,11 @@ namespace stonerkart
 
         private static HexPanel hexPanel => gameFrame.gamePanel.hexPanel;
 
+        private static DraggablePanel friendsList;
+        private static FriendsListPanel friendsListPanel = new FriendsListPanel();
+
+        private static List<string> friends = new List<string>();
+
         public static void startup()
         {
             gameFrame = launchUI();
@@ -45,6 +50,30 @@ namespace stonerkart
         public static void transitionToMainMenu()
         {
             gameFrame.transitionTo(gameFrame.mainMenuPanel);
+        }
+
+        public static void addFriend(string name)
+        {
+            if (friends.Contains(name)) return;
+
+            if (Network.addFriend(name))
+            {
+                friends.Add(name);
+                friendsListPanel.showFriend(name);
+            }
+        }
+
+        public static void toggleFriendsList()
+        {
+            if (friendsList != null && !friendsList.closed)
+            {
+                friendsList.close();
+                friendsList = null;
+            }
+            else
+            {
+                friendsList = gameFrame.showPanel(friendsListPanel);
+            }
         }
 
         public static void addArrow(List<Tile> l)

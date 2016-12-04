@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -12,21 +13,41 @@ namespace stonerkart
 
     class GameFrame : Form
     {
-        
-
         public Screen mainMenuPanel { get; private set; }
         public Screen loginPanel { get; private set; }
         public GamePanel gamePanel;
+        private StickyPanel mainPanel;
+        private MenuBar menuBar1;
+
         public Screen mapEditorScreen { get; private set; }
 
         public Control active;
+        
 
         public GameFrame()
         {
+            InitializeComponent();
+
             mainMenuPanel = new MainMenuPanel();
             mapEditorScreen = new MapEditor();
             loginPanel = new LoginScreen();
             Closed += (_, __) => Environment.Exit(1);
+            Resize += (_, __) =>
+            {
+                int w = ClientSize.Width;
+                int h = ClientSize.Height;
+                menuBar1.Width = w;
+                menuBar1.Location = new Point(0, h - menuBar1.Height);
+                mainPanel.Size = new Size(w, h - menuBar1.Height);
+            };
+        }
+
+        public DraggablePanel showPanel(Control content)
+        {
+            DraggablePanel r = new DraggablePanel(content);
+            Controls.Add(r);
+            r.BringToFront();
+            return r;
         }
 
         public void setPrompt(string message, string[] buttons)
@@ -68,12 +89,44 @@ namespace stonerkart
             {
                 if (active != null)
                 {
-                    Controls.Remove(active);
+                    mainPanel.Controls.Remove(active);
                 }
                 active = (Control)s;
                 active.Dock = DockStyle.Fill;
-                Controls.Add(active);
+                mainPanel.Controls.Add(active);
             });
+        }
+
+        private void InitializeComponent()
+        {
+            this.mainPanel = new stonerkart.StickyPanel();
+            this.menuBar1 = new stonerkart.MenuBar();
+            this.SuspendLayout();
+            // 
+            // mainPanel
+            // 
+            this.mainPanel.BackColor = System.Drawing.Color.DarkViolet;
+            this.mainPanel.Location = new System.Drawing.Point(0, 0);
+            this.mainPanel.Name = "mainPanel";
+            this.mainPanel.Size = new System.Drawing.Size(1211, 682);
+            this.mainPanel.TabIndex = 0;
+            // 
+            // menuBar1
+            // 
+            this.menuBar1.BackColor = System.Drawing.Color.SlateBlue;
+            this.menuBar1.Location = new System.Drawing.Point(0, 682);
+            this.menuBar1.Name = "menuBar1";
+            this.menuBar1.Size = new System.Drawing.Size(1211, 31);
+            this.menuBar1.TabIndex = 1;
+            // 
+            // GameFrame
+            // 
+            this.ClientSize = new System.Drawing.Size(1211, 709);
+            this.Controls.Add(this.menuBar1);
+            this.Controls.Add(this.mainPanel);
+            this.Name = "GameFrame";
+            this.ResumeLayout(false);
+
         }
     }
 

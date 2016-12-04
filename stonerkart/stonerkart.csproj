@@ -108,6 +108,12 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\G.cs" />
+    <Compile Include="src\view\DraggablePanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="src\view\FriendsListPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="src\view\GameFrame.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -135,6 +141,9 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\MapEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="src\view\MenuBar.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\PlayerPanel.cs">
@@ -191,6 +200,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\MapEditor.resx">
       <DependentUpon>MapEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="src\view\MenuBar.resx">
+      <DependentUpon>MenuBar.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\PlayerPanel.resx">
       <DependentUpon>PlayerPanel.cs</DependentUpon>

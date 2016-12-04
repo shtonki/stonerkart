@@ -38,10 +38,13 @@ namespace stonerkart
         public static void handle(Message m)
         {
             receivedMessage = m;
-            if (m.messageType == Message.MessageType.RESPONSE)
+            switch (m.messageType)
             {
-                receivedMessage = m;
-                messageReceived.Set();
+                case Message.MessageType.RESPONSE:
+                {
+                    receivedMessage = m;
+                    messageReceived.Set();
+                } break;
             }
         }
 
@@ -70,5 +73,13 @@ namespace stonerkart
             return false;
         }
 
+        public static bool addFriend(string username)
+        {
+            AddFriendBody b = new AddFriendBody(username);
+            serverConnection.send(new Message(servername, Message.MessageType.ADDFRIEND, b.toBody()));
+            Message m = awaitResponseMessage();
+            ResponseBody rb = new ResponseBody(m.body);
+            return rb.code == ResponseBody.ResponseCode.OK;
+        }
     }
 }
