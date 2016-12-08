@@ -17,7 +17,7 @@ namespace stonerkart
         public Screen loginPanel { get; private set; }
         public GamePanel gamePanel;
         private StickyPanel mainPanel;
-        private MenuBar menuBar1;
+        public MenuBar menuBar1;
 
         public Screen mapEditorScreen { get; private set; }
 

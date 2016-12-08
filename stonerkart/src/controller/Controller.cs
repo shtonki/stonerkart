@@ -19,7 +19,7 @@ namespace stonerkart
         private static DraggablePanel friendsList;
         private static FriendsListPanel friendsListPanel = new FriendsListPanel();
 
-        private static List<string> friends = new List<string>();
+        private static List<string> friends;
 
         public static void startup()
         {
@@ -34,10 +34,15 @@ namespace stonerkart
             }
         }
 
+        public static void challengePlayer(string username)
+        {
+            Network.challenge(username);
+        }
+
         public static void newGame()
         {
-            Map map = new Map(21, 13, false, false);
-            Game g = new Game(map, 420);
+            NewGameStruct s = new NewGameStruct();
+            Game g = new Game(s);
             gameFrame.toGame(g);
             g.startGame();
         }
@@ -50,6 +55,18 @@ namespace stonerkart
         public static void transitionToMainMenu()
         {
             gameFrame.transitionTo(gameFrame.mainMenuPanel);
+        }
+
+        public static void setFriendList(List<string> fs)
+        {
+            friends = new List<string>();
+
+            foreach (var f in fs)
+            {
+                friends.Add(f);
+                friendsListPanel.showFriend(f);
+            }
+            gameFrame.menuBar1.enableFriendsButton();
         }
 
         public static void addFriend(string name)

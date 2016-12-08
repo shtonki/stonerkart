@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
 
 namespace stonerkart
 {
+    struct NewGameStruct
+    {
+        public readonly int randomSeed;
+    }
+
     class Game
     {
         public readonly Map map;
@@ -27,13 +31,13 @@ namespace stonerkart
         private IEnumerable<Card> herpable => hero.field;
 
         private Random random;
-        private GameConnection connection = new DummyConnection();
+        private GameConnection connection;
 
-        public Game(Map map, int randoSeed)
+        public Game(NewGameStruct ngs)
         {
-            this.map = map;
+            this.map = new Map(21, 13, false, false);
 
-            random = new Random(randoSeed);
+            random = new Random(ngs.randomSeed);
 
             players = new Player[2];
             players[0] = new Player(this, CardTemplate.Hero);

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,11 +23,11 @@ namespace stonerkart
             body = s.Substring(fks[1] + 1, s.Length - fks[1] - 1);
         }
 
-        public Message(string recipient, MessageType messageType, string body)
+        public Message(string recipient, MessageType messageType, MessageBody b)
         {
             this.recipient = recipient;
             this.messageType = messageType;
-            this.body = body;
+            this.body = b.toBody();
         }
 
         public byte[] getBytes()
@@ -52,10 +53,16 @@ namespace stonerkart
             REGISTER,
             RESPONSE,
             ADDFRIEND,
+            CHALLENGE,
         }
     }
 
-    class LoginBody
+    interface MessageBody
+    {
+        string toBody();
+    }
+
+    class LoginBody : MessageBody
     {
         public string username;
         public string password;
@@ -79,7 +86,7 @@ namespace stonerkart
         }
     }
 
-    class ResponseBody
+    class ResponseBody : MessageBody
     {
         public ResponseCode code;
         public string text;
@@ -105,11 +112,13 @@ namespace stonerkart
         public enum ResponseCode
         {
             OK,
+            OKWITHFRIENDS,
             FAILEDGENERIC,
+            FAILEDREQUIRESLOGIN,
         }
     }
 
-    class AddFriendBody
+    class AddFriendBody : MessageBody
     {
         public string name;
 
@@ -121,6 +130,49 @@ namespace stonerkart
         public string toBody()
         {
             return name;
+        }
+    }
+
+    class FriendListBody : MessageBody
+    {
+        public List<string> friends;
+
+        public FriendListBody(List<string> fs)
+        {
+            friends = fs;
+        }
+
+        public FriendListBody(string s)
+        {
+            friends = s.Split(':').ToList();
+        }
+
+        public string toBody()
+        {
+            if (friends.Count == 0) return "";
+            StringBuilder b = new StringBuilder();
+            b.Append(friends[0]);
+            for (int i = 1; i < friends.Count; i++)
+            {
+                b.Append(':');
+                b.Append(friends[i]);
+            }
+            return b.ToString();
+        }
+    }
+
+    class ChallengeBody : MessageBody
+    {
+        public string username;
+
+        public ChallengeBody(string s)
+        {
+            this.username = s;
+        }
+
+        public string toBody()
+        {
+            return username;
         }
     }
 }

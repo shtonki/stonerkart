@@ -13,8 +13,6 @@ namespace stonerkart
         void send(Message m);
     }
 
-    
-
     static class Network
     {
         public static ServerConnection serverConnection;
@@ -60,23 +58,41 @@ namespace stonerkart
         public static bool login(string username, string password)
         {
             LoginBody b = new LoginBody(username, password);
-            serverConnection.send(new Message(servername, Message.MessageType.LOGIN, b.toBody()));
+            serverConnection.send(new Message(servername, Message.MessageType.LOGIN, b));
             Message m = awaitResponseMessage();
             ResponseBody rb = new ResponseBody(m.body);
-            return rb.code == ResponseBody.ResponseCode.OK;
+            if (rb.code == ResponseBody.ResponseCode.OKWITHFRIENDS)
+            {
+                FriendListBody fb = new FriendListBody(rb.text);
+                Controller.setFriendList(fb.friends);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public static bool register(string username, string password)
         {
             LoginBody b = new LoginBody(username, password);
-            serverConnection.send(new Message(servername, Message.MessageType.REGISTER, b.toBody()));
+            serverConnection.send(new Message(servername, Message.MessageType.REGISTER, b));
             return false;
         }
 
         public static bool addFriend(string username)
         {
             AddFriendBody b = new AddFriendBody(username);
-            serverConnection.send(new Message(servername, Message.MessageType.ADDFRIEND, b.toBody()));
+            serverConnection.send(new Message(servername, Message.MessageType.ADDFRIEND, b));
+            Message m = awaitResponseMessage();
+            ResponseBody rb = new ResponseBody(m.body);
+            return rb.code == ResponseBody.ResponseCode.OK;
+        }
+
+        public static bool challenge(string username)
+        {
+            ChallengeBody b = new ChallengeBody(username);
+            serverConnection.send(new Message(servername, Message.MessageType.CHALLENGE, b));
             Message m = awaitResponseMessage();
             ResponseBody rb = new ResponseBody(m.body);
             return rb.code == ResponseBody.ResponseCode.OK;
