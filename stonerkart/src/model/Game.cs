@@ -35,6 +35,8 @@ namespace stonerkart
 
         public Game(NewGameStruct ngs)
         {
+            connection = new DummyConnection();
+
             this.map = new Map(21, 13, false, false);
 
             random = new Random(ngs.randomSeed);
