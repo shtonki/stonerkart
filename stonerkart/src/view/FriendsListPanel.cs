@@ -114,6 +114,7 @@ namespace stonerkart
             Controls.Add(nameLabel);
 
             Resize += (_, __) => xd();
+            MouseClick += (_, __) => Controller.challengePlayer(name);
         }
 
         private void xd()

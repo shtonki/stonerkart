@@ -216,7 +216,7 @@ namespace stonerkart
 
                 while (true)
                 {
-                    var from = getTile(tile => tile.card != null && tile.card.movement > 0, "Move your cards nigra");
+                    var from = getTile(tile => tile.card != null && tile.card.movement > 0 && tile.card.owner == activePlayer ,  "Move your cards nigra");
                     if (from == null) break;
 
                     Card card = from.card;

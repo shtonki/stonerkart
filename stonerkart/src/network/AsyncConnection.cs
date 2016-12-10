@@ -40,9 +40,8 @@ namespace stonerkart
             
             byte[] myBytes = myStuff.PublicKey.ToByteArray();
             socket.Send(myBytes);
-            byte[] theirBytes = new byte[256];
+            byte[] theirBytes = new byte[72];
             socket.Receive(theirBytes);
-
             ECDiffieHellmanPublicKey tb = ECDiffieHellmanCngPublicKey.FromByteArray(theirBytes, CngKeyBlobFormat.GenericPublicBlob);
             sharedSecret = myStuff.DeriveKeyMaterial(tb);
             encryptSalt = hashMe(sharedSecret.Take(16).ToArray());
