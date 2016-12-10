@@ -17,7 +17,8 @@ namespace stonerkart
         private AutoFontTextBox cardTypeText;
         private AutoFontTextBox castRangeSlashMovementBox;
         private ManaCostPanel manaCostPanel1;
-        public readonly Card card;
+
+        public Card card;
         
         public CardView()
         {
@@ -29,10 +30,22 @@ namespace stonerkart
             toughnessBox.Text = "x";
         }
 
+        public CardView(CardTemplate ct)
+        {
+            card = new Card(ct, null);
+            ihavedowns();
+        }
+
         public CardView(Card c) : this()
         {
             c.addObserver(this);
             card = c;
+            ihavedowns();
+        }
+
+        public void setCard(CardTemplate ct)
+        {
+            card = new Card(ct, null);
             ihavedowns();
         }
 
