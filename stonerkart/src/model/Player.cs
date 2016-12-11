@@ -8,7 +8,7 @@ namespace stonerkart
 {
     class Player : Observable<PlayerChangedArgs>, Targetable
     {
-        public readonly Card heroCard;
+        public Card heroCard { get; private set; }
         public readonly Game game;
 
         public readonly Pile deck;
@@ -19,27 +19,31 @@ namespace stonerkart
 
         public bool isHero => this == game.hero;
 
-        public Player(Game g, CardTemplate hc)
+        public Player(Game g)
         {
             game = g;
 
             deck = new Pile(new Location(this, PileLocation.Deck));
             field = new Pile(new Location(this, PileLocation.Field));
             hand = new Pile(new Location(this, PileLocation.Hand));
-
-            heroCard = new Card(hc, this);
-            field.addTop(heroCard);
+            
 
             manaPool = new ManaPool();
+        }
 
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Zap, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
-            deck.addTop(new Card(CardTemplate.Jordan, this));
+        public void setHeroCard(Card hc)
+        {
+            if (heroCard != null) throw new Exception();
+            heroCard = hc;
+            field.addTop(heroCard);
+        }
 
+        public void loadDeck(IEnumerable<Card> cards)
+        {
+            foreach (Card c in cards)
+            {
+                deck.addTop(c);
+            }
         }
 
         public void resetMana()

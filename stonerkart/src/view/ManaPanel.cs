@@ -23,6 +23,7 @@ namespace stonerkart
                 for (int j = 0; j < 6; j++)
                 {
                     var p = new ManaButton((ManaColour)i, 0.3f);
+                    p.setVisibility(ManaButton.Visibility.Hidden);
                     images[i][j] = p;
                     Controls.Add(p);
                     p.MouseDown += (_, __) => { foreach (var c in callbacks) c(p); };

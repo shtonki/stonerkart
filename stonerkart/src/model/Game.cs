@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -6,19 +7,16 @@ using System.Threading;
 
 namespace stonerkart
 {
-    struct NewGameStruct
-    {
-        public readonly int randomSeed;
-    }
-
     class Game
     {
-        public readonly Map map;
-        public readonly Player hero;
-        public readonly Player villain;
-        public readonly Player[] players;
+        public Map map { get; }
+        public Player hero { get; }
+        public Player villain { get; }
 
-        public readonly Pile stack = new Pile(new Location(null, PileLocation.Stack));
+        private List<Player> players;
+        private List<Card> cards;
+
+        public Pile stack = new Pile(new Location(null, PileLocation.Stack));
 
         private int activePlayerIndex;
         public Player activePlayer => players[activePlayerIndex];
@@ -33,23 +31,90 @@ namespace stonerkart
         private Random random;
         private GameConnection connection;
 
-        public Game(NewGameStruct ngs)
+        public Game(NewGameStruct ngs, bool local)
         {
-            connection = new DummyConnection();
-
-            this.map = new Map(21, 13, false, false);
+            if (local)
+            {
+                connection = new DummyConnection();
+            }
+            else
+            {
+                connection = new MultiplayerConnection(this, ngs);
+            }
 
             random = new Random(ngs.randomSeed);
+            map = new Map(21, 13, false, false);
+            cards = new List<Card>();
+            players = new List<Player>();
 
-            players = new Player[2];
-            players[0] = new Player(this, CardTemplate.Hero);
-            players[1] = new Player(this, CardTemplate.Hero);
-            hero = players[0];
-            villain = players[1];
+            for (int i = 0; i < ngs.playerNames.Length; i++)
+            {
+                Player p = new Player(this);
+                Card heroCard = createCard(CardTemplate.Hero, p);
+                p.setHeroCard(heroCard);
+
+                players.Add(p);
+                if (i == ngs.heroIndex) hero = p;
+                else
+                {
+                    if (villain != null) throw new Exception();
+                    villain = p;
+                }
+
+                List<Card> deck = new List<Card>();
+                for (int j = 0; j < 10; j++)
+                {
+                    Card c = createCard(CardTemplate.Jordan, p);
+                    deck.Add(c);
+                }
+                p.loadDeck(deck);
+            }
 
             stepHandler = new StepHandler();
 
             setupHandlers();
+        }
+
+        public Card createCard(CardTemplate ct, Player owner)
+        {
+            Card r = new Card(ct, owner);
+            cards.Add(r);
+            return r;
+        }
+
+        public int ord(Card c)
+        {
+            return cards.IndexOf(c);
+        }
+
+        public Card cardFromOrd(int i)
+        {
+            return cards[i];
+        }
+
+        public int ord(Player p)
+        {
+            return players.IndexOf(p);
+        }
+
+        public Player playerFromOrd(int i)
+        {
+            return players[i];
+        }
+
+        public int ord(Tile t)
+        {
+            return map.ord(t);
+        }
+
+        public Tile tileFromOrd(int i)
+        {
+            return map.tileAt(i);
+        }
+
+        public Path pathTo(Card c, Tile t)
+        {
+            return map.path(c.tile, t);
         }
 
         private void setupHandlers()
@@ -125,6 +190,7 @@ namespace stonerkart
 
         private void loopEx()
         {
+            Controller.setPrompt("Game starting");
             initGame();
 
             while (true)
@@ -190,6 +256,7 @@ namespace stonerkart
             }
             else
             {
+                Controller.setPrompt("Opponent is gaining mama");
                 selection = connection.receiveAction<ManaOrbSelection>();
             }
 
@@ -252,6 +319,7 @@ namespace stonerkart
             }
             else
             {
+                Controller.setPrompt("Opponent is moving");
                 MoveSelection v = connection.receiveAction<MoveSelection>();
                 paths = v.moves;
             }
@@ -274,7 +342,7 @@ namespace stonerkart
 
         private void endStep()
         {
-            activePlayerIndex = (activePlayerIndex + 1)%players.Length;
+            activePlayerIndex = (activePlayerIndex + 1)%players.Count;
         }
 
         private void priority()
@@ -282,7 +350,7 @@ namespace stonerkart
             int c = 0;
             while (true)
             {
-                Player fuckboy = players[(activePlayerIndex + c)%players.Length];
+                Player fuckboy = players[(activePlayerIndex + c)%players.Count];
                 StackWrapper? w = getCast(fuckboy);
 
                 if (w.HasValue)
@@ -294,7 +362,7 @@ namespace stonerkart
                 else //pass
                 {
                     c++;
-                    if (c == players.Length)
+                    if (c == players.Count)
                     {
                         if (wrapperStack.Count == 0)
                         {
@@ -366,6 +434,7 @@ namespace stonerkart
             }
             else
             {
+                Controller.setPrompt("Opponents turn to act.");
                 r = connection.receiveAction<CastSelection>().wrapper;
             }
 
