@@ -57,6 +57,11 @@ namespace stonerkart
             gameFrame.transitionTo(gameFrame.mainMenuPanel);
         }
 
+        public static void transitionToDeckEditor()
+        {
+            gameFrame.transitionTo(gameFrame.deckEditorScreen);
+        }
+
         public static void setFriendList(List<string> fs)
         {
             friends = new List<string>();

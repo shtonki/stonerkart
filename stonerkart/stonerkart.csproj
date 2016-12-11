@@ -108,6 +108,9 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\G.cs" />
+    <Compile Include="src\view\DeckEditorPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="src\view\DraggablePanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -179,6 +182,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\ConsolePanel.resx">
       <DependentUpon>ConsolePanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="src\view\DeckEditorPanel.resx">
+      <DependentUpon>DeckEditorPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\GameFrame.resx">
       <DependentUpon>GameFrame.cs</DependentUpon>

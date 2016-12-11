@@ -34,6 +34,7 @@ namespace stonerkart
 
         private void fixKey()
         {
+
             ECDiffieHellmanCng myStuff = new ECDiffieHellmanCng(256);
             myStuff.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
             myStuff.HashAlgorithm = CngAlgorithm.Sha256;
@@ -42,6 +43,7 @@ namespace stonerkart
             socket.Send(myBytes);
             byte[] theirBytes = new byte[72];
             socket.Receive(theirBytes);
+
             ECDiffieHellmanPublicKey tb = ECDiffieHellmanCngPublicKey.FromByteArray(theirBytes, CngKeyBlobFormat.GenericPublicBlob);
             sharedSecret = myStuff.DeriveKeyMaterial(tb);
             encryptSalt = hashMe(sharedSecret.Take(16).ToArray());

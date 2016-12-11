@@ -29,6 +29,7 @@ namespace stonerkart
             }
             catch (Exception e)
             {
+                System.Console.WriteLine(e);
                 return false;
             }
         }

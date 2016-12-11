@@ -106,7 +106,7 @@ namespace stonerkart
             BackColor = Color.DodgerBlue;
 
             challengeButton = new Button();
-
+            challengeButton.Text ="\uD83D\uDC71";
             nameLabel = new AutoFontTextBox();
             nameLabel.Text = friendName;
 

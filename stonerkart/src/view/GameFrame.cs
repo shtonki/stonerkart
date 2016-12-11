@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using stonerkart.src.view;
 
 namespace stonerkart
 {
@@ -20,7 +21,7 @@ namespace stonerkart
         public MenuBar menuBar1;
 
         public Screen mapEditorScreen { get; private set; }
-
+        public Screen deckEditorScreen { get; private set; }
         public Control active;
         
 
@@ -30,6 +31,7 @@ namespace stonerkart
 
             mainMenuPanel = new MainMenuPanel();
             mapEditorScreen = new MapEditor();
+            deckEditorScreen = new DeckEditorPanel();
             loginPanel = new LoginScreen();
             Closed += (_, __) => Environment.Exit(1);
             Resize += (_, __) =>

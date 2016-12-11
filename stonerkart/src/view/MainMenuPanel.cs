@@ -61,7 +61,8 @@ namespace stonerkart
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Controller.transitionToMapEditor();
+            //Controller.transitionToMapEditor();
+            Controller.transitionToDeckEditor();
         }
     }
 }
