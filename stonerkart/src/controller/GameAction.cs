@@ -49,7 +49,74 @@ namespace stonerkart
             }
             else
             {
-                throw new NotImplementedException();
+                string[] ss = s.Split(';');
+
+                int cardOrd = Int32.Parse(ss[0]);
+                Card card = g.cardFromOrd(cardOrd);
+
+                int abilityOrd = Int32.Parse(ss[1]);
+                Ability ability = card.abilityFromOrd(abilityOrd);
+                List<TargetMatrix> matricies = new List<TargetMatrix>();
+                string[] matrixStrings = ss[2].Split('.');
+                foreach (string matrixString in matrixStrings)
+                {
+                    List<TargetColumn> columns = new List<TargetColumn>(); 
+                    string[] colStrings = matrixString.Split(':');
+                    foreach (string colString in colStrings)
+                    {
+                        List<Targetable> targets = new List<Targetable>();
+                        string[] targetStrings = colString.Split(',');
+                        foreach (string targetString in targetStrings)
+                        {
+                            if (targetString.Length == 0) continue;
+                            char targetType = targetString[0];
+                            int targetOrd = Int32.Parse(targetString.Substring(1));
+                            Targetable target;
+                            switch (targetType)
+                            {
+                                case 'c':
+                                {
+                                    target = g.cardFromOrd(targetOrd);
+                                } break;
+
+                                case 't':
+                                {
+                                    target = g.tileFromOrd(targetOrd);
+                                } break;
+
+                                case 'p':
+                                {
+                                    target = g.playerFromOrd(targetOrd);
+                                } break;
+
+                                default: throw new Exception();
+                            }
+                            targets.Add(target);
+                        }
+                        columns.Add(new TargetColumn(targets.ToArray()));
+                    }
+                    matricies.Add(new TargetMatrix(columns.ToArray()));
+                }
+
+                TargetMatrix[] targetMatricies = matricies.ToArray();
+
+                string[] costStrings = ss[3].Split(':');
+
+                List<int[]> costArrays = new List<int[]>();
+                foreach (string costString in costStrings)
+                {
+                    List<int> csts = new List<int>();
+                    string[] css = costString.Split(',');
+                    foreach (string c in css)
+                    {
+                        csts.Add(Int32.Parse(c));
+                    }
+                    costArrays.Add(csts.ToArray());
+                }
+
+                int[][] costs = costArrays.ToArray();
+
+                wrapper = new StackWrapper(card, ability, targetMatricies, costs);
             }
         }
 
@@ -61,7 +128,63 @@ namespace stonerkart
             }
             else
             {
-                throw new NotImplementedException();
+                StringBuilder sb = new StringBuilder();
+
+                StackWrapper wp = wrapper.Value;
+
+                int cardOrd = g.ord(wp.card);
+                sb.Append(cardOrd);
+                sb.Append(';');
+
+                int abilityOrd = wp.card.abilityOrd(wp.ability);
+                sb.Append(abilityOrd);
+                sb.Append(';');
+
+                foreach (TargetMatrix tm in wp.matricies)
+                {
+                    foreach (TargetColumn col in tm.columns)
+                    {
+                        foreach (Targetable v in col.targets)
+                        {
+                            if (v is Card)
+                            {
+                                sb.Append('c');
+                                sb.Append(g.ord((Card)v));
+                            }
+                            else if (v is Tile)
+                            {
+                                sb.Append('t');
+                                sb.Append(g.ord((Tile)v));
+                            }
+                            else if (v is Player)
+                            {
+                                sb.Append('p');
+                                sb.Append(g.ord((Player)v));
+                            }
+                            sb.Append(',');
+                        }
+                        if (sb[sb.Length - 1] == ',') sb.Length--;
+                        sb.Append(':');
+                    }
+                    if (sb[sb.Length - 1] == ':') sb.Length--;
+                    sb.Append('.');
+                }
+                if (sb[sb.Length - 1] == '.') sb.Length--;
+                sb.Append(";");
+
+                foreach (int[] costList in wp.costs)
+                {
+                    foreach (int cost in costList)
+                    {
+                        sb.Append(cost);
+                        sb.Append(',');
+                    }
+                    if (sb[sb.Length - 1] == ',') sb.Length--;
+                    sb.Append(':');
+                }
+                if (sb[sb.Length - 1] == ':') sb.Length--;
+
+                return sb.ToString();
             }
         }
     }

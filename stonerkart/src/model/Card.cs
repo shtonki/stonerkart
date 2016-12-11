@@ -127,6 +127,11 @@ namespace stonerkart
             return abilities.IndexOf(a);
         }
 
+        public Ability abilityFromOrd(int i)
+        {
+            return abilities[i];
+        }
+
         public void reherp(GameEvent e)
         {
             foreach (var v in ms)
