@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -54,6 +55,9 @@ namespace stonerkart
             RESPONSE,
             ADDFRIEND,
             CHALLENGE,
+            ACCEPTCHALLENGE,
+            NEWGAME,
+            GAMEMESSAGE,
         }
     }
 
@@ -161,6 +165,21 @@ namespace stonerkart
         }
     }
 
+    class GameMessageBody : MessageBody
+    {
+        public string message;
+
+        public GameMessageBody(string s)
+        {
+            message = s;
+        }
+
+        public string toBody()
+        {
+            return message;
+        }
+    }
+
     class ChallengeBody : MessageBody
     {
         public string username;
@@ -173,6 +192,58 @@ namespace stonerkart
         public string toBody()
         {
             return username;
+        }
+    }
+
+    class NewGameStruct
+    {
+        public readonly int randomSeed;
+        public readonly string[] playerNames;
+        public readonly int heroIndex;
+
+        public NewGameStruct(int randomSeed, string[] playerNames, int heroIndex)
+        {
+            this.randomSeed = randomSeed;
+            this.playerNames = playerNames;
+            this.heroIndex = heroIndex;
+        }
+    }
+
+    class NewGameBody : MessageBody
+    {
+        public NewGameStruct newGameStruct;
+
+        public NewGameBody(int randoSeed, string[] playerNames, int heroIndex)
+        {
+            newGameStruct = new NewGameStruct(randoSeed, playerNames, heroIndex);
+        }
+
+        public NewGameBody(string body)
+        {
+            string[] ss = body.Split(',');
+            int randoSeed = Int32.Parse(ss[0]);
+            string[] names = ss[1].Split(':');
+            string [] playerNames = names.Where(n => n.Length > 0).ToArray();
+            int heroIndex = Int32.Parse(ss[2]);
+            newGameStruct = new NewGameStruct(randoSeed, playerNames, heroIndex);
+        }
+
+        public string toBody()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(newGameStruct.randomSeed.ToString());
+            sb.Append(',');
+
+            foreach (string name in newGameStruct.playerNames)
+            {
+                sb.Append(name);
+                sb.Append(':');
+            }
+
+            sb.Append(',');
+            sb.Append(newGameStruct.heroIndex.ToString());
+
+            return sb.ToString();
         }
     }
 }

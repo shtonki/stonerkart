@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -20,6 +21,10 @@ namespace stonerkart
         private static ManualResetEvent messageReceived = new ManualResetEvent(false);
         private static Message receivedMessage;
 
+        private static Object GameMessageLockObject = new Object();
+        private static Queue<string> gameActionQueue = new Queue<string>();
+        private static ManualResetEvent gameMessageReceived = new ManualResetEvent(false);
+
         public static bool connectToServer()
         {
             try
@@ -35,7 +40,6 @@ namespace stonerkart
 
         public static void handle(Message m)
         {
-            receivedMessage = m;
             switch (m.messageType)
             {
                 case Message.MessageType.RESPONSE:
@@ -43,6 +47,60 @@ namespace stonerkart
                     receivedMessage = m;
                     messageReceived.Set();
                 } break;
+
+                case Message.MessageType.CHALLENGE:
+                {
+                    ChallengeBody cb = new ChallengeBody(m.body);
+                    serverConnection.send(new Message("_server", Message.MessageType.ACCEPTCHALLENGE, new ChallengeBody(cb.username)));
+                } break;
+
+                case Message.MessageType.NEWGAME:
+                {
+                    NewGameBody b = new NewGameBody(m.body);
+                    Controller.newGame(b.newGameStruct, false);
+                } break;
+
+                case Message.MessageType.GAMEMESSAGE:
+                {
+                    GameMessageBody b = new GameMessageBody(m.body);
+                    enqueueGameMessage(b.message);
+                } break;
+
+                default:
+                    throw new Exception(m.messageType.ToString());
+            }
+        }
+
+        private static void enqueueGameMessage(string message)
+        {
+            lock (GameMessageLockObject)
+            {
+                gameActionQueue.Enqueue(message);
+                gameMessageReceived.Set();
+            }
+        }
+
+        public static string dequeueGameMessage()
+        {
+            if (gameActionQueue.Count == 0)
+            {
+                gameMessageReceived.WaitOne();
+            }
+            lock (GameMessageLockObject)
+            {
+                string r = gameActionQueue.Dequeue();
+                gameMessageReceived.Reset();
+                return r;
+            }
+        }
+
+        public static void sendGameMessage(string message, string[] recipients)
+        {
+            foreach (string recipient in recipients)
+            {
+                GameMessageBody b = new GameMessageBody(message);
+                Message m = new Message(recipient, Message.MessageType.GAMEMESSAGE, b);
+                serverConnection.send(m);
             }
         }
 

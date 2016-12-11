@@ -56,7 +56,8 @@ namespace stonerkart
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Controller.newGame();
+            NewGameStruct s = new NewGameStruct(420, new []{"Hero", "Villain"}, 0);
+            Controller.newGame(s, true);
         }
 
         private void button2_Click(object sender, EventArgs e)

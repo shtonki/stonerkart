@@ -8,8 +8,7 @@ namespace stonerkart
 {
     interface GameAction
     {
-        byte[] toBytes();
-        GameAction fromBytes(byte[] bytes);
+        string toString(Game g);
     }
 
     class ManaOrbSelection : GameAction
@@ -21,14 +20,15 @@ namespace stonerkart
             this.orb = orb;
         }
 
-        public byte[] toBytes()
+        public ManaOrbSelection(Game g, string data)
         {
-            throw new NotImplementedException();
+            int i = Int32.Parse(data);
+            orb = (ManaColour)i;
         }
 
-        public GameAction fromBytes(byte[] bytes)
+        public string toString(Game g)
         {
-            throw new NotImplementedException();
+            return ((int)orb).ToString();
         }
     }
 
@@ -41,14 +41,28 @@ namespace stonerkart
             this.wrapper = wrapper;
         }
 
-        public GameAction fromBytes(byte[] bytes)
+        public CastSelection(Game g, string s)
         {
-            throw new NotImplementedException();
+            if (s.Length == 0)
+            {
+                wrapper = null;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        public byte[] toBytes()
+        public string toString(Game g)
         {
-            throw new NotImplementedException();
+            if (!wrapper.HasValue)
+            {
+                return "";
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 
@@ -61,14 +75,42 @@ namespace stonerkart
             this.moves = moves;
         }
 
-        public GameAction fromBytes(byte[] bytes)
+        public MoveSelection(Game g, string s)
         {
-            throw new NotImplementedException();
+            string[] ss = s.Split(';');
+            moves = new List<Tuple<Card, Path>>();
+
+            foreach (string str in ss)
+            {
+                string[] foo = str.Split(',');
+
+                int cardOrd = Int32.Parse(foo[0]);
+                int tileOrd = Int32.Parse(foo[1]);
+
+                Card card = g.cardFromOrd(cardOrd);
+                Tile tile = g.tileFromOrd(tileOrd);
+
+                Path path = g.pathTo(card, tile);
+
+                moves.Add(new Tuple<Card, Path>(card, path));
+            }
         }
 
-        public byte[] toBytes()
+        public string toString(Game g)
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var v in moves)
+            {
+                Card c = v.Item1;
+                Tile t = v.Item2.to;
+                sb.Append(g.ord(c));
+                sb.Append(',');
+                sb.Append(g.ord(t));
+                sb.Append(';');
+            }
+            sb.Length--;
+            return sb.ToString();
         }
     }
 }

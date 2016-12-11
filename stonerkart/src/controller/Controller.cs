@@ -21,6 +21,8 @@ namespace stonerkart
 
         private static List<string> friends;
 
+        public static bool inGame;
+
         public static void startup()
         {
             gameFrame = launchUI();
@@ -39,10 +41,10 @@ namespace stonerkart
             Network.challenge(username);
         }
 
-        public static void newGame()
+        public static void newGame(NewGameStruct ngs, bool local)
         {
-            NewGameStruct s = new NewGameStruct();
-            Game g = new Game(s);
+            inGame = true;
+            Game g = new Game(ngs, local);
             gameFrame.toGame(g);
             g.startGame();
         }
