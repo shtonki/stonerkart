@@ -19,9 +19,12 @@ namespace stonerkart
         private ManaCostPanel manaCostPanel1;
 
         public Card card;
+
+        private CardView me;
         
         public CardView()
         {
+            me = this;
             InitializeComponent();
             DoubleBuffered = true;
             breadText.Text = "Bush did it if I do say so myself kappa keepo 420 swag it up ranch all the way";
@@ -53,6 +56,14 @@ namespace stonerkart
         {
             this.memeout(() =>
             {
+                if (card.coloursEx().Count == 1)
+                {
+                    BackgroundImage = ImageLoader.frameImage(card.colours[0]);
+                }
+                else
+                {
+                    throw new Exception();
+                }
                 art.Image = card.image;
 
                 nameBox.Text = card.name;
@@ -60,7 +71,7 @@ namespace stonerkart
                 breadText.Text = card.breadText;
                 manaCostPanel1.setCost(card.castManaCost);
 
-                if (card.cardType == CardType.Creature || card.cardType == CardType.Hero)
+                if (card.cardType == CardType.Creature)
                 {
                     powerBox.Text = card.power.ToString();
                     toughnessBox.Text = card.toughness.ToString();
@@ -155,7 +166,7 @@ namespace stonerkart
             // pictureBox1
             // 
             this.pictureBox1.Enabled = false;
-            this.pictureBox1.Image = global::stonerkart.Properties.Resources.white3;
+            this.pictureBox1.Image = global::stonerkart.Properties.Resources.lifeFrame;
             this.pictureBox1.InitialImage = null;
             this.pictureBox1.Location = new System.Drawing.Point(0, 0);
             this.pictureBox1.Name = "pictureBox1";

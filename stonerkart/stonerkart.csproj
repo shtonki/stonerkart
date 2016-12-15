@@ -98,7 +98,8 @@
     <Compile Include="src\network\Network.cs" />
     <Compile Include="src\network\AsyncConnection.cs" />
     <Compile Include="src\network\ServerConnection.cs" />
-    <Compile Include="src\Observable.cs" />
+    <Compile Include="src\util\ImageLoader.cs" />
+    <Compile Include="src\util\Observable.cs" />
     <Compile Include="src\view\AutoFontTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -108,7 +109,7 @@
     <Compile Include="src\view\ConsolePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="src\G.cs" />
+    <Compile Include="src\util\G.cs" />
     <Compile Include="src\view\DeckEditorPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -231,6 +232,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="musings.txt" />
+    <None Include="Resources\red3.png" />
+    <None Include="Resources\multi3.png" />
+    <None Include="Resources\grey3.png" />
+    <None Include="Resources\green3.png" />
+    <None Include="Resources\black3.png" />
     <None Include="Resources\LightningBolt.png" />
     <None Include="Resources\AlterTime.png" />
     <None Include="Resources\order.png" />

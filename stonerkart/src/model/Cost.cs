@@ -66,6 +66,18 @@ namespace stonerkart
             cost = new ManaSet(cs);
         }
 
+        public ManaCost(int chaosCost, int deathCost, int lifeCost, int mightCost,  int natureCost, int orderCost)
+        {
+            int[] cs = new int[6];
+            cs[(int)ManaColour.Chaos]  = chaosCost;
+            cs[(int)ManaColour.Death]  = deathCost;
+            cs[(int)ManaColour.Life]   = lifeCost;
+            cs[(int)ManaColour.Might]  = mightCost;
+            cs[(int)ManaColour.Nature] = natureCost;
+            cs[(int)ManaColour.Order]  = orderCost;
+            cost = new ManaSet(cs);
+        }
+
         public int[] measure(Player p)
         {
             for (int i = 0; i < 6; i++)

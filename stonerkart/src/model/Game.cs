@@ -148,7 +148,7 @@ namespace stonerkart
             {
                 raiseEvent(new MoveToTileEvent(e.attacker, e.attackFrom));
                 raiseEvent(new DamageEvent(e.attacker, e.defender, e.attacker.power));
-                if (e.defender.cardType != CardType.Hero) raiseEvent(new DamageEvent(e.defender, e.attacker, e.defender.power));
+                if (!e.defender.isHeroic) raiseEvent(new DamageEvent(e.defender, e.attacker, e.defender.power));
             }));
 
             geFilters.Add(new GameEventHandler<DamageEvent>(e =>
