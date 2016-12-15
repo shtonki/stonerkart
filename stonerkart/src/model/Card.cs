@@ -20,7 +20,7 @@ namespace stonerkart
         public Location location => pile.location;
         public ActivatedAbility castAbility;
         public int castRange => castAbility.castRange;
-        public int[] castManaCost => castAbility.cost.getSubCost<ManaCost>().costs;
+        public ManaSet castManaCost => castAbility.cost.getSubCost<ManaCost>().cost;
 
 
         public List<Ability> abilities = new List<Ability>();
@@ -33,7 +33,7 @@ namespace stonerkart
 
         private Modifiable[] ms;
 
-        public Card(CardTemplate ct, Player owner)
+        public Card(CardTemplate ct, Player owner = null)
         {
             int basePower = -1;
             int baseToughness = -1;
@@ -120,6 +120,22 @@ namespace stonerkart
             tile?.removeCard();
             tile = t;
             t.place(this);
+        }
+
+        public ManaColour[] coloursEx()
+        {
+            List<ManaColour> rt = new List<ManaColour>();
+            return castManaCost.Cast<ManaColour>().ToArray();
+        }
+
+        public int abilityOrd(Ability a)
+        {
+            return abilities.IndexOf(a);
+        }
+
+        public Ability abilityFromOrd(int i)
+        {
+            return abilities[i];
         }
 
         public void reherp(GameEvent e)

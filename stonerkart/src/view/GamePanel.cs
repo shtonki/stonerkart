@@ -48,6 +48,7 @@ namespace stonerkart
             g.hero.addObserver(heroPanel);
 
             g.villain.addObserver(villainPanel);
+            
 
             g.stepHandler.addObserver(stepPanel1);
         }

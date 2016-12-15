@@ -59,29 +59,25 @@ namespace stonerkart
 
     class ManaCost : SubCost
     {
-        public int[] costs;
+        public ManaSet cost { get; }
 
         public ManaCost(params ManaColour[] cs)
         {
-            costs = new int[6];
-            foreach (var c in cs)
-            {
-                costs[(int)c]++;
-            }
+            cost = new ManaSet(cs);
         }
 
         public int[] measure(Player p)
         {
             for (int i = 0; i < 6; i++)
             {
-                if (p.manaPool.current[i] < costs[i]) return null;
+                if (p.manaPool.current[i] < cost[i]) return null;
             }
-            return costs;
+            return cost.ToArray();
         }
 
         public void cut(Player p, int[] iz)
         {
-            p.payMana(iz);
+            p.payMana(new ManaSet(iz));
         }
     }
 }

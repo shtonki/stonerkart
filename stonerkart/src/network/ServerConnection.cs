@@ -26,7 +26,7 @@ namespace stonerkart
 
         private static Socket generateSocket()
         {
-            EndPoint endpoint = new IPEndPoint(IPAddress.Parse("46.239.124.155"), 420);
+            EndPoint endpoint = new IPEndPoint(IPAddress.Parse("82.196.98.15"), 420);
             Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             socket.Connect(endpoint);
             return socket;

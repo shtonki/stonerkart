@@ -15,7 +15,7 @@ namespace stonerkart
         public Pile pile;
         public Card card;
 
-        public MoveToPileEvent(Pile pile, Card card)
+        public MoveToPileEvent(Card card, Pile pile)
         {
             this.pile = pile;
             this.card = card;

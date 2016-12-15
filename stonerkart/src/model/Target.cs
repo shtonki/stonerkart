@@ -31,7 +31,7 @@ namespace stonerkart
 
         public TargetMatrix fillResolve(TargetMatrix tm, Card resolveCard, Game g)
         {
-            TargetColumn[] r = tm.cs;
+            TargetColumn[] r = tm.columns;
 
             for (int i = 0; i < rules.Length; i++)
             {
@@ -45,23 +45,23 @@ namespace stonerkart
 
     class TargetMatrix
     {
-        public TargetColumn[] cs;
+        public TargetColumn[] columns;
 
-        public TargetMatrix(TargetColumn[] cs)
+        public TargetMatrix(TargetColumn[] columns)
         {
-            this.cs = cs;
+            this.columns = columns;
         }
 
         public TargetRow[] generateRows()
         {
-            int l = cs.Aggregate(1, (current, c) => current*c.ts.Length);
+            int l = columns.Aggregate(1, (current, c) => current*c.targets.Length);
             TargetRow[] r = new TargetRow[l];
             if (l != 1) throw new Exception();
 
-            Targetable[] i1 = new Targetable[cs.Length];
-            for (int i = 0; i < cs.Length; i++)
+            Targetable[] i1 = new Targetable[columns.Length];
+            for (int i = 0; i < columns.Length; i++)
             {
-                i1[i] = cs[i].ts[0];
+                i1[i] = columns[i].targets[0];
             }
 
             r[0] = new TargetRow(i1);
@@ -140,7 +140,7 @@ namespace stonerkart
 
         public TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
         {
-            if (c.ts.Length != 0) throw new Exception();
+            if (c.targets.Length != 0) throw new Exception();
             switch (rule)
             {
                 case Rule.ResolveCard:
@@ -185,11 +185,11 @@ namespace stonerkart
 
     struct TargetColumn
     {
-        public Targetable[] ts;
+        public Targetable[] targets;
         
-        public TargetColumn(params Targetable[] ts)
+        public TargetColumn(params Targetable[] targets)
         {
-            this.ts = ts;
+            this.targets = targets;
         }
     }
     
