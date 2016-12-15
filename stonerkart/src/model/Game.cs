@@ -186,6 +186,11 @@ namespace stonerkart
             activePlayerIndex = 0;
             map.tileAt(4, 4).place(players[0].heroCard);
             map.tileAt(6, 6).place(players[1].heroCard);
+
+            foreach (Player p in players)
+            {
+                p.deck.shuffle(random);
+            }
         }
 
         private void loopEx()
@@ -246,7 +251,7 @@ namespace stonerkart
             if (activePlayer == hero)
             {
 
-                int[] r = activePlayer.stuntMana();
+                ManaSet r = activePlayer.stuntMana();
                 Controller.setPrompt("Gain mana nerd");
                 ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => r[(int)o.colour] != 6);
                 activePlayer.unstuntMana(r);
@@ -343,6 +348,17 @@ namespace stonerkart
         private void endStep()
         {
             activePlayerIndex = (activePlayerIndex + 1)%players.Count;
+        }
+
+        private void enforceRules()
+        {
+            foreach (Card c in herpable)
+            {
+                if (c.toughness <= 0)
+                {
+                    raiseEvent(new MoveToPileEvent(c, c.owner.graveyard));
+                }
+            }
         }
 
         private void priority()
@@ -487,7 +503,7 @@ namespace stonerkart
                 raiseEvent(e);
             }
 
-            raiseEvent(new MoveToPileEvent(wrapper.card.owner.field, wrapper.card));
+            raiseEvent(new MoveToPileEvent(wrapper.card, wrapper.card.owner.field));
 
         }
         

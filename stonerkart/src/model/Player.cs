@@ -14,6 +14,7 @@ namespace stonerkart
         public readonly Pile deck;
         public readonly Pile field;
         public readonly Pile hand;
+        public readonly Pile graveyard;
 
         public ManaPool manaPool;
 
@@ -26,7 +27,8 @@ namespace stonerkart
             deck = new Pile(new Location(this, PileLocation.Deck));
             field = new Pile(new Location(this, PileLocation.Field));
             hand = new Pile(new Location(this, PileLocation.Hand));
-            
+            graveyard = new Pile(new Location(this, PileLocation.Hand));
+
 
             manaPool = new ManaPool();
         }
@@ -52,53 +54,31 @@ namespace stonerkart
             notify(new PlayerChangedArgs(this));
         }
 
-        public int[] stuntMana()
+        public ManaSet stuntMana()
         {
-            int[] r = manaPool.max;
+            ManaSet r = manaPool.max;
             int[] s = r.Select(v => v == 6 ? 6 : v + 1).ToArray();
-            manaPool.max = s;
+            manaPool.max = new ManaSet(s);
             notify(new PlayerChangedArgs(this));
             return r;
         }
 
-        public void unstuntMana(int[] r)
+        public void unstuntMana(ManaSet r)
         {
             manaPool.max = r;
         }
 
         public void gainMana(ManaColour c)
         {
-            manaPool.max[(int)c]++;
-            manaPool.current[(int)c]++;
+            manaPool.max[c]++;
+            manaPool.current[c]++;
             notify(new PlayerChangedArgs(this));
         }
 
-        public void payMana(int[] iz)
+        public void payMana(ManaSet iz)
         {
             manaPool.subtract(iz);
             notify(new PlayerChangedArgs(this));
-        }
-    }
-
-    class ManaPool
-    {
-        public int[] max = new int[6];
-        public int[] current = new int[6];
-
-        public void reset()
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                current[i] = max[i];
-            }
-        }
-
-        public void subtract(int[] costs)
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                current[i] -= costs[i];
-            }
         }
     }
 }

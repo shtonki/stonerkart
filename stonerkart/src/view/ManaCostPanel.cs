@@ -10,24 +10,16 @@ namespace stonerkart
 {
     class ManaCostPanel : TransparentPanel
     {
-        private ManaColour[] costs;
+        private List<ManaColour> costs;
 
         public ManaCostPanel()
         {
-            costs = new ManaColour[0];
+            costs = new List<ManaColour>();
         }
 
-        public void setCost(int[] costs)
+        public void setCost(ManaSet cs)
         {
-            List<ManaColour> l = new List<ManaColour>();
-            for (int i = 0; i < 6; i++)
-            {
-                for (int j = 0; j < costs[i]; j++)
-                {
-                    l.Add((ManaColour)i);
-                }
-            }
-            this.costs = l.ToArray();
+            costs = cs.orbs;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -40,7 +32,7 @@ namespace stonerkart
             int dh = h;
             int dw = h;
 
-            for (int j = 0; j < costs.Length; j++)
+            for (int j = 0; j < costs.Count; j++)
             {
                 Image b = G.manaImage(costs[j]);
                 Image i = G.ResizeImage(b, dw, dh);

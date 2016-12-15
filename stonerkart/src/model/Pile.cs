@@ -55,6 +55,20 @@ namespace stonerkart
             notify(new PileChangedMessage(false, c));
         }
 
+
+        public void shuffle(Random rng)
+        {
+            int n = cardList.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                Card c = cardList[k];
+                cardList[k] = cardList[n];
+                cardList[n] = c;
+            }
+        }
+
         public IEnumerator<Card> GetEnumerator()
         {
             return cardList.GetEnumerator();
