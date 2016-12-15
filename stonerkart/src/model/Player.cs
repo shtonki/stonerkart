@@ -57,7 +57,7 @@ namespace stonerkart
         public ManaSet stuntMana()
         {
             ManaSet r = manaPool.max;
-            int[] s = r.Select(v => v == 6 ? 6 : v + 1).ToArray();
+            int[] s = r.Select((v, index) => index == (int)ManaColour.Colourless || v == 6 ? v : v + 1).ToArray();
             manaPool.max = new ManaSet(s);
             notify(new PlayerChangedArgs(this));
             return r;

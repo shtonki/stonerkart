@@ -181,7 +181,7 @@ namespace stonerkart
 
         public static void print(string s)
         {
-            gameFrame?.gamePanel?.consolePanel?.print(s);
+            //gameFrame?.gamePanel?.consolePanel?.print(s);
         }
     }
 }

@@ -13,35 +13,24 @@ namespace stonerkart
         private AutoFontTextBox nameBox;
         private AutoFontTextBox toughnessBox;
         private AutoFontTextBox powerBox;
-        private PictureBox pictureBox1;
+        private PictureBox frameImage;
         private AutoFontTextBox cardTypeText;
         private AutoFontTextBox castRangeSlashMovementBox;
         private ManaCostPanel manaCostPanel1;
 
-        public Card card;
-
-        private CardView me;
+        public Card card { get; private set; }
         
-        public CardView()
+        public CardView() : this(CardTemplate.Belwas)
+        { 
+        }
+
+        public CardView(CardTemplate ct) : this (new Card(ct))
         {
-            me = this;
+        }
+
+        public CardView(Card c)
+        {
             InitializeComponent();
-            DoubleBuffered = true;
-            breadText.Text = "Bush did it if I do say so myself kappa keepo 420 swag it up ranch all the way";
-            nameBox.Text = "x";
-            powerBox.Text = "x";
-            toughnessBox.Text = "x";
-        }
-
-        public CardView(CardTemplate ct)
-        {
-            card = new Card(ct, null);
-            ihavedowns();
-        }
-
-        public CardView(Card c) : this()
-        {
-            c.addObserver(this);
             card = c;
             ihavedowns();
         }
@@ -52,19 +41,28 @@ namespace stonerkart
             ihavedowns();
         }
 
+        public void setCard(Card c)
+        {
+            card.tryUnsubscribe(this);
+            card = c;
+            card.addObserver(this);
+            ihavedowns();
+        }
+
         private void ihavedowns()
         {
             this.memeout(() =>
             {
-                if (card.coloursEx().Count == 1)
+                
+                if (card.colours.Count == 1)
                 {
-                    BackgroundImage = ImageLoader.frameImage(card.colours[0]);
+                    frameImage.Image = ImageLoader.frameImage(card.colours[0]);
                 }
                 else
                 {
                     throw new Exception();
                 }
-                art.Image = card.image;
+                art.Image = ImageLoader.artImage(card.template);
 
                 nameBox.Text = card.name;
                 cardTypeText.Text = card.cardType.ToString();
@@ -83,12 +81,13 @@ namespace stonerkart
                     powerBox.Text = "";
                     toughnessBox.Text = "";
                 }
+                Invalidate();
             });
         }
 
         public void notify(CardChangedMessage t)
         {
-            throw new NotImplementedException();
+            ihavedowns();
         }
 
         public Stuff getStuff()
@@ -103,22 +102,22 @@ namespace stonerkart
             this.nameBox = new stonerkart.AutoFontTextBox();
             this.toughnessBox = new stonerkart.AutoFontTextBox();
             this.powerBox = new stonerkart.AutoFontTextBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.frameImage = new System.Windows.Forms.PictureBox();
             this.cardTypeText = new stonerkart.AutoFontTextBox();
             this.castRangeSlashMovementBox = new stonerkart.AutoFontTextBox();
             this.manaCostPanel1 = new stonerkart.ManaCostPanel();
             ((System.ComponentModel.ISupportInitialize)(this.art)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.frameImage)).BeginInit();
             this.SuspendLayout();
             // 
             // art
             // 
             this.art.Enabled = false;
-            this.art.Image = global::stonerkart.Properties.Resources.jordanno;
+            this.art.Image = global::stonerkart.Properties.Resources.artBelwas;
             this.art.InitialImage = null;
             this.art.Location = new System.Drawing.Point(46, 64);
             this.art.Name = "art";
-            this.art.Size = new System.Drawing.Size(386, 291);
+            this.art.Size = new System.Drawing.Size(390, 300);
             this.art.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.art.TabIndex = 0;
             this.art.TabStop = false;
@@ -163,17 +162,17 @@ namespace stonerkart
             this.powerBox.Size = new System.Drawing.Size(53, 57);
             this.powerBox.TabIndex = 4;
             // 
-            // pictureBox1
+            // frameImage
             // 
-            this.pictureBox1.Enabled = false;
-            this.pictureBox1.Image = global::stonerkart.Properties.Resources.lifeFrame;
-            this.pictureBox1.InitialImage = null;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(478, 618);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
+            this.frameImage.Enabled = false;
+            this.frameImage.Image = global::stonerkart.Properties.Resources.lifeFrame;
+            this.frameImage.InitialImage = null;
+            this.frameImage.Location = new System.Drawing.Point(0, 0);
+            this.frameImage.Name = "frameImage";
+            this.frameImage.Size = new System.Drawing.Size(478, 618);
+            this.frameImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.frameImage.TabIndex = 5;
+            this.frameImage.TabStop = false;
             // 
             // cardTypeText
             // 
@@ -197,8 +196,10 @@ namespace stonerkart
             // 
             // manaCostPanel1
             // 
+            this.manaCostPanel1.BackColor = System.Drawing.Color.Transparent;
             this.manaCostPanel1.Location = new System.Drawing.Point(280, 15);
             this.manaCostPanel1.Name = "manaCostPanel1";
+            this.manaCostPanel1.Opacity = 100;
             this.manaCostPanel1.Size = new System.Drawing.Size(161, 33);
             this.manaCostPanel1.TabIndex = 6;
             // 
@@ -212,11 +213,11 @@ namespace stonerkart
             this.Controls.Add(this.nameBox);
             this.Controls.Add(this.breadText);
             this.Controls.Add(this.art);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.frameImage);
             this.Name = "CardView";
             this.Size = new System.Drawing.Size(478, 618);
             ((System.ComponentModel.ISupportInitialize)(this.art)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.frameImage)).EndInit();
             this.ResumeLayout(false);
 
         }

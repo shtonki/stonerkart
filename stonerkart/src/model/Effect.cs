@@ -32,7 +32,7 @@ namespace stonerkart
             foreach (var row in ts)
             {
                 if (row.ts.Length != 2) throw new Exception();
-                r.Add(new MoveToTileEvent((Card)row.ts[0], (Tile)row.ts[1]));
+                r.Add(new PlaceOnTileEvent((Card)row.ts[0], (Tile)row.ts[1]));
             }
 
             return r.ToArray();

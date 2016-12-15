@@ -13,7 +13,6 @@ namespace stonerkart
     class GamePanel : StickyPanel, Screen
     {
         private CardsPanel cardsPanel1;
-        public ConsolePanel consolePanel;
         public AutoFontTextBox promtText;
         public Shibbutton shibbutton2;
         public Shibbutton shibbutton3;
@@ -23,6 +22,7 @@ namespace stonerkart
         private PlayerPanel heroPanel;
         private PlayerPanel villainPanel;
         private StepPanel stepPanel1;
+        private CardView highlightCard;
         public HexPanel hexPanel;
 
         public GamePanel(Game g)
@@ -31,13 +31,17 @@ namespace stonerkart
             if (g == null) return;
             hexPanel.setMap(g.map);
             hexPanel.tileClicked.Add(g.clicked);
+            hexPanel.tileEntered.Add(clickable => setHightlight(clickable?.getStuff()));
+            
 
             cardsPanel1.setPile(g.hero.hand);
-            cardsPanel1.callbacks.Add(g.clicked);
+            cardsPanel1.clickedCallbacks.Add(g.clicked);
+            cardsPanel1.mouseEnteredCallbacks.Add(clickable => setHightlight(clickable.getStuff()));
 
             stackPanel.vertical = true;
             stackPanel.setPile(g.stack);
-            stackPanel.callbacks.Add(g.clicked);
+            stackPanel.clickedCallbacks.Add(g.clicked);
+            stackPanel.mouseEnteredCallbacks.Add(clickable => setHightlight(clickable.getStuff()));
 
             shibbutton2.MouseDown += (_, __) => g.clicked(shibbutton2);
             shibbutton3.MouseDown += (_, __) => g.clicked(shibbutton3);
@@ -57,11 +61,32 @@ namespace stonerkart
         {
         }
 
+        private void setHightlight(Stuff stuff)
+        {
+            if (stuff == null) return;
+            Card newCard = null;
+            if (stuff is Tile)
+            {
+                Tile tile = (Tile)stuff;
+                if (tile.card != null)
+                {
+                    newCard = tile.card;
+                }
+            }
+            else if (stuff is Card)
+            {
+                newCard = (Card)stuff;
+            }
+            if (newCard != null && newCard != highlightCard.card)
+            {
+                highlightCard.setCard(newCard);
+            }
+        }
+
         private void InitializeComponent()
         {
             this.hexPanel = new stonerkart.HexPanel();
             this.cardsPanel1 = new stonerkart.CardsPanel();
-            this.consolePanel = new stonerkart.ConsolePanel();
             this.promtText = new stonerkart.AutoFontTextBox();
             this.shibbutton2 = new stonerkart.Shibbutton();
             this.shibbutton3 = new stonerkart.Shibbutton();
@@ -71,6 +96,7 @@ namespace stonerkart
             this.heroPanel = new stonerkart.PlayerPanel();
             this.villainPanel = new stonerkart.PlayerPanel();
             this.stepPanel1 = new stonerkart.StepPanel();
+            this.highlightCard = new stonerkart.CardView();
             this.SuspendLayout();
             // 
             // hexPanel
@@ -88,13 +114,6 @@ namespace stonerkart
             this.cardsPanel1.Name = "cardsPanel1";
             this.cardsPanel1.Size = new System.Drawing.Size(866, 150);
             this.cardsPanel1.TabIndex = 1;
-            // 
-            // consolePanel
-            // 
-            this.consolePanel.Location = new System.Drawing.Point(911, 3);
-            this.consolePanel.Name = "consolePanel";
-            this.consolePanel.Size = new System.Drawing.Size(172, 507);
-            this.consolePanel.TabIndex = 2;
             // 
             // promtText
             // 
@@ -156,15 +175,15 @@ namespace stonerkart
             this.heroPanel.BackColor = System.Drawing.Color.DarkViolet;
             this.heroPanel.Location = new System.Drawing.Point(4, 533);
             this.heroPanel.Name = "heroPanel";
-            this.heroPanel.Size = new System.Drawing.Size(150, 132);
+            this.heroPanel.Size = new System.Drawing.Size(139, 132);
             this.heroPanel.TabIndex = 11;
             // 
-            // playerPanel1
+            // villainPanel
             // 
             this.villainPanel.BackColor = System.Drawing.Color.DarkViolet;
             this.villainPanel.Location = new System.Drawing.Point(7, 176);
             this.villainPanel.Name = "villainPanel";
-            this.villainPanel.Size = new System.Drawing.Size(147, 132);
+            this.villainPanel.Size = new System.Drawing.Size(136, 132);
             this.villainPanel.TabIndex = 12;
             // 
             // stepPanel1
@@ -174,9 +193,18 @@ namespace stonerkart
             this.stepPanel1.Size = new System.Drawing.Size(53, 213);
             this.stepPanel1.TabIndex = 13;
             // 
+            // highlightCard
+            // 
+            this.highlightCard.BackColor = System.Drawing.Color.DarkViolet;
+            this.highlightCard.Location = new System.Drawing.Point(911, 265);
+            this.highlightCard.Name = "highlightCard";
+            this.highlightCard.Size = new System.Drawing.Size(172, 245);
+            this.highlightCard.TabIndex = 14;
+            // 
             // GamePanel
             // 
             this.BackColor = System.Drawing.Color.Fuchsia;
+            this.Controls.Add(this.highlightCard);
             this.Controls.Add(this.stepPanel1);
             this.Controls.Add(this.villainPanel);
             this.Controls.Add(this.heroPanel);
@@ -186,7 +214,6 @@ namespace stonerkart
             this.Controls.Add(this.shibbutton3);
             this.Controls.Add(this.shibbutton2);
             this.Controls.Add(this.promtText);
-            this.Controls.Add(this.consolePanel);
             this.Controls.Add(this.cardsPanel1);
             this.Controls.Add(this.hexPanel);
             this.Name = "GamePanel";

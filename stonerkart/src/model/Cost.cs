@@ -66,25 +66,47 @@ namespace stonerkart
             cost = new ManaSet(cs);
         }
 
-        public ManaCost(int chaosCost, int deathCost, int lifeCost, int mightCost,  int natureCost, int orderCost)
+        public ManaCost(int chaosCost, int deathCost, int lifeCost, int mightCost,  int natureCost, int orderCost, int colourlessCost)
         {
-            int[] cs = new int[6];
+            int[] cs = new int[ManaSet.size];
             cs[(int)ManaColour.Chaos]  = chaosCost;
             cs[(int)ManaColour.Death]  = deathCost;
             cs[(int)ManaColour.Life]   = lifeCost;
             cs[(int)ManaColour.Might]  = mightCost;
             cs[(int)ManaColour.Nature] = natureCost;
             cs[(int)ManaColour.Order]  = orderCost;
+            cs[(int)ManaColour.Colourless]  = colourlessCost;
             cost = new ManaSet(cs);
         }
 
         public int[] measure(Player p)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < ManaSet.size; i++)
             {
+                if ((ManaColour)i == ManaColour.Colourless) continue;
                 if (p.manaPool.current[i] < cost[i]) return null;
             }
-            return cost.ToArray();
+
+            ManaSet pool = p.manaPool.current;
+            List<ManaColour> poolOrbs = pool.orbs;
+            List<ManaColour> costOrbs = cost.orbs;
+
+            if (poolOrbs.Count() < costOrbs.Count()) return null;
+
+            if (cost[ManaColour.Colourless] > 0)
+            {
+                if (poolOrbs.Count() > costOrbs.Count())
+                {
+                    throw new Exception();
+                }
+
+                return pool.ToArray();
+
+            }
+            else
+            {
+                return cost.ToArray();
+            }
         }
 
         public void cut(Player p, int[] iz)

@@ -170,7 +170,7 @@ namespace stonerkart.src.view
 
         private void drawCards(Func<CardTemplate, bool> filter)
         {
-            var cards = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().Where(x => x != CardTemplate.Hero && x != CardTemplate.AlterTime).Where(filter);
+            var cards = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().Where(x => x != CardTemplate.Belwas && x != CardTemplate.AlterTime).Where(filter);
 
             for (int i = 0; i < cardViews.Length; i++)
             {

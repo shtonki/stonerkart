@@ -52,7 +52,7 @@ namespace stonerkart
 
         private void fixEx()
         {
-            Graphics g = Graphics.FromImage(Properties.Resources.jordanno); //todo hack
+            Graphics g = Graphics.FromImage(Properties.Resources.orbDeath); //todo hack
             Font testFont = null;
             for (int AdjustedSize = 20; AdjustedSize >= 4; AdjustedSize--)
             {

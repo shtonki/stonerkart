@@ -10,16 +10,18 @@ namespace stonerkart
 {
     class ManaCostPanel : TransparentPanel
     {
-        private List<ManaColour> costs;
+        private List<ManaColour> colouredCosts;
+        private int colourless;
 
         public ManaCostPanel()
         {
-            costs = new List<ManaColour>();
+            colouredCosts = new List<ManaColour>();
         }
 
         public void setCost(ManaSet cs)
         {
-            costs = cs.orbs;
+            colourless = cs[ManaColour.Colourless];
+            colouredCosts = cs.orbs.Where(x => x != ManaColour.Colourless).ToList();
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -32,13 +34,20 @@ namespace stonerkart
             int dh = h;
             int dw = h;
 
-            for (int j = 0; j < costs.Count; j++)
+            int j = 0;
+
+            for (; j < colouredCosts.Count; j++)
             {
-                Image b = G.manaImage(costs[j]);
+                Image b = ImageLoader.orbImage(colouredCosts[j]);
                 Image i = G.ResizeImage(b, dw, dh);
                 g.DrawImage(i, new PointF(w - j*dw - dw, 0));
             }
-
+            if (colourless > 0)
+            {
+                Image b = ImageLoader.orbImage(ManaColour.Colourless);
+                Image i = G.ResizeImage(b, dw, dh);
+                g.DrawImage(i, new PointF(w - j * dw - dw, 0));
+            }
         }
 
         /*{

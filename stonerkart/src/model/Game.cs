@@ -50,7 +50,7 @@ namespace stonerkart
             for (int i = 0; i < ngs.playerNames.Length; i++)
             {
                 Player p = new Player(this);
-                Card heroCard = createCard(CardTemplate.Hero, p);
+                Card heroCard = createCard(CardTemplate.Belwas, p);
                 p.setHeroCard(heroCard);
 
                 players.Add(p);
@@ -64,7 +64,7 @@ namespace stonerkart
                 List<Card> deck = new List<Card>();
                 for (int j = 0; j < 10; j++)
                 {
-                    Card c = createCard(CardTemplate.Jordan, p);
+                    Card c = createCard(CardTemplate.Zap, p);
                     deck.Add(c);
                 }
                 p.loadDeck(deck);
@@ -139,21 +139,29 @@ namespace stonerkart
                 Controller.redraw();
             }));
 
-            geFilters.Add(new GameEventHandler<MoveToTileEvent>(e =>
+            geFilters.Add(new GameEventHandler<MoveEvent>(e =>
             {
-                e.card.moveTo(e.tile);
-            }));
+                Path path = e.path;
+                Card mover = path.from.card;
+                Tile destination = path.to;
+                Card defender = destination.card;
 
-            geFilters.Add(new GameEventHandler<AttackEvent>(e =>
-            {
-                raiseEvent(new MoveToTileEvent(e.attacker, e.attackFrom));
-                raiseEvent(new DamageEvent(e.attacker, e.defender, e.attacker.power));
-                if (!e.defender.isHeroic) raiseEvent(new DamageEvent(e.defender, e.attacker, e.defender.power));
+                if (defender == null)
+                {
+                    mover.moveTo(destination);
+                }
+                else
+                {
+                    raiseEvent(new DamageEvent(mover, defender, mover.power));
+                    if (!defender.isHeroic) raiseEvent(new DamageEvent(defender, mover, defender.power));
+                }
+
+                mover.movement.modify(-path.length, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfPlayersTurn(mover.owner));
             }));
 
             geFilters.Add(new GameEventHandler<DamageEvent>(e =>
             {
-                e.target.toughness.modify(-e.amount, Modifiable.intAdd, Modifiable.startOfEndStep);
+                e.target.toughness.modify(-e.amount, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfEndStep);
             }));
 
             geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>
@@ -243,7 +251,7 @@ namespace stonerkart
 
         private void untapStep()
         {
-            raiseEvent(new StartOfStepEvent(Steps.Untap));
+            raiseEvent(new StartOfStepEvent(activePlayer, Steps.Untap)); //todo hack me the fuck up
             activePlayer.resetMana();
 
             ManaOrbSelection selection;
@@ -333,14 +341,8 @@ namespace stonerkart
             {
                 Card c = v.Item1;
                 Path p = v.Item2;
-                if (p.to.card == null)
-                {
-                    raiseEvent(new MoveToTileEvent(c, p.to));
-                }
-                else
-                {
-                    raiseEvent(new AttackEvent(p));
-                }
+                raiseEvent(new MoveEvent(c, p));
+                
             }
             Controller.redraw();
         }

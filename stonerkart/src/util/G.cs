@@ -12,35 +12,19 @@ namespace stonerkart
     static class G
     {
 
-        public static Image manaImage(ManaColour c)
-        {
-            switch (c)
-            {
-                case ManaColour.Chaos:
-                    return Properties.Resources.chaos;
-
-                case ManaColour.Death:
-                    return Properties.Resources.death;
-
-                case ManaColour.Life:
-                    return Properties.Resources.life;
-
-                case ManaColour.Might:
-                    return Properties.Resources.might;
-
-                case ManaColour.Nature:
-                    return Properties.Resources.nature;
-
-                case ManaColour.Order:
-                    return Properties.Resources.order;
-
-                default:
-                    throw new Exception();
-            }
-        }
+        private static Dictionary<Image, Bitmap> imageCache = new Dictionary<Image, Bitmap>();
 
         public static Bitmap ResizeImage(Image image, int width, int height)
         {
+            Size size = new Size(width, height);
+            if (imageCache.ContainsKey(image))
+            {
+                Bitmap bmp = imageCache[image];
+                if (size.Width == bmp.Width && size.Height == bmp.Height)
+                {
+                    return bmp;
+                }
+            }
             if (width <= 0 || height <= 0) return new Bitmap(image);
             var destRect = new Rectangle(0, 0, width, height);
             var destImage = new Bitmap(width, height);
@@ -61,7 +45,7 @@ namespace stonerkart
                     graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
                 }
             }
-
+            imageCache[image] = destImage;
             return destImage;
         }
 

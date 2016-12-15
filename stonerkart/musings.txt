@@ -8,10 +8,12 @@ draw step before selecting which mana orb to gain
 
 things that are broken:
 martin rectum
+not all steps trigger the StartOfStepEvent GameEvents
 Tile.atDistance leaks memory
 
 
 things that are fucked:
+ImageLoader.orbImage wins the most fucked award 
 if we lose inputs it's because we don't buffer inputevents
 martin
 this code base

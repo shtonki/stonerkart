@@ -8,7 +8,8 @@ namespace stonerkart
     internal class CardsPanel : UserControl, Observer<PileChangedMessage>
     {
         private List<CardView> cardViews;
-        public readonly List<Action<Clickable>> callbacks = new List<Action<Clickable>>();
+        public List<Action<Clickable>> clickedCallbacks { get; } = new List<Action<Clickable>>();
+        public List<Action<Clickable>> mouseEnteredCallbacks { get; } = new List<Action<Clickable>>();
         public bool vertical;
 
         public CardsPanel()
@@ -21,7 +22,12 @@ namespace stonerkart
 
         private void clicked(CardView c)
         {
-            foreach (var cb in callbacks) cb(c);
+            foreach (var cb in clickedCallbacks) cb(c);
+        }
+
+        private void entered(CardView c)
+        {
+            foreach (var cb in mouseEnteredCallbacks) cb(c);
         }
 
         public void setPile(Pile p)
@@ -33,8 +39,10 @@ namespace stonerkart
         private void addCardView(Card c)
         {
             CardView cv = new CardView(c);
+            c.addObserver(cv);
             cardViews.Add(cv);
             cv.MouseDown += (_, __) => clicked(cv);
+            cv.MouseEnter += (_, __) => entered(cv);
             this.memeout(() => Controls.Add(cv));
         }
 
