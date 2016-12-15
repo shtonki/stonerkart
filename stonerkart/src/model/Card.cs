@@ -16,6 +16,7 @@ namespace stonerkart
         public Player controller { get; }
         public CardTemplate template { get; }
         public CardType cardType { get; }
+        public Rarity rarity { get; }
         public string breadText { get; }
 
         public Location location => pile.location;
@@ -60,6 +61,7 @@ namespace stonerkart
                 colourlessCost = 0;
             int castRange = -1;
             Effect castEffect = null;
+            Rarity rarity;
 
 
             #region oophell
@@ -68,6 +70,7 @@ namespace stonerkart
                 case CardTemplate.Belwas:
                 {
                     cardType = CardType.Creature;
+                    rarity = Rarity.Rare;
                     isHeroic = true;
                     baseMovement = 4;
                     basePower = 1;
@@ -77,6 +80,8 @@ namespace stonerkart
 
                 case CardTemplate.Kappa:
                 {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Common;
                     baseMovement = 2;
                     basePower = 1;
                     baseToughness = 1;
@@ -87,6 +92,7 @@ namespace stonerkart
                 case CardTemplate.Zap:
                 {
                     cardType = CardType.Instant;
+                    rarity = Rarity.Common;
 
                     castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), new ZepperDoer(2));
                     castRange = 3;
@@ -94,6 +100,9 @@ namespace stonerkart
 
                     breadText = "Deal 2 damage to target creature.";
                 } break;
+
+                default:
+                    throw new Exception();
             }
 
             #endregion
@@ -137,7 +146,9 @@ namespace stonerkart
             this.owner = owner;
             controller = owner;
 
-            name = ct.ToString();
+            this.rarity = rarity;
+
+            name = ct.ToString().Replace('_', ' ');
         }
 
         public void moveTo(Pile p)
@@ -208,7 +219,6 @@ namespace stonerkart
     enum CardTemplate
     {
         Belwas,
-        AlterTime,
         Zap,
         Kappa,
     }
@@ -217,5 +227,13 @@ namespace stonerkart
     {
         Creature,
         Instant,
+    }
+
+    enum Rarity
+    {
+        Common,
+        Uncommon,
+        Rare,
+        Legendary,
     }
 }

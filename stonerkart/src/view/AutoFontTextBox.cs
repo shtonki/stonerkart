@@ -20,6 +20,7 @@ namespace stonerkart
             SetStyle(ControlStyles.Opaque, true);
             this.BackColor = Color.Transparent;
             TextChanged += (sender, args) => txt = Text;
+            Enabled = false;
         }
 
         protected override void OnPaint(PaintEventArgs e)

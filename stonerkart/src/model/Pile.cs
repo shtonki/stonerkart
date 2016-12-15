@@ -11,13 +11,16 @@ namespace stonerkart
     {
         public readonly Location location;
 
-        private List<Card> cardList;
+        private List<Card> cardList = new List<Card>();
 
         public int Count => cardList.Count;
 
+        public Pile()
+        {
+        }
+
         public Pile(Location location)
         {
-            cardList = new List<Card>();
             this.location = location;
         }
 

@@ -10,7 +10,8 @@ namespace stonerkart
         private List<CardView> cardViews;
         public List<Action<Clickable>> clickedCallbacks { get; } = new List<Action<Clickable>>();
         public List<Action<Clickable>> mouseEnteredCallbacks { get; } = new List<Action<Clickable>>();
-        public bool vertical;
+
+        public bool vertical { get; set; }
 
         public CardsPanel()
         {
@@ -18,6 +19,9 @@ namespace stonerkart
             BackColor = Color.Navy;
             DoubleBuffered = true;
             Resize += (_, __) => layoutCards();
+            MouseMove += xd;
+            //Capture = true;
+
         }
 
         private void clicked(CardView c)
@@ -30,10 +34,53 @@ namespace stonerkart
             foreach (var cb in mouseEnteredCallbacks) cb(c);
         }
 
+        private CardView frontCard;
+
+        private void xd(object a, MouseEventArgs e)
+        {
+            Point v = this.PointToClient(Control.MousePosition);
+            int cardIndexUnderMouse = v.Y / actualPad;
+            CardView cardUnderMouse;
+
+
+            
+
+
+            if (cardIndexUnderMouse >= cardViews.Count)
+            {
+                cardUnderMouse = null;
+            }
+            else
+            {
+                cardUnderMouse = cardViews[cardIndexUnderMouse];
+            }
+
+            if (frontCard == cardUnderMouse) return;
+
+            foreach (CardView cv in cardViews)
+            {
+                cv.BringToFront();
+            }
+
+            frontCard = cardUnderMouse;
+            frontCard?.BringToFront();
+        }
+
         public void setPile(Pile p)
         {
             p.addObserver(this);
             foreach (var v in p) addCardView(v);
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            if (!(ClientRectangle.Contains(PointToClient(Control.MousePosition))))
+            {
+                foreach (CardView cv in cardViews)
+                {
+                    cv.BringToFront();
+                }
+            }
         }
 
         private void addCardView(Card c)
@@ -43,6 +90,9 @@ namespace stonerkart
             cardViews.Add(cv);
             cv.MouseDown += (_, __) => clicked(cv);
             cv.MouseEnter += (_, __) => entered(cv);
+            cv.MouseMove += xd;
+            cv.MouseLeave += (a, b) => OnMouseLeave(b);
+            
             this.memeout(() => Controls.Add(cv));
         }
 
@@ -73,20 +123,30 @@ namespace stonerkart
             }
         }
 
-        //todo unhack these
+
+        private const float HtoWratio = 1.57f;
+        private const int minPad = 20;
+        private int actualPad;
 
         private void layoutVertical()
         {
             this.memeout(() =>
             {
+                actualPad = minPad;
                 int cards = cardViews.Count;
                 if (cards == 0) return;
-                int cardHeight = Size.Height/cards;
                 int cardWidth = Size.Width;
+                int cardHeight = (int)(HtoWratio * cardWidth);
+
+                if (cardHeight + actualPad * cards > Size.Height)
+                {
+                    cardHeight = Size.Height - actualPad * cards;
+                }
 
                 for (int i = 0; i < cards; i++)
                 {
-                    cardViews[i].SetBounds(0, i*cardHeight, cardWidth, cardHeight);
+                    cardViews[i].SetBounds(0, i* actualPad, cardWidth, cardHeight);
+                    cardViews[i].BringToFront();
                 }
             });
         }
