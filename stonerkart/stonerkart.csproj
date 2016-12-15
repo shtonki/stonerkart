@@ -83,9 +83,10 @@
     <Compile Include="src\model\Ability.cs" />
     <Compile Include="src\model\Card.cs" />
     <Compile Include="src\model\Cost.cs" />
+    <Compile Include="src\model\Deck.cs" />
     <Compile Include="src\model\Effect.cs" />
     <Compile Include="src\model\Game.cs" />
-    <Compile Include="src\model\ManaOrb.cs" />
+    <Compile Include="src\model\Mana.cs" />
     <Compile Include="src\model\Map.cs" />
     <Compile Include="src\model\Modifiable.cs" />
     <Compile Include="src\model\Pile.cs" />
