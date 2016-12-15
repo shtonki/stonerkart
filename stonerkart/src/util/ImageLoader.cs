@@ -37,6 +37,11 @@ namespace stonerkart
                     return Resources.artZap;
                 }
 
+                case CardTemplate.Kappa:
+                {
+                    return Resources.artKappa;
+                }
+
                 default:
                 {
                     return Resources.orbLife;
@@ -58,35 +63,44 @@ namespace stonerkart
 
         private static Image frameImageEx(ManaColour colour)
         {
-            Image i;
             switch (colour)
             {
                 case ManaColour.Death:
                 {
-                    i = Resources.frameDeath;
+                    return Resources.frameDeath;
                 } break;
 
                 case ManaColour.Life:
                 {
-                    i = Resources.lifeFrame;
+                    return Resources.lifeFrame;
                 } break;
 
                 case ManaColour.Chaos:
                 {
-                    i = Resources.frameChaos;
+                    return Resources.frameChaos;
                 } break;
 
                 case ManaColour.Nature:
                 {
-                    i = Resources.frameNature;
+                    return Resources.frameNature;
                 } break;
 
-                default:
+                case ManaColour.Might:
                 {
-                    i = Resources.frameGrey;
+                    return Resources.frameMight;
+                } break;
+                        
+                case ManaColour.Order:
+                {
+                    return Resources.frameOrder;
+                } break;
+
+                case ManaColour.Colourless:
+                {
+                    return Resources.frameGrey;
                 } break;
             }
-            return i;
+            throw new Exception();
         }
 
         public static Image orbImage(ManaColour c)
@@ -115,7 +129,7 @@ namespace stonerkart
                     return Properties.Resources.orbLife;
 
                 case ManaColour.Might:
-                    return Properties.Resources.orbMulti;
+                    return Properties.Resources.orbMight;
 
                 case ManaColour.Nature:
                     return Properties.Resources.orbNature;

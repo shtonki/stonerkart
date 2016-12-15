@@ -96,6 +96,18 @@ namespace stonerkart
         }
     }
 
+    struct EndOfStepEvent : GameEvent
+    {
+        public Player activePlayer;
+        public Steps step { get; }
+
+        public EndOfStepEvent(Player activePlayer, Steps step)
+        {
+            this.activePlayer = activePlayer;
+            this.step = step;
+        }
+    }
+
     struct DrawEvent : GameEvent
     {
         public Player player { get; }

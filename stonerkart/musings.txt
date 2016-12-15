@@ -1,5 +1,5 @@
 ﻿missing features:
-canceling targeting
+lmfao as if there aren't any
 
 
 thing which are up for debate:
@@ -8,20 +8,15 @@ draw step before selecting which mana orb to gain
 
 things that are broken:
 martin rectum
-not all steps trigger the StartOfStepEvent GameEvents
 Tile.atDistance leaks memory
 
 
 things that are fucked:
-ImageLoader.orbImage wins the most fucked award 
 if we lose inputs it's because we don't buffer inputevents
 martin
 this code base
 Map.dijkstra using Int32.MaxValue/2 to denote an uninitialized node
 we up and load every fucking screen when loading the form
 if cardViews start sending their shit twice or to the wrong place it's because we never remove the MouseDown callback because we're autistic
-Card contructor
-ManaButton image caching and how it's nonexistant and how that's fucked
-targeting was rotten from the get go, still sort of is xd
 Tile.atDistance should probably be in Map
 Card.path makes me :puke:

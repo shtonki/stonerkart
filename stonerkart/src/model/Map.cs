@@ -165,6 +165,7 @@ namespace stonerkart
         public readonly int length;
         public Tile from => tiles[0];
         public Tile to => tiles[tiles.Count() - 1];
+        public Tile penultimate => tiles[tiles.Count() - 2];
         private readonly List<Tile> tiles;
 
         public Path(List<Tile> tiles, int length)

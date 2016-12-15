@@ -47,6 +47,7 @@ namespace stonerkart
                 Image b = ImageLoader.orbImage(ManaColour.Colourless);
                 Image i = G.ResizeImage(b, dw, dh);
                 g.DrawImage(i, new PointF(w - j * dw - dw, 0));
+                g.DrawString(colourless.ToString(), new Font(new FontFamily("Arial"), dw * 0.75f), Brushes.Black, w - j*dw - dw + dw*0.1f, -0.1f*dh);
             }
         }
 

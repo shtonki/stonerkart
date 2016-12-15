@@ -823,6 +823,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap frameMight {
+            get {
+                object obj = ResourceManager.GetObject("frameMight", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap frameMulti {
             get {
                 object obj = ResourceManager.GetObject("frameMulti", resourceCulture);
@@ -836,6 +846,16 @@ namespace stonerkart.Properties {
         internal static System.Drawing.Bitmap frameNature {
             get {
                 object obj = ResourceManager.GetObject("frameNature", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap frameOrder {
+            get {
+                object obj = ResourceManager.GetObject("frameOrder", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -893,9 +913,9 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap orbMulti {
+        internal static System.Drawing.Bitmap orbMight {
             get {
-                object obj = ResourceManager.GetObject("orbMulti", resourceCulture);
+                object obj = ResourceManager.GetObject("orbMight", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

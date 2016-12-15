@@ -23,6 +23,7 @@ namespace stonerkart
         public int castRange => castAbility.castRange;
         public ManaSet castManaCost => castAbility.cost.getSubCost<ManaCost>().cost;
 
+        public string typeText => typeTextEx();
 
         public List<Ability> abilities = new List<Ability>();
         public ActivatedAbility[] usableHere => abilities.Where(a => a is ActivatedAbility && a.activeIn == location.pile).Cast<ActivatedAbility>().ToArray();
@@ -39,7 +40,7 @@ namespace stonerkart
         public Modifiable<int> movement { get; }
 
 
-
+        private ManaColour? forceColour;
         private Modifiable[] modifiables;
 
         public Card(CardTemplate ct, Player owner = null)
@@ -71,13 +72,14 @@ namespace stonerkart
                     baseMovement = 4;
                     basePower = 1;
                     baseToughness = 10;
+                    forceColour = ManaColour.Life;
                 } break;
 
                 case CardTemplate.Kappa:
                 {
                     baseMovement = 2;
                     basePower = 1;
-                    baseToughness = 2;
+                    baseToughness = 1;
                     orderCost = 1;
                     cardType = CardType.Creature;
                 } break;
@@ -89,18 +91,9 @@ namespace stonerkart
                     castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), new ZepperDoer(2));
                     castRange = 3;
                     chaosCost = 1;
-                    //colourlessCost = 1;
 
-                    breadText = "Deal 2 damage to target creature";
+                    breadText = "Deal 2 damage to target creature.";
                 } break;
-
-                case CardTemplate.AlterTime:
-                {
-                    throw new NotImplementedException();
-                } break;
-
-                default:
-                    throw new Exception();
             }
 
             #endregion
@@ -160,9 +153,15 @@ namespace stonerkart
             tile = t;
             t.place(this);
         }
-        
+
+        public void exhaust()
+        {
+            movement.modify(-movement, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(this));
+        }
+
         private List<ManaColour> coloursEx()
         {
+            if (forceColour.HasValue) return new List<ManaColour>(new ManaColour[] { forceColour.Value });
             HashSet<ManaColour> hs = new HashSet<ManaColour>(castManaCost.orbs.Where(x => x != ManaColour.Colourless));
             if (hs.Count == 0) return new List<ManaColour>(new ManaColour[] {ManaColour.Colourless,});
             
@@ -185,6 +184,14 @@ namespace stonerkart
             {
                 modifiable.check(e);
             }
+        }
+
+        private string typeTextEx()
+        {
+            string s = isHeroic ? "Heroic " : "";
+            s += cardType.ToString(); 
+
+            return s;
         }
 
         public void notify(int t)

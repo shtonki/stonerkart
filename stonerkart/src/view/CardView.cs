@@ -65,7 +65,7 @@ namespace stonerkart
                 art.Image = ImageLoader.artImage(card.template);
 
                 nameBox.Text = card.name;
-                cardTypeText.Text = card.cardType.ToString();
+                cardTypeText.Text = card.typeText;
                 breadText.Text = card.breadText;
                 manaCostPanel1.setCost(card.castManaCost);
 

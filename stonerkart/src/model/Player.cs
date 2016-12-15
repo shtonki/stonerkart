@@ -16,7 +16,7 @@ namespace stonerkart
         public readonly Pile hand;
         public readonly Pile graveyard;
 
-        public ManaPool manaPool;
+        public ManaPool manaPool { get; private set; }
 
         public bool isHero => this == game.hero;
 
@@ -54,30 +54,67 @@ namespace stonerkart
             notify(new PlayerChangedArgs(this));
         }
 
-        public ManaSet stuntMana()
+        private ManaPool original;
+        public void stuntMana(ManaPool newPool)
         {
-            ManaSet r = manaPool.max;
-            int[] s = r.Select((v, index) => index == (int)ManaColour.Colourless || v == 6 ? v : v + 1).ToArray();
-            manaPool.max = new ManaSet(s);
+            fixOriginal();
+
+            manaPool = newPool;
+
             notify(new PlayerChangedArgs(this));
-            return r;
         }
 
-        public void unstuntMana(ManaSet r)
+        public void stuntCurrentDiff(ManaColour mc, int d)
         {
-            manaPool.max = r;
+            fixOriginal();
+
+            manaPool.current[mc] += d;
+
+            notify(new PlayerChangedArgs(this));
+        }
+
+        public void stuntCurrentLoss(ManaSet set)
+        {
+            fixOriginal();
+
+            manaPool.subtractCurrent(set);
+
+            notify(new PlayerChangedArgs(this));
+        }
+
+        public void unstuntMana()
+        {
+            if (original == null) throw new Exception();
+            manaPool = original;
+            original = null;
+
+            notify(new PlayerChangedArgs(this));
+        }
+
+        private void fixOriginal()
+        {
+            if (original == null)
+            {
+                original = manaPool.clone();
+                manaPool = manaPool.clone();
+            }
         }
 
         public void gainMana(ManaColour c)
         {
+            if (original != null) throw new Exception();
+
             manaPool.max[c]++;
             manaPool.current[c]++;
+
             notify(new PlayerChangedArgs(this));
         }
 
         public void payMana(ManaSet iz)
         {
-            manaPool.subtract(iz);
+            if (original != null) throw new Exception();
+
+            manaPool.subtractCurrent(iz);
             notify(new PlayerChangedArgs(this));
         }
     }

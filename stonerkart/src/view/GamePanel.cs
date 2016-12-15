@@ -196,9 +196,9 @@ namespace stonerkart
             // highlightCard
             // 
             this.highlightCard.BackColor = System.Drawing.Color.DarkViolet;
-            this.highlightCard.Location = new System.Drawing.Point(911, 265);
+            this.highlightCard.Location = new System.Drawing.Point(911, 256);
             this.highlightCard.Name = "highlightCard";
-            this.highlightCard.Size = new System.Drawing.Size(172, 245);
+            this.highlightCard.Size = new System.Drawing.Size(172, 254);
             this.highlightCard.TabIndex = 14;
             // 
             // GamePanel

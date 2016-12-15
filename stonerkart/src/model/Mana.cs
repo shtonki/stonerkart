@@ -9,13 +9,19 @@ namespace stonerkart
 {
     class ManaPool
     {
-        public ManaSet max;
-        public ManaSet current;
+        public ManaSet max { get; private set; }
+        public ManaSet current { get; private set; }
 
         public ManaPool()
         {
             max = new ManaSet();
             current = new ManaSet();
+        }
+
+        public ManaPool(ManaSet max, ManaSet current)
+        {
+            this.max = max;
+            this.current = current;
         }
 
         public void reset()
@@ -26,9 +32,14 @@ namespace stonerkart
             }
         }
 
-        public void subtract(ManaSet costs)
+        public void subtractCurrent(ManaSet costs)
         {
             current = current - costs;
+        }
+
+        public ManaPool clone()
+        {
+            return new ManaPool(max.clone(), current.clone());
         }
     }
 
@@ -106,6 +117,11 @@ namespace stonerkart
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return manas.GetEnumerator();
+        }
+
+        public ManaSet clone()
+        {
+            return new ManaSet(manas);
         }
     }
 

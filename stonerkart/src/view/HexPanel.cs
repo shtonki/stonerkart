@@ -15,9 +15,9 @@ namespace stonerkart
     {
         private Map map;
         private TileView[] tileViews;
+
         public readonly List<Action<Clickable>> tileClicked = new List<Action<Clickable>>();
         public readonly List<Action<Clickable>> tileEntered = new List<Action<Clickable>>();
-        //public readonly List<Action<Clickable>> tileClicked = new List<Action<Clickable>>();
 
         public HexPanel(Map m)
         {

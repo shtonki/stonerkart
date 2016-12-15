@@ -6,6 +6,16 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
+    struct CostPayStruct
+    {
+        public Func<Stuff> getStuff { get; }
+
+        public CostPayStruct(Func<Stuff> getStuff)
+        {
+            this.getStuff = getStuff;
+        }
+    }
+
     class Cost
     {
         private SubCost[] costs;
@@ -15,12 +25,12 @@ namespace stonerkart
             this.costs = costs;
         }
 
-        public int[][] measure(Player p)
+        public int[][] measure(Player p, CostPayStruct str)
         {
             int[][] r = new int[costs.Length][];
             for (int i = 0; i < costs.Length; i++)
             {
-                int[] v = costs[i].measure(p);
+                int[] v = costs[i].measure(p, str);
                 if (v == null) return null;
                 r[i] = v;
             }
@@ -52,7 +62,7 @@ namespace stonerkart
 
     interface SubCost
     {
-        int[] measure(Player p);
+        int[] measure(Player p, CostPayStruct s);
 
         void cut(Player p, int[] iz);
     }
@@ -79,8 +89,9 @@ namespace stonerkart
             cost = new ManaSet(cs);
         }
 
-        public int[] measure(Player p)
+        public int[] measure(Player p, CostPayStruct s)
         {
+            ManaSet cost = this.cost.clone();
             for (int i = 0; i < ManaSet.size; i++)
             {
                 if ((ManaColour)i == ManaColour.Colourless) continue;
@@ -91,16 +102,49 @@ namespace stonerkart
             List<ManaColour> poolOrbs = pool.orbs;
             List<ManaColour> costOrbs = cost.orbs;
 
-            if (poolOrbs.Count() < costOrbs.Count()) return null;
+            int diff = costOrbs.Count() - poolOrbs.Count();
+
+            if (diff > 0) return null;
 
             if (cost[ManaColour.Colourless] > 0)
             {
-                if (poolOrbs.Count() > costOrbs.Count())
+                if (diff < 0) // we have more total mana than the cost
                 {
-                    throw new Exception();
+                    int cls = 0;
+
+                    Controller.setPrompt("Cast using what mana", ButtonOption.Cancel);
+                    var colours = cost.clone();
+                    colours[ManaColour.Colourless] = 0;
+                    p.stuntCurrentLoss(colours);
+                    while (cost[ManaColour.Colourless] > 0)
+                    {
+                        var v = s.getStuff();
+                        if (v is ManaOrb)
+                        {
+                            ManaOrb orb = (ManaOrb)v;
+                            ManaColour colour = orb.colour;
+                            if (pool[colour] - cost[colour] > 0)
+                            {
+                                cost[colour]++;
+                                cost[ManaColour.Colourless]--;
+                                p.stuntCurrentDiff(colour, -1);
+                            }
+                        }
+                        if (v is ShibbuttonStuff)
+                        {
+                            ShibbuttonStuff b = (ShibbuttonStuff)v;
+                            if (b.option == ButtonOption.Cancel)
+                            {
+                                p.unstuntMana();
+                                return null;
+                            }
+                        }
+                    }
+                    p.unstuntMana();
+                    return cost.ToArray();
                 }
 
-                return pool.ToArray();
+                return pool.ToArray(); // we have the same amount of mana as the cost
 
             }
             else
