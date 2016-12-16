@@ -9,13 +9,19 @@ namespace stonerkart
 {
     class ManaPool
     {
-        public ManaSet max;
-        public ManaSet current;
+        public ManaSet max { get; private set; }
+        public ManaSet current { get; private set; }
 
         public ManaPool()
         {
             max = new ManaSet();
             current = new ManaSet();
+        }
+
+        public ManaPool(ManaSet max, ManaSet current)
+        {
+            this.max = max;
+            this.current = current;
         }
 
         public void reset()
@@ -26,15 +32,20 @@ namespace stonerkart
             }
         }
 
-        public void subtract(ManaSet costs)
+        public void subtractCurrent(ManaSet costs)
         {
             current = current - costs;
+        }
+
+        public ManaPool clone()
+        {
+            return new ManaPool(max.clone(), current.clone());
         }
     }
 
     class ManaSet : IEnumerable<int>
     {
-        public const int size = 6;
+        public const int size = 7;
         private List<int> manas;
 
         public List<ManaColour> orbs => orbsEx();
@@ -43,18 +54,18 @@ namespace stonerkart
 
         public ManaSet()
         {
-            manas = new List<int>(new int[6]);
+            manas = new List<int>(new int[size]);
         }
 
         public ManaSet(IEnumerable<int> e)
         {
-            if (e.Count() != 6) throw new Exception();
+            if (e.Count() != size) throw new Exception();
             manas = new List<int>(e);
         }
 
         public ManaSet(IEnumerable<ManaColour> cs)
         {
-            int[] vs = new int[6];
+            int[] vs = new int[size];
             foreach (ManaColour c in cs)
             {
                 vs[(int)c]++;
@@ -87,11 +98,12 @@ namespace stonerkart
         private List<ManaColour> orbsEx()
         {
             List<ManaColour> l = new List<ManaColour>();
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < ManaSet.size; i++)
             {
+                var c = (ManaColour)i;
                 for (int j = 0; j < manas[i]; j++)
                 {
-                    l.Add((ManaColour)i);
+                    l.Add(c);
                 }
             }
             return l;
@@ -105,6 +117,11 @@ namespace stonerkart
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return manas.GetEnumerator();
+        }
+
+        public ManaSet clone()
+        {
+            return new ManaSet(manas);
         }
     }
 
@@ -121,11 +138,12 @@ namespace stonerkart
 
     enum ManaColour
     {
+        Colourless,
         Might, 
         Life,
         Death,
         Nature,
         Order,
-        Chaos
+        Chaos,
     }
 }

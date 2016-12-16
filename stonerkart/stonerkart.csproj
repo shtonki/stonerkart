@@ -82,6 +82,7 @@
     <Compile Include="src\controller\InputEvent.cs" />
     <Compile Include="src\model\Ability.cs" />
     <Compile Include="src\model\Card.cs" />
+    <Compile Include="src\model\CardContructorFuckery.cs" />
     <Compile Include="src\model\Cost.cs" />
     <Compile Include="src\model\Deck.cs" />
     <Compile Include="src\model\Effect.cs" />
@@ -98,7 +99,8 @@
     <Compile Include="src\network\Network.cs" />
     <Compile Include="src\network\AsyncConnection.cs" />
     <Compile Include="src\network\ServerConnection.cs" />
-    <Compile Include="src\Observable.cs" />
+    <Compile Include="src\util\ImageLoader.cs" />
+    <Compile Include="src\util\Observable.cs" />
     <Compile Include="src\view\AutoFontTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -108,7 +110,7 @@
     <Compile Include="src\view\ConsolePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="src\G.cs" />
+    <Compile Include="src\util\G.cs" />
     <Compile Include="src\view\DeckEditorPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -174,6 +176,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\CardsPanel.resx">
       <DependentUpon>CardsPanel.cs</DependentUpon>
@@ -231,8 +234,87 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="musings.txt" />
+    <None Include="Resources\frameMight.png" />
+    <None Include="Resources\frameOrder.png" />
+    <None Include="Resources\Namnlös.png" />
+    <None Include="Resources\YungLich.png" />
+    <None Include="Resources\Wolf.png" />
+    <None Include="Resources\Unmake.png" />
+    <None Include="Resources\TempleHealer.png" />
+    <None Include="Resources\SteamBolt.png" />
+    <None Include="Resources\StampedingDragon.png" />
+    <None Include="Resources\Squire.png" />
+    <None Include="Resources\Spirit.png" />
+    <None Include="Resources\Spark.png" />
+    <None Include="Resources\SoothingRhapsode.png" />
+    <None Include="Resources\SolemnAberration.png" />
+    <None Include="Resources\Skeltal.png" />
+    <None Include="Resources\ShimmeringKoi.png" />
+    <None Include="Resources\SebasGambit.png" />
+    <None Include="Resources\RottingZombie.png" />
+    <None Include="Resources\RockhandOgre.png" />
+    <None Include="Resources\RiderOfDeath.png" />
+    <None Include="Resources\Rapture.png" />
+    <None Include="Resources\PropheticVision.png" />
+    <None Include="Resources\Overgrow.png" />
+    <None Include="Resources\OneWithNature.png" />
+    <None Include="Resources\NOTHING.png" />
+    <None Include="Resources\MysteriousLilac.png" />
+    <None Include="Resources\MorenianMedic.png" />
+    <None Include="Resources\MeteorRain.png" />
+    <None Include="Resources\memes.png" />
+    <None Include="Resources\MattysGambit.png" />
+    <None Include="Resources\MaleficentSpirit.png" />
+    <None Include="Resources\LoneWolf.png" />
+    <None Include="Resources\LoneRanger.png" />
     <None Include="Resources\LightningBolt.png" />
+    <None Include="Resources\Kappa.png" />
+    <None Include="Resources\Infiltrator.png" />
+    <None Include="Resources\IlatianWineMerchant.png" />
+    <None Include="Resources\IlatianFlutePlayer.png" />
+    <None Include="Resources\IlasGravekeeper.png" />
+    <None Include="Resources\IlasGambit.png" />
+    <None Include="Resources\Hypnotist.png" />
+    <None Include="Resources\HourOfTheWolf.png" />
+    <None Include="Resources\HauntedChapel.png" />
+    <None Include="Resources\GrizzlyCub.png" />
+    <None Include="Resources\GrizzlyBear.png" />
+    <None Include="Resources\GrazingBison.png" />
+    <None Include="Resources\FuryOfTheRighteous.png" />
+    <None Include="Resources\FrothingGoblin.png" />
+    <None Include="Resources\FrenziedPiranha.png" />
+    <None Include="Resources\ForkedLightning.png" />
+    <None Include="Resources\Flamemane.png" />
+    <None Include="Resources\Figment.png" />
+    <None Include="Resources\Extinguish.png" />
+    <None Include="Resources\EvolveFangs.png" />
+    <None Include="Resources\EssenceOfRage.png" />
+    <None Include="Resources\EssenceOfDemise.png" />
+    <None Include="Resources\EssenceOfClarity.png" />
+    <None Include="Resources\EnragedDragon.png" />
+    <None Include="Resources\ElvenDruid.png" />
+    <None Include="Resources\ElderTreeant.png" />
+    <None Include="Resources\DragonHatchling.png" />
+    <None Include="Resources\DecayingZombie.png" />
+    <None Include="Resources\DaringPoppy.png" />
+    <None Include="Resources\CoupDeGrace.png" />
+    <None Include="Resources\Counterspell.png" />
+    <None Include="Resources\ChromaticUnicorn.png" />
+    <None Include="Resources\CallToArms2.png" />
+    <None Include="Resources\CallToArms.png" />
+    <None Include="Resources\Bubastis.png" />
+    <None Include="Resources\BelwasGambit.png" />
+    <None Include="Resources\Belwas.png" />
+    <None Include="Resources\BearCavalary.png" />
     <None Include="Resources\AlterTime.png" />
+    <None Include="Resources\AlterFate.png" />
+    <None Include="Resources\Abolish.png" />
+    <None Include="Resources\AberrantSacrifice.png" />
+    <None Include="Resources\red3.png" />
+    <None Include="Resources\multi3.png" />
+    <None Include="Resources\grey3.png" />
+    <None Include="Resources\green3.png" />
+    <None Include="Resources\black3.png" />
     <None Include="Resources\order.png" />
     <None Include="Resources\nature.png" />
     <None Include="Resources\might.png" />

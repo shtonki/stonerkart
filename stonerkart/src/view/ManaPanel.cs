@@ -10,17 +10,18 @@ namespace stonerkart
 {
     class ManaPanel : UserControl
     {
+        public const int maxMana = 6;
         private ManaButton[][] images;
         public readonly List<Action<Clickable>> callbacks = new List<Action<Clickable>>();
 
         public ManaPanel()
         {
             BackColor = Color.DarkGray;
-            images = new ManaButton[6][];
-            for (int i = 0; i < 6; i++)
+            images = new ManaButton[ManaSet.size][];
+            for (int i = 0; i < ManaSet.size; i++)
             {
-                images[i] = new ManaButton[6];
-                for (int j = 0; j < 6; j++)
+                images[i] = new ManaButton[maxMana];
+                for (int j = 0; j < maxMana; j++)
                 {
                     var p = new ManaButton((ManaColour)i, 0.3f);
                     p.setVisibility(ManaButton.Visibility.Hidden);
@@ -34,9 +35,9 @@ namespace stonerkart
 
         public void setLightUp(ManaPool p)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < ManaSet.size; i++)
             {
-                for (int j = 0; j < 6; j++)
+                for (int j = 0; j < maxMana; j++)
                 {
                     ManaButton.Visibility v;
                     if (p.current[i] > j)
@@ -64,15 +65,15 @@ namespace stonerkart
 
         private void layoutPicures()
         {
-            int w = Size.Width/6;
-            int h = Size.Height/6;
+            int w = Size.Width/maxMana;
+            int h = Size.Height/ManaSet.size;
             int padding = 4;
             int dw = w - 2 * padding;
             int dh = h - 2 * padding;
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < ManaSet.size; i++)
             {
-                for (int j = 0; j < 6; j++)
+                for (int j = 0; j < maxMana; j++)
                 {
                     images[i][j].Bounds = new Rectangle(j * w + padding, i * h + padding,  w - padding, h - padding);
                 }
@@ -127,7 +128,7 @@ namespace stonerkart
 
         private void renigra()
         {
-            full = G.ResizeImage(G.manaImage(orb), Size.Width, Size.Height);
+            full = G.ResizeImage(ImageLoader.orbImage(orb), Size.Width, Size.Height);
             faded = G.SetImageOpacity(full, fade);
             setVisibility(visibility);
         }

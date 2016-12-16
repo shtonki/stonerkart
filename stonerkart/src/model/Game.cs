@@ -50,7 +50,7 @@ namespace stonerkart
             for (int i = 0; i < ngs.playerNames.Length; i++)
             {
                 Player p = new Player(this);
-                Card heroCard = createCard(CardTemplate.Hero, p);
+                Card heroCard = createCard(CardTemplate.Belwas, p);
                 p.setHeroCard(heroCard);
 
                 players.Add(p);
@@ -64,10 +64,13 @@ namespace stonerkart
                 List<Card> deck = new List<Card>();
                 for (int j = 0; j < 10; j++)
                 {
-                    Card c = createCard(CardTemplate.Jordan, p);
+                    Card c = createCard(CardTemplate.Kappa, p);
+                    deck.Add(c);
+                    c = createCard(CardTemplate.Zap, p);
                     deck.Add(c);
                 }
                 p.loadDeck(deck);
+                p.deck.shuffle(random);
             }
 
             stepHandler = new StepHandler();
@@ -119,6 +122,15 @@ namespace stonerkart
 
         private void setupHandlers()
         {
+            geFilters.Add(new GameEventHandler<PlaceOnTileEvent>(e =>
+            {
+                if (e.tile.card != null) throw new Exception();
+
+                e.card.moveTo(e.tile);
+                e.card.moveTo(e.card.controller.field);
+                e.card.exhaust();
+            }));
+
             geFilters.Add(new GameEventHandler<PayCostsEvent>(e =>
             { 
                 e.ability.cost.cut(e.player, e.costs);
@@ -139,25 +151,42 @@ namespace stonerkart
                 Controller.redraw();
             }));
 
-            geFilters.Add(new GameEventHandler<MoveToTileEvent>(e =>
+            geFilters.Add(new GameEventHandler<MoveEvent>(e =>
             {
-                e.card.moveTo(e.tile);
-            }));
+                Path path = e.path;
+                Card mover = path.from.card;
+                Tile destination = path.to;
+                Card defender = destination.card;
 
-            geFilters.Add(new GameEventHandler<AttackEvent>(e =>
-            {
-                raiseEvent(new MoveToTileEvent(e.attacker, e.attackFrom));
-                raiseEvent(new DamageEvent(e.attacker, e.defender, e.attacker.power));
-                if (e.defender.cardType != CardType.Hero) raiseEvent(new DamageEvent(e.defender, e.attacker, e.defender.power));
+                if (defender == null)
+                {
+                    mover.moveTo(destination);
+                    mover.movement.modify(-path.length, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(mover));
+                }
+                else
+                {
+                    if (path.penultimate.card != null && path.penultimate.card != mover) throw new Exception();
+
+                    mover.moveTo(path.penultimate);
+                    raiseEvent(new DamageEvent(mover, defender, mover.power));
+                    if (true || !defender.isHeroic) raiseEvent(new DamageEvent(defender, mover, defender.power));
+                    mover.exhaust();
+                }
+
             }));
 
             geFilters.Add(new GameEventHandler<DamageEvent>(e =>
             {
-                e.target.toughness.modify(-e.amount, Modifiable.intAdd, Modifiable.startOfEndStep);
+                e.target.toughness.modify(-e.amount, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfEndStep);
             }));
 
             geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>
             {
+                if (e.card.tile != null)
+                {
+                    e.card.tile.removeCard();
+                    e.card.tile = null;
+                }
                 e.card.moveTo(e.pile);
             }));
         }
@@ -207,6 +236,9 @@ namespace stonerkart
 
         private void doStep(Steps step)
         {
+            raiseEvent(new StartOfStepEvent(activePlayer, Steps.Untap));
+            enforceRules();
+
             switch (step)
             {
                 case Steps.Untap:
@@ -239,22 +271,29 @@ namespace stonerkart
                     endStep();
                 } break;
             }
+
+            raiseEvent(new EndOfStepEvent(activePlayer, Steps.Untap));
+            enforceRules();
         }
 
         private void untapStep()
         {
-            raiseEvent(new StartOfStepEvent(Steps.Untap));
             activePlayer.resetMana();
 
             ManaOrbSelection selection;
 
             if (activePlayer == hero)
             {
-
-                ManaSet r = activePlayer.stuntMana();
+                ManaPool pool = activePlayer.manaPool.clone();
+                for (int i = 0; i < ManaSet.size; i++)
+                {
+                    if ((ManaColour)i == ManaColour.Colourless) continue;
+                    pool.max[i]++;
+                }
+                activePlayer.stuntMana(pool);
                 Controller.setPrompt("Gain mana nerd");
-                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => r[(int)o.colour] != 6);
-                activePlayer.unstuntMana(r);
+                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.max[(int)o.colour] != 6);
+                activePlayer.unstuntMana();
 
                 selection = new ManaOrbSelection(v.colour);
                 connection.sendAction(selection);
@@ -318,7 +357,6 @@ namespace stonerkart
                         paths.Add(new Tuple<Card, Path>(card, path));
                     }
                 }
-                Controller.clearArrows();
 
                 connection.sendAction(new MoveSelection(paths));
             }
@@ -329,20 +367,19 @@ namespace stonerkart
                 paths = v.moves;
             }
 
+            //todo raise MoveDeclared events lmfao
+            priority();
+
             foreach (var v in paths)
             {
                 Card c = v.Item1;
                 Path p = v.Item2;
-                if (p.to.card == null)
-                {
-                    raiseEvent(new MoveToTileEvent(c, p.to));
-                }
-                else
-                {
-                    raiseEvent(new AttackEvent(p));
-                }
+                raiseEvent(new MoveEvent(c, p));
             }
-            Controller.redraw();
+
+            Controller.clearArrows();
+
+            enforceRules();
         }
 
         private void endStep()
@@ -352,13 +389,21 @@ namespace stonerkart
 
         private void enforceRules()
         {
+            List<Card> trashcan = new List<Card>();
             foreach (Card c in herpable)
             {
                 if (c.toughness <= 0)
                 {
-                    raiseEvent(new MoveToPileEvent(c, c.owner.graveyard));
+                    trashcan.Add(c);
                 }
             }
+
+            foreach (Card c in trashcan)
+            {
+                raiseEvent(new MoveToPileEvent(c, c.owner.graveyard));
+            }
+
+            Controller.redraw();
         }
 
         private void priority()
@@ -390,15 +435,16 @@ namespace stonerkart
                         resolve(wrapper);
                         c = 0;
 
-                        Controller.redraw();
+                        //Controller.redraw();
                     }
                 }
+                enforceRules();
             }
         }
 
         private Card getCard(Func<Card, bool> f, string prompt)
         {
-            Controller.setPrompt(prompt, "nigra");
+            Controller.setPrompt(prompt, ButtonOption.OK);
             var v = waitForButtonOr<Card>(f);
             if (v is ShibbuttonStuff)
             {
@@ -409,7 +455,7 @@ namespace stonerkart
 
         private Tile getTile(Func<Tile, bool> f, string prompt)
         {
-            Controller.setPrompt(prompt, "nigra");
+            Controller.setPrompt(prompt, ButtonOption.OK);
             var v = waitForButtonOr<Tile>(f);
             if (v is ShibbuttonStuff)
             {
@@ -436,11 +482,12 @@ namespace stonerkart
                     ActivatedAbility ability = chooseAbility(card);
                     if (ability == null) continue;
 
-                    int[][] costs = ability.cost.measure(p);
-                    if (costs == null) continue;
-
                     TargetMatrix[] targets = chooseCastTargets(ability, from);
                     if (targets == null) continue;
+
+                    CostPayStruct s = new CostPayStruct(waitForAnything);
+                    int[][] costs = ability.cost.measure(p, s);
+                    if (costs == null) continue;
 
                     r = new StackWrapper(card, ability, targets, costs);
 
@@ -459,11 +506,35 @@ namespace stonerkart
 
         private ActivatedAbility chooseAbility(Card c)
         {
+            ActivatedAbility r;
             ActivatedAbility[] v = c.usableHere;
+            bool canCastSlow = activePlayer == hero && (stepHandler.step == Steps.Main1 || stepHandler.step == Steps.Main1);
             if (v.Length > 1) throw new Exception();
             if (v.Length == 0) return null;
-            return v[0];
+            r = v[0];
+
+            if (
+                r.isInstant
+                ||
+                (stack.Count() == 0
+                 &&
+                 (stepHandler.step == Steps.Main1
+                  ||
+                  stepHandler.step == Steps.Main2
+                     )
+                 &&
+                 activePlayer == hero
+                    )
+                )
+            {
+                return r;
+            }
+            else
+            {
+                return null;
+            }
         }
+
 
         private TargetMatrix[] chooseCastTargets(Ability a, Tile castFrom)
         {
@@ -471,10 +542,19 @@ namespace stonerkart
             List<Tile> v = castFrom.withinDistance(a.castRange);
 
             Controller.highlight(v, Color.Green);
-            Controller.setPrompt("target nigra", "Cancel");
+            Controller.setPrompt("target nigra", ButtonOption.Cancel);
+
+            ChooseTargetToolbox box = new ChooseTargetToolbox(generateStuff(v));
+
             for (int i = 0; i < ms.Length; i++)
             {
-                ms[i] = a.effects[i].ts.fillCast(generateTargetable(v));
+                TargetMatrix tm =  a.effects[i].ts.fillCast(box);
+                if (tm == null)
+                {
+                    ms = null;
+                    break;
+                }
+                ms[i] = tm;
             }
             Controller.clearHighlights();
             return ms;
@@ -503,39 +583,31 @@ namespace stonerkart
                 raiseEvent(e);
             }
 
-            raiseEvent(new MoveToPileEvent(wrapper.card, wrapper.card.owner.field));
+            if (wrapper.card.tile == null)
+            {
+                raiseEvent(new MoveToPileEvent(wrapper.card, wrapper.card.owner.graveyard));
+            }
 
+            enforceRules();
         }
         
         private ManualResetEventSlim callerBacker;
         private InputEventFilter filter;
-        private Stuff s;
+        private Stuff waitedForStuff;
         
 
-        private Func<Targetable> generateTargetable(IEnumerable<Tile> allowedTiles)
+        private Func<Stuff> generateStuff(IEnumerable<Tile> allowedTiles)
         {
             Tile[] allowed = allowedTiles.ToArray();
             return () =>
             {
                 while (true)
                 {
-                    Stuff v = waitFor(new InputEventFilter((clickable, o) => true));
+                    Stuff v = waitForAnything();
 
-                    if (v is Tile)
-                    {
-                        if (!allowed.Contains(v)) continue;
-                        return (Tile)v;
-                    }
+                    if (v is Tile) { if (!allowed.Contains(v)) continue; }
 
-                    if (v is Card)
-                    {
-                        return (Card)v;
-                    }
-
-                    if (v is ShibbuttonStuff)
-                    {
-                        return null;
-                    }
+                    return v;
                 }
             };
         }
@@ -546,7 +618,7 @@ namespace stonerkart
             InputEvent e = new InputEvent(c, stuff);
             if (filter != null && filter.filter(e))
             {
-                s = stuff;
+                waitedForStuff = stuff;
                 callerBacker.Set();
             }
         }
@@ -556,15 +628,21 @@ namespace stonerkart
             InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || (o is T && fn((T)o)));
             return waitFor(f);
         }
-        
+
+        private Stuff waitForAnything()
+        {
+            InputEventFilter f = new InputEventFilter((x, y) => true);
+            return waitFor(f);
+        }
+
         private Stuff waitFor(InputEventFilter f)
         {
             if (callerBacker != null || filter != null) throw new Exception();
             callerBacker = new ManualResetEventSlim();
             filter = f;
             callerBacker.Wait();
-            var r = s;
-            s = null;
+            var r = waitedForStuff;
+            waitedForStuff = null;
             callerBacker = null;
             filter = null;
             return r;

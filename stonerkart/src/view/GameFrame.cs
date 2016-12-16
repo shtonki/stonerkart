@@ -52,7 +52,7 @@ namespace stonerkart
             return r;
         }
 
-        public void setPrompt(string message, string[] buttons)
+        public void setPrompt(string message, ButtonOption[] buttons)
         {
             this.memeout(() =>
             {
@@ -68,7 +68,7 @@ namespace stonerkart
                     if (buttons.Length > i)
                     {
                         bs[i].Visible = true;
-                        bs[i].Text = buttons[i];
+                        bs[i].setOption(buttons[i]);
                     }
                     else
                     {
@@ -148,6 +148,11 @@ namespace stonerkart
             {
                 a();
             }
+        }
+
+        public static void memehard(this Control uc, Action a)
+        {
+            
         }
     }
 }

@@ -129,9 +129,9 @@ namespace stonerkart
             return r;
         }
 
-        public static void setPrompt(string s, params string[] ss)
+        public static void setPrompt(string prompt, params ButtonOption[] options)
         {
-            gameFrame.setPrompt(s, ss);
+            gameFrame.setPrompt(prompt, options);
         }
         
 
@@ -181,7 +181,7 @@ namespace stonerkart
 
         public static void print(string s)
         {
-            gameFrame?.gamePanel?.consolePanel?.print(s);
+            //gameFrame?.gamePanel?.consolePanel?.print(s);
         }
     }
 }

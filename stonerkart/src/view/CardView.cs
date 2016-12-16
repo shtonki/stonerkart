@@ -13,32 +13,28 @@ namespace stonerkart
         private AutoFontTextBox nameBox;
         private AutoFontTextBox toughnessBox;
         private AutoFontTextBox powerBox;
-        private PictureBox pictureBox1;
+        private PictureBox frameImage;
         private AutoFontTextBox cardTypeText;
         private AutoFontTextBox castRangeSlashMovementBox;
+        private AutoFontTextBox autoFontTextBox1;
         private ManaCostPanel manaCostPanel1;
 
-        public Card card;
+        public Card card { get; private set; }
         
-        public CardView()
+        public CardView() : this(CardTemplate.Belwas)
+        { 
+        }
+
+        public CardView(CardTemplate ct) : this (new Card(ct))
+        {
+        }
+
+        public CardView(Card c)
         {
             InitializeComponent();
-            DoubleBuffered = true;
-            breadText.Text = "Bush did it if I do say so myself kappa keepo 420 swag it up ranch all the way";
-            nameBox.Text = "x";
-            powerBox.Text = "x";
-            toughnessBox.Text = "x";
-        }
 
-        public CardView(CardTemplate ct)
-        {
-            card = new Card(ct, null);
-            ihavedowns();
-        }
+            powerBox.justifyText = Justify.Right;
 
-        public CardView(Card c) : this()
-        {
-            c.addObserver(this);
             card = c;
             ihavedowns();
         }
@@ -49,35 +45,55 @@ namespace stonerkart
             ihavedowns();
         }
 
+        public void setCard(Card c)
+        {
+            card.tryUnsubscribe(this);
+            card = c;
+            card.addObserver(this);
+            ihavedowns();
+        }
+
         private void ihavedowns()
         {
             this.memeout(() =>
             {
-                art.Image = card.image;
+                
+                if (card.colours.Count == 1)
+                {
+                    frameImage.Image = ImageLoader.frameImage(card.colours[0]);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+                art.Image = ImageLoader.artImage(card.template);
 
                 nameBox.Text = card.name;
-                cardTypeText.Text = card.cardType.ToString();
+                cardTypeText.Text = card.typeText;
                 breadText.Text = card.breadText;
                 manaCostPanel1.setCost(card.castManaCost);
 
-                if (card.cardType == CardType.Creature || card.cardType == CardType.Hero)
+                if (card.cardType == CardType.Creature)
                 {
                     powerBox.Text = card.power.ToString();
                     toughnessBox.Text = card.toughness.ToString();
                     castRangeSlashMovementBox.Text = card.movement.ToString();
+                    autoFontTextBox1.Text = "/";
                 }
                 else
                 {
                     castRangeSlashMovementBox.Text = card.castRange.ToString();
                     powerBox.Text = "";
                     toughnessBox.Text = "";
+                    autoFontTextBox1.Text = "";
                 }
+                Invalidate();
             });
         }
 
         public void notify(CardChangedMessage t)
         {
-            throw new NotImplementedException();
+            ihavedowns();
         }
 
         public Stuff getStuff()
@@ -92,22 +108,23 @@ namespace stonerkart
             this.nameBox = new stonerkart.AutoFontTextBox();
             this.toughnessBox = new stonerkart.AutoFontTextBox();
             this.powerBox = new stonerkart.AutoFontTextBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.frameImage = new System.Windows.Forms.PictureBox();
             this.cardTypeText = new stonerkart.AutoFontTextBox();
             this.castRangeSlashMovementBox = new stonerkart.AutoFontTextBox();
             this.manaCostPanel1 = new stonerkart.ManaCostPanel();
+            this.autoFontTextBox1 = new stonerkart.AutoFontTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.art)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.frameImage)).BeginInit();
             this.SuspendLayout();
             // 
             // art
             // 
             this.art.Enabled = false;
-            this.art.Image = global::stonerkart.Properties.Resources.jordanno;
+            this.art.Image = global::stonerkart.Properties.Resources.artBelwas;
             this.art.InitialImage = null;
             this.art.Location = new System.Drawing.Point(46, 64);
             this.art.Name = "art";
-            this.art.Size = new System.Drawing.Size(386, 291);
+            this.art.Size = new System.Drawing.Size(390, 300);
             this.art.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.art.TabIndex = 0;
             this.art.TabStop = false;
@@ -115,6 +132,7 @@ namespace stonerkart
             // breadText
             // 
             this.breadText.BackColor = System.Drawing.Color.Transparent;
+            this.breadText.Enabled = false;
             this.breadText.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
             this.breadText.Location = new System.Drawing.Point(41, 394);
             this.breadText.Name = "breadText";
@@ -125,6 +143,7 @@ namespace stonerkart
             // nameBox
             // 
             this.nameBox.BackColor = System.Drawing.Color.Transparent;
+            this.nameBox.Enabled = false;
             this.nameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
             this.nameBox.Location = new System.Drawing.Point(31, 15);
             this.nameBox.Name = "nameBox";
@@ -135,8 +154,9 @@ namespace stonerkart
             // toughnessBox
             // 
             this.toughnessBox.BackColor = System.Drawing.Color.Transparent;
+            this.toughnessBox.Enabled = false;
             this.toughnessBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-            this.toughnessBox.Location = new System.Drawing.Point(407, 545);
+            this.toughnessBox.Location = new System.Drawing.Point(405, 545);
             this.toughnessBox.Name = "toughnessBox";
             this.toughnessBox.Opacity = 100;
             this.toughnessBox.Size = new System.Drawing.Size(53, 57);
@@ -145,28 +165,30 @@ namespace stonerkart
             // powerBox
             // 
             this.powerBox.BackColor = System.Drawing.Color.Transparent;
+            this.powerBox.Enabled = false;
             this.powerBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-            this.powerBox.Location = new System.Drawing.Point(21, 545);
+            this.powerBox.Location = new System.Drawing.Point(332, 545);
             this.powerBox.Name = "powerBox";
             this.powerBox.Opacity = 100;
-            this.powerBox.Size = new System.Drawing.Size(53, 57);
+            this.powerBox.Size = new System.Drawing.Size(49, 57);
             this.powerBox.TabIndex = 4;
             // 
-            // pictureBox1
+            // frameImage
             // 
-            this.pictureBox1.Enabled = false;
-            this.pictureBox1.Image = global::stonerkart.Properties.Resources.white3;
-            this.pictureBox1.InitialImage = null;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(478, 618);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
+            this.frameImage.Enabled = false;
+            this.frameImage.Image = global::stonerkart.Properties.Resources.lifeFrame;
+            this.frameImage.InitialImage = null;
+            this.frameImage.Location = new System.Drawing.Point(0, 0);
+            this.frameImage.Name = "frameImage";
+            this.frameImage.Size = new System.Drawing.Size(478, 618);
+            this.frameImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.frameImage.TabIndex = 5;
+            this.frameImage.TabStop = false;
             // 
             // cardTypeText
             // 
             this.cardTypeText.BackColor = System.Drawing.Color.Transparent;
+            this.cardTypeText.Enabled = false;
             this.cardTypeText.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
             this.cardTypeText.Location = new System.Drawing.Point(46, 370);
             this.cardTypeText.Name = "cardTypeText";
@@ -177,8 +199,9 @@ namespace stonerkart
             // castRangeSlashMovementBox
             // 
             this.castRangeSlashMovementBox.BackColor = System.Drawing.Color.Transparent;
+            this.castRangeSlashMovementBox.Enabled = false;
             this.castRangeSlashMovementBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-            this.castRangeSlashMovementBox.Location = new System.Drawing.Point(212, 550);
+            this.castRangeSlashMovementBox.Location = new System.Drawing.Point(31, 545);
             this.castRangeSlashMovementBox.Name = "castRangeSlashMovementBox";
             this.castRangeSlashMovementBox.Opacity = 100;
             this.castRangeSlashMovementBox.Size = new System.Drawing.Size(53, 57);
@@ -186,13 +209,26 @@ namespace stonerkart
             // 
             // manaCostPanel1
             // 
+            this.manaCostPanel1.BackColor = System.Drawing.Color.Transparent;
             this.manaCostPanel1.Location = new System.Drawing.Point(280, 15);
             this.manaCostPanel1.Name = "manaCostPanel1";
+            this.manaCostPanel1.Opacity = 100;
             this.manaCostPanel1.Size = new System.Drawing.Size(161, 33);
             this.manaCostPanel1.TabIndex = 6;
             // 
+            // autoFontTextBox1
+            // 
+            this.autoFontTextBox1.BackColor = System.Drawing.Color.Transparent;
+            this.autoFontTextBox1.Enabled = false;
+            this.autoFontTextBox1.Location = new System.Drawing.Point(382, 545);
+            this.autoFontTextBox1.Name = "autoFontTextBox1";
+            this.autoFontTextBox1.Opacity = 100;
+            this.autoFontTextBox1.Size = new System.Drawing.Size(24, 57);
+            this.autoFontTextBox1.TabIndex = 7;
+            // 
             // CardView
             // 
+            this.Controls.Add(this.autoFontTextBox1);
             this.Controls.Add(this.manaCostPanel1);
             this.Controls.Add(this.castRangeSlashMovementBox);
             this.Controls.Add(this.cardTypeText);
@@ -201,11 +237,11 @@ namespace stonerkart
             this.Controls.Add(this.nameBox);
             this.Controls.Add(this.breadText);
             this.Controls.Add(this.art);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.frameImage);
             this.Name = "CardView";
             this.Size = new System.Drawing.Size(478, 618);
             ((System.ComponentModel.ISupportInitialize)(this.art)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.frameImage)).EndInit();
             this.ResumeLayout(false);
 
         }
