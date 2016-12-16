@@ -120,7 +120,7 @@ namespace stonerkart
             }
 
             else if (castAbility == null) throw new Exception();
-            abilities.Add(castAbility);
+            activatedAbilities.Add(castAbility);
 
             breadText = breadText ?? "";
 

@@ -12,22 +12,31 @@ namespace stonerkart
         public Effect[] effects;
         public int castRange;
         public Cost cost;
-        public CastSpeed castSpeed;
-        public bool isInstant => castSpeed == CastSpeed.Instant;
 
-        public Ability(PileLocation activeIn, Effect[] effects, int castRange, Cost cost, CastSpeed castSpeed)
+        public Ability(PileLocation activeIn, Effect[] effects, int castRange, Cost cost)
         {
             this.activeIn = activeIn;
             this.effects = effects;
             this.castRange = castRange;
             this.cost = cost;
-            this.castSpeed = castSpeed;
         }
     }
 
     class ActivatedAbility : Ability
     {
-        public ActivatedAbility(PileLocation activeIn, int castRange, Cost cost, CastSpeed castSpeed, params Effect[] effects) : base(activeIn, effects, castRange, cost, castSpeed)
+        public bool isInstant => castSpeed == CastSpeed.Instant;
+        public CastSpeed castSpeed;
+
+
+        public ActivatedAbility(PileLocation activeIn, int castRange, Cost cost, CastSpeed castSpeed, params Effect[] effects) : base(activeIn, effects, castRange, cost)
+        {
+            this.castSpeed = castSpeed;
+        }
+    }
+
+    class TriggeredAbility : Ability
+    {
+        public TriggeredAbility(PileLocation activeIn, Effect[] effects, int castRange, Cost cost) : base(activeIn, effects, castRange, cost)
         {
         }
     }

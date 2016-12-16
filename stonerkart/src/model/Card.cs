@@ -26,8 +26,10 @@ namespace stonerkart
 
         public string typeText => typeTextEx();
 
-        public List<Ability> abilities = new List<Ability>();
-        public ActivatedAbility[] usableHere => abilities.Where(a => a is ActivatedAbility && a.activeIn == location.pile).Cast<ActivatedAbility>().ToArray();
+        public IEnumerable<Ability> abilities => activatedAbilities;
+        private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
+        private List<TriggeredAbility> triggeredAbilities = new List<TriggeredAbility>();
+        public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).Cast<ActivatedAbility>().ToArray();
         /// <summary>
         /// Returns a list containing the unique colours of the card. If the card has no mana cost it returns an 
         /// array containing only ManaColour.Colourless.
@@ -71,14 +73,52 @@ namespace stonerkart
             return hs.ToList();
         }
 
+
+        private const int _ACTIVATED = 0x100;
+        private const int _TRIGGERED = 0x101;
         public int abilityOrd(Ability a)
         {
-            return abilities.IndexOf(a);
+            int c, i;
+            if (a is ActivatedAbility)
+            {
+                ActivatedAbility ab = (ActivatedAbility)a;
+                i = activatedAbilities.IndexOf(ab);
+                if (i == -1) throw new Exception();
+                c = _ACTIVATED;
+            }
+            else if (a is TriggeredAbility)
+            {
+                TriggeredAbility ab = (TriggeredAbility)a;
+                i = triggeredAbilities.IndexOf(ab);
+                if (i == -1) throw new Exception();
+                c = _ACTIVATED;
+            }
+            else
+            {
+                throw new Exception();
+            }
+            return c | i;
         }
 
-        public Ability abilityFromOrd(int i)
+        public Ability abilityFromOrd(int v)
         {
-            return abilities[i];
+            int c, i;
+
+            i = v & 0x00FF;
+            c = v & 0xFF00;
+
+            IEnumerable<Ability> l;
+            if (c == _TRIGGERED)
+            {
+                l = triggeredAbilities.Cast<Ability>();
+            }
+            else if (c == _ACTIVATED)
+            {
+                l = activatedAbilities.Cast<Ability>();
+            }
+            else throw new Exception();
+
+            return l.ToArray()[i];
         }
 
         public void reherp(GameEvent e)
