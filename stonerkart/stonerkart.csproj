@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CFC26B37-6090-4492-A003-E558D8324FDE}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>stonerkart</RootNamespace>
     <AssemblyName>stonerkart</AssemblyName>
@@ -82,6 +82,7 @@
     <Compile Include="src\controller\InputEvent.cs" />
     <Compile Include="src\model\Ability.cs" />
     <Compile Include="src\model\Card.cs" />
+    <Compile Include="src\model\CardContructorFuckery.cs" />
     <Compile Include="src\model\Cost.cs" />
     <Compile Include="src\model\Deck.cs" />
     <Compile Include="src\model\Effect.cs" />

@@ -12,6 +12,7 @@ Tile.atDistance leaks memory
 
 
 things that are fucked:
+AutoFontTextBox eats inputs like mouseEntered and mouseClicked
 if we lose inputs it's because we don't buffer inputevents
 martin
 this code base

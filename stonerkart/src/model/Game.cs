@@ -66,8 +66,11 @@ namespace stonerkart
                 {
                     Card c = createCard(CardTemplate.Kappa, p);
                     deck.Add(c);
+                    c = createCard(CardTemplate.Zap, p);
+                    deck.Add(c);
                 }
                 p.loadDeck(deck);
+                p.deck.shuffle(random);
             }
 
             stepHandler = new StepHandler();
@@ -503,10 +506,33 @@ namespace stonerkart
 
         private ActivatedAbility chooseAbility(Card c)
         {
+            ActivatedAbility r;
             ActivatedAbility[] v = c.usableHere;
+            bool canCastSlow = activePlayer == hero && (stepHandler.step == Steps.Main1 || stepHandler.step == Steps.Main1);
             if (v.Length > 1) throw new Exception();
             if (v.Length == 0) return null;
-            return v[0];
+            r = v[0];
+
+            if (
+                r.isInstant
+                ||
+                (stack.Count() == 0
+                 &&
+                 (stepHandler.step == Steps.Main1
+                  ||
+                  stepHandler.step == Steps.Main2
+                     )
+                 &&
+                 activePlayer == hero
+                    )
+                )
+            {
+                return r;
+            }
+            else
+            {
+                return null;
+            }
         }
 
 

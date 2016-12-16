@@ -16,6 +16,7 @@ namespace stonerkart
         private PictureBox frameImage;
         private AutoFontTextBox cardTypeText;
         private AutoFontTextBox castRangeSlashMovementBox;
+        private AutoFontTextBox autoFontTextBox1;
         private ManaCostPanel manaCostPanel1;
 
         public Card card { get; private set; }
@@ -31,6 +32,9 @@ namespace stonerkart
         public CardView(Card c)
         {
             InitializeComponent();
+
+            powerBox.justifyText = Justify.Right;
+
             card = c;
             ihavedowns();
         }
@@ -74,12 +78,14 @@ namespace stonerkart
                     powerBox.Text = card.power.ToString();
                     toughnessBox.Text = card.toughness.ToString();
                     castRangeSlashMovementBox.Text = card.movement.ToString();
+                    autoFontTextBox1.Text = "/";
                 }
                 else
                 {
                     castRangeSlashMovementBox.Text = card.castRange.ToString();
                     powerBox.Text = "";
                     toughnessBox.Text = "";
+                    autoFontTextBox1.Text = "";
                 }
                 Invalidate();
             });
@@ -106,6 +112,7 @@ namespace stonerkart
             this.cardTypeText = new stonerkart.AutoFontTextBox();
             this.castRangeSlashMovementBox = new stonerkart.AutoFontTextBox();
             this.manaCostPanel1 = new stonerkart.ManaCostPanel();
+            this.autoFontTextBox1 = new stonerkart.AutoFontTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.art)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.frameImage)).BeginInit();
             this.SuspendLayout();
@@ -125,6 +132,7 @@ namespace stonerkart
             // breadText
             // 
             this.breadText.BackColor = System.Drawing.Color.Transparent;
+            this.breadText.Enabled = false;
             this.breadText.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
             this.breadText.Location = new System.Drawing.Point(41, 394);
             this.breadText.Name = "breadText";
@@ -135,6 +143,7 @@ namespace stonerkart
             // nameBox
             // 
             this.nameBox.BackColor = System.Drawing.Color.Transparent;
+            this.nameBox.Enabled = false;
             this.nameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
             this.nameBox.Location = new System.Drawing.Point(31, 15);
             this.nameBox.Name = "nameBox";
@@ -145,8 +154,9 @@ namespace stonerkart
             // toughnessBox
             // 
             this.toughnessBox.BackColor = System.Drawing.Color.Transparent;
+            this.toughnessBox.Enabled = false;
             this.toughnessBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-            this.toughnessBox.Location = new System.Drawing.Point(407, 545);
+            this.toughnessBox.Location = new System.Drawing.Point(405, 545);
             this.toughnessBox.Name = "toughnessBox";
             this.toughnessBox.Opacity = 100;
             this.toughnessBox.Size = new System.Drawing.Size(53, 57);
@@ -155,11 +165,12 @@ namespace stonerkart
             // powerBox
             // 
             this.powerBox.BackColor = System.Drawing.Color.Transparent;
+            this.powerBox.Enabled = false;
             this.powerBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-            this.powerBox.Location = new System.Drawing.Point(21, 545);
+            this.powerBox.Location = new System.Drawing.Point(332, 545);
             this.powerBox.Name = "powerBox";
             this.powerBox.Opacity = 100;
-            this.powerBox.Size = new System.Drawing.Size(53, 57);
+            this.powerBox.Size = new System.Drawing.Size(49, 57);
             this.powerBox.TabIndex = 4;
             // 
             // frameImage
@@ -177,6 +188,7 @@ namespace stonerkart
             // cardTypeText
             // 
             this.cardTypeText.BackColor = System.Drawing.Color.Transparent;
+            this.cardTypeText.Enabled = false;
             this.cardTypeText.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
             this.cardTypeText.Location = new System.Drawing.Point(46, 370);
             this.cardTypeText.Name = "cardTypeText";
@@ -187,8 +199,9 @@ namespace stonerkart
             // castRangeSlashMovementBox
             // 
             this.castRangeSlashMovementBox.BackColor = System.Drawing.Color.Transparent;
+            this.castRangeSlashMovementBox.Enabled = false;
             this.castRangeSlashMovementBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-            this.castRangeSlashMovementBox.Location = new System.Drawing.Point(212, 550);
+            this.castRangeSlashMovementBox.Location = new System.Drawing.Point(31, 545);
             this.castRangeSlashMovementBox.Name = "castRangeSlashMovementBox";
             this.castRangeSlashMovementBox.Opacity = 100;
             this.castRangeSlashMovementBox.Size = new System.Drawing.Size(53, 57);
@@ -203,8 +216,19 @@ namespace stonerkart
             this.manaCostPanel1.Size = new System.Drawing.Size(161, 33);
             this.manaCostPanel1.TabIndex = 6;
             // 
+            // autoFontTextBox1
+            // 
+            this.autoFontTextBox1.BackColor = System.Drawing.Color.Transparent;
+            this.autoFontTextBox1.Enabled = false;
+            this.autoFontTextBox1.Location = new System.Drawing.Point(382, 545);
+            this.autoFontTextBox1.Name = "autoFontTextBox1";
+            this.autoFontTextBox1.Opacity = 100;
+            this.autoFontTextBox1.Size = new System.Drawing.Size(24, 57);
+            this.autoFontTextBox1.TabIndex = 7;
+            // 
             // CardView
             // 
+            this.Controls.Add(this.autoFontTextBox1);
             this.Controls.Add(this.manaCostPanel1);
             this.Controls.Add(this.castRangeSlashMovementBox);
             this.Controls.Add(this.cardTypeText);

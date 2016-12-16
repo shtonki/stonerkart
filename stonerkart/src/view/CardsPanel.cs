@@ -38,13 +38,11 @@ namespace stonerkart
 
         private void xd(object a, MouseEventArgs e)
         {
+            if (!vertical) return;
+
             Point v = this.PointToClient(Control.MousePosition);
             int cardIndexUnderMouse = v.Y / actualPad;
             CardView cardUnderMouse;
-
-
-            
-
 
             if (cardIndexUnderMouse >= cardViews.Count)
             {
