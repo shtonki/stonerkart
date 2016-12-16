@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 namespace stonerkart.src.view
 {
+    
     class DeckEditorPanel : StickyPanel, Screen
     {
         private CardView cardView1;
@@ -21,8 +22,17 @@ namespace stonerkart.src.view
         private CardView cardView9;
         private CardView cardView10;
         private TextBox searchBox;
+<<<<<<< Updated upstream
         private CardsPanel cardsPanel1;
+=======
+        private Panel manaPanel;
+>>>>>>> Stashed changes
         private CardView[] cardViews;
+        private ManaButton[] manaButtons;
+        private CardView cardView4;
+        private CardView cardView7;
+        private List<Card> allCards;
+        private List<CardTemplate> myCurrentDeck; 
 
         private CardTemplate[] filteredCards;
         private CardTemplate?[] shownCards;
@@ -32,6 +42,31 @@ namespace stonerkart.src.view
         public DeckEditorPanel()
         {
             InitializeComponent();
+<<<<<<< Updated upstream
+=======
+            myCurrentDeck = new List<CardTemplate>();
+            var cards = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().Where(x => x != CardTemplate.Hero && x != CardTemplate.AlterTime);
+            allCards = new List<Card>();
+            foreach (var c in cards)
+            {
+                allCards.Add(new Card(c, null));
+            }
+
+            
+            manaButtons = new ManaButton[6];
+            for (int i = 0; i < 6; i++)
+            {
+                manaButtons[i] = new ManaButton((ManaColour)i, 0);
+                manaPanel.Controls.Add(manaButtons[i]);
+                manaButtons[i].setVisibility(ManaButton.Visibility.Full);
+                var i1 = i;
+                manaButtons[i].Click += (sender, args) => newManaFilter(manaButtons[i1]);
+            }
+            
+            //Paint += (sender, args) => onResize();
+            Resize += (sender, args) => onResize();
+            
+>>>>>>> Stashed changes
 
             cardViews = new CardView[]
             {
@@ -44,6 +79,7 @@ namespace stonerkart.src.view
                 cardView9,
                 cardView10,
             };
+<<<<<<< Updated upstream
 
             page = 0;
             deck = new Pile();
@@ -111,6 +147,30 @@ namespace stonerkart.src.view
 
         private void InitializeComponent()
         {
+=======
+            foreach (var c in cardViews)
+            {
+                var c1 = c;
+                c.Click += (sender, args) =>
+                {
+                    myCurrentDeck.Add(c1.card.);
+                };
+            }
+            drawCards(x => true);
+            onResize();
+        }
+
+        private void onResize()
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                manaButtons[i].SetBounds(i*manaPanel.Width/6, 0, manaPanel.Width/6, manaPanel.Height);
+            }
+        }   
+                                       
+        private void InitializeComponent()                              
+        {                                                               
+>>>>>>> Stashed changes
             this.cardView1 = new stonerkart.CardView();
             this.cardView2 = new stonerkart.CardView();
             this.cardView3 = new stonerkart.CardView();
@@ -120,13 +180,23 @@ namespace stonerkart.src.view
             this.cardView9 = new stonerkart.CardView();
             this.cardView10 = new stonerkart.CardView();
             this.searchBox = new System.Windows.Forms.TextBox();
+<<<<<<< Updated upstream
             this.cardsPanel1 = new stonerkart.CardsPanel();
+=======
+            this.manaPanel = new System.Windows.Forms.Panel();
+            this.cardView4 = new stonerkart.CardView();
+            this.cardView7 = new stonerkart.CardView();
+>>>>>>> Stashed changes
             this.SuspendLayout();
             // 
             // cardView1
             // 
             this.cardView1.BackColor = System.Drawing.Color.DarkViolet;
+<<<<<<< Updated upstream
             this.cardView1.Location = new System.Drawing.Point(3, 254);
+=======
+            this.cardView1.Location = new System.Drawing.Point(3, 105);
+>>>>>>> Stashed changes
             this.cardView1.Name = "cardView1";
             this.cardView1.Size = new System.Drawing.Size(161, 193);
             this.cardView1.TabIndex = 0;
@@ -134,7 +204,11 @@ namespace stonerkart.src.view
             // cardView2
             // 
             this.cardView2.BackColor = System.Drawing.Color.DarkViolet;
+<<<<<<< Updated upstream
             this.cardView2.Location = new System.Drawing.Point(170, 254);
+=======
+            this.cardView2.Location = new System.Drawing.Point(170, 105);
+>>>>>>> Stashed changes
             this.cardView2.Name = "cardView2";
             this.cardView2.Size = new System.Drawing.Size(161, 193);
             this.cardView2.TabIndex = 7;
@@ -142,7 +216,11 @@ namespace stonerkart.src.view
             // cardView3
             // 
             this.cardView3.BackColor = System.Drawing.Color.DarkViolet;
+<<<<<<< Updated upstream
             this.cardView3.Location = new System.Drawing.Point(337, 254);
+=======
+            this.cardView3.Location = new System.Drawing.Point(337, 105);
+>>>>>>> Stashed changes
             this.cardView3.Name = "cardView3";
             this.cardView3.Size = new System.Drawing.Size(161, 193);
             this.cardView3.TabIndex = 7;
@@ -150,7 +228,11 @@ namespace stonerkart.src.view
             // cardView5
             // 
             this.cardView5.BackColor = System.Drawing.Color.DarkViolet;
+<<<<<<< Updated upstream
             this.cardView5.Location = new System.Drawing.Point(504, 254);
+=======
+            this.cardView5.Location = new System.Drawing.Point(504, 105);
+>>>>>>> Stashed changes
             this.cardView5.Name = "cardView5";
             this.cardView5.Size = new System.Drawing.Size(161, 193);
             this.cardView5.TabIndex = 7;
@@ -158,7 +240,11 @@ namespace stonerkart.src.view
             // cardView6
             // 
             this.cardView6.BackColor = System.Drawing.Color.DarkViolet;
+<<<<<<< Updated upstream
             this.cardView6.Location = new System.Drawing.Point(504, 453);
+=======
+            this.cardView6.Location = new System.Drawing.Point(504, 304);
+>>>>>>> Stashed changes
             this.cardView6.Name = "cardView6";
             this.cardView6.Size = new System.Drawing.Size(161, 193);
             this.cardView6.TabIndex = 9;
@@ -166,7 +252,11 @@ namespace stonerkart.src.view
             // cardView8
             // 
             this.cardView8.BackColor = System.Drawing.Color.DarkViolet;
+<<<<<<< Updated upstream
             this.cardView8.Location = new System.Drawing.Point(337, 453);
+=======
+            this.cardView8.Location = new System.Drawing.Point(337, 304);
+>>>>>>> Stashed changes
             this.cardView8.Name = "cardView8";
             this.cardView8.Size = new System.Drawing.Size(161, 193);
             this.cardView8.TabIndex = 11;
@@ -174,7 +264,11 @@ namespace stonerkart.src.view
             // cardView9
             // 
             this.cardView9.BackColor = System.Drawing.Color.DarkViolet;
+<<<<<<< Updated upstream
             this.cardView9.Location = new System.Drawing.Point(170, 453);
+=======
+            this.cardView9.Location = new System.Drawing.Point(170, 304);
+>>>>>>> Stashed changes
             this.cardView9.Name = "cardView9";
             this.cardView9.Size = new System.Drawing.Size(161, 193);
             this.cardView9.TabIndex = 12;
@@ -182,13 +276,18 @@ namespace stonerkart.src.view
             // cardView10
             // 
             this.cardView10.BackColor = System.Drawing.Color.DarkViolet;
+<<<<<<< Updated upstream
             this.cardView10.Location = new System.Drawing.Point(3, 453);
+=======
+            this.cardView10.Location = new System.Drawing.Point(3, 304);
+>>>>>>> Stashed changes
             this.cardView10.Name = "cardView10";
             this.cardView10.Size = new System.Drawing.Size(161, 193);
             this.cardView10.TabIndex = 8;
             // 
             // searchBox
             // 
+<<<<<<< Updated upstream
             this.searchBox.Location = new System.Drawing.Point(3, 219);
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(662, 20);
@@ -203,11 +302,45 @@ namespace stonerkart.src.view
             this.cardsPanel1.Size = new System.Drawing.Size(147, 646);
             this.cardsPanel1.TabIndex = 14;
             this.cardsPanel1.vertical = false;
+=======
+            this.searchBox.Location = new System.Drawing.Point(0, 79);
+            this.searchBox.Name = "searchBox";
+            this.searchBox.Size = new System.Drawing.Size(328, 20);
+            this.searchBox.TabIndex = 13;
+            this.searchBox.TextChanged += new System.EventHandler(this.newSearch);
+            // 
+            // manaPanel
+            // 
+            this.manaPanel.Location = new System.Drawing.Point(3, 3);
+            this.manaPanel.Name = "manaPanel";
+            this.manaPanel.Size = new System.Drawing.Size(328, 70);
+            this.manaPanel.TabIndex = 14;
+            // 
+            // cardView4
+            // 
+            this.cardView4.BackColor = System.Drawing.Color.DarkViolet;
+            this.cardView4.Location = new System.Drawing.Point(671, 105);
+            this.cardView4.Name = "cardView4";
+            this.cardView4.Size = new System.Drawing.Size(161, 193);
+            this.cardView4.TabIndex = 7;
+            // 
+            // cardView7
+            // 
+            this.cardView7.BackColor = System.Drawing.Color.DarkViolet;
+            this.cardView7.Location = new System.Drawing.Point(671, 304);
+            this.cardView7.Name = "cardView7";
+            this.cardView7.Size = new System.Drawing.Size(161, 193);
+            this.cardView7.TabIndex = 10;
+>>>>>>> Stashed changes
             // 
             // DeckEditorPanel
             // 
             this.BackColor = System.Drawing.Color.Aqua;
+<<<<<<< Updated upstream
             this.Controls.Add(this.cardsPanel1);
+=======
+            this.Controls.Add(this.manaPanel);
+>>>>>>> Stashed changes
             this.Controls.Add(this.searchBox);
             this.Controls.Add(this.cardView6);
             this.Controls.Add(this.cardView5);
@@ -223,5 +356,35 @@ namespace stonerkart.src.view
             this.PerformLayout();
 
         }
+<<<<<<< Updated upstream
+=======
+
+        private void drawCards(Func<CardTemplate, bool> filter)
+        {
+            var cards = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().Where(x => x != CardTemplate.Hero && x != CardTemplate.AlterTime).Where(filter);
+
+            for (int i = 0; i < cardViews.Length; i++)
+            {
+                if (i < cards.Count())
+                {
+                    cardViews[i].setCard(cards.ElementAt(i));
+                    cardViews[i].Visible = true;
+                }
+                else
+                    cardViews[i].Visible = false;
+            }
+        }
+
+        private void newManaFilter(ManaButton mb)
+        {
+            
+        }
+
+        private void newSearch(object sender, EventArgs e)
+        {
+            drawCards(x => x.ToString().ToLower().Contains(searchBox.Text));
+        }
+
+>>>>>>> Stashed changes
     }
 }
