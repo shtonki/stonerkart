@@ -38,11 +38,10 @@ namespace stonerkart
 
         }
 
-        public Card removeTop()
+        public Card peek()
         {
             int c = cardList.Count;
             Card r = cardList[c - 1];
-            cardList.RemoveAt(c - 1);
             return r;
         }
 

@@ -33,6 +33,8 @@ namespace stonerkart
 
     enum ButtonOption
     {
+        NOTHING,
+
         Nigra,
         OK,
         Cancel,

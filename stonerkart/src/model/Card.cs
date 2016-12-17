@@ -19,7 +19,8 @@ namespace stonerkart
         public Rarity rarity { get; }
         public string breadText { get; }
 
-        public Location location => pile.location;
+        public Location location => locationEx();
+
         public ActivatedAbility castAbility { get; }
         public int castRange => castAbility.castRange;
         public ManaSet castManaCost => castAbility.cost.getSubCost<ManaCost>().cost;
@@ -38,6 +39,8 @@ namespace stonerkart
 
 
         public bool isHeroic { get; }
+
+        public bool hasPT => cardType == CardType.Creature;
         public Modifiable<int> power { get; }
         public Modifiable<int> toughness { get; }
         public Modifiable<int> movement { get; }
@@ -121,7 +124,12 @@ namespace stonerkart
             return l.ToArray()[i];
         }
 
-        public void reherp(GameEvent e)
+        public TriggeredAbility[] abilitiesTriggeredBy(GameEvent e)
+        {
+            return triggeredAbilities.Where(a => a.triggeredBy(e)).ToArray();
+        }
+
+        public void remodify(GameEvent e)
         {
             foreach (Modifiable modifiable in modifiables)
             {
@@ -135,6 +143,12 @@ namespace stonerkart
             s += cardType.ToString(); 
 
             return s;
+        }
+
+        private Location locationEx()
+        {
+            if (pile == null) throw new Exception();
+            return pile.location;
         }
 
         public void notify(int t)

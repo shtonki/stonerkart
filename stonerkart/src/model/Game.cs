@@ -26,7 +26,8 @@ namespace stonerkart
         private List<GameEventHandler> geFilters = new List<GameEventHandler>();
         private Stack<StackWrapper> wrapperStack = new Stack<StackWrapper>();
 
-        private IEnumerable<Card> herpable => hero.field;
+
+        private IEnumerable<Card> triggerableCards => cards.Where(card => card.location.pile != PileLocation.Deck);
 
         private Random random;
         private GameConnection connection;
@@ -50,7 +51,7 @@ namespace stonerkart
             for (int i = 0; i < ngs.playerNames.Length; i++)
             {
                 Player p = new Player(this);
-                Card heroCard = createCard(CardTemplate.Belwas, p);
+                Card heroCard = createCard(CardTemplate.Belwas, p, p.field);
                 p.setHeroCard(heroCard);
 
                 players.Add(p);
@@ -64,8 +65,7 @@ namespace stonerkart
                 List<Card> deck = new List<Card>();
                 for (int j = 0; j < 10; j++)
                 {
-                    Card c = createCard(CardTemplate.Cantrip, p);
-                    deck.Add(c);
+                    Card c = createCard(CardTemplate.Cantrip, p, p.deck);
                 }
                 p.loadDeck(deck);
                 p.deck.shuffle(random);
@@ -76,10 +76,11 @@ namespace stonerkart
             setupHandlers();
         }
 
-        public Card createCard(CardTemplate ct, Player owner)
+        public Card createCard(CardTemplate ct, Player owner, Pile pile)
         {
             Card r = new Card(ct, owner);
             cards.Add(r);
+            r.moveTo(pile);
             return r;
         }
 
@@ -136,7 +137,7 @@ namespace stonerkart
 
             geFilters.Add(new GameEventHandler<DrawEvent>(e =>
             {
-                e.player.deck.removeTop().moveTo(e.player.hand);
+                e.player.deck.peek().moveTo(e.player.hand);
             }));
 
             geFilters.Add(new GameEventHandler<CastEvent>(e =>
@@ -191,14 +192,66 @@ namespace stonerkart
 
         private void raiseEvent(GameEvent e)
         {
-            foreach (var v in geFilters)
+            List<TriggeredAbility>[] preLists = players.Select(p => new List<TriggeredAbility>()).ToArray();
+            List<TriggeredAbility>[] postLists = players.Select(p => new List<TriggeredAbility>()).ToArray();
+
+            foreach (Card card in triggerableCards)
             {
-                v.handle(e);
+                int controllerIndex = ord(card.controller);
+                TriggeredAbility[] abilities = card.abilitiesTriggeredBy(e);
+
+                foreach (TriggeredAbility ability in abilities)
+                {
+                    List<TriggeredAbility>[] addToMe;
+                    switch (ability.timing)
+                    {
+                        case TriggeredAbility.Timing.Post:
+                        {
+                            addToMe = postLists;
+                        } break;
+
+                        case TriggeredAbility.Timing.Pre:
+                        {
+                            addToMe = preLists;
+                        } break;
+
+                        default: throw new Exception();
+                    }
+                    addToMe[controllerIndex].AddRange(abilities);
+                }
+
             }
 
-            foreach (var v in herpable)
+            bool remodify = false;
+
+            foreach (Player p in players)
             {
-                v.reherp(e);
+                List<TriggeredAbility> triggered = preLists[ord(p)];
+                if (triggered.Count > 1) throw new NotImplementedException();
+
+                foreach (TriggeredAbility a in triggered)
+                {
+                    remodify = true;
+                    var ts = getCastTargets(a, p.heroCard.tile);
+                }
+            }
+
+            if (remodify)
+            {
+                foreach (Card card in cards)
+                {
+                    card.remodify(e);
+                }
+            }
+
+            foreach (GameEventHandler handler in geFilters)
+            {
+                handler.handle(e);
+            }
+
+            foreach (Card card in cards)
+            {
+                card.remodify(e);
             }
         }
 
@@ -211,8 +264,20 @@ namespace stonerkart
         private void initGame()
         {
             activePlayerIndex = 0;
-            map.tileAt(4, 4).place(players[0].heroCard);
-            map.tileAt(6, 6).place(players[1].heroCard);
+
+            Tile[] ts = new[]
+            {
+                map.tileAt(4, 4),
+                map.tileAt(6, 6),
+            };
+            int ix = 0;
+
+            foreach (Player p in players)
+            {
+                if (ix >= ts.Length) throw new Exception();
+
+                ts[ix++].place(p.heroCard);
+            }
 
             foreach (Player p in players)
             {
@@ -388,9 +453,9 @@ namespace stonerkart
         private void enforceRules()
         {
             List<Card> trashcan = new List<Card>();
-            foreach (Card c in herpable)
+            foreach (Card c in triggerableCards)
             {
-                if (c.toughness <= 0)
+                if (c.hasPT && c.toughness <= 0)
                 {
                     trashcan.Add(c);
                 }
@@ -410,7 +475,7 @@ namespace stonerkart
             while (true)
             {
                 Player fuckboy = players[(activePlayerIndex + c)%players.Count];
-                StackWrapper? w = getCast(fuckboy);
+                StackWrapper? w = priority(fuckboy);
 
                 if (w.HasValue)
                 {
@@ -440,9 +505,15 @@ namespace stonerkart
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="prompt"></param>
+        /// <returns></returns>
         private Card getCard(Func<Card, bool> f, string prompt)
         {
-            Controller.setPrompt(prompt, ButtonOption.OK);
+            Controller.setPrompt(prompt, ButtonOption.Cancel);
             var v = waitForButtonOr<Card>(f);
             if (v is ShibbuttonStuff)
             {
@@ -462,34 +533,49 @@ namespace stonerkart
             return (Tile)v;
         }
 
-        private StackWrapper? getCast(Player p)
+        private StackWrapper? priority(Player p)
         {
-            StackWrapper? r;
+            return cast(p, null);
+        }
+
+        private StackWrapper? cast(Player p, Card card = null, Ability ability = null, TargetMatrix[] targets = null, int[][] costs = null)
+        {
+            int lv = 0;
+            int bt = 0;
+
+            if (card != null) { lv = bt = 1; }
+            if (ability != null) { lv = bt = 2; }
+
+            StackWrapper? r = null;
             if (p == hero)
             {
                 Tile from = p.heroCard.tile;
-                while (true)
+                while (lv >= bt && r == null)
                 {
-                    Card card = getCard((crd) => true, "Cast a card");
-                    if (card == null)
+                    object stuff = null;
+                    if (lv == 0)
                     {
-                        r = null;
-                        break;
+                        stuff = card = getCard(c => c.controller == p, "Cast a card");
+                    }
+                    else if (lv == 1)
+                    {
+                        stuff = ability = chooseAbility(card);
+                    }
+                    else if (lv == 2)
+                    {
+                        stuff = targets = getCastTargets(ability, from);
+                    }
+                    else if (lv == 3)
+                    {
+                        CostPayStruct s = new CostPayStruct(waitForAnything);
+                        stuff = costs = ability.cost.measure(p, s);
+                    }
+                    else if (lv == 4)
+                    {
+                        r = new StackWrapper(card, ability, targets, costs);
                     }
 
-                    ActivatedAbility ability = chooseAbility(card);
-                    if (ability == null) continue;
-
-                    TargetMatrix[] targets = chooseCastTargets(ability, from);
-                    if (targets == null) continue;
-
-                    CostPayStruct s = new CostPayStruct(waitForAnything);
-                    int[][] costs = ability.cost.measure(p, s);
-                    if (costs == null) continue;
-
-                    r = new StackWrapper(card, ability, targets, costs);
-
-                    break;
+                    lv += stuff == null ? -1 : 1;
                 }
                 connection.sendAction(new CastSelection(r));
             }
@@ -534,7 +620,7 @@ namespace stonerkart
         }
 
 
-        private TargetMatrix[] chooseCastTargets(Ability a, Tile castFrom)
+        private TargetMatrix[] getCastTargets(Ability a, Tile castFrom)
         {
             TargetMatrix[] ms = new TargetMatrix[a.effects.Length];
             List<Tile> v = castFrom.withinDistance(a.castRange);
@@ -546,7 +632,7 @@ namespace stonerkart
 
             for (int i = 0; i < ms.Length; i++)
             {
-                TargetMatrix tm =  a.effects[i].ts.fillCast(box);
+                TargetMatrix tm = a.effects[i].ts.fillCast(box);
                 if (tm == null)
                 {
                     ms = null;
@@ -561,8 +647,11 @@ namespace stonerkart
 
         private void resolve(StackWrapper wrapper)
         {
+            Card card = wrapper.card;
             TargetMatrix[] ts = wrapper.matricies;
             Effect[] es = wrapper.ability.effects;
+
+
 
             if (ts.Length != es.Length) throw new Exception();
 
@@ -571,7 +660,7 @@ namespace stonerkart
             for (int i = 0; i < ts.Length; i++)
             {
                 Effect effect = es[i];
-                TargetMatrix matrix = effect.ts.fillResolve(ts[i], wrapper.card, this);
+                TargetMatrix matrix = effect.ts.fillResolve(ts[i], card, this);
 
                 events.AddRange(effect.doer.act(matrix.generateRows()));
             }
@@ -581,9 +670,13 @@ namespace stonerkart
                 raiseEvent(e);
             }
 
-            if (wrapper.card.tile == null)
+            if (card.cardType == CardType.Creature)
             {
-                raiseEvent(new MoveToPileEvent(wrapper.card, wrapper.card.owner.graveyard));
+                raiseEvent(new MoveToPileEvent(card, card.controller.field));
+            }
+            else
+            {
+                raiseEvent(new MoveToPileEvent(card, card.owner.graveyard));
             }
 
             enforceRules();

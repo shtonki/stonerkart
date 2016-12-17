@@ -16,7 +16,7 @@ namespace stonerkart
 
     static class Network
     {
-        public static ServerConnection serverConnection;
+        public static ServerConnection serverConnection = null;
         private const string servername = "_server";
         private static ManualResetEvent messageReceived = new ManualResetEvent(false);
         private static Message receivedMessage;
@@ -27,6 +27,8 @@ namespace stonerkart
 
         public static bool connectToServer()
         {
+            if (serverConnection != null) return true;
+
             try
             {
                 serverConnection = new ServerConnection();

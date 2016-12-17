@@ -37,7 +37,6 @@ namespace stonerkart
         {
             if (heroCard != null) throw new Exception();
             heroCard = hc;
-            field.addTop(heroCard);
         }
 
         public void loadDeck(IEnumerable<Card> cards)

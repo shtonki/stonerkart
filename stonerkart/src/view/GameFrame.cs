@@ -65,7 +65,7 @@ namespace stonerkart
                 };
                 for (int i = 0; i < bs.Length; i++)
                 {
-                    if (buttons.Length > i)
+                    if (buttons.Length > i && buttons[i] != ButtonOption.NOTHING)
                     {
                         bs[i].Visible = true;
                         bs[i].setOption(buttons[i]);

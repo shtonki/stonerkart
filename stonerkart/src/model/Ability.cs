@@ -36,8 +36,23 @@ namespace stonerkart
 
     class TriggeredAbility : Ability
     {
-        public TriggeredAbility(PileLocation activeIn, Effect[] effects, int castRange, Cost cost) : base(activeIn, effects, castRange, cost)
+        public enum Timing { Pre, Post };
+
+        private Card card;
+        private GameEventFilter filter;
+        public Timing timing;
+
+        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Cost cost, GameEventFilter trigger, Timing timing) : base(activeIn, effects, castRange, cost)
         {
+            this.card = card;
+            filter = trigger;
+            this.timing = timing;
+        }
+
+        public bool triggeredBy(GameEvent e)
+        {
+            if (card.location.pile != activeIn) return false;
+            return filter.filter(e);
         }
     }
     
