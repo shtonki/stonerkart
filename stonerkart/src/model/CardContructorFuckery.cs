@@ -55,6 +55,17 @@ namespace stonerkart
                     }
                     break;
 
+                case CardTemplate.Cantrip:
+                {
+                    cardType = CardType.Sorcery;
+                    rarity = Rarity.Common;
+
+                    orderCost = 1;
+                        castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)), 
+                            new DrawCardsDoer(1));
+
+                } break;
+
                 case CardTemplate.Zap:
                     {
                         cardType = CardType.Instant;

@@ -42,6 +42,11 @@ namespace stonerkart
                     return Resources.artKappa;
                 }
 
+                case CardTemplate.Cantrip:
+                {
+                    return Resources.artAlterFate;
+                }
+
                 default:
                 {
                     return Resources.orbLife;

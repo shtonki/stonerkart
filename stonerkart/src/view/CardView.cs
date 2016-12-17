@@ -82,7 +82,7 @@ namespace stonerkart
                 }
                 else
                 {
-                    castRangeSlashMovementBox.Text = card.castRange.ToString();
+                    castRangeSlashMovementBox.Text = card.castRange > 0 ? card.castRange.ToString() : "";
                     powerBox.Text = "";
                     toughnessBox.Text = "";
                     autoFontTextBox1.Text = "";

@@ -153,6 +153,7 @@ namespace stonerkart
         Belwas,
         Zap,
         Kappa,
+        Cantrip,
     }
 
     enum CardType

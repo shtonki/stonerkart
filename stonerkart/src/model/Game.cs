@@ -64,9 +64,7 @@ namespace stonerkart
                 List<Card> deck = new List<Card>();
                 for (int j = 0; j < 10; j++)
                 {
-                    Card c = createCard(CardTemplate.Kappa, p);
-                    deck.Add(c);
-                    c = createCard(CardTemplate.Zap, p);
+                    Card c = createCard(CardTemplate.Cantrip, p);
                     deck.Add(c);
                 }
                 p.loadDeck(deck);

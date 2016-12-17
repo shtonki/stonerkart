@@ -170,6 +170,11 @@ namespace stonerkart
                 case Rule.ResolveCard:
                 {
                     return new TargetColumn(re.resolveCard);
+                } 
+
+                case Rule.ResolveController:
+                {
+                    return new TargetColumn(re.resolveCard.controller);
                 }
             }
             throw new Exception();
@@ -183,6 +188,8 @@ namespace stonerkart
         public enum Rule
         {
             ResolveCard,
+            ResolveController,
+
         }
     }
 
