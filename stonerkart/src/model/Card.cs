@@ -17,7 +17,7 @@ namespace stonerkart
         public CardTemplate template { get; }
         public CardType cardType { get; }
         public Rarity rarity { get; }
-        public string breadText { get; }
+        public string breadText => breadTextEx();
 
         public Location location => locationEx();
 
@@ -143,6 +143,17 @@ namespace stonerkart
             s += cardType.ToString(); 
 
             return s;
+        }
+
+        private string breadTextEx()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (Ability a in abilities)
+            {
+                sb.Append(a.description);
+                sb.Append("\r\n");
+            }
+            return sb.ToString();
         }
 
         private Location locationEx()

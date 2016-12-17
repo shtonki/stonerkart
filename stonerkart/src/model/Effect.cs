@@ -11,28 +11,37 @@ namespace stonerkart
         public TargetRuleSet ts;
         public Doer doer;
 
+
         public Effect(TargetRuleSet ts, Doer d)
         {
             this.ts = ts;
             doer = d;
         }
+
     }
 
-    internal interface Doer
+    abstract class Doer
     {
-        GameEvent[] act(TargetRow[] ts);
+        public string description { get; }
+
+        public Doer(string description)
+        {
+            this.description = description?.Length == 0 ? null : description;
+        }
+
+        public abstract GameEvent[] act(TargetRow[] ts);
     }
 
     class DrawCardsDoer : Doer
     {
         public int cards;
 
-        public DrawCardsDoer(int cards)
+        public DrawCardsDoer(int cards) : base("draws " + cards + (cards != 1 ? " cards" : " card"))
         {
             this.cards = cards;
         }
 
-        public GameEvent[] act(TargetRow[] ts)
+        public override GameEvent[] act(TargetRow[] ts)
         {
             List<GameEvent> r = new List<GameEvent>();
 
@@ -49,7 +58,12 @@ namespace stonerkart
 
     class MoveToTileDoer : Doer
     {
-        public GameEvent[] act(TargetRow[] ts)
+        public MoveToTileDoer(string description) : base(description)
+        {
+
+        }
+
+        public override GameEvent[] act(TargetRow[] ts)
         {
             List<GameEvent> r = new List<GameEvent>();
 
@@ -67,12 +81,12 @@ namespace stonerkart
     {
         public int damage;
 
-        public ZepperDoer(int damage)
+        public ZepperDoer(int damage) : base ("deal " + damage + " damage")
         {
             this.damage = damage;
         }
 
-        public GameEvent[] act(TargetRow[] ts)
+        public override GameEvent[] act(TargetRow[] ts)
         {
             List<GameEvent> r = new List<GameEvent>();
 

@@ -23,12 +23,15 @@ namespace stonerkart
                 natureCost = 0,
                 orderCost = 0,
                 colourlessCost = 0;
+
             int castRange = -1;
             Effect castEffect = null;
-            Rarity rarity;
+            string castDescription = "";
+            CastSpeed castSpeed;
 
 
             #region oophell
+
             switch (ct)
             {
                 case CardTemplate.Belwas:
@@ -56,32 +59,34 @@ namespace stonerkart
                     break;
 
                 case CardTemplate.Cantrip:
-                {
-                    cardType = CardType.Sorcery;
-                    rarity = Rarity.Common;
+                    {
+                        cardType = CardType.Sorcery;
+                        rarity = Rarity.Common;
 
-                    orderCost = 1;
-                        castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)), 
+                        orderCost = 1;
+                        castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)),
                             new DrawCardsDoer(1));
+                        castDescription = "Draw 1 card.";
 
-                } break;
+                    }
+                    break;
 
                 case CardTemplate.Zap:
                     {
                         cardType = CardType.Instant;
                         rarity = Rarity.Common;
 
-                        castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), new ZepperDoer(2));
                         castRange = 3;
                         chaosCost = 1;
-
-                        breadText = "Deal 2 damage to target creature.";
+                        castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), new ZepperDoer(2));
+                        castDescription = "Deal 2 damage to target creature.";
                     }
                     break;
 
                 default:
                     throw new Exception();
             }
+
 
             #endregion
 
@@ -101,44 +106,34 @@ namespace stonerkart
                 movement,
             };
 
-            CastSpeed castSpeed;
 
-            if (castEffect != null)
+            if (cardType == CardType.Instant)
             {
-
-                if (cardType == CardType.Instant)
-                {
-                    castSpeed = CastSpeed.Instant;
-                }
-                else if (cardType == CardType.Sorcery)
-                {
-                    castSpeed = CastSpeed.Slow;
-                }
-                else throw new Exception();
-                castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(cmc), castSpeed, castEffect);
+                castSpeed = CastSpeed.Instant;
             }
-
-            if (cardType == CardType.Creature)
+            else if (cardType == CardType.Sorcery)
             {
-
-
-                Effect e = new Effect(new TargetRuleSet(
+                castSpeed = CastSpeed.Slow;
+            }
+            else if (cardType == CardType.Creature)
+            {
+                castSpeed = CastSpeed.Slow;
+                castRange = 2;
+                castEffect = new Effect(new TargetRuleSet(
                     new ResolveRule(ResolveRule.Rule.ResolveCard),
                     new PryTileRule(t => t.card == null)),
-                    new MoveToTileDoer());
-
-                castAbility = new ActivatedAbility(PileLocation.Hand, 2, new Cost(cmc), CastSpeed.Slow, e);
+                    new MoveToTileDoer(null));
             }
+            else throw new Exception();
 
-            else if (castAbility == null) throw new Exception();
+            if (castEffect == null) throw new Exception();
+
+            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(cmc), castSpeed, castDescription, castEffect);
             activatedAbilities.Add(castAbility);
-
-            breadText = breadText ?? "";
 
             this.owner = owner;
             controller = owner;
 
-            this.rarity = rarity;
 
             name = ct.ToString().Replace('_', ' ');
         }

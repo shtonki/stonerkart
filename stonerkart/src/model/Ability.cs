@@ -12,13 +12,15 @@ namespace stonerkart
         public Effect[] effects;
         public int castRange;
         public Cost cost;
+        public string description;
 
-        public Ability(PileLocation activeIn, Effect[] effects, int castRange, Cost cost)
+        public Ability(PileLocation activeIn, Effect[] effects, int castRange, Cost cost, string description)
         {
             this.activeIn = activeIn;
             this.effects = effects;
             this.castRange = castRange;
             this.cost = cost;
+            this.description = description;
         }
     }
 
@@ -28,7 +30,7 @@ namespace stonerkart
         public CastSpeed castSpeed;
 
 
-        public ActivatedAbility(PileLocation activeIn, int castRange, Cost cost, CastSpeed castSpeed, params Effect[] effects) : base(activeIn, effects, castRange, cost)
+        public ActivatedAbility(PileLocation activeIn, int castRange, Cost cost, CastSpeed castSpeed, string description, params Effect[] effects) : base(activeIn, effects, castRange, cost, description)
         {
             this.castSpeed = castSpeed;
         }
@@ -42,7 +44,7 @@ namespace stonerkart
         private GameEventFilter filter;
         public Timing timing;
 
-        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Cost cost, GameEventFilter trigger, Timing timing) : base(activeIn, effects, castRange, cost)
+        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Cost cost, GameEventFilter trigger, Timing timing, string description) : base(activeIn, effects, castRange, cost, description)
         {
             this.card = card;
             filter = trigger;
