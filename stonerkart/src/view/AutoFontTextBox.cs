@@ -12,21 +12,57 @@ namespace stonerkart
     using System.Windows.Forms;
     using System.Windows.Forms.Design;
 
+    enum Justify
+    {
+        Left,
+        Right,
+    }
+
     class AutoFontTextBox : TransparentPanel
     {
+
+        public Justify justifyText { get; set; }
+
         public AutoFontTextBox()
         {
+            justifyText = Justify.Left;
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             SetStyle(ControlStyles.Opaque, true);
             this.BackColor = Color.Transparent;
             TextChanged += (sender, args) => txt = Text;
+            Enabled = false;
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
-            g.DrawString(txt, f,Brushes.Black, new Rectangle(new Point(), Size), new StringFormat(StringFormatFlags.FitBlackBox));
+
+            Rectangle r = generateRectangle();
+            g.DrawString(txt, f,Brushes.Black, r, new StringFormat(StringFormatFlags.FitBlackBox));
+        }
+
+        private Rectangle generateRectangle()
+        {
+            int m;
+
+            switch (justifyText)
+            {
+                case Justify.Left:
+                {
+                    m = 0;
+                } break;
+
+                case Justify.Right:
+                {
+                    m = textMargin;
+                } break;
+
+                default:
+                    throw new Exception();
+            }
+
+            return new Rectangle(m, 0, Size.Width, Size.Height);
         }
 
         private Font f = new Font("Ariel Black", 10);
@@ -50,9 +86,10 @@ namespace stonerkart
             this.memeout(fixEx);
         }
 
+        private int textMargin;
         private void fixEx()
         {
-            Graphics g = Graphics.FromImage(Properties.Resources.jordanno); //todo hack
+            Graphics g = Graphics.FromImage(Properties.Resources.orbDeath); //todo hack
             Font testFont = null;
             for (int AdjustedSize = 20; AdjustedSize >= 4; AdjustedSize--)
             {
@@ -63,6 +100,7 @@ namespace stonerkart
                     new StringFormat(StringFormatFlags.LineLimit), out df, out ff);
                 if (Size.Width > d.Width && Size.Height > d.Height && df == txt.Length)
                 {
+                    textMargin = (int)(Size.Width - d.Width);
                     break;
                 }
             }

@@ -3,34 +3,48 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
-    public class Shibbutton : Button, Clickable
+    class Shibbutton : Button, Clickable
     {
-        private object hackEx() { return Text; }
+        public ShibbuttonStuff stuff { get; set; }
+        //private object hackEx() { return Text; }
         private Func<object> f;
 
-        public Shibbutton()
+        public Shibbutton() : this(ButtonOption.Nigra)
         {
-            f = hackEx;
+            
         }
 
-        public void setStuffer(Func<object> f)
+        public Shibbutton(ButtonOption bo)
         {
-            this.f = f;
+            setOption(bo);
+        }
+
+        public void setOption(ButtonOption bo)
+        {
+            stuff = new ShibbuttonStuff(bo);
+            Text = stuff.option.ToString();
         }
 
         public Stuff getStuff()
         {
-            return new ShibbuttonStuff(Text);
+            return stuff;
         }
+    }
+
+    enum ButtonOption
+    {
+        Nigra,
+        OK,
+        Cancel,
     }
 
     class ShibbuttonStuff : Stuff
     {
-        public string text { get; }
+        public ButtonOption option { get; }
 
-        public ShibbuttonStuff(string text)
+        public ShibbuttonStuff(ButtonOption option)
         {
-            this.text = text;
+            this.option = option;
         }
     }
 }

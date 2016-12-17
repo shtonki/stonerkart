@@ -15,9 +15,9 @@ namespace stonerkart
     {
         private Map map;
         private TileView[] tileViews;
+
         public readonly List<Action<Clickable>> tileClicked = new List<Action<Clickable>>();
         public readonly List<Action<Clickable>> tileEntered = new List<Action<Clickable>>();
-        //public readonly List<Action<Clickable>> tileClicked = new List<Action<Clickable>>();
 
         public HexPanel(Map m)
         {
@@ -151,7 +151,7 @@ namespace stonerkart
                     if (tv.tile.card != null)
                     {
                         Card card = tv.tile.card;
-                        TextureBrush bh = new TextureBrush(G.ResizeImage(card.image, dw, dh));
+                        TextureBrush bh = new TextureBrush(G.ResizeImage(ImageLoader.artImage(card.template), dw, dh));
                         var x = tv.poly[0].X;
                         var y = tv.poly[0].Y;
                         var m = new Matrix();
@@ -174,13 +174,13 @@ namespace stonerkart
                         Brush filler = card.owner.isHero ? Brushes.Green : Brushes.Red;
 
                         g.FillEllipse(filler, vxR, vy, a, b);
-                        g.DrawString(card.power.ToString().PadLeft(2), f, Brushes.Black, vxR + xp, vy + yp);
+                        g.DrawString(card.movement.ToString().PadLeft(2), f, Brushes.Black, vxR + xp, vy + yp);
 
                         g.FillEllipse(filler, vxL, vy, a, b);
                         g.DrawString(card.toughness.ToString().PadLeft(2), f, Brushes.Black, vxL + xp, vy + yp);
                         
                         g.FillEllipse(filler, vxM, vyB, a, b);
-                        g.DrawString(card.movement.ToString().PadLeft(2),  f, Brushes.Black, vxM + xp, vyB + yp);
+                        g.DrawString(card.power.ToString().PadLeft(2),  f, Brushes.Black, vxM + xp, vyB + yp);
                     }
                     else
                     {

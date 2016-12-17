@@ -27,7 +27,7 @@ namespace stonerkart
             observers.Add(new WeakReference<Observer<T>>(o));
         }
 
-        public void unsubscribe(Observer<T> o)
+        public bool tryUnsubscribe(Observer<T> o)
         {
             WeakReference<Observer<T>> a = null;
             foreach (var v in observers)
@@ -36,8 +36,12 @@ namespace stonerkart
                 v.TryGetTarget(out w);
                 if (w != null && w == o) a = v;
             }
-            if (a == null) throw new Exception();
+            if (a == null)
+            {
+                return false;
+            }
             observers.Remove(a);
+            return true;
         }
 
         protected void notify(T t)

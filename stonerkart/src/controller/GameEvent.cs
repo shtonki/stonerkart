@@ -36,23 +36,6 @@ namespace stonerkart
         }
     }
 
-    struct AttackEvent : GameEvent
-    {
-        public Card attacker;
-        public Card defender;
-        public Path path;
-        public Tile attackFrom;
-
-        public AttackEvent(Path path)
-        {
-            this.attacker = path.from.card;
-            this.defender = path.to.card;
-            this.path = path;
-            List<Tile> t = path;
-            attackFrom = t[t.Count - 2];
-        }
-    }
-
     struct PayCostsEvent : GameEvent
     {
         public Player player;
@@ -67,15 +50,27 @@ namespace stonerkart
         }
     }
 
-    struct MoveToTileEvent : GameEvent
+    struct PlaceOnTileEvent : GameEvent
     {
         public Card card { get; }
         public Tile tile { get; }
 
-        public MoveToTileEvent(Card card, Tile tile)
+        public PlaceOnTileEvent(Card card, Tile tile)
         {
             this.card = card;
             this.tile = tile;
+        }
+    }
+
+    struct MoveEvent : GameEvent
+    {
+        public Card card { get; }
+        public Path path { get; }
+
+        public MoveEvent(Card card, Path path)
+        {
+            this.card = card;
+            this.path = path;
         }
     }
 
@@ -91,10 +86,24 @@ namespace stonerkart
 
     struct StartOfStepEvent : GameEvent
     {
+        public Player activePlayer;
         public Steps step { get; }
 
-        public StartOfStepEvent(Steps step)
+        public StartOfStepEvent(Player activePlayer, Steps step)
         {
+            this.activePlayer = activePlayer;
+            this.step = step;
+        }
+    }
+
+    struct EndOfStepEvent : GameEvent
+    {
+        public Player activePlayer;
+        public Steps step { get; }
+
+        public EndOfStepEvent(Player activePlayer, Steps step)
+        {
+            this.activePlayer = activePlayer;
             this.step = step;
         }
     }

@@ -15,13 +15,13 @@ namespace stonerkart
             this.rules = rules;
         }
 
-        public TargetMatrix fillCast(Func<Targetable> f)
+        public TargetMatrix fillCast(ChooseTargetToolbox str)
         {
             TargetColumn[] r = new TargetColumn[rules.Length];
 
             for (int i = 0; i < rules.Length; i++)
             {
-                TargetColumn? v = rules[i].fillCastTargets(f);
+                TargetColumn? v = rules[i].fillCastTargets(str);
                 if (v == null) return null;
                 r[i] = v.Value;
             }
@@ -41,6 +41,17 @@ namespace stonerkart
             return new TargetMatrix(r);
         }
 
+    }
+
+
+    struct ChooseTargetToolbox
+    {
+        public Func<Stuff> getTargetable { get; }
+
+        public ChooseTargetToolbox(Func<Stuff> getTargetable)
+        {
+            this.getTargetable = getTargetable;
+        }
     }
 
     class TargetMatrix
@@ -72,7 +83,7 @@ namespace stonerkart
 
     interface TargetRule
     {
-        TargetColumn? fillCastTargets(Func<Targetable> f);
+        TargetColumn? fillCastTargets(ChooseTargetToolbox f);
         TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c);
     }
 
@@ -85,11 +96,15 @@ namespace stonerkart
             this.filter = filter;
         }
 
-        public TargetColumn? fillCastTargets(Func<Targetable> f)
+        public TargetColumn? fillCastTargets(ChooseTargetToolbox box)
         {
             while (true)
             {
-                Targetable v = f();
+                Stuff v = box.getTargetable();
+
+                var b = v as ShibbuttonStuff;
+                if (b?.option == ButtonOption.Cancel) return null;
+
                 if (!(v is Tile)) continue;
                 Tile t = (Tile)v;
                 if (filter(t)) return new TargetColumn(t);
@@ -111,14 +126,23 @@ namespace stonerkart
             this.filter = filter;
         }
 
-        public TargetColumn? fillCastTargets(Func<Targetable> f)
+        public TargetColumn? fillCastTargets(ChooseTargetToolbox box)
         {
             while (true)
             {
-                Targetable v = f();
+                Stuff v = box.getTargetable();
+
+                if (v is ShibbuttonStuff)
+                {
+                    var b = (ShibbuttonStuff)v;
+                    if (b.option == ButtonOption.Cancel) return null;
+                }
+
                 if (!(v is Tile)) continue;
+
                 Tile t = (Tile)v;
                 if (t.card == null) continue;
+
                 if (filter(t.card)) return new TargetColumn(t.card);
             }
         }
@@ -151,7 +175,7 @@ namespace stonerkart
             throw new Exception();
         }
 
-        public TargetColumn? fillCastTargets(Func<Targetable> f)
+        public TargetColumn? fillCastTargets(ChooseTargetToolbox box)
         {
             return new TargetColumn(new Targetable[] {});
         }

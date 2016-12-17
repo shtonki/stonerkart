@@ -7,106 +7,43 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class Card : Observable<CardChangedMessage>, Stuff, Targetable
+    partial class Card : Observable<CardChangedMessage>, Stuff, Targetable, Observer<int>
     {
         public string name { get; }
-        public Image image { get; }
         public Pile pile { get; private set; }
         public Tile tile { get; set; }
         public Player owner { get; }
+        public Player controller { get; }
+        public CardTemplate template { get; }
         public CardType cardType { get; }
+        public Rarity rarity { get; }
         public string breadText { get; }
 
         public Location location => pile.location;
-        public ActivatedAbility castAbility;
+        public ActivatedAbility castAbility { get; }
         public int castRange => castAbility.castRange;
         public ManaSet castManaCost => castAbility.cost.getSubCost<ManaCost>().cost;
 
+        public string typeText => typeTextEx();
 
-        public List<Ability> abilities = new List<Ability>();
-        public ActivatedAbility[] usableHere => abilities.Where(a => a is ActivatedAbility && a.activeIn == location.pile).Cast<ActivatedAbility>().ToArray();
+        public IEnumerable<Ability> abilities => activatedAbilities;
+        private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
+        private List<TriggeredAbility> triggeredAbilities = new List<TriggeredAbility>();
+        public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).Cast<ActivatedAbility>().ToArray();
+        /// <summary>
+        /// Returns a list containing the unique colours of the card. If the card has no mana cost it returns an 
+        /// array containing only ManaColour.Colourless.
+        /// </summary>
+        public List<ManaColour> colours => coloursEx();
 
 
-        public readonly Modifiable<int> power;
-        public readonly Modifiable<int> toughness;
-        public readonly Modifiable<int> movement;
+        public bool isHeroic { get; }
+        public Modifiable<int> power { get; }
+        public Modifiable<int> toughness { get; }
+        public Modifiable<int> movement { get; }
 
-        private Modifiable[] ms;
-
-        public Card(CardTemplate ct, Player owner = null)
-        {
-            int basePower = -1;
-            int baseToughness = -1;
-            int baseMovement = -1;
-
-            #region oophell
-            switch (ct)
-            {
-                case CardTemplate.Hero:
-                {
-                    cardType = CardType.Hero;
-                    image = Properties.Resources.pepeman;
-                    baseMovement = 1;
-                    basePower = 1;
-                    baseToughness = 10;
-                } break;
-
-                case CardTemplate.Jordan:
-                {
-                    image = Properties.Resources.jordanno;
-                    baseMovement = 2;
-                    basePower = 1;
-                    baseToughness = 2;
-                    cardType = CardType.Creature;
-                } break;
-
-                case CardTemplate.Zap:
-                {
-                    image = Properties.Resources.Zap;
-                    cardType = CardType.Instant;
-                    Effect e = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), new ZepperDoer(2));
-                    castAbility = new ActivatedAbility(PileLocation.Hand, 3, new Cost(new ManaCost(ManaColour.Chaos)), e);
-                    abilities.Add(castAbility);
-                    breadText = "Deal 2 damage to target creature";
-                } break;
-
-                case CardTemplate.AlterTime:
-                {
-                    throw new NotImplementedException();
-                } break;
-
-                default:
-                    throw new Exception();
-            }
-
-            #endregion
-
-            power = new Modifiable<int>(basePower);
-            toughness = new Modifiable<int>(baseToughness);
-            movement = new Modifiable<int>(baseMovement);
-
-            ms = new Modifiable[]
-            {
-                power,
-                toughness,
-                movement,
-            };
-
-            if (cardType == CardType.Creature)
-            {
-                Effect e = new Effect(new TargetRuleSet(
-                    new ResolveRule(ResolveRule.Rule.ResolveCard),
-                    new PryTileRule(t => t.card == null)),
-                    new MoveToTileDoer());
-
-                    castAbility = new ActivatedAbility(PileLocation.Hand, 2, new Cost(new ManaCost(ManaColour.Chaos)), e);
-                    abilities.Add(castAbility);
-            }
-            
-            breadText = breadText ?? "";
-            this.owner = owner;
-            name = ct.ToString();
-        }
+        private ManaColour? forceColour;
+        private Modifiable[] modifiables;
 
         public void moveTo(Pile p)
         {
@@ -122,28 +59,87 @@ namespace stonerkart
             t.place(this);
         }
 
-        public ManaColour[] coloursEx()
+        public void exhaust()
         {
-            List<ManaColour> rt = new List<ManaColour>();
-            return castManaCost.Cast<ManaColour>().ToArray();
+            movement.modify(-movement, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(this));
         }
 
+        private List<ManaColour> coloursEx()
+        {
+            if (forceColour.HasValue) return new List<ManaColour>(new ManaColour[] { forceColour.Value });
+            HashSet<ManaColour> hs = new HashSet<ManaColour>(castManaCost.orbs.Where(x => x != ManaColour.Colourless));
+            if (hs.Count == 0) return new List<ManaColour>(new ManaColour[] {ManaColour.Colourless,});
+            
+            return hs.ToList();
+        }
+
+
+        private const int _ACTIVATED = 0x100;
+        private const int _TRIGGERED = 0x101;
         public int abilityOrd(Ability a)
         {
-            return abilities.IndexOf(a);
+            int c, i;
+            if (a is ActivatedAbility)
+            {
+                ActivatedAbility ab = (ActivatedAbility)a;
+                i = activatedAbilities.IndexOf(ab);
+                if (i == -1) throw new Exception();
+                c = _ACTIVATED;
+            }
+            else if (a is TriggeredAbility)
+            {
+                TriggeredAbility ab = (TriggeredAbility)a;
+                i = triggeredAbilities.IndexOf(ab);
+                if (i == -1) throw new Exception();
+                c = _ACTIVATED;
+            }
+            else
+            {
+                throw new Exception();
+            }
+            return c | i;
         }
 
-        public Ability abilityFromOrd(int i)
+        public Ability abilityFromOrd(int v)
         {
-            return abilities[i];
+            int c, i;
+
+            i = v & 0x00FF;
+            c = v & 0xFF00;
+
+            IEnumerable<Ability> l;
+            if (c == _TRIGGERED)
+            {
+                l = triggeredAbilities.Cast<Ability>();
+            }
+            else if (c == _ACTIVATED)
+            {
+                l = activatedAbilities.Cast<Ability>();
+            }
+            else throw new Exception();
+
+            return l.ToArray()[i];
         }
 
         public void reherp(GameEvent e)
         {
-            foreach (var v in ms)
+            foreach (Modifiable modifiable in modifiables)
             {
-                v.check(e);
+                modifiable.check(e);
             }
+        }
+
+        private string typeTextEx()
+        {
+            string s = isHeroic ? "Heroic " : "";
+            s += cardType.ToString(); 
+
+            return s;
+        }
+
+        public void notify(int t)
+        {
+            notify(new CardChangedMessage());
         }
 
         public override string ToString()
@@ -154,16 +150,29 @@ namespace stonerkart
 
     enum CardTemplate
     {
-        Hero,
-        Jordan,
-        AlterTime,
+        Belwas,
         Zap,
+        Kappa,
     }
 
     enum CardType
     {
-        Hero,
         Creature,
         Instant,
+        Sorcery,
+    }
+
+    enum Rarity
+    {
+        Common,
+        Uncommon,
+        Rare,
+        Legendary,
+    }
+
+    enum CastSpeed
+    {
+        Instant,
+        Slow,
     }
 }
