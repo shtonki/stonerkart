@@ -5,7 +5,9 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace stonerkart
 {
@@ -74,6 +76,23 @@ namespace stonerkart
                 gfx.DrawImage(image, new Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
             }
             return bmp;
+        }
+
+        public static void clapTrap(object sender, UnhandledExceptionEventArgs e)
+        {
+            Form2 f = new Form2();
+            AutoFontTextBox b = new AutoFontTextBox();
+            b.Text = e.ExceptionObject.ToString();
+            f.Controls.Add(b);
+            f.Closed += (_, __) => Environment.Exit(2);
+            f.Resize += (_, __) => b.Size = f.ClientSize;
+            f.Size = new Size(600, 600);
+            Application.Run(f);
+        }
+
+        private class Form2 : Form
+        {
+            
         }
     }
 }

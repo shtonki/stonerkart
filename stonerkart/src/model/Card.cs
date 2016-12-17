@@ -113,15 +113,14 @@ namespace stonerkart
             IEnumerable<Ability> l;
             if (c == _TRIGGERED)
             {
-                l = triggeredAbilities.Cast<Ability>();
+                return triggeredAbilities[i];
             }
             else if (c == _ACTIVATED)
             {
-                l = activatedAbilities.Cast<Ability>();
+                return activatedAbilities[i];
             }
             else throw new Exception();
 
-            return l.ToArray()[i];
         }
 
         public TriggeredAbility[] abilitiesTriggeredBy(GameEvent e)
@@ -179,6 +178,7 @@ namespace stonerkart
         Zap,
         Kappa,
         Cantrip,
+        Temple_Healer,
     }
 
     enum CardType

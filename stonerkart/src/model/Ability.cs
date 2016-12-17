@@ -27,7 +27,8 @@ namespace stonerkart
     class ActivatedAbility : Ability
     {
         public bool isInstant => castSpeed == CastSpeed.Instant;
-        public CastSpeed castSpeed;
+
+        private CastSpeed castSpeed;
 
 
         public ActivatedAbility(PileLocation activeIn, int castRange, Cost cost, CastSpeed castSpeed, string description, params Effect[] effects) : base(activeIn, effects, castRange, cost, description)

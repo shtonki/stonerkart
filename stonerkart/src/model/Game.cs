@@ -168,7 +168,7 @@ namespace stonerkart
 
                     mover.moveTo(path.penultimate);
                     raiseEvent(new DamageEvent(mover, defender, mover.power));
-                    if (true || !defender.isHeroic) raiseEvent(new DamageEvent(defender, mover, defender.power));
+                    if (!defender.isHeroic) raiseEvent(new DamageEvent(defender, mover, defender.power));
                     mover.exhaust();
                 }
 

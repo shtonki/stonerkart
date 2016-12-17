@@ -22,7 +22,7 @@ namespace stonerkart
                 mightCost = 0,
                 natureCost = 0,
                 orderCost = 0,
-                colourlessCost = 0;
+                greyCost = 0;
 
             int castRange = -1;
             Effect castEffect = null;
@@ -35,53 +35,62 @@ namespace stonerkart
             switch (ct)
             {
                 case CardTemplate.Belwas:
-                    {
-                        cardType = CardType.Creature;
-                        rarity = Rarity.Rare;
-                        isHeroic = true;
-                        baseMovement = 4;
-                        basePower = 1;
-                        baseToughness = 10;
-                        forceColour = ManaColour.Life;
-                    }
-                    break;
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Rare;
+                    isHeroic = true;
+                    baseMovement = 4;
+                    basePower = 1;
+                    baseToughness = 10;
+                    forceColour = ManaColour.Life;
+                } break;
 
                 case CardTemplate.Kappa:
-                    {
-                        cardType = CardType.Creature;
-                        rarity = Rarity.Common;
-                        baseMovement = 2;
-                        basePower = 1;
-                        baseToughness = 1;
-                        orderCost = 1;
-                        cardType = CardType.Creature;
-                    }
-                    break;
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Common;
+                    baseMovement = 2;
+                    basePower = 1;
+                    baseToughness = 1;
+                    orderCost = 1;
+                    cardType = CardType.Creature;
+                } break;
 
                 case CardTemplate.Cantrip:
-                    {
-                        cardType = CardType.Sorcery;
-                        rarity = Rarity.Common;
+                {
+                    cardType = CardType.Sorcery;
+                    rarity = Rarity.Common;
 
-                        orderCost = 1;
-                        castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)),
-                            new DrawCardsDoer(1));
-                        castDescription = "Draw 1 card.";
+                    orderCost = 1;
+                    castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)),
+                        new DrawCardsDoer(1));
+                    castDescription = "Draw a card.";
 
-                    }
-                    break;
+                } break;
 
                 case CardTemplate.Zap:
-                    {
-                        cardType = CardType.Instant;
-                        rarity = Rarity.Common;
+                {
+                    cardType = CardType.Instant;
+                    rarity = Rarity.Common;
 
-                        castRange = 3;
-                        chaosCost = 1;
-                        castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), new ZepperDoer(2));
-                        castDescription = "Deal 2 damage to target creature.";
-                    }
-                    break;
+                    castRange = 3;
+                    chaosCost = 1;
+                    castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), new ZepperDoer(2));
+                    castDescription = "Deal 2 damage to target creature.";
+                } break;
+
+                case CardTemplate.Temple_Healer:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Uncommon;
+
+                    basePower = 3;
+                    baseToughness = 4;
+                    baseMovement = 2;
+
+                    lifeCost = 2;
+                    greyCost = 2;
+                } break;
 
                 default:
                     throw new Exception();
@@ -90,7 +99,7 @@ namespace stonerkart
 
             #endregion
 
-            ManaCost cmc = new ManaCost(chaosCost, deathCost, lifeCost, mightCost, natureCost, orderCost, colourlessCost);
+            ManaCost cmc = new ManaCost(chaosCost, deathCost, lifeCost, mightCost, natureCost, orderCost, greyCost);
 
             power = new Modifiable<int>(basePower);
             power.addObserver(this);

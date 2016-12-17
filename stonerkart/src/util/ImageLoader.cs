@@ -47,9 +47,14 @@ namespace stonerkart
                     return Resources.artAlterFate;
                 }
 
+                case CardTemplate.Temple_Healer:
+                {
+                    return Resources.artTempleHealer;
+                }
+
                 default:
                 {
-                    return Resources.orbLife;
+                    return Resources.artNothing;
                 }
             }
         }
