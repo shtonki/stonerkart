@@ -26,7 +26,6 @@ namespace stonerkart
         private List<GameEventHandler> geFilters = new List<GameEventHandler>();
         private Stack<StackWrapper> wrapperStack = new Stack<StackWrapper>();
 
-
         private IEnumerable<Card> triggerableCards => cards.Where(card => card.location.pile != PileLocation.Deck);
 
         private Random random;
@@ -65,7 +64,8 @@ namespace stonerkart
                 List<Card> deck = new List<Card>();
                 for (int j = 0; j < 10; j++)
                 {
-                    Card c = createCard(CardTemplate.Cantrip, p, p.deck);
+                    Card c = createCard(CardTemplate.Zap, p, p.deck);
+                    Card c1 = createCard(CardTemplate.Kappa, p, p.deck);
                 }
                 p.loadDeck(deck);
                 p.deck.shuffle(random);
@@ -181,7 +181,7 @@ namespace stonerkart
 
             geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>
             {
-                if (e.card.tile != null)
+                if (e.nullTile && e.card.tile != null)
                 {
                     e.card.tile.removeCard();
                     e.card.tile = null;
@@ -219,7 +219,6 @@ namespace stonerkart
                     }
                     addToMe[controllerIndex].AddRange(abilities);
                 }
-
             }
 
             bool remodify = false;
@@ -299,8 +298,7 @@ namespace stonerkart
 
         private void doStep(Steps step)
         {
-            raiseEvent(new StartOfStepEvent(activePlayer, Steps.Untap));
-            enforceRules();
+            raiseEvent(new StartOfStepEvent(activePlayer, step));
 
             switch (step)
             {
@@ -336,7 +334,6 @@ namespace stonerkart
             }
 
             raiseEvent(new EndOfStepEvent(activePlayer, Steps.Untap));
-            enforceRules();
         }
 
         private void untapStep()
@@ -441,8 +438,6 @@ namespace stonerkart
             }
 
             Controller.clearArrows();
-
-            enforceRules();
         }
 
         private void endStep()
@@ -474,6 +469,7 @@ namespace stonerkart
             int c = 0;
             while (true)
             {
+                enforceRules();
                 Player fuckboy = players[(activePlayerIndex + c)%players.Count];
                 StackWrapper? w = priority(fuckboy);
 
@@ -501,7 +497,6 @@ namespace stonerkart
                         //Controller.redraw();
                     }
                 }
-                enforceRules();
             }
         }
 
@@ -672,14 +667,12 @@ namespace stonerkart
 
             if (card.cardType == CardType.Creature)
             {
-                raiseEvent(new MoveToPileEvent(card, card.controller.field));
+                raiseEvent(new MoveToPileEvent(card, card.controller.field, false));
             }
             else
             {
-                raiseEvent(new MoveToPileEvent(card, card.owner.graveyard));
+                raiseEvent(new MoveToPileEvent(card, card.owner.graveyard, false));
             }
-
-            enforceRules();
         }
         
         private ManualResetEventSlim callerBacker;

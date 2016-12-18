@@ -14,11 +14,13 @@ namespace stonerkart
     {
         public Pile pile;
         public Card card;
+        public bool nullTile;
 
-        public MoveToPileEvent(Card card, Pile pile)
+        public MoveToPileEvent(Card card, Pile pile, bool nullTile = true)
         {
             this.pile = pile;
             this.card = card;
+            this.nullTile = nullTile;
         }
     }
 
