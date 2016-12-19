@@ -54,7 +54,6 @@ namespace stonerkart
 
         public bool triggeredBy(GameEvent e)
         {
-            if (card.location.pile != activeIn) return false;
             return filter.filter(e);
         }
     }

@@ -89,6 +89,7 @@ namespace stonerkart
         Stack,
         Deck,
         Graveyard,
+        Displaced
     }
 
     struct Location

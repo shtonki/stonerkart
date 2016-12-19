@@ -73,7 +73,12 @@ namespace stonerkart
                 breadText.Text = card.breadText;
                 manaCostPanel1.setCost(card.castManaCost);
 
-                if (card.cardType == CardType.Creature)
+                if (card.isDummy)
+                {
+                    powerBox.Text = toughnessBox.Text =
+                        castRangeSlashMovementBox.Text = autoFontTextBox1.Text = "";
+                }
+                else if (card.cardType == CardType.Creature)
                 {
                     powerBox.Text = card.power.ToString();
                     toughnessBox.Text = card.toughness.ToString();

@@ -15,6 +15,7 @@ namespace stonerkart
         public Player owner { get; }
         public Player controller { get; }
         public CardTemplate template { get; }
+        public bool isDummy { get; private set; }
         public CardType cardType { get; }
         public Rarity rarity { get; }
         public string breadText => breadTextEx();
@@ -27,7 +28,7 @@ namespace stonerkart
 
         public string typeText => typeTextEx();
 
-        public IEnumerable<Ability> abilities => activatedAbilities;
+        public IEnumerable<Ability> abilities => activatedAbilities.Cast<Ability>().Concat(triggeredAbilities);
         private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
         private List<TriggeredAbility> triggeredAbilities = new List<TriggeredAbility>();
         public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).Cast<ActivatedAbility>().ToArray();
@@ -123,9 +124,9 @@ namespace stonerkart
 
         }
 
-        public TriggeredAbility[] abilitiesTriggeredBy(GameEvent e)
+        public IEnumerable<TriggeredAbility> abilitiesTriggeredBy(GameEvent e)
         {
-            return triggeredAbilities.Where(a => a.triggeredBy(e)).ToArray();
+            return triggeredAbilities.Where(a => a.triggeredBy(e));
         }
 
         public void remodify(GameEvent e)
@@ -135,6 +136,7 @@ namespace stonerkart
                 modifiable.check(e);
             }
         }
+
 
         private string typeTextEx()
         {

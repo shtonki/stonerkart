@@ -16,7 +16,9 @@ namespace stonerkart
         private List<Player> players;
         private List<Card> cards;
 
-        public Pile stack = new Pile(new Location(null, PileLocation.Stack));
+        public Pile stack { get; } = new Pile(new Location(null, PileLocation.Stack));
+
+        private List<PendingAbilityStruct> pendingTriggeredAbilities = new List<PendingAbilityStruct>();
 
         private int activePlayerIndex;
         public Player activePlayer => players[activePlayerIndex];
@@ -26,7 +28,8 @@ namespace stonerkart
         private List<GameEventHandler> geFilters = new List<GameEventHandler>();
         private Stack<StackWrapper> wrapperStack = new Stack<StackWrapper>();
 
-        private IEnumerable<Card> triggerableCards => cards.Where(card => card.location.pile != PileLocation.Deck);
+        private IEnumerable<Card> triggerableCards => cards.Where(card => card.location.pile != PileLocation.Deck && !card.isDummy);
+        private IEnumerable<Card> fieldCards => cards.Where(card => card.location.pile == PileLocation.Field);
 
         private Random random;
         private GameConnection connection;
@@ -50,7 +53,7 @@ namespace stonerkart
             for (int i = 0; i < ngs.playerNames.Length; i++)
             {
                 Player p = new Player(this);
-                Card heroCard = createCard(CardTemplate.Belwas, p, p.field);
+                Card heroCard = createCard(CardTemplate.Belwas, p.field, p);
                 p.setHeroCard(heroCard);
 
                 players.Add(p);
@@ -64,8 +67,8 @@ namespace stonerkart
                 List<Card> deck = new List<Card>();
                 for (int j = 0; j < 10; j++)
                 {
-                    Card c = createCard(CardTemplate.Zap, p, p.deck);
-                    Card c1 = createCard(CardTemplate.Kappa, p, p.deck);
+                    Card c = createCard(CardTemplate.Zap, p.deck, p);
+                    Card c1 = createCard(CardTemplate.Kappa, p.deck, p);
                 }
                 p.loadDeck(deck);
                 p.deck.shuffle(random);
@@ -76,12 +79,17 @@ namespace stonerkart
             setupHandlers();
         }
 
-        public Card createCard(CardTemplate ct, Player owner, Pile pile)
+        public Card createCard(CardTemplate ct, Pile pile, Player owner = null, bool dummy = false)
         {
-            Card r = new Card(ct, owner);
+            Card r = new Card(ct, owner, dummy);
             cards.Add(r);
             r.moveTo(pile);
             return r;
+        }
+
+        private Card createDummy(Card from, Pile pile)
+        {
+            return createCard(from.template, pile, from.controller, true);
         }
 
         public int ord(Card c)
@@ -137,7 +145,10 @@ namespace stonerkart
 
             geFilters.Add(new GameEventHandler<DrawEvent>(e =>
             {
-                e.player.deck.peek().moveTo(e.player.hand);
+                for (int i = 0; i < e.cards; i++)
+                {
+                    e.player.deck.peek().moveTo(e.player.hand);
+                }
             }));
 
             geFilters.Add(new GameEventHandler<CastEvent>(e =>
@@ -167,8 +178,6 @@ namespace stonerkart
                     if (path.penultimate.card != null && path.penultimate.card != mover) throw new Exception();
 
                     mover.moveTo(path.penultimate);
-                    raiseEvent(new DamageEvent(mover, defender, mover.power));
-                    if (!defender.isHeroic) raiseEvent(new DamageEvent(defender, mover, defender.power));
                     mover.exhaust();
                 }
 
@@ -186,72 +195,8 @@ namespace stonerkart
                     e.card.tile.removeCard();
                     e.card.tile = null;
                 }
-                e.card.moveTo(e.pile);
+                e.card.moveTo(e.to);
             }));
-        }
-
-        private void raiseEvent(GameEvent e)
-        {
-            List<TriggeredAbility>[] preLists = players.Select(p => new List<TriggeredAbility>()).ToArray();
-            List<TriggeredAbility>[] postLists = players.Select(p => new List<TriggeredAbility>()).ToArray();
-
-            foreach (Card card in triggerableCards)
-            {
-                int controllerIndex = ord(card.controller);
-                TriggeredAbility[] abilities = card.abilitiesTriggeredBy(e);
-
-                foreach (TriggeredAbility ability in abilities)
-                {
-                    List<TriggeredAbility>[] addToMe;
-                    switch (ability.timing)
-                    {
-                        case TriggeredAbility.Timing.Post:
-                        {
-                            addToMe = postLists;
-                        } break;
-
-                        case TriggeredAbility.Timing.Pre:
-                        {
-                            addToMe = preLists;
-                        } break;
-
-                        default: throw new Exception();
-                    }
-                    addToMe[controllerIndex].AddRange(abilities);
-                }
-            }
-
-            bool remodify = false;
-
-            foreach (Player p in players)
-            {
-                List<TriggeredAbility> triggered = preLists[ord(p)];
-                if (triggered.Count > 1) throw new NotImplementedException();
-
-                foreach (TriggeredAbility a in triggered)
-                {
-                    remodify = true;
-                    var ts = getCastTargets(a, p.heroCard.tile);
-                }
-            }
-
-            if (remodify)
-            {
-                foreach (Card card in cards)
-                {
-                    card.remodify(e);
-                }
-            }
-
-            foreach (GameEventHandler handler in geFilters)
-            {
-                handler.handle(e);
-            }
-
-            foreach (Card card in cards)
-            {
-                card.remodify(e);
-            }
         }
 
         public void startGame()
@@ -298,8 +243,7 @@ namespace stonerkart
 
         private void doStep(Steps step)
         {
-            raiseEvent(new StartOfStepEvent(activePlayer, step));
-
+            handleTransaction(new StartOfStepEvent(activePlayer, step));
             switch (step)
             {
                 case Steps.Untap:
@@ -333,7 +277,7 @@ namespace stonerkart
                 } break;
             }
 
-            raiseEvent(new EndOfStepEvent(activePlayer, Steps.Untap));
+            handleTransaction(new EndOfStepEvent(activePlayer, Steps.Untap));
         }
 
         private void untapStep()
@@ -369,7 +313,7 @@ namespace stonerkart
 
         private void drawStep()
         {
-            raiseEvent(new DrawEvent(activePlayer, 1));
+            handleTransaction(new DrawEvent(activePlayer, 1));
         }
 
         private void mainStep()
@@ -430,12 +374,26 @@ namespace stonerkart
             //todo raise MoveDeclared events lmfao
             priority();
 
+            GameTransaction gt = new GameTransaction();
+
             foreach (var v in paths)
             {
-                Card c = v.Item1;
-                Path p = v.Item2;
-                raiseEvent(new MoveEvent(c, p));
+                Card card = v.Item1;
+                Path path = v.Item2;
+
+                if (path.to.card != null)
+                {
+                    Card mover = card;
+                    Card defender = path.to.card;
+
+                    gt.addEvent(new DamageEvent(mover, defender, mover.power));
+                    if (!defender.isHeroic) gt.addEvent(new DamageEvent(defender, mover, defender.power));
+                }
+                
+                gt.addEvent(new MoveEvent(card, path));
             }
+
+            handleTransaction(gt);
 
             Controller.clearArrows();
         }
@@ -445,12 +403,87 @@ namespace stonerkart
             activePlayerIndex = (activePlayerIndex + 1)%players.Count;
         }
 
+        private void handleTransaction(GameEvent e)
+        {
+            handleTransaction(new GameTransaction(e));
+        }
+
+        private void handleTransaction(GameTransaction t)
+        {
+            var gameEvents = t.events;
+
+            foreach (GameEvent e in gameEvents)
+            {
+                foreach (Card card in triggerableCards)
+                {
+                    var abilities = card.abilitiesTriggeredBy(e);
+                    pendingTriggeredAbilities.AddRange(
+                        abilities.Where(a => a.timing == TriggeredAbility.Timing.Pre).Select(a => new PendingAbilityStruct(a, card)));
+                }
+            }
+
+
+            foreach (GameEvent e in gameEvents)
+            {
+                foreach (GameEventHandler handler in geFilters)
+                {
+                    handler.handle(e);
+                }
+
+                foreach (Card card in cards)
+                {
+                    card.remodify(e);
+                }
+            }
+
+            foreach (GameEvent e in gameEvents)
+            {
+                foreach (Card card in triggerableCards)
+                {
+                    var abilities = card.abilitiesTriggeredBy(e);
+                    pendAbilities(abilities.Where(a => a.timing == TriggeredAbility.Timing.Post).Select(a => new PendingAbilityStruct(a, card)));
+                }
+            }
+        }
+
+        private void pendAbilities(IEnumerable<PendingAbilityStruct> tas)
+        {
+            if (tas.Count() == 0) return;
+            pendingTriggeredAbilities.AddRange(tas);
+        }
+
         private void enforceRules()
         {
-            List<Card> trashcan = new List<Card>();
-            foreach (Card c in triggerableCards)
+            if (pendingTriggeredAbilities.Count > 0)
             {
-                if (c.hasPT && c.toughness <= 0)
+                List<PendingAbilityStruct>[] abilityArrays = players.Select(p => new List<PendingAbilityStruct>()).ToArray();
+
+                foreach (PendingAbilityStruct pending in pendingTriggeredAbilities)
+                {
+                    int ix = ord(pending.card.controller);
+                    abilityArrays[ix].Add(pending);
+                }
+
+                for (int i = 0; i < abilityArrays.Length; i++)
+                {
+                    Player p = playerFromOrd(i);
+                    List<PendingAbilityStruct> abilityList = abilityArrays[i];
+                    
+                    if (abilityList.Count > 1) throw new NotImplementedException();
+
+                    foreach (PendingAbilityStruct str in abilityList)
+                    {
+                        var v = cast(p, createDummy(str.card, p.displaced), str.ability);
+                        if (!v.HasValue) throw new Exception();
+                        playerCasts(p, v.Value);
+                    }
+                }
+            }
+
+            List<Card> trashcan = new List<Card>();
+            foreach (Card c in fieldCards)
+            {
+                if (c.toughness <= 0)
                 {
                     trashcan.Add(c);
                 }
@@ -458,9 +491,9 @@ namespace stonerkart
 
             foreach (Card c in trashcan)
             {
-                raiseEvent(new MoveToPileEvent(c, c.owner.graveyard));
+                handleTransaction(new MoveToPileEvent(c, c.owner.graveyard));
             }
-
+            pendingTriggeredAbilities.Clear();
             Controller.redraw();
         }
 
@@ -475,8 +508,7 @@ namespace stonerkart
 
                 if (w.HasValue)
                 {
-                    raiseEvent(new PayCostsEvent(activePlayer, w.Value.ability, w.Value.costs));
-                    raiseEvent(new CastEvent(w.Value));
+                    playerCasts(activePlayer, w.Value);
                     c = 0;
                 }
                 else //pass
@@ -528,9 +560,17 @@ namespace stonerkart
             return (Tile)v;
         }
 
+        private void playerCasts(Player p, StackWrapper w)
+        {
+            GameTransaction gt = new GameTransaction();
+            gt.addEvent(new PayCostsEvent(p, w.ability, w.costs));
+            gt.addEvent(new CastEvent(w));
+            handleTransaction(gt);
+        }
+
         private StackWrapper? priority(Player p)
         {
-            return cast(p, null);
+            return cast(p);
         }
 
         private StackWrapper? cast(Player p, Card card = null, Ability ability = null, TargetMatrix[] targets = null, int[][] costs = null)
@@ -660,19 +700,22 @@ namespace stonerkart
                 events.AddRange(effect.doer.act(matrix.generateRows()));
             }
 
-            foreach (GameEvent e in events)
-            {
-                raiseEvent(e);
-            }
+            GameTransaction gt = new GameTransaction(events);
 
-            if (card.cardType == CardType.Creature)
+            if (card.isDummy)
             {
-                raiseEvent(new MoveToPileEvent(card, card.controller.field, false));
+                card.pile.remove(card);
+            }
+            else if (card.cardType == CardType.Creature)
+            {
+                gt.addEvent(new MoveToPileEvent(card, card.controller.field, false));
             }
             else
             {
-                raiseEvent(new MoveToPileEvent(card, card.owner.graveyard, false));
+                gt.addEvent(new MoveToPileEvent(card, card.owner.graveyard, false));
             }
+
+            handleTransaction(gt);
         }
         
         private ManualResetEventSlim callerBacker;
@@ -758,6 +801,42 @@ namespace stonerkart
             if (step == Steps.End) step = Steps.Untap;
             else step = (Steps)(((int)step)+1);
             notify(step);
+        }
+    }
+
+    class GameTransaction
+    {
+        public List<GameEvent> events { get; private set; }
+
+        public GameTransaction()
+        {
+            events = new List<GameEvent>();
+        }
+
+        public GameTransaction(IEnumerable<GameEvent> ges) : this(ges.ToArray())
+        {
+        }
+
+        public GameTransaction(params GameEvent[] ges)
+        {
+            events = new List<GameEvent>(ges);
+        }
+
+        public void addEvent(GameEvent e)
+        {
+            events.Add(e);
+        }
+    }
+
+    internal struct PendingAbilityStruct
+    {
+        public TriggeredAbility ability { get; }
+        public Card card { get; }
+
+        public PendingAbilityStruct(TriggeredAbility ability, Card card)
+        {
+            this.ability = ability;
+            this.card = card;
         }
     }
 

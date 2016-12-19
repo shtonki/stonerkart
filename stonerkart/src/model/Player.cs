@@ -11,10 +11,12 @@ namespace stonerkart
         public Card heroCard { get; private set; }
         public readonly Game game;
 
-        public readonly Pile deck;
-        public readonly Pile field;
-        public readonly Pile hand;
-        public readonly Pile graveyard;
+        public Pile deck { get; }
+        public Pile field { get; }
+        public Pile hand { get; }
+        public Pile graveyard { get; }
+
+        public Pile displaced { get; }
 
         public ManaPool manaPool { get; private set; }
 
@@ -27,8 +29,8 @@ namespace stonerkart
             deck = new Pile(new Location(this, PileLocation.Deck));
             field = new Pile(new Location(this, PileLocation.Field));
             hand = new Pile(new Location(this, PileLocation.Hand));
-            graveyard = new Pile(new Location(this, PileLocation.Hand));
-
+            graveyard = new Pile(new Location(this, PileLocation.Graveyard));
+            displaced = new Pile(new Location(this, PileLocation.Displaced));
 
             manaPool = new ManaPool();
         }

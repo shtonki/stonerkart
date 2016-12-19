@@ -8,9 +8,11 @@ namespace stonerkart
 {
     partial class Card
     {
-        public Card(CardTemplate ct, Player owner = null)
+        public Card(CardTemplate ct, Player owner = null, bool isDummy = false)
         {
             template = ct;
+            this.isDummy = isDummy;
+
 
             int basePower = -1;
             int baseToughness = -1;
@@ -53,7 +55,27 @@ namespace stonerkart
                     basePower = 1;
                     baseToughness = 1;
                     orderCost = 1;
-                    cardType = CardType.Creature;
+
+
+                    Effect e = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)), new DrawCardsDoer(2));
+                    Cost c = new Cost();
+                    GameEventFilter t =
+                        new TypedGameEventFilter<MoveToPileEvent>(
+                            moveEvent =>
+                            {
+                                if (moveEvent.card == this && location.pile == PileLocation.Field)
+                                {
+                                    return true;
+                                }
+                                return false;
+                            });
+                    TriggeredAbility ta = new TriggeredAbility(
+                        this, PileLocation.Field, new []{e}, 0, 
+                        c, t, TriggeredAbility.Timing.Post, 
+                        "Whenever Kappa enters the battlefield under your control you draw two cards.");
+                    triggeredAbilities.Add(ta);
+
+                        cardType = CardType.Creature;
                 } break;
 
                 case CardTemplate.Cantrip:
@@ -90,7 +112,8 @@ namespace stonerkart
 
                     lifeCost = 2;
                     greyCost = 2;
-                } break;
+                }
+                    break;
 
                 default:
                     throw new Exception();
