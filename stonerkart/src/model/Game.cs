@@ -20,7 +20,7 @@ namespace stonerkart
 
         private List<PendingAbilityStruct> pendingTriggeredAbilities = new List<PendingAbilityStruct>();
 
-        private int activePlayerIndex;
+        private int activePlayerIndex { get; set; }
         public Player activePlayer => players[activePlayerIndex];
 
         public StepHandler stepHandler;
@@ -282,6 +282,11 @@ namespace stonerkart
 
         private void untapStep()
         {
+            foreach (Player p in players)
+            {
+                p.setActive(p == activePlayer);
+            }
+
             activePlayer.resetMana();
 
             ManaOrbSelection selection;
@@ -309,11 +314,15 @@ namespace stonerkart
             }
 
             activePlayer.gainMana(selection.orb);
+
+            priority();
         }
 
         private void drawStep()
         {
             handleTransaction(new DrawEvent(activePlayer, 1));
+
+            priority();
         }
 
         private void mainStep()
@@ -400,6 +409,8 @@ namespace stonerkart
 
         private void endStep()
         {
+            priority();
+
             activePlayerIndex = (activePlayerIndex + 1)%players.Count;
         }
 
@@ -460,6 +471,7 @@ namespace stonerkart
                 handlePendingTrigs();
                 trashcanDeadCreatures();
             } while (pendingTriggeredAbilities.Count > 0);
+            Controller.redraw();
         }
 
         private void handlePendingTrigs()
@@ -484,7 +496,7 @@ namespace stonerkart
 
                     foreach (PendingAbilityStruct str in abilityList)
                     {
-                        var v = cast(p, createDummy(str.card, p.displaced), str.ability);
+                        var v = cast(p, false, createDummy(str.card, p.displaced), str.ability);
                         if (!v.HasValue) throw new Exception();
                         playerCasts(p, v.Value);
                     }
@@ -587,10 +599,10 @@ namespace stonerkart
 
         private StackWrapper? priority(Player p)
         {
-            return cast(p);
+            return cast(p, true);
         }
 
-        private StackWrapper? cast(Player p, Card card = null, Ability ability = null, TargetMatrix[] targets = null, int[][] costs = null)
+        private StackWrapper? cast(Player p, bool cancellable, Card card = null, Ability ability = null, TargetMatrix[] targets = null, int[][] costs = null)
         {
             int lv = 0;
             int bt = 0;
@@ -611,6 +623,12 @@ namespace stonerkart
                     }
                     else if (lv == 1)
                     {
+                        Ability ab = chooseAbility(card);
+                        if (ab != null && !ab.cost.possible(p))
+                        {
+                            lv = bt;
+                            continue;
+                        }
                         stuff = ability = chooseAbility(card);
                     }
                     else if (lv == 2)
@@ -624,9 +642,9 @@ namespace stonerkart
                     }
                     else if (lv == 4)
                     {
-                        r = new StackWrapper(card, ability, targets, costs);
+                        stuff = r = new StackWrapper(card, ability, targets, costs);
                     }
-
+                    if (cancellable && stuff == null) return null;
                     lv += stuff == null ? -1 : 1;
                 }
                 connection.sendAction(new CastSelection(r));

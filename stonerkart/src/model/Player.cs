@@ -118,5 +118,10 @@ namespace stonerkart
             manaPool.subtractCurrent(iz);
             notify(new PlayerChangedArgs(this));
         }
+
+        public void setActive(bool b)
+        {
+            notify(new PlayerChangedArgs(b));
+        }
     }
 }
