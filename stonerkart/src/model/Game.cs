@@ -68,7 +68,7 @@ namespace stonerkart
                 for (int j = 0; j < 10; j++)
                 {
                     Card c = createCard(CardTemplate.Zap, p.deck, p);
-                    Card c1 = createCard(CardTemplate.Kappa, p.deck, p);
+                    Card c1 = createCard(CardTemplate.Yung_Lich, p.deck, p);
                 }
                 p.loadDeck(deck);
                 p.deck.shuffle(random);
@@ -417,8 +417,8 @@ namespace stonerkart
                 foreach (Card card in triggerableCards)
                 {
                     var abilities = card.abilitiesTriggeredBy(e);
-                    pendingTriggeredAbilities.AddRange(
-                        abilities.Where(a => a.timing == TriggeredAbility.Timing.Pre).Select(a => new PendingAbilityStruct(a, card)));
+                    var card1 = card;
+                    pendAbilities(abilities.Where(a => a.timing == TriggeredAbility.Timing.Pre).Select(a => new PendingAbilityStruct(a, card1)));
                 }
             }
 
@@ -441,7 +441,8 @@ namespace stonerkart
                 foreach (Card card in triggerableCards)
                 {
                     var abilities = card.abilitiesTriggeredBy(e);
-                    pendAbilities(abilities.Where(a => a.timing == TriggeredAbility.Timing.Post).Select(a => new PendingAbilityStruct(a, card)));
+                    var card1 = card;
+                    pendAbilities(abilities.Where(a => a.timing == TriggeredAbility.Timing.Post).Select(a => new PendingAbilityStruct(a, card1)));
                 }
             }
         }
@@ -454,9 +455,19 @@ namespace stonerkart
 
         private void enforceRules()
         {
+            do
+            {
+                handlePendingTrigs();
+                trashcanDeadCreatures();
+            } while (pendingTriggeredAbilities.Count > 0);
+        }
+
+        private void handlePendingTrigs()
+        {
             if (pendingTriggeredAbilities.Count > 0)
             {
-                List<PendingAbilityStruct>[] abilityArrays = players.Select(p => new List<PendingAbilityStruct>()).ToArray();
+                List<PendingAbilityStruct>[] abilityArrays =
+                    players.Select(p => new List<PendingAbilityStruct>()).ToArray();
 
                 foreach (PendingAbilityStruct pending in pendingTriggeredAbilities)
                 {
@@ -468,7 +479,7 @@ namespace stonerkart
                 {
                     Player p = playerFromOrd(i);
                     List<PendingAbilityStruct> abilityList = abilityArrays[i];
-                    
+
                     if (abilityList.Count > 1) throw new NotImplementedException();
 
                     foreach (PendingAbilityStruct str in abilityList)
@@ -479,7 +490,11 @@ namespace stonerkart
                     }
                 }
             }
+            pendingTriggeredAbilities.Clear();
+        }
 
+        private void trashcanDeadCreatures()
+        { 
             List<Card> trashcan = new List<Card>();
             foreach (Card c in fieldCards)
             {
@@ -489,12 +504,14 @@ namespace stonerkart
                 }
             }
 
+            GameTransaction gt = new GameTransaction();
+
             foreach (Card c in trashcan)
             {
-                handleTransaction(new MoveToPileEvent(c, c.owner.graveyard));
+                gt.addEvent(new MoveToPileEvent(c, c.owner.graveyard));
             }
-            pendingTriggeredAbilities.Clear();
-            Controller.redraw();
+
+            handleTransaction(gt);
         }
 
         private void priority()

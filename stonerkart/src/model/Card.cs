@@ -181,6 +181,7 @@ namespace stonerkart
         Kappa,
         Cantrip,
         Temple_Healer,
+        Yung_Lich,
     }
 
     enum CardType

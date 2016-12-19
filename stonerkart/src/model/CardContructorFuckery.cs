@@ -51,10 +51,12 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
+
                     baseMovement = 2;
-                    basePower = 1;
-                    baseToughness = 1;
-                    orderCost = 1;
+                    basePower = 2;
+                    baseToughness = 2;
+                    orderCost = 3;
+                    greyCost = 1;
 
 
                     Effect e = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)), new DrawCardsDoer(2));
@@ -72,11 +74,40 @@ namespace stonerkart
                     TriggeredAbility ta = new TriggeredAbility(
                         this, PileLocation.Field, new []{e}, 0, 
                         c, t, TriggeredAbility.Timing.Post, 
-                        "Whenever Kappa enters the battlefield under your control you draw two cards.");
+                        "Whenever this creature enters the battlefield under your control, draw two cards.");
                     triggeredAbilities.Add(ta);
-
-                        cardType = CardType.Creature;
                 } break;
+
+                case CardTemplate.Yung_Lich:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Common;
+
+                    baseMovement = 2;
+                    basePower = 1;
+                    baseToughness = 1;
+                    orderCost = 1;
+                    deathCost = 1;
+
+
+                    Effect e = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)), new DrawCardsDoer(1));
+                    Cost c = new Cost();
+                    GameEventFilter t =
+                        new TypedGameEventFilter<MoveToPileEvent>(
+                            moveEvent =>
+                            {
+                                if (moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard && location.pile == PileLocation.Field)
+                                {
+                                    return true;
+                                }
+                                return false;
+                            });
+                    TriggeredAbility ta = new TriggeredAbility(
+                        this, PileLocation.Field, new[] { e }, 0,
+                        c, t, TriggeredAbility.Timing.Pre,
+                        "Whenever this creature enters the graveyard from the battlefield under your control, draw a card.");
+                    triggeredAbilities.Add(ta);
+                    } break;
 
                 case CardTemplate.Cantrip:
                 {

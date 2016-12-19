@@ -145,5 +145,6 @@ namespace stonerkart
         Nature,
         Order,
         Chaos,
+        Multi,
     }
 }

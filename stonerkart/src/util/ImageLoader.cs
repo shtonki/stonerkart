@@ -27,6 +27,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Yung_Lich:
+                {
+                    return Resources.artYungLich;
+                }
+
                 case CardTemplate.Belwas:
                 {
                     return Resources.artBelwas;
@@ -75,40 +80,45 @@ namespace stonerkart
         {
             switch (colour)
             {
+                case ManaColour.Multi:
+                {
+                    return Resources.frameMulti;
+                }
+
                 case ManaColour.Death:
                 {
                     return Resources.frameDeath;
-                } break;
+                } 
 
                 case ManaColour.Life:
                 {
                     return Resources.lifeFrame;
-                } break;
+                } 
 
                 case ManaColour.Chaos:
                 {
                     return Resources.frameChaos;
-                } break;
+                } 
 
                 case ManaColour.Nature:
                 {
                     return Resources.frameNature;
-                } break;
+                } 
 
                 case ManaColour.Might:
                 {
                     return Resources.frameMight;
-                } break;
+                } 
                         
                 case ManaColour.Order:
                 {
                     return Resources.frameOrder;
-                } break;
+                } 
 
                 case ManaColour.Colourless:
                 {
                     return Resources.frameGrey;
-                } break;
+                } 
             }
             throw new Exception();
         }

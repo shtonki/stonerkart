@@ -64,7 +64,7 @@ namespace stonerkart
                 }
                 else
                 {
-                    throw new Exception();
+                    frameImage.Image = ImageLoader.frameImage(ManaColour.Multi);
                 }
                 art.Image = ImageLoader.artImage(card.template);
 
