@@ -22,6 +22,7 @@ namespace stonerkart.src.view
         private CardView cardView9;
         private CardView cardView10;
         private TextBox searchBox;
+        private CardsPanel cardsPanel1;
         private Panel manaPanel;
         private CardView[] cardViews;
         private ManaButton[] manaButtons;
@@ -30,11 +31,16 @@ namespace stonerkart.src.view
         private List<Card> allCards;
         private List<CardTemplate> myCurrentDeck;
 
+        private CardTemplate[] filteredCards;
+        private CardTemplate?[] shownCards;
+        private int page;
+        private Pile deck;
+
         public DeckEditorPanel()
         {
             InitializeComponent();
             myCurrentDeck = new List<CardTemplate>();
-            var cards = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().Where(x => x != CardTemplate.Hero && x != CardTemplate.AlterTime);
+            var cards = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>();
             allCards = new List<Card>();
             foreach (var c in cards)
             {
@@ -74,11 +80,39 @@ namespace stonerkart.src.view
                 var c1 = c;
                 c.Click += (sender, args) =>
                 {
-                    myCurrentDeck.Add(c1.card.);
+                    myCurrentDeck.Add(c1.card.template);
+                };
+            }
+
+            drawCards(x => true);
+            page = 0;
+            deck = new Pile();
+            cardsPanel1.setPile(deck);
+            cardsPanel1.vertical = true;
+            shownCards = new CardTemplate?[cardViews.Length];
+
+            //var inte detta en foreach förut?
+            foreach(var c in cardViews)
+            {
+                var c1 = c;
+                c.Click += (sender, args) =>
+                {
+                    myCurrentDeck.Add(c1.card.template);
                 };
             }
             drawCards(x => true);
             onResize();
+        }
+
+        private void filterCards(Func<CardTemplate, bool> filter)
+        {
+            filteredCards = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().Where(filter).ToArray();
+            drawCards(x=> true);
+        }
+        private void newSearch(object sender, EventArgs e)
+        {
+            //whut you gon done do to it? bara renameat?
+            filterCards(x => x.ToString().ToLower().Contains(searchBox.Text));
         }
 
         private void onResize()
@@ -88,6 +122,29 @@ namespace stonerkart.src.view
                 manaButtons[i].SetBounds(i * manaPanel.Width / 6, 0, manaPanel.Width / 6, manaPanel.Height);
             }
         }
+
+        private void newManaFilter(ManaButton mb)
+        {
+
+        }
+
+
+        private void drawCards(Func<CardTemplate, bool> filter)
+        {
+            var cards = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().Where(filter);
+
+            for (int i = 0; i < cardViews.Length; i++)
+            {
+                if (i < cards.Count())
+                {
+                    cardViews[i].setCard(cards.ElementAt(i));
+                    cardViews[i].Visible = true;
+                }
+                else
+                    cardViews[i].Visible = false;
+            }
+        }
+
 
         private void InitializeComponent()
         {
@@ -103,7 +160,19 @@ namespace stonerkart.src.view
             this.manaPanel = new System.Windows.Forms.Panel();
             this.cardView4 = new stonerkart.CardView();
             this.cardView7 = new stonerkart.CardView();
+            this.cardsPanel1 = new CardsPanel();
             this.SuspendLayout();
+
+            //
+            // cardsPanel1
+            //
+            this.cardsPanel1.BackColor = System.Drawing.Color.Navy;
+            this.cardsPanel1.Location = new System.Drawing.Point(870, 3);
+            this.cardsPanel1.Name = "cardsPanel1";
+            this.cardsPanel1.Size = new System.Drawing.Size(147, 646);
+            this.cardsPanel1.TabIndex = 14;
+            this.cardsPanel1.vertical = false;
+
             // 
             // cardView1
             // 
@@ -203,6 +272,7 @@ namespace stonerkart.src.view
             // DeckEditorPanel
             // 
             this.BackColor = System.Drawing.Color.Aqua;
+            this.Controls.Add(this.cardsPanel1);
             this.Controls.Add(this.manaPanel);
             this.Controls.Add(this.searchBox);
             this.Controls.Add(this.cardView6);
@@ -221,32 +291,5 @@ namespace stonerkart.src.view
             this.PerformLayout();
 
         }
-
-        private void drawCards(Func<CardTemplate, bool> filter)
-        {
-            var cards = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().Where(x => x != CardTemplate.Hero && x != CardTemplate.AlterTime).Where(filter);
-
-            for (int i = 0; i < cardViews.Length; i++)
-            {
-                if (i < cards.Count())
-                {
-                    cardViews[i].setCard(cards.ElementAt(i));
-                    cardViews[i].Visible = true;
-                }
-                else
-                    cardViews[i].Visible = false;
-            }
-        }
-
-        private void newManaFilter(ManaButton mb)
-        {
-
-        }
-
-        private void newSearch(object sender, EventArgs e)
-        {
-            drawCards(x => x.ToString().ToLower().Contains(searchBox.Text));
-        }
-
     }
 }
