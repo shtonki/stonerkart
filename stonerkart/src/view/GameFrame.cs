@@ -33,7 +33,7 @@ namespace stonerkart
             mapEditorScreen = new MapEditor();
             deckEditorScreen = new DeckEditorPanel();
             loginPanel = new LoginScreen();
-            Closed += (_, __) => Environment.Exit(1);
+            Closed += (_, __) => Controller.quit();
             Resize += (_, __) =>
             {
                 int w = ClientSize.Width;

@@ -101,6 +101,7 @@
     <Compile Include="src\network\ServerConnection.cs" />
     <Compile Include="src\util\ImageLoader.cs" />
     <Compile Include="src\util\Observable.cs" />
+    <Compile Include="src\util\Settings.cs" />
     <Compile Include="src\view\AutoFontTextBox.cs">
       <SubType>Component</SubType>
     </Compile>

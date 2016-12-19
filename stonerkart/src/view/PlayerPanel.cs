@@ -21,7 +21,7 @@ namespace stonerkart
         {
             if (t.active.HasValue)
             {
-                Color c = t.active.Value ? Color.RoyalBlue : Color.Olive;
+                Color c = t.active.Value ? StepPanel.on : StepPanel.off;
                 BackColor = c;
                 //manaPanel1.BackColor = c;
             }

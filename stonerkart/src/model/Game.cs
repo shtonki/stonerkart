@@ -68,7 +68,7 @@ namespace stonerkart
                 for (int j = 0; j < 10; j++)
                 {
                     Card c = createCard(CardTemplate.Zap, p.deck, p);
-                    Card c1 = createCard(CardTemplate.Yung_Lich, p.deck, p);
+                    //Card c1 = createCard(CardTemplate.Yung_Lich, p.deck, p);
                 }
                 p.loadDeck(deck);
                 p.deck.shuffle(random);
@@ -171,7 +171,7 @@ namespace stonerkart
                 if (defender == null)
                 {
                     mover.moveTo(destination);
-                    mover.movement.modify(-path.length, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(mover));
+                    mover.movement.modify(-path.length, ModifiableSchmoo.intAdd, ModifiableSchmoo.never);
                 }
                 else
                 {
@@ -180,12 +180,11 @@ namespace stonerkart
                     mover.moveTo(path.penultimate);
                     mover.exhaust();
                 }
-
             }));
 
             geFilters.Add(new GameEventHandler<DamageEvent>(e =>
             {
-                e.target.toughness.modify(-e.amount, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfEndStep);
+                e.target.toughness.modify(-e.amount, ModifiableSchmoo.intAdd, ModifiableSchmoo.never);
             }));
 
             geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>
@@ -613,6 +612,7 @@ namespace stonerkart
             StackWrapper? r = null;
             if (p == hero)
             {
+                if (cancellable && !Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)) return null;
                 Tile from = p.heroCard.tile;
                 while (lv >= bt && r == null)
                 {
@@ -620,15 +620,11 @@ namespace stonerkart
                     if (lv == 0)
                     {
                         stuff = card = getCard(c => c.controller == p, "Cast a card");
+                        if (cancellable && stuff == null) return null;
                     }
                     else if (lv == 1)
                     {
                         Ability ab = chooseAbility(card);
-                        if (ab != null && !ab.cost.possible(p))
-                        {
-                            lv = bt;
-                            continue;
-                        }
                         stuff = ability = chooseAbility(card);
                     }
                     else if (lv == 2)
@@ -644,8 +640,7 @@ namespace stonerkart
                     {
                         stuff = r = new StackWrapper(card, ability, targets, costs);
                     }
-                    if (cancellable && stuff == null) return null;
-                    lv += stuff == null ? -1 : 1;
+                    lv = stuff == null ? bt : lv+1;
                 }
                 connection.sendAction(new CastSelection(r));
             }
@@ -661,32 +656,20 @@ namespace stonerkart
         private ActivatedAbility chooseAbility(Card c)
         {
             ActivatedAbility r;
-            ActivatedAbility[] v = c.usableHere;
-            bool canCastSlow = activePlayer == hero && (stepHandler.step == Steps.Main1 || stepHandler.step == Steps.Main1);
-            if (v.Length > 1) throw new Exception();
-            if (v.Length == 0) return null;
-            r = v[0];
+            ActivatedAbility[] activatableAbilities = c.usableHere;
 
-            if (
-                r.isInstant
-                ||
-                (stack.Count() == 0
-                 &&
-                 (stepHandler.step == Steps.Main1
-                  ||
-                  stepHandler.step == Steps.Main2
-                     )
-                 &&
-                 activePlayer == hero
-                    )
-                )
+            bool canCastSlow = stack.Count == 0 && activePlayer == hero && (stepHandler.step == Steps.Main1 || stepHandler.step == Steps.Main1);
+            if (!canCastSlow)
             {
-                return r;
+                activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
             }
-            else
-            {
-                return null;
-            }
+
+            if (activatableAbilities.Length > 1) throw new NotImplementedException();
+            if (activatableAbilities.Length == 0) return null;
+
+            r = activatableAbilities[0];
+
+            return r;
         }
 
 

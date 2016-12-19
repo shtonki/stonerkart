@@ -36,6 +36,12 @@ namespace stonerkart
             }
         }
 
+        public static void quit()
+        {
+            Settings.saveSettings();
+            Environment.Exit(1);
+        }
+
         public static void challengePlayer(string username)
         {
             Network.challenge(username);

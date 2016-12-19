@@ -31,7 +31,7 @@ namespace stonerkart
         public IEnumerable<Ability> abilities => activatedAbilities.Cast<Ability>().Concat(triggeredAbilities);
         private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
         private List<TriggeredAbility> triggeredAbilities = new List<TriggeredAbility>();
-        public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).Cast<ActivatedAbility>().ToArray();
+        public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).ToArray();
         /// <summary>
         /// Returns a list containing the unique colours of the card. If the card has no mana cost it returns an 
         /// array containing only ManaColour.Colourless.
@@ -171,6 +171,18 @@ namespace stonerkart
         public override string ToString()
         {
             return name;
+        }
+
+        private static Card[] flyweight = Enum.GetValues(typeof (CardTemplate)).Cast<CardTemplate>().Select(ct => (Card)null).ToArray();
+        public static Card fromTemplate(CardTemplate ct)
+        {
+            int ix = (int)ct;
+            if (flyweight[ix] == null)
+            {
+                Card c = new Card(ct);
+                flyweight[ix] = c;
+            }
+            return flyweight[ix];
         }
     }
 

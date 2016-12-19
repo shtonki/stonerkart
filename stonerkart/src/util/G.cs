@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -11,8 +12,33 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
+    class ReduceResult<T>
+    {
+        public IEnumerable<T> values => d.Keys;
+
+        public int this[T t]    // Indexer declaration  
+        {
+            get { return d[t]; }
+        }
+
+        private Dictionary<T, int> d = new Dictionary<T, int>();
+
+        public ReduceResult(IEnumerable<T> e)
+        {
+            foreach (var t in e)
+            {
+                if (!d.ContainsKey(t)) d[t] = 0;
+                d[t] = d[t] + 1;
+            }
+        }
+    }
+
     static class G
     {
+        public static ReduceResult<T> Reduce<T>(this IEnumerable<T> e)
+        {
+            return new ReduceResult<T>(e);
+        }
 
         private static Dictionary<Image, Bitmap> imageCache = new Dictionary<Image, Bitmap>();
 
