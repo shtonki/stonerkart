@@ -36,6 +36,7 @@ namespace stonerkart
 
             switch (ct)
             {
+                #region Belwas
                 case CardTemplate.Belwas:
                 {
                     cardType = CardType.Creature;
@@ -46,13 +47,14 @@ namespace stonerkart
                     baseToughness = 10;
                     forceColour = ManaColour.Life;
                 } break;
-
+                #endregion
+                #region Kappa
                 case CardTemplate.Kappa:
                 {
                     cardType = CardType.Creature;
-                    rarity = Rarity.Common;
+                    rarity = Rarity.Uncommon;
 
-                    baseMovement = 2;
+                    baseMovement = 1;
                     basePower = 2;
                     baseToughness = 2;
                     orderCost = 3;
@@ -77,15 +79,16 @@ namespace stonerkart
                         "Whenever this creature enters the battlefield under your control, draw two cards.");
                     triggeredAbilities.Add(ta);
                 } break;
-
+                #endregion
+                #region Yung Lich
                 case CardTemplate.Yung_Lich:
                 {
                     cardType = CardType.Creature;
-                    rarity = Rarity.Common;
+                    rarity = Rarity.Rare;
 
                     baseMovement = 2;
-                    basePower = 1;
-                    baseToughness = 1;
+                    basePower = 2;
+                    baseToughness = 2;
                     orderCost = 1;
                     deathCost = 1;
 
@@ -107,8 +110,9 @@ namespace stonerkart
                         c, t, TriggeredAbility.Timing.Pre,
                         "Whenever this creature enters the graveyard from the battlefield under your control, draw a card.");
                     triggeredAbilities.Add(ta);
-                    } break;
-
+                } break;
+                #endregion
+                #region Cantrip
                 case CardTemplate.Cantrip:
                 {
                     cardType = CardType.Sorcery;
@@ -120,7 +124,8 @@ namespace stonerkart
                     castDescription = "Draw a card.";
 
                 } break;
-
+                #endregion
+                #region Zap
                 case CardTemplate.Zap:
                 {
                     cardType = CardType.Instant;
@@ -131,7 +136,8 @@ namespace stonerkart
                     castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), new ZepperDoer(2));
                     castDescription = "Deal 2 damage to target creature.";
                 } break;
-
+                #endregion
+                #region Temple Healer
                 case CardTemplate.Temple_Healer:
                 {
                     cardType = CardType.Creature;
@@ -143,8 +149,8 @@ namespace stonerkart
 
                     lifeCost = 2;
                     greyCost = 2;
-                }
-                    break;
+                } break;
+                #endregion
 
                 default:
                     throw new Exception();

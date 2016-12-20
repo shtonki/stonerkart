@@ -18,6 +18,7 @@ namespace stonerkart
         public bool isDummy { get; private set; }
         public CardType cardType { get; }
         public Rarity rarity { get; }
+        public CardSet set { get; }
         public string breadText => breadTextEx();
 
         public Location location => locationEx();
@@ -215,5 +216,10 @@ namespace stonerkart
     {
         Instant,
         Slow,
+    }
+
+    enum CardSet
+    {
+        FirstEdition,
     }
 }

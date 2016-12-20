@@ -221,7 +221,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="codemap.dgml" />
-    <None Include="Resources\14691083_189944301454153_378468379668925571_n.jpg" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -235,6 +234,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="musings.txt" />
+    <None Include="Resources\firstedition.png" />
     <None Include="Resources\frameMight.png" />
     <None Include="Resources\frameOrder.png" />
     <None Include="Resources\Namnlös.png" />
@@ -323,7 +323,6 @@
     <None Include="Resources\death.png" />
     <None Include="Resources\chaos.png" />
     <None Include="Resources\Image1.bmp" />
-    <None Include="Resources\1473797210360.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

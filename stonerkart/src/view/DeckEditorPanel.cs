@@ -22,7 +22,7 @@ namespace stonerkart.src.view
         private CardView cardView9;
         private CardView cardView10;
         private TextBox searchBox;
-        private CardsPanel cardsPanel1;
+        private CardsPanel deckPanel;
         private Panel manaPanel;
         private CardView[] cardViews;
         private ManaButton[] manaButtons;
@@ -35,6 +35,8 @@ namespace stonerkart.src.view
         private CardTemplate?[] shownCards;
         private int page;
         private Pile deck;
+
+        private DeckContraints standardConstraint = new DeckContraints(Format.Standard);
 
         public DeckEditorPanel()
         {
@@ -89,8 +91,8 @@ namespace stonerkart.src.view
 
             page = 0;
             deck = new Pile();
-            cardsPanel1.setPile(deck);
-            cardsPanel1.vertical = true;
+            deckPanel.setPile(deck);
+            deckPanel.vertical = true;
             shownCards = new CardTemplate?[cardViews.Length];
 
             for (int i = 0; i < cardViews.Length; i++)
@@ -105,14 +107,21 @@ namespace stonerkart.src.view
                 };
             }
 
+            deckPanel.clickedCallbacks.Add(clickable =>
+            {
+                Card c = (Card)clickable.getStuff();
+                deck.remove(c);
+            });
+
             filterCards(x => true);
             drawCards();
         }
 
         private void cardClicked(CardTemplate ct)
         {
-            int cc = deck.Count(c => c.template == ct);
-            if (cc >= 3) return;
+            if (!standardConstraint.willBeLegal(CardTemplate.Belwas, deck.Select(c => c.template).ToArray(), ct))
+                return;
+
             deck.addTop(new Card(ct));
         }
 
@@ -173,18 +182,18 @@ namespace stonerkart.src.view
             this.manaPanel = new System.Windows.Forms.Panel();
             this.cardView4 = new stonerkart.CardView();
             this.cardView7 = new stonerkart.CardView();
-            this.cardsPanel1 = new CardsPanel();
+            this.deckPanel = new CardsPanel();
             this.SuspendLayout();
 
             //
             // cardsPanel1
             //
-            this.cardsPanel1.BackColor = System.Drawing.Color.Navy;
-            this.cardsPanel1.Location = new System.Drawing.Point(870, 3);
-            this.cardsPanel1.Name = "cardsPanel1";
-            this.cardsPanel1.Size = new System.Drawing.Size(147, 646);
-            this.cardsPanel1.TabIndex = 14;
-            this.cardsPanel1.vertical = false;
+            this.deckPanel.BackColor = System.Drawing.Color.Navy;
+            this.deckPanel.Location = new System.Drawing.Point(870, 3);
+            this.deckPanel.Name = "deckPanel";
+            this.deckPanel.Size = new System.Drawing.Size(147, 646);
+            this.deckPanel.TabIndex = 14;
+            this.deckPanel.vertical = false;
 
             // 
             // cardView1
@@ -285,7 +294,7 @@ namespace stonerkart.src.view
             // DeckEditorPanel
             // 
             this.BackColor = System.Drawing.Color.Aqua;
-            this.Controls.Add(this.cardsPanel1);
+            this.Controls.Add(this.deckPanel);
             this.Controls.Add(this.manaPanel);
             this.Controls.Add(this.searchBox);
             this.Controls.Add(this.cardView6);
