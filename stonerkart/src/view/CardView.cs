@@ -73,9 +73,15 @@ namespace stonerkart
 
                 nameBox.Text = card.name;
                 cardTypeText.Text = card.typeText;
+
                 breadText.Text = card.breadText;
                 manaCostPanel1.setCost(card.castManaCost);
                 setArtPanel1.setThings(card.set, card.rarity);
+
+                if (card.race.HasValue)
+                {
+                    cardTypeText.Text = card.typeText + " -- " + card.race.Value + " " + (card.subtype?.ToString() ?? "");
+                }
 
                 if (card.isDummy)
                 {

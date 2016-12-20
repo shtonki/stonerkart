@@ -104,40 +104,45 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Nature_Heroman:
+                {
+                    return Resources.artLoneRanger;
+                }
+
                 case CardTemplate.Yung_Lich:
-                    {
-                        return Resources.artYungLich;
-                    }
+                {
+                    return Resources.artYungLich;
+                }
 
                 case CardTemplate.Belwas:
-                    {
-                        return Resources.artBelwas;
-                    }
+                {
+                    return Resources.artBelwas;
+                }
 
                 case CardTemplate.Zap:
-                    {
-                        return Resources.artZap;
-                    }
+                {
+                    return Resources.artZap;
+                }
 
                 case CardTemplate.Kappa:
-                    {
-                        return Resources.artKappa;
-                    }
+                {
+                    return Resources.artKappa;
+                }
 
                 case CardTemplate.Cantrip:
-                    {
-                        return Resources.artAlterFate;
-                    }
+                {
+                    return Resources.artAlterFate;
+                }
 
                 case CardTemplate.Temple_Healer:
-                    {
-                        return Resources.artTempleHealer;
-                    }
+                {
+                    return Resources.artTempleHealer;
+                }
 
                 default:
-                    {
-                        return Resources.artNothing;
-                    }
+                {
+                    return Resources.artNothing;
+                }
             }
         }
 

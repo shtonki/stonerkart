@@ -19,6 +19,10 @@ namespace stonerkart
         public CardType cardType { get; }
         public Rarity rarity { get; }
         public CardSet set { get; }
+        public Race? race { get; }
+        public Subtype? subtype { get; }
+        public int convertedManaCost => castManaCost.orbs.Count();
+
         public string breadText => breadTextEx();
 
         public Location location => locationEx();
@@ -195,6 +199,7 @@ namespace stonerkart
         Cantrip,
         Temple_Healer,
         Yung_Lich,
+        Nature_Heroman,
     }
 
     enum CardType
@@ -221,5 +226,19 @@ namespace stonerkart
     enum CardSet
     {
         FirstEdition,
+    }
+
+    enum Race
+    {
+        Human,
+        Undead,
+        Lizard,
+    }
+
+    enum Subtype
+    {
+        Warrior,
+        Wizard,
+        Cleric,
     }
 }

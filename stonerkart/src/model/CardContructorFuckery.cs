@@ -40,12 +40,15 @@ namespace stonerkart
                 case CardTemplate.Belwas:
                 {
                     cardType = CardType.Creature;
+                    race = Race.Human;
+                    subtype = Subtype.Warrior;
                     rarity = Rarity.Rare;
                     isHeroic = true;
-                    baseMovement = 4;
-                    basePower = 1;
-                    baseToughness = 10;
                     forceColour = ManaColour.Life;
+
+                    baseMovement = 2;
+                    basePower = 2;
+                    baseToughness = 25;
                 } break;
                 #endregion
                 #region Kappa
@@ -53,6 +56,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Uncommon;
+                    race = Race.Lizard;
 
                     baseMovement = 1;
                     basePower = 2;
@@ -151,7 +155,18 @@ namespace stonerkart
                     greyCost = 2;
                 } break;
                 #endregion
-
+                #region Nature Heroman
+                case CardTemplate.Nature_Heroman:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Rare;
+                    isHeroic = true;
+                    baseMovement = 3;
+                    basePower = 1;
+                    baseToughness = 20;
+                    forceColour = ManaColour.Nature;
+                } break;
+                #endregion
                 default:
                     throw new Exception();
             }
