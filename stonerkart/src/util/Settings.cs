@@ -129,6 +129,8 @@ namespace stonerkart
 
     internal static class Settings
     {
+        public static string decksPath { get; set; } = "./";
+
         public static StopTurnSetting stopTurnSetting { get; } = new StopTurnSetting();
 
         private static Dictionary<string, Setting> settingDict;

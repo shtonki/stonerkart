@@ -160,7 +160,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="src\view\StepPanel.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="src\view\StickyPanel.cs">
       <SubType>UserControl</SubType>
@@ -234,6 +234,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="musings.txt" />
+    <None Include="Resources\multi.png" />
     <None Include="Resources\firstedition.png" />
     <None Include="Resources\frameMight.png" />
     <None Include="Resources\frameOrder.png" />

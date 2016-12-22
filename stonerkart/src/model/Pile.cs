@@ -38,6 +38,16 @@ namespace stonerkart
 
         }
 
+        public void addRange(IEnumerable<Card> cs)
+        {
+            PileChangedMessage m = new PileChangedMessage(true, cs.ToArray());
+            foreach (Card c in cs)
+            {
+                cardList.Add(c);
+            }
+            notify(m);
+        }
+
         public Card peek()
         {
             int c = cardList.Count;
@@ -57,6 +67,12 @@ namespace stonerkart
             notify(new PileChangedMessage(false, c));
         }
 
+        public void clear()
+        {
+            PileChangedMessage m = new PileChangedMessage(false, cardList.ToArray());
+            cardList.Clear();
+            notify(m);
+        }
 
         public void shuffle(Random rng)
         {
@@ -107,12 +123,18 @@ namespace stonerkart
     struct PileChangedMessage
     {
         public readonly bool added;
-        public readonly Card card;
+        public readonly Card[] cards;
 
         public PileChangedMessage(bool added, Card card)
         {
             this.added = added;
-            this.card = card;
+            this.cards = new [] { card };
+        }
+
+        public PileChangedMessage(bool added, Card[] cards)
+        {
+            this.added = added;
+            this.cards = cards;
         }
     }
 

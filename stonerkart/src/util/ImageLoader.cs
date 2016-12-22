@@ -104,6 +104,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Risen_Abberation:
+                {
+                    return Resources.artSolemnAberration;
+                }
+
                 case CardTemplate.Nature_Heroman:
                 {
                     return Resources.artLoneRanger;
@@ -217,6 +222,9 @@ namespace stonerkart
 
                 case ManaColour.Colourless:
                     return Properties.Resources.orbColourless;
+
+                case ManaColour.Multi:
+                    return Resources.orbMulti;
 
                 default:
                     throw new Exception();

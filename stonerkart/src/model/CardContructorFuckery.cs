@@ -42,7 +42,7 @@ namespace stonerkart
                     cardType = CardType.Creature;
                     race = Race.Human;
                     subtype = Subtype.Warrior;
-                    rarity = Rarity.Rare;
+                    rarity = Rarity.Legendary;
                     isHeroic = true;
                     forceColour = ManaColour.Life;
 
@@ -159,13 +159,26 @@ namespace stonerkart
                 case CardTemplate.Nature_Heroman:
                 {
                     cardType = CardType.Creature;
-                    rarity = Rarity.Rare;
+                    rarity = Rarity.Legendary;
                     isHeroic = true;
                     baseMovement = 3;
                     basePower = 1;
                     baseToughness = 20;
                     forceColour = ManaColour.Nature;
                 } break;
+                #endregion
+                #region Risen Abberation
+                case CardTemplate.Risen_Abberation:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Common;
+
+                    basePower = 2;
+                    baseToughness = 2;
+                    baseMovement = 1;
+
+                    deathCost = 2;
+                    } break;
                 #endregion
                 default:
                     throw new Exception();

@@ -22,6 +22,48 @@ namespace stonerkart
             this.heroic = heroic;
             this.templates = templates;
         }
+
+        public Deck(string saveText)
+        {
+            string[] ss = saveText.Split(',');
+
+            heroic = parse(ss[0]);
+            
+            templates = new CardTemplate[ss.Length - 1];
+            for (int i = 1; i < ss.Length; i++)
+            {
+                templates[i-1] = parse(ss[i]);
+            }
+        }
+
+        private CardTemplate parse(string s)
+        {
+            CardTemplate xd;
+
+            if (!(CardTemplate.TryParse(s, out xd)))
+            {
+                throw new Exception();
+            }
+
+            return xd;
+        }
+
+        public string toSaveText()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(heroic);
+            sb.Append(',');
+
+            foreach (var ct in templates)
+            {
+                sb.Append(ct);
+                sb.Append(',');
+            }
+            sb.Length--;
+
+            return sb.ToString();
+        }
     }
 
 

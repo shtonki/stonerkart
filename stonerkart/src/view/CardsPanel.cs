@@ -177,11 +177,17 @@ namespace stonerkart
         {
             if (t.added)
             {
-                addCardView(t.card);
+                foreach (Card c in t.cards)
+                {
+                    addCardView(c);
+                }
             }
             else
             {
-                removeCardView(t.card);
+                foreach (Card c in t.cards)
+                {
+                    removeCardView(c);
+                }
             }
             layoutCards();
         }

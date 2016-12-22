@@ -44,9 +44,9 @@ namespace stonerkart
             };
         }
 
-        public DraggablePanel showPanel(Control content)
+        public DraggablePanel showPanel(Control content, bool resizeable = true, bool closeable = true)
         {
-            DraggablePanel r = new DraggablePanel(content);
+            DraggablePanel r = new DraggablePanel(content, resizeable, closeable);
             Controls.Add(r);
             r.BringToFront();
             return r;

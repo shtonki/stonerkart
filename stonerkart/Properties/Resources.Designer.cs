@@ -923,6 +923,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap orbMulti {
+            get {
+                object obj = ResourceManager.GetObject("orbMulti", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap orbNature {
             get {
                 object obj = ResourceManager.GetObject("orbNature", resourceCulture);

@@ -200,6 +200,7 @@ namespace stonerkart
         Temple_Healer,
         Yung_Lich,
         Nature_Heroman,
+        Risen_Abberation,
     }
 
     enum CardType
