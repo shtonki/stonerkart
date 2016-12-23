@@ -104,6 +104,21 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Frothing_Goblin:
+                {
+                    return Resources.artFrothingGoblin;
+                }
+
+                case CardTemplate.Unmake:
+                {
+                    return Resources.artUnmake;
+                }
+
+                case CardTemplate.Shibby_Shtank:
+                {
+                    return Resources.artEssenceOfClarity;
+                }
+
                 case CardTemplate.Risen_Abberation:
                 {
                     return Resources.artSolemnAberration;

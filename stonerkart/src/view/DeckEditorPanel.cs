@@ -43,7 +43,11 @@ namespace stonerkart
         private Button button4;
         private Label formatTextBox;
         private Button button5;
+        private Button button6;
+        private Button button7;
         private DeckContraints currentConstraint = new DeckContraints(Format.Standard);
+
+        private const int cardsPerPage = 10;
 
         public DeckEditorPanel()
         {
@@ -149,6 +153,7 @@ namespace stonerkart
             x.Sort(srt);
             filteredCards = x.ToArray();
 
+            page = 0;
             drawCards();
         }
 
@@ -171,7 +176,7 @@ namespace stonerkart
 
         private void drawCards()
         {
-            int offset = 0;
+            int offset = page*cardsPerPage;
             for (int i = 0; i < shownCards.Length; i++)
             {
                 int ix = offset + i;
@@ -204,6 +209,14 @@ namespace stonerkart
             Deck v = Controller.loadDeck(deckName);
             deck.addRange(v.templates.Select(t => new Card(t)));
             heroic = v.hero;
+        }
+
+        private void turnPage(bool left)
+        {
+            page += left ? -1 : 1;
+            if (page*cardsPerPage > filteredCards.Length) page--;
+            if (page < 0) page = 0;
+            drawCards();
         }
 
         private int srt(CardView v1, CardView v2)
@@ -250,12 +263,14 @@ namespace stonerkart
             this.button4 = new System.Windows.Forms.Button();
             this.formatTextBox = new System.Windows.Forms.Label();
             this.button5 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
+            this.button7 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // cardView1
             // 
             this.cardView1.BackColor = System.Drawing.Color.DarkViolet;
-            this.cardView1.Location = new System.Drawing.Point(83, 249);
+            this.cardView1.Location = new System.Drawing.Point(87, 249);
             this.cardView1.Name = "cardView1";
             this.cardView1.Size = new System.Drawing.Size(133, 193);
             this.cardView1.TabIndex = 0;
@@ -263,7 +278,7 @@ namespace stonerkart
             // cardView2
             // 
             this.cardView2.BackColor = System.Drawing.Color.DarkViolet;
-            this.cardView2.Location = new System.Drawing.Point(222, 249);
+            this.cardView2.Location = new System.Drawing.Point(226, 249);
             this.cardView2.Name = "cardView2";
             this.cardView2.Size = new System.Drawing.Size(133, 193);
             this.cardView2.TabIndex = 7;
@@ -271,7 +286,7 @@ namespace stonerkart
             // cardView3
             // 
             this.cardView3.BackColor = System.Drawing.Color.DarkViolet;
-            this.cardView3.Location = new System.Drawing.Point(361, 249);
+            this.cardView3.Location = new System.Drawing.Point(365, 249);
             this.cardView3.Name = "cardView3";
             this.cardView3.Size = new System.Drawing.Size(133, 193);
             this.cardView3.TabIndex = 7;
@@ -279,7 +294,7 @@ namespace stonerkart
             // cardView5
             // 
             this.cardView5.BackColor = System.Drawing.Color.DarkViolet;
-            this.cardView5.Location = new System.Drawing.Point(500, 249);
+            this.cardView5.Location = new System.Drawing.Point(643, 249);
             this.cardView5.Name = "cardView5";
             this.cardView5.Size = new System.Drawing.Size(133, 193);
             this.cardView5.TabIndex = 7;
@@ -287,7 +302,7 @@ namespace stonerkart
             // cardView6
             // 
             this.cardView6.BackColor = System.Drawing.Color.DarkViolet;
-            this.cardView6.Location = new System.Drawing.Point(83, 448);
+            this.cardView6.Location = new System.Drawing.Point(87, 448);
             this.cardView6.Name = "cardView6";
             this.cardView6.Size = new System.Drawing.Size(133, 193);
             this.cardView6.TabIndex = 9;
@@ -295,7 +310,7 @@ namespace stonerkart
             // cardView8
             // 
             this.cardView8.BackColor = System.Drawing.Color.DarkViolet;
-            this.cardView8.Location = new System.Drawing.Point(361, 448);
+            this.cardView8.Location = new System.Drawing.Point(365, 448);
             this.cardView8.Name = "cardView8";
             this.cardView8.Size = new System.Drawing.Size(133, 193);
             this.cardView8.TabIndex = 11;
@@ -303,7 +318,7 @@ namespace stonerkart
             // cardView9
             // 
             this.cardView9.BackColor = System.Drawing.Color.DarkViolet;
-            this.cardView9.Location = new System.Drawing.Point(500, 448);
+            this.cardView9.Location = new System.Drawing.Point(504, 448);
             this.cardView9.Name = "cardView9";
             this.cardView9.Size = new System.Drawing.Size(133, 193);
             this.cardView9.TabIndex = 12;
@@ -311,7 +326,7 @@ namespace stonerkart
             // cardView10
             // 
             this.cardView10.BackColor = System.Drawing.Color.DarkViolet;
-            this.cardView10.Location = new System.Drawing.Point(639, 448);
+            this.cardView10.Location = new System.Drawing.Point(643, 448);
             this.cardView10.Name = "cardView10";
             this.cardView10.Size = new System.Drawing.Size(133, 193);
             this.cardView10.TabIndex = 8;
@@ -334,7 +349,7 @@ namespace stonerkart
             // cardView4
             // 
             this.cardView4.BackColor = System.Drawing.Color.DarkViolet;
-            this.cardView4.Location = new System.Drawing.Point(639, 249);
+            this.cardView4.Location = new System.Drawing.Point(504, 249);
             this.cardView4.Name = "cardView4";
             this.cardView4.Size = new System.Drawing.Size(133, 193);
             this.cardView4.TabIndex = 7;
@@ -342,7 +357,7 @@ namespace stonerkart
             // cardView7
             // 
             this.cardView7.BackColor = System.Drawing.Color.DarkViolet;
-            this.cardView7.Location = new System.Drawing.Point(222, 448);
+            this.cardView7.Location = new System.Drawing.Point(226, 448);
             this.cardView7.Name = "cardView7";
             this.cardView7.Size = new System.Drawing.Size(133, 193);
             this.cardView7.TabIndex = 10;
@@ -435,9 +450,31 @@ namespace stonerkart
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(782, 249);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(77, 392);
+            this.button6.TabIndex = 24;
+            this.button6.Text = "button6";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // button7
+            // 
+            this.button7.Location = new System.Drawing.Point(4, 249);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(77, 392);
+            this.button7.TabIndex = 25;
+            this.button7.Text = "button7";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            // 
             // DeckEditorPanel
             // 
             this.BackColor = System.Drawing.Color.Aqua;
+            this.Controls.Add(this.button7);
+            this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.formatTextBox);
             this.Controls.Add(this.button4);
@@ -466,25 +503,24 @@ namespace stonerkart
 
         }
 
-        private void drawCards(Func<CardTemplate, bool> filter)
-        {
-            var cards = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().Where(filter);
-
-            for (int i = 0; i < cardViews.Length; i++)
-            {
-                if (i < cards.Count())
-                {
-                    cardViews[i].setCard(cards.ElementAt(i));
-                    cardViews[i].Visible = true;
-                }
-                else
-                    cardViews[i].Visible = false;
-            }
-        }
-
+        private ManaColour? hack;
         private void newManaFilter(ManaButton mb)
         {
+            ManaColour colour = mb.orb;
 
+            if (hack.HasValue && hack.Value == colour)
+            {
+                hack = null;
+                filterCards(_ => true);
+                return;
+            }
+
+            hack = colour;
+
+            Func<CardTemplate, bool> f = ct => (Card.fromTemplate(ct).colours.Contains(colour));
+            Func<CardTemplate, bool> f2 = ct => (Card.fromTemplate(ct).colours.Count > 1);
+
+            filterCards(colour == ManaColour.Multi ? f2 : f);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -531,6 +567,16 @@ namespace stonerkart
         private void button5_Click(object sender, EventArgs e)
         {
             Controller.transitionToMainMenu();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            turnPage(false);
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            turnPage(true);
         }
     }
 }

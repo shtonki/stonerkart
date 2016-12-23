@@ -201,6 +201,9 @@ namespace stonerkart
         Yung_Lich,
         Nature_Heroman,
         Risen_Abberation,
+        Shibby_Shtank,
+        Unmake,
+        Frothing_Goblin,
     }
 
     enum CardType
@@ -234,6 +237,7 @@ namespace stonerkart
         Human,
         Undead,
         Lizard,
+        Goblin,
     }
 
     enum Subtype

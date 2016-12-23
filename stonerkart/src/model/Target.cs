@@ -176,6 +176,11 @@ namespace stonerkart
                 {
                     return new TargetColumn(re.resolveCard.controller);
                 }
+
+                case Rule.ResolveControllerCard:
+                {
+                    return new TargetColumn(re.resolveCard.controller.heroCard);
+                }
             }
             throw new Exception();
         }
@@ -189,6 +194,7 @@ namespace stonerkart
         {
             ResolveCard,
             ResolveController,
+            ResolveControllerCard,
 
         }
     }

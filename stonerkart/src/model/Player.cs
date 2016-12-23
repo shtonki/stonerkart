@@ -49,6 +49,30 @@ namespace stonerkart
             }
         }
 
+        public Pile pileFrom(PileLocation l)
+        {
+            switch (l)
+            {
+                case PileLocation.Deck:
+                    return deck;
+
+                case PileLocation.Hand:
+                    return hand;
+
+                case PileLocation.Displaced:
+                    return displaced;
+
+                case PileLocation.Field:
+                    return field;
+
+                case PileLocation.Graveyard:
+                    return graveyard;
+
+                default:
+                    throw new Exception();
+            }
+        }
+
         public void resetMana()
         {
             manaPool.reset();

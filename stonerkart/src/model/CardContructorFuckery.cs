@@ -60,7 +60,7 @@ namespace stonerkart
 
                     baseMovement = 1;
                     basePower = 2;
-                    baseToughness = 2;
+                    baseToughness = 3;
                     orderCost = 3;
                     greyCost = 1;
 
@@ -89,6 +89,8 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Rare;
+                    race = Race.Undead;
+                    subtype = Subtype.Wizard;
 
                     baseMovement = 2;
                     basePower = 2;
@@ -137,7 +139,8 @@ namespace stonerkart
 
                     castRange = 3;
                     chaosCost = 1;
-                    castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), new ZepperDoer(2));
+
+                    castEffect = new Effect(new TargetRuleSet(new PryCardRule(c => true)), new ZepperDoer(2));
                     castDescription = "Deal 2 damage to target creature.";
                 } break;
                 #endregion
@@ -153,7 +156,23 @@ namespace stonerkart
 
                     lifeCost = 2;
                     greyCost = 2;
-                } break;
+
+                    Effect e = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new ResolveRule(ResolveRule.Rule.ResolveControllerCard)), new ZepperDoer(-1));
+                    Cost c = new Cost();
+                    GameEventFilter t =
+                        new TypedGameEventFilter<MoveToPileEvent>(
+                            moveEvent =>
+                            {
+                                return (moveEvent.card.controller == this.controller && 
+                                    moveEvent.to.location.pile == PileLocation.Field && 
+                                    this.location.pile == PileLocation.Field);
+                            });
+                    TriggeredAbility ta = new TriggeredAbility(
+                        this, PileLocation.Field, new[] { e }, 0,
+                        c, t, TriggeredAbility.Timing.Pre,
+                        "Whenever a creature enters the battlefield under your control, gain 1 life.");
+                    triggeredAbilities.Add(ta);
+                    } break;
                 #endregion
                 #region Nature Heroman
                 case CardTemplate.Nature_Heroman:
@@ -177,8 +196,58 @@ namespace stonerkart
                     baseToughness = 2;
                     baseMovement = 1;
 
-                    deathCost = 2;
+                    deathCost = 1;
                     } break;
+                #endregion
+                #region Shibby Shtank
+                case CardTemplate.Shibby_Shtank:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Human;
+                    subtype = Subtype.Wizard;
+                    rarity = Rarity.Legendary;
+                    isHeroic = true;
+                    forceColour = ManaColour.Order;
+
+                    baseMovement = 1;
+                    basePower = 1;
+                    baseToughness = 20;
+
+                    ActivatedAbility a = new ActivatedAbility(PileLocation.Field, 0, 
+                        new Cost(new ManaCost(0, 0, 0, 0, 0, 1, 0)),
+                        CastSpeed.Instant, 
+                        "\\o: Draw a card",
+                        new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)), new DrawCardsDoer(1)));
+                    activatedAbilities.Add(a);
+                } break;
+                #endregion
+                #region Unmake
+                case CardTemplate.Unmake:
+                {
+                    cardType = CardType.Instant;
+                    rarity = Rarity.Common;
+
+                    castRange = 4;
+                    orderCost = 1;
+                    greyCost = 1;
+
+                    castEffect = new Effect(new TargetRuleSet(new PryCardRule(c => !c.isHeroic)), 
+                        new ToOwners(PileLocation.Hand));
+                    castDescription = "Return target non-heroic creature to its owner's hand.";
+                } break;
+                #endregion
+                #region Frothing Goblin
+                case CardTemplate.Frothing_Goblin:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Uncommon;
+                    race = Race.Goblin;
+
+                    baseMovement = 2;
+                    basePower = 2;
+                    baseToughness = 2;
+                    mightCost = 1;
+                } break;
                 #endregion
                 default:
                     throw new Exception();
@@ -219,7 +288,7 @@ namespace stonerkart
                 castEffect = new Effect(new TargetRuleSet(
                     new ResolveRule(ResolveRule.Rule.ResolveCard),
                     new PryTileRule(t => t.card == null)),
-                    new MoveToTileDoer(null));
+                    new MoveToTileDoer());
             }
             else throw new Exception();
 

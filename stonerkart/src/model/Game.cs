@@ -624,12 +624,23 @@ namespace stonerkart
         private Card getCard(Func<Card, bool> f, string prompt)
         {
             Controller.setPrompt(prompt, ButtonOption.Cancel);
-            var v = waitForButtonOr<Card>(f);
-            if (v is ShibbuttonStuff)
+            while (true)
             {
-                return null;
+                var v = waitForAnything();
+                if (v is ShibbuttonStuff)
+                {
+                    return null;
+                }
+                else if (v is Card)
+                {
+                    return (Card)v;
+                }
+                else if (v is Tile)
+                {
+                    Tile t = (Tile)v;
+                    if (t.card != null) return t.card;
+                }
             }
-            return (Card)v;
         }
 
         private Tile getTile(Func<Tile, bool> f, string prompt)

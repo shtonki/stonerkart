@@ -20,28 +20,21 @@ namespace stonerkart
 
     }
 
-    abstract class Doer
+    interface Doer
     {
-        public string description { get; }
-
-        public Doer(string description)
-        {
-            this.description = description?.Length == 0 ? null : description;
-        }
-
-        public abstract GameEvent[] act(TargetRow[] ts);
+          GameEvent[] act(TargetRow[] ts);
     }
 
     class DrawCardsDoer : Doer
     {
         public int cards;
 
-        public DrawCardsDoer(int cards) : base("draws " + cards + (cards != 1 ? " cards" : " card"))
+        public DrawCardsDoer(int cards)
         {
             this.cards = cards;
         }
 
-        public override GameEvent[] act(TargetRow[] ts)
+        public GameEvent[] act(TargetRow[] ts)
         {
             List<GameEvent> r = new List<GameEvent>();
 
@@ -58,12 +51,12 @@ namespace stonerkart
 
     class MoveToTileDoer : Doer
     {
-        public MoveToTileDoer(string description) : base(description)
+        public MoveToTileDoer()
         {
 
         }
 
-        public override GameEvent[] act(TargetRow[] ts)
+        public GameEvent[] act(TargetRow[] ts)
         {
             List<GameEvent> r = new List<GameEvent>();
 
@@ -81,12 +74,12 @@ namespace stonerkart
     {
         public int damage;
 
-        public ZepperDoer(int damage) : base ("deal " + damage + " damage")
+        public ZepperDoer(int damage) 
         {
             this.damage = damage;
         }
 
-        public override GameEvent[] act(TargetRow[] ts)
+        public GameEvent[] act(TargetRow[] ts)
         {
             List<GameEvent> r = new List<GameEvent>();
 
@@ -99,5 +92,28 @@ namespace stonerkart
             return r.ToArray();
         }
     }
-    
+
+    class ToOwners : Doer
+    {
+        public PileLocation pileLocation;
+
+        public ToOwners(PileLocation pileLocation)
+        {
+            this.pileLocation = pileLocation;
+        }
+
+        public GameEvent[] act(TargetRow[] ts)
+        {
+            List<GameEvent> r = new List<GameEvent>();
+
+            foreach (var row in ts)
+            {
+                if (row.ts.Length != 1) throw new Exception();
+                Card c = (Card)row.ts[0];
+                r.Add(new MoveToPileEvent(c, c.owner.pileFrom(pileLocation)));
+            }
+
+            return r.ToArray();
+        }
+    }
 }
