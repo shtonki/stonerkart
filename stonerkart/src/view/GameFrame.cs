@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using stonerkart.src.view;
 
 namespace stonerkart
 {
@@ -47,8 +46,11 @@ namespace stonerkart
         public DraggablePanel showPanel(Control content, bool resizeable = true, bool closeable = true)
         {
             DraggablePanel r = new DraggablePanel(content, resizeable, closeable);
-            Controls.Add(r);
-            r.BringToFront();
+            this.memeout(() =>
+            {
+                Controls.Add(r);
+                r.BringToFront();
+            });
             return r;
         }
 

@@ -44,6 +44,21 @@ namespace stonerkart
             Environment.Exit(1);
         }
 
+        public static Deck chooseDeck()
+        {
+            ManualResetEventSlim re = new ManualResetEventSlim(false);
+            string s = null;
+            Thread t = new Thread(() => chooseDeck(v =>
+            {
+                s = v;
+                re.Set();
+            }));
+            t.Start();
+            re.Wait();
+
+            return loadDeck(s);
+        }
+
         public static void chooseDeck(Action<string> cb)
         {
             Panel p = new Panel();

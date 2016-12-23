@@ -67,6 +67,14 @@ namespace stonerkart
             notify(new PileChangedMessage(false, c));
         }
 
+        public Card removeTop()
+        {
+            Card r = cardList[cardList.Count - 1];
+            cardList.RemoveAt(cardList.Count - 1);
+            notify(new PileChangedMessage(false, r));
+            return r;
+        }
+
         public void clear()
         {
             PileChangedMessage m = new PileChangedMessage(false, cardList.ToArray());

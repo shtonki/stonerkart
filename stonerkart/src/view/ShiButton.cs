@@ -36,6 +36,8 @@ namespace stonerkart
         NOTHING,
 
         Nigra,
+        Yes,
+        No,
         OK,
         Cancel,
     }

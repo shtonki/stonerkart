@@ -14,12 +14,12 @@ namespace stonerkart
 
     class Deck
     {
-        public CardTemplate heroic;
+        public CardTemplate hero;
         public CardTemplate[] templates;
 
-        public Deck(CardTemplate heroic, CardTemplate[] templates)
+        public Deck(CardTemplate hero, CardTemplate[] templates)
         {
-            this.heroic = heroic;
+            this.hero = hero;
             this.templates = templates;
         }
 
@@ -27,7 +27,7 @@ namespace stonerkart
         {
             string[] ss = saveText.Split(',');
 
-            heroic = parse(ss[0]);
+            hero = parse(ss[0]);
             
             templates = new CardTemplate[ss.Length - 1];
             for (int i = 1; i < ss.Length; i++)
@@ -52,7 +52,7 @@ namespace stonerkart
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(heroic);
+            sb.Append(hero);
             sb.Append(',');
 
             foreach (var ct in templates)
@@ -93,7 +93,12 @@ namespace stonerkart
             {
                 case Format.Test:
                 {
+                    cardMin = 10;
 
+                    this[Rarity.Common]     = Int32.MaxValue;
+                    this[Rarity.Uncommon]   = Int32.MaxValue;
+                    this[Rarity.Rare]       = Int32.MaxValue;
+                    this[Rarity.Legendary]  = Int32.MaxValue;
                 } break;
 
                 case Format.Standard:
@@ -112,7 +117,7 @@ namespace stonerkart
 
         public bool testLegal(Deck d)
         {
-            return testLegal(d.heroic, d.templates);
+            return testLegal(d.hero, d.templates);
         }
 
         public bool testLegal(CardTemplate heroic, CardTemplate[] deck, bool checkSize = true)
@@ -142,7 +147,7 @@ namespace stonerkart
 
         public bool willBeLegal(Deck d, CardTemplate add)
         {
-            return willBeLegal(d.heroic, d.templates, add);
+            return willBeLegal(d.hero, d.templates, add);
         }
     }
 }

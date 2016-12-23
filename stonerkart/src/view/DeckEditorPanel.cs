@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace stonerkart.src.view
+namespace stonerkart
 {
 
     class DeckEditorPanel : StickyPanel, Screen
@@ -39,7 +39,11 @@ namespace stonerkart.src.view
         private Button button1;
         private TextBox deckName;
         private Button button2;
-        private DeckContraints standardConstraint = new DeckContraints(Format.Standard);
+        private Button button3;
+        private Button button4;
+        private Label formatTextBox;
+        private Button button5;
+        private DeckContraints currentConstraint = new DeckContraints(Format.Standard);
 
         public DeckEditorPanel()
         {
@@ -108,6 +112,7 @@ namespace stonerkart.src.view
 
             filterCards(x => true);
             drawCards();
+            button3_Click(null, null);
         }
 
         private CardTemplate heroic
@@ -125,8 +130,10 @@ namespace stonerkart.src.view
             if (Card.fromTemplate(ct).isHeroic)
                 heroic = ct;
 
-            if (!standardConstraint.willBeLegal(CardTemplate.Belwas, deck.Select(c => c.template).ToArray(), ct))
+            if (!currentConstraint.willBeLegal(CardTemplate.Belwas, deck.Select(c => c.template).ToArray(), ct))
                 return;
+
+            nicememe();
 
             deck.addTop(new Card(ct));
         }
@@ -196,7 +203,7 @@ namespace stonerkart.src.view
             deck.clear();
             Deck v = Controller.loadDeck(deckName);
             deck.addRange(v.templates.Select(t => new Card(t)));
-            heroic = v.heroic;
+            heroic = v.hero;
         }
 
         private int srt(CardView v1, CardView v2)
@@ -239,6 +246,10 @@ namespace stonerkart.src.view
             this.button1 = new System.Windows.Forms.Button();
             this.deckName = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.formatTextBox = new System.Windows.Forms.Label();
+            this.button5 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // cardView1
@@ -315,7 +326,7 @@ namespace stonerkart.src.view
             // 
             // manaPanel
             // 
-            this.manaPanel.Location = new System.Drawing.Point(3, 3);
+            this.manaPanel.Location = new System.Drawing.Point(83, 3);
             this.manaPanel.Name = "manaPanel";
             this.manaPanel.Size = new System.Drawing.Size(508, 70);
             this.manaPanel.TabIndex = 14;
@@ -384,9 +395,53 @@ namespace stonerkart.src.view
             this.button2.UseVisualStyleBackColor = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(616, 29);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 19;
+            this.button3.Text = "Standard";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(616, 58);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(75, 23);
+            this.button4.TabIndex = 21;
+            this.button4.Text = "Test";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // formatTextBox
+            // 
+            this.formatTextBox.AutoSize = true;
+            this.formatTextBox.BackColor = System.Drawing.Color.Gray;
+            this.formatTextBox.Location = new System.Drawing.Point(636, 6);
+            this.formatTextBox.Name = "formatTextBox";
+            this.formatTextBox.Size = new System.Drawing.Size(55, 13);
+            this.formatTextBox.TabIndex = 22;
+            this.formatTextBox.Text = "nicememe";
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(4, -1);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(73, 74);
+            this.button5.TabIndex = 23;
+            this.button5.Text = "Back";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // DeckEditorPanel
             // 
             this.BackColor = System.Drawing.Color.Aqua;
+            this.Controls.Add(this.button5);
+            this.Controls.Add(this.formatTextBox);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.deckName);
             this.Controls.Add(this.button1);
@@ -441,6 +496,41 @@ namespace stonerkart.src.view
         private void button2_Click(object sender, EventArgs e)
         {
             Controller.chooseDeck(loadDeck);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            nicememe(Format.Standard);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            nicememe(Format.Test);
+        }
+
+        private void nicememe(Format f)
+        {
+            formatTextBox.memeout(() =>
+            {
+                formatTextBox.Text = f.ToString();
+                formatTextBox.Refresh();
+                currentConstraint = new DeckContraints(f);
+            });
+            nicememe();
+        }
+
+        private void nicememe()
+        {
+
+            formatTextBox.memeout(() =>
+            {
+                formatTextBox.BackColor = currentConstraint.testLegal(CardTemplate.Belwas, deck.Select(c => c.template).ToArray()) ? Color.ForestGreen : Color.IndianRed;
+            });
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            Controller.transitionToMainMenu();
         }
     }
 }

@@ -53,8 +53,6 @@ namespace stonerkart
             for (int i = 0; i < ngs.playerNames.Length; i++)
             {
                 Player p = new Player(this);
-                Card heroCard = createCard(CardTemplate.Belwas, p.field, p);
-                p.setHeroCard(heroCard);
 
                 players.Add(p);
                 if (i == ngs.heroIndex) hero = p;
@@ -63,15 +61,6 @@ namespace stonerkart
                     if (villain != null) throw new Exception();
                     villain = p;
                 }
-
-                List<Card> deck = new List<Card>();
-                for (int j = 0; j < 10; j++)
-                {
-                    Card c = createCard(CardTemplate.Zap, p.deck, p);
-                    //Card c1 = createCard(CardTemplate.Yung_Lich, p.deck, p);
-                }
-                p.loadDeck(deck);
-                p.deck.shuffle(random);
             }
 
             stepHandler = new StepHandler();
@@ -206,7 +195,25 @@ namespace stonerkart
 
         private void initGame()
         {
-            activePlayerIndex = 0;
+            Deck d = Controller.chooseDeck();
+
+            Deck[] decks = connection.deckify(d, ord(hero));
+
+            for (int i = 0; i < players.Count; i++)
+            {
+                Player p = players[i];
+                Deck deck = decks[i];
+
+                Card heroCard = createCard(deck.hero, p.field, p);
+                p.setHeroCard(heroCard);
+
+                foreach (var ct in deck.templates)
+                {
+                    createCard(ct, p.deck, p);
+                }
+                p.deck.shuffle(random);
+            }
+
 
             Tile[] ts = new[]
             {
@@ -222,10 +229,58 @@ namespace stonerkart
                 ts[ix++].place(p.heroCard);
             }
 
+            int xi = random.Next();
+            activePlayerIndex = xi%players.Count;
+
+            int[] draws = {5, 5, 4, 3, 2, 1};
+
+            for (int i = 0; i < players.Count; i++)
+            {
+                for (int j = 0; j < draws.Length; j++)
+                {
+                    Player p = players[(i + activePlayerIndex)%players.Count];
+                    int cards = draws[j];
+                    handleTransaction(new DrawEvent(p, cards));
+
+                    if (j == draws.Length - 1) break;
+
+                    ChoiceSelection cs;
+
+                    if (p == hero)
+                    {
+                        ButtonOption b = waitForButton(String.Format("Redraw to {0}?", draws[j+1]), ButtonOption.Yes, ButtonOption.No);
+                        cs = new ChoiceSelection((int)b);
+                        connection.sendAction(cs);
+                    }
+                    else
+                    {
+                        cs = connection.receiveAction<ChoiceSelection>();
+                    }
+
+                    ButtonOption bo = cs.choices.Length > 0 ? (ButtonOption)cs.choices[0] : ButtonOption.No;
+
+                    if (bo == ButtonOption.Yes)
+                    {
+                        while (p.hand.Count > 0)
+                        {
+                            Card crd = p.hand.peek();
+                            crd.moveTo(p.deck);
+                        }
+                        p.deck.shuffle(random);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
             foreach (Player p in players)
             {
                 p.deck.shuffle(random);
             }
+
+            Controller.redraw();
         }
 
         private void loopEx()
@@ -791,6 +846,13 @@ namespace stonerkart
             callerBacker = null;
             filter = null;
             return r;
+        }
+
+        private ButtonOption waitForButton(string prompt, params ButtonOption[] options)
+        {
+            Controller.setPrompt(prompt, options);
+            ShibbuttonStuff s = (ShibbuttonStuff)waitFor(new InputEventFilter((c, o) => c is Shibbutton));
+            return s.option;
         }
     }
 

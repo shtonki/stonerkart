@@ -236,4 +236,42 @@ namespace stonerkart
             return sb.ToString();
         }
     }
+
+    class ChoiceSelection : GameAction
+    {
+        public int[] choices;
+
+        public ChoiceSelection(IEnumerable<int> choices)
+        {
+            this.choices = choices.ToArray();
+        }
+
+        public ChoiceSelection(params int[] choices)
+        {
+            this.choices = choices;
+        }
+
+        public ChoiceSelection(Game g, string s)
+        {
+            string[] ss = s.Split(',');
+
+            choices = ss.Select(Int32.Parse).ToArray();
+        }
+
+        public string toString(Game g)
+        {
+            if (!choices.Any()) return "";
+            StringBuilder b = new StringBuilder();
+
+            foreach (int choice in choices)
+            {
+                b.Append(choice);
+                b.Append(',');
+            }
+
+            b.Length--;
+
+            return b.ToString();
+        }
+    }
 }
