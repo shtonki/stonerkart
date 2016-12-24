@@ -34,6 +34,11 @@ namespace stonerkart
         private bool[] heroTurnStop { get; set; }
         private bool[] villainTurnStop { get; set; }
 
+        public StopTurnSetting()
+        {
+            setupArrays(true);
+        }
+
         public override void FromString(string v)
         {
             setupArrays(false);
