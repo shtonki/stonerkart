@@ -86,7 +86,7 @@ namespace stonerkart
                 Controls.Add(p);
                 panels[i] = p;
             }
-
+            
             Resize += (_, __) => xd();
             notify(Steps.Untap);
         }

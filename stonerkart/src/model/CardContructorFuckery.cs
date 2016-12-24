@@ -140,7 +140,8 @@ namespace stonerkart
                     castRange = 3;
                     chaosCost = 1;
 
-                    castEffect = new Effect(new TargetRuleSet(new PryCardRule(c => true)), new ZepperDoer(2));
+                    castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), 
+                        new ZepperDoer(2));
                     castDescription = "Deal 2 damage to target creature.";
                 } break;
                 #endregion
