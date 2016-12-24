@@ -274,19 +274,14 @@ namespace stonerkart
                     }
                 }
             }
-
-            foreach (Player p in players)
-            {
-                p.deck.shuffle(random);
-            }
-
-            Controller.redraw();
         }
 
         private void loopEx()
         {
             Controller.setPrompt("Game starting");
             initGame();
+            Controller.redraw();
+
 
             while (true)
             {
@@ -591,7 +586,7 @@ namespace stonerkart
 
                 if (w.HasValue)
                 {
-                    playerCasts(activePlayer, w.Value);
+                    playerCasts(fuckboy, w.Value);
                     c = 0;
                 }
                 else //pass
@@ -738,7 +733,6 @@ namespace stonerkart
             return r;
         }
 
-
         private TargetMatrix[] getCastTargets(Ability a, Tile castFrom)
         {
             TargetMatrix[] ms = new TargetMatrix[a.effects.Length];
@@ -762,7 +756,6 @@ namespace stonerkart
             Controller.clearHighlights();
             return ms;
         }
-        
 
         private void resolve(StackWrapper wrapper)
         {

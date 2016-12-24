@@ -68,9 +68,10 @@ namespace stonerkart
             t.place(this);
         }
 
-        public void exhaust()
+        public void exhaust(int steps = -1)
         {
-            movement.modify(-movement, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(this));
+            int v = steps < 0 ? movement : steps;
+            movement.modify(-v, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(this));
         }
 
         private List<ManaColour> coloursEx()

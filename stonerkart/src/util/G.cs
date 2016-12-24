@@ -35,6 +35,14 @@ namespace stonerkart
 
     static class G
     {
+        private static char[] hackish = G.range(0, 20).Select(v => (char)('\u2460' + v)).ToArray();
+
+        private static char[] hackedaf =
+            Enum.GetValues(typeof (ManaColour))
+                .Cast<ManaColour>()
+                .Select(c => (char)('\u24b6' + (c.ToString().ToLower())[0] - 97))
+                .ToArray();
+
         public static ReduceResult<T> Reduce<T>(this IEnumerable<T> e)
         {
             return new ReduceResult<T>(e);
@@ -102,6 +110,28 @@ namespace stonerkart
                 gfx.DrawImage(image, new Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
             }
             return bmp;
+        }
+
+        public static char colourless(int i)
+        {
+            return hackish[i-1];
+        }
+
+        public static char coloured(ManaColour c)
+        {
+            return hackedaf[(int)c];
+        }
+
+        public static IEnumerable<int> range(int min, int max)
+        {
+            int[] r = new int[max - min];
+
+            for (int i = 0; i < max - min; i++)
+            {
+                r[i] = min + i;
+            }
+
+            return r;
         }
 
         public static void clapTrap(object sender, UnhandledExceptionEventArgs e)

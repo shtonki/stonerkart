@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace stonerkart
@@ -20,6 +21,10 @@ namespace stonerkart
 
     class AutoFontTextBox : TransparentPanel
     {
+        private int textMargin;
+        private Font f = null;
+
+
 
         public Justify justifyText { get; set; }
 
@@ -65,7 +70,7 @@ namespace stonerkart
             return new Rectangle(m, 0, Size.Width, Size.Height);
         }
 
-        private Font f = new Font("Ariel Black", 10);
+        private string fontName = "Comic Sans MS";
         private string txt = ":^)";
 
         protected override void OnSizeChanged(EventArgs e)
@@ -86,14 +91,36 @@ namespace stonerkart
             this.memeout(fixEx);
         }
 
-        private int textMargin;
-        private void fixEx()
+        public void setFont(string name)
         {
-            Graphics g = Graphics.FromImage(Properties.Resources.orbDeath); //todo hack
-            Font testFont = null;
-            for (int AdjustedSize = 20; AdjustedSize >= 4; AdjustedSize--)
+            fontName = name;
+            fixEx();
+            Refresh();
+        }
+
+        private int inc = 0;
+
+        private ManualResetEventSlim parallelHackWaiter = new ManualResetEventSlim(false);
+        private Font parallelHackValue = null;
+
+        private Font[] fonts = new Font[100];
+
+        private Font loadFont(int size)
+        {
+            if (fonts[size] == null)
             {
-                testFont = new Font(f.Name, AdjustedSize, f.Style);
+                fonts[size] = new Font("Lucid Sans Unicode", size, FontStyle.Regular);
+            }
+            return fonts[size];
+        }
+
+        private void parallelHack(object o)
+        {
+            int AdjustedSize = (int)o;
+            Panel p = new Panel();
+            using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                var testFont = loadFont(AdjustedSize);
 
                 int df, ff;
                 var d = g.MeasureString(txt, testFont, Size,
@@ -101,11 +128,41 @@ namespace stonerkart
                 if (Size.Width > d.Width && Size.Height > d.Height && df == txt.Length)
                 {
                     textMargin = (int)(Size.Width - d.Width);
-                    break;
+                    parallelHackValue = testFont;
+                    parallelHackWaiter.Set();
                 }
             }
+        }
 
-            f = testFont;
+        private void fixEx()
+        {
+            using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                for (int AdjustedSize = 33; AdjustedSize >= 3; AdjustedSize -= 3)
+                {
+                    var testFont = loadFont(AdjustedSize);
+
+                    int df, ff;
+                    var d = g.MeasureString(txt, testFont, Size,
+                        new StringFormat(StringFormatFlags.LineLimit), out df, out ff);
+                    if (Size.Width > d.Width && Size.Height > d.Height && df == txt.Length)
+                    {
+                        f = testFont;
+                        break;
+                    }
+
+                    /*
+                    while (parallelHackValue == null)
+                    {
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(parallelHack), 
+                            AdjustedSize);
+                    }
+
+                    parallelHackWaiter.Wait();
+                    f = parallelHackValue;
+                    */
+                }
+            }
         }
     }
 }

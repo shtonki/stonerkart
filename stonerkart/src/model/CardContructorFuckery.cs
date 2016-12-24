@@ -121,7 +121,7 @@ namespace stonerkart
                 #region Cantrip
                 case CardTemplate.Cantrip:
                 {
-                    cardType = CardType.Sorcery;
+                    cardType = CardType.Instant;
                     rarity = Rarity.Common;
 
                     orderCost = 1;
@@ -215,9 +215,9 @@ namespace stonerkart
                     baseToughness = 20;
 
                     ActivatedAbility a = new ActivatedAbility(PileLocation.Field, 0, 
-                        new Cost(new ManaCost(0, 0, 0, 0, 0, 1, 0)),
+                        new Cost(new ManaCost(0, 0, 0, 0, 0, 2, 2)),
                         CastSpeed.Instant, 
-                        "\\o: Draw a card",
+                        String.Format("{1}{0}{0}: Draw a card", G.coloured(ManaColour.Order), G.colourless(2)),
                         new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)), new DrawCardsDoer(1)));
                     activatedAbilities.Add(a);
                 } break;
