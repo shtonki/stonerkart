@@ -14,106 +14,102 @@ namespace stonerkart
 
         public Effect(TargetRuleSet ts, Doer d)
         {
+            if (!ts.matchesTypeSignatureOf(d)) throw new Exception();
             this.ts = ts;
             doer = d;
         }
 
     }
 
-    interface Doer
+    abstract class Doer : TypeSigned
     {
-          GameEvent[] act(TargetRow[] ts);
+        public Doer(params Type[] typeSignatureTypes) : base(typeSignatureTypes)
+        {
+        }
+
+        public abstract GameEvent[] act(TargetRow[] ts);
     }
 
-    class DrawCardsDoer : Doer
+    abstract class SimpleDoer : Doer
+    {
+        public SimpleDoer(params Type[] typeSignatureTypes) : base(typeSignatureTypes)
+        {
+        }
+
+        public override GameEvent[] act(TargetRow[] ts)
+        {
+            List<GameEvent> r = new List<GameEvent>();
+            foreach (TargetRow row in ts)
+            {
+                r.AddRange(simpleAct(row));
+            }
+            return r.ToArray();
+        }
+
+        protected abstract GameEvent[] simpleAct(TargetRow row);
+    }
+
+    class DrawCardsDoer : SimpleDoer
     {
         public int cards;
 
-        public DrawCardsDoer(int cards)
+        public DrawCardsDoer(int cards) : base(typeof(Player))
         {
             this.cards = cards;
         }
 
-        public GameEvent[] act(TargetRow[] ts)
+        protected override GameEvent[] simpleAct(TargetRow row)
         {
-            List<GameEvent> r = new List<GameEvent>();
-
-            foreach (var row in ts)
-            {
-                if (row.ts.Length != 1 || !(row.ts[0] is Player)) throw new Exception();
-                Player player = (Player)row.ts[0];
-                r.Add(new DrawEvent(player, cards));
-            }
-
-            return r.ToArray();
+            Player player = (Player)row.ts[0];
+            return new[] {new DrawEvent(player, cards)};
         }
     }
 
-    class MoveToTileDoer : Doer
+    class MoveToTileDoer : SimpleDoer
     {
-        public MoveToTileDoer()
+        public MoveToTileDoer() : base(typeof(Card), typeof(Tile))
         {
 
         }
 
-        public GameEvent[] act(TargetRow[] ts)
+        protected override GameEvent[] simpleAct(TargetRow row)
         {
-            List<GameEvent> r = new List<GameEvent>();
-
-            foreach (var row in ts)
-            {
-                if (row.ts.Length != 2) throw new Exception();
-                r.Add(new PlaceOnTileEvent((Card)row.ts[0], (Tile)row.ts[1]));
-            }
-
-            return r.ToArray();
+            Card moved = (Card)row.ts[0];
+            Tile moveTo = (Tile)row.ts[1];
+            return new[] {new PlaceOnTileEvent(moved, moveTo)};
         }
     }
 
-    class ZepperDoer : Doer
+    class ZepperDoer : SimpleDoer
     {
         public int damage;
 
-        public ZepperDoer(int damage) 
+        public ZepperDoer(int damage) : base(typeof(Card), typeof(Card))
         {
             this.damage = damage;
         }
 
-        public GameEvent[] act(TargetRow[] ts)
+        protected override GameEvent[] simpleAct(TargetRow row)
         {
-            List<GameEvent> r = new List<GameEvent>();
-
-            foreach (var row in ts)
-            {
-                if (row.ts.Length != 2) throw new Exception();
-                r.Add(new DamageEvent((Card)row.ts[0], (Card)row.ts[1], damage));
-            }
-
-            return r.ToArray();
+            Card damager = (Card)row.ts[0];
+            Card damaged = (Card)row.ts[1];
+            return new[] {new DamageEvent(damager, damaged, damage)};
         }
     }
 
-    class ToOwners : Doer
+    class ToOwners : SimpleDoer
     {
         public PileLocation pileLocation;
 
-        public ToOwners(PileLocation pileLocation)
+        public ToOwners(PileLocation pileLocation) : base(typeof(Card))
         {
             this.pileLocation = pileLocation;
         }
 
-        public GameEvent[] act(TargetRow[] ts)
+        protected override GameEvent[] simpleAct(TargetRow row)
         {
-            List<GameEvent> r = new List<GameEvent>();
-
-            foreach (var row in ts)
-            {
-                if (row.ts.Length != 1) throw new Exception();
                 Card c = (Card)row.ts[0];
-                r.Add(new MoveToPileEvent(c, c.owner.pileFrom(pileLocation)));
-            }
-
-            return r.ToArray();
+                return new[] { new MoveToPileEvent(c, c.owner.pileFrom(pileLocation))};
         }
     }
 }

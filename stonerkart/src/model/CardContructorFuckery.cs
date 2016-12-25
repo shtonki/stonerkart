@@ -65,7 +65,7 @@ namespace stonerkart
                     greyCost = 1;
 
 
-                    Effect e = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)), new DrawCardsDoer(2));
+                    Effect e = new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), new DrawCardsDoer(2));
                     Cost c = new Cost();
                     GameEventFilter t =
                         new TypedGameEventFilter<MoveToPileEvent>(
@@ -99,7 +99,7 @@ namespace stonerkart
                     deathCost = 1;
 
 
-                    Effect e = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)), new DrawCardsDoer(1));
+                    Effect e = new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), new DrawCardsDoer(1));
                     Cost c = new Cost();
                     GameEventFilter t =
                         new TypedGameEventFilter<MoveToPileEvent>(
@@ -125,7 +125,7 @@ namespace stonerkart
                     rarity = Rarity.Common;
 
                     orderCost = 1;
-                    castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)),
+                    castEffect = new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                         new DrawCardsDoer(1));
                     castDescription = "Draw a card.";
 
@@ -140,7 +140,7 @@ namespace stonerkart
                     castRange = 3;
                     chaosCost = 1;
 
-                    castEffect = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), 
+                    castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), 
                         new ZepperDoer(2));
                     castDescription = "Deal 2 damage to target creature.";
                 } break;
@@ -158,7 +158,12 @@ namespace stonerkart
                     lifeCost = 2;
                     greyCost = 2;
 
-                    Effect e = new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveCard), new ResolveRule(ResolveRule.Rule.ResolveControllerCard)), new ZepperDoer(-1));
+                    Effect e =
+                        new Effect(
+                            new TargetRuleSet(
+                                new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)), 
+                            new ZepperDoer(-1));
                     Cost c = new Cost();
                     GameEventFilter t =
                         new TypedGameEventFilter<MoveToPileEvent>(
@@ -218,7 +223,7 @@ namespace stonerkart
                         new Cost(new ManaCost(0, 0, 0, 0, 0, 2, 2)),
                         CastSpeed.Instant, 
                         String.Format("{1}{0}{0}: Draw a card", G.coloured(ManaColour.Order), G.colourless(2)),
-                        new Effect(new TargetRuleSet(new ResolveRule(ResolveRule.Rule.ResolveController)), new DrawCardsDoer(1)));
+                        new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), new DrawCardsDoer(1)));
                     activatedAbilities.Add(a);
                 } break;
                 #endregion
@@ -299,7 +304,7 @@ namespace stonerkart
                 castSpeed = CastSpeed.Slow;
                 castRange = 2;
                 castEffect = new Effect(new TargetRuleSet(
-                    new ResolveRule(ResolveRule.Rule.ResolveCard),
+                    new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                     new PryTileRule(t => t.card == null)),
                     new MoveToTileDoer());
             }
