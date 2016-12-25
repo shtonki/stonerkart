@@ -250,6 +250,18 @@ namespace stonerkart
                     mightCost = 1;
                 } break;
                 #endregion
+                #region Bear Cavalary
+                case CardTemplate.Bear_Cavalary:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Common;
+
+                    baseMovement = 3;
+                    basePower = 3;
+                    baseToughness = 3;
+                    mightCost = 2;
+                } break;
+                #endregion 
                 default:
                     throw new Exception();
             }
@@ -302,7 +314,7 @@ namespace stonerkart
             controller = owner;
 
 
-            name = ct.ToString().Replace('_', ' ');
+            name = ct.ToString().Replace("_a", "'").Replace('_', ' ');
         }
     }
 }

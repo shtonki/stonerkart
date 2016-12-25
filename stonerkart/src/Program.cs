@@ -14,8 +14,6 @@ namespace stonerkart
     {
         static void Main(string[] args)
         {
-            var v = G.range(4, 7);
-
             //System.AppDomain.CurrentDomain.UnhandledException += G.clapTrap;
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
             Controller.startup();

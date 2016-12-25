@@ -150,8 +150,8 @@ namespace stonerkart
         private void filterCards(Func<CardTemplate, bool> filter)
         {
             var x = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().Where(filter).ToList();
-            x.Sort(srt);
-            filteredCards = x.ToArray();
+            var xx = x.Memesort(srt);
+            filteredCards = xx.ToArray();
 
             page = 0;
             drawCards();
@@ -168,8 +168,8 @@ namespace stonerkart
             if ((int)c1.colours[0] > (int)c2.colours[0]) return 1;
             if ((int)c1.colours[0] < (int)c2.colours[0]) return -1;
 
-            if (c1.convertedManaCost > c2.convertedManaCost) return -1;
-            if (c1.convertedManaCost < c2.convertedManaCost) return 1;
+            if (c1.convertedManaCost > c2.convertedManaCost) return 1;
+            if (c1.convertedManaCost < c2.convertedManaCost) return -1;
 
             return String.Compare(c1.name, c2.name);
         }

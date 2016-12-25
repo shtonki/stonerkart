@@ -48,6 +48,100 @@ namespace stonerkart
             return new ReduceResult<T>(e);
         }
 
+        public static T[] Memesort<T>(this IEnumerable<T> es, Func<T, T, int> cmp)
+        {
+            T[] tl = es.ToArray();
+            Maymsort<T>(tl, 0, tl.Length - 1, cmp);
+            return tl;
+        }
+
+        public static void Maymsort<T>(T[] es, int left, int right, Func<T, T, int> cmp)
+        {
+            if (left >= right) return;
+
+            T pivot = es[left];
+
+            int i = left - 1;
+            int j = right + 1;
+            int r;
+            while (true)
+            {
+                do
+                {
+                    i++;
+                } while (cmp(es[i], pivot) < 0);
+
+                do
+                {
+                    j--;
+                } while (cmp(pivot, es[j]) < 0);
+
+                if (i >= j)
+                {
+                    r = j;
+                    break;
+                }
+
+                T io = es[i];
+                T jo = es[j];
+
+                T tmp = es[j];
+                es[j] = es[i];
+                es[i] = tmp;
+
+                if (cmp(es[i], jo) != 0 || cmp(es[j], io) != 0)
+                {
+                    //throw new Exception();
+                }
+            }
+
+            Maymsort<T>(es, left, r, cmp);
+            Maymsort<T>(es, r+1, right, cmp);
+        }
+
+        public static void Quicksort<T>(T[] elements, int left, int right, Func<T, T, int> cmp)
+        {
+            if (left >= right) return;
+
+            int i = left, j = right;
+            T pivot = elements[left + (right - left) / 2];
+
+            while (i <= j)
+            {
+                while (cmp(elements[i],pivot) < 0)
+                {
+                    i++;
+                }
+
+                while (cmp(elements[j],pivot) > 0)
+                {
+                    j--;
+                }
+
+                if (i <= j)
+                {
+                    // Swap
+                    T tmp = elements[i];
+                    elements[i] = elements[j];
+                    elements[j] = tmp;
+
+                    i++;
+                    j--;
+                }
+            }
+
+            // Recursive calls
+            if (left < j)
+            {
+                Quicksort(elements, left, j, cmp);
+            }
+
+            if (i < right)
+            {
+                Quicksort(elements, i, right, cmp);
+            }
+        }
+
         private static Dictionary<Image, Bitmap> imageCache = new Dictionary<Image, Bitmap>();
 
         public static Bitmap ResizeImage(Image image, int width, int height)
@@ -122,6 +216,7 @@ namespace stonerkart
             return hackedaf[(int)c];
         }
 
+        
         public static IEnumerable<int> range(int min, int max)
         {
             int[] r = new int[max - min];

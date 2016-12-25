@@ -139,11 +139,11 @@ namespace stonerkart
     enum ManaColour
     {
         Colourless,
-        Might, 
-        Life,
         Death,
-        Nature,
+        Might,
         Order,
+        Life,
+        Nature,
         Chaos,
         Multi,
     }

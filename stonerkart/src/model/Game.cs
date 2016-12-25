@@ -33,6 +33,7 @@ namespace stonerkart
 
         private Random random;
         private GameConnection connection;
+        private bool skipFirstDraw = true;
 
         public Game(NewGameStruct ngs, bool local)
         {
@@ -326,7 +327,7 @@ namespace stonerkart
                 } break;
             }
 
-            handleTransaction(new EndOfStepEvent(activePlayer, Steps.Untap));
+            handleTransaction(new EndOfStepEvent(activePlayer, step));
         }
 
         private void untapStep()
@@ -369,7 +370,14 @@ namespace stonerkart
 
         private void drawStep()
         {
-            handleTransaction(new DrawEvent(activePlayer, 1));
+            if (!skipFirstDraw)
+            {
+                handleTransaction(new DrawEvent(activePlayer, 1));
+            }
+            else
+            {
+                skipFirstDraw = false;
+            }
 
             priority();
         }
@@ -772,7 +780,8 @@ namespace stonerkart
             for (int i = 0; i < ts.Length; i++)
             {
                 Effect effect = es[i];
-                TargetMatrix matrix = effect.ts.fillResolve(ts[i], card, this);
+                ResolveEnv env = new ResolveEnv(card);
+                TargetMatrix matrix = effect.ts.fillResolve(ts[i], env, this);
 
                 events.AddRange(effect.doer.act(matrix.generateRows()));
             }

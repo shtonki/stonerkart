@@ -29,13 +29,13 @@ namespace stonerkart
             return new TargetMatrix(r);
         }
 
-        public TargetMatrix fillResolve(TargetMatrix tm, Card resolveCard, Game g)
+        public TargetMatrix fillResolve(TargetMatrix tm, ResolveEnv re, Game g)
         {
             TargetColumn[] r = tm.columns;
 
             for (int i = 0; i < rules.Length; i++)
             {
-                r[i] = rules[i].fillResolveTargets(new ResolveEnv(resolveCard), r[i]);
+                r[i] = rules[i].fillResolveTargets(re, r[i]);
             }
 
             return new TargetMatrix(r);

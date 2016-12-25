@@ -43,7 +43,18 @@ namespace stonerkart
 
         public static TypedGameEventFilter<StartOfStepEvent> startOfOwnersTurn(Card card)
         {
-            return new TypedGameEventFilter<StartOfStepEvent>(evnt => evnt.activePlayer == card.owner && evnt.step == Steps.Untap);
+            //return new TypedGameEventFilter<StartOfStepEvent>(evnt => evnt.activePlayer == card.owner && evnt.step == Steps.Untap);
+            return new TypedGameEventFilter<StartOfStepEvent>(evnt =>
+            {
+                if (evnt.activePlayer == card.owner && evnt.step == Steps.Untap)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            });
         }
     }
 
@@ -51,7 +62,7 @@ namespace stonerkart
     {
         private T baseValue;
         private T currentValue;
-        private List<ModifiableStruct<T>> modifiers;
+        public List<ModifiableStruct<T>> modifiers;
 
         public Modifiable(T baseValue)
         {
