@@ -109,7 +109,7 @@ namespace stonerkart
         {
             if (fonts[size] == null)
             {
-                fonts[size] = new Font("Lucid Sans Unicode", size, FontStyle.Regular);
+                fonts[size] = new Font("Lucid Sans Unicode", size, FontStyle.Bold);
             }
             return fonts[size];
         }

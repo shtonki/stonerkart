@@ -41,9 +41,9 @@ namespace stonerkart
     {
         public enum Timing { Pre, Post };
 
-        private Card card;
-        private GameEventFilter filter;
         public Timing timing;
+        private GameEventFilter filter;
+        private Card card;
 
         public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Cost cost, GameEventFilter trigger, Timing timing, string description) : base(activeIn, effects, castRange, cost, description)
         {
@@ -54,7 +54,7 @@ namespace stonerkart
 
         public bool triggeredBy(GameEvent e)
         {
-            return filter.filter(e);
+            return card.location.pile == activeIn && filter.filter(e);
         }
     }
     

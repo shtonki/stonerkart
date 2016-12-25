@@ -39,22 +39,11 @@ namespace stonerkart
         }
 
         public static TypedGameEventFilter<StartOfStepEvent> startOfEndStep = new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.End);
-        public static TypedGameEventFilter<GameEvent>        never = new TypedGameEventFilter<GameEvent>(e => false);
+        public static TypedGameEventFilter<GameEvent> never { get; } = new TypedGameEventFilter<GameEvent>(e => false);
 
         public static TypedGameEventFilter<StartOfStepEvent> startOfOwnersTurn(Card card)
         {
-            //return new TypedGameEventFilter<StartOfStepEvent>(evnt => evnt.activePlayer == card.owner && evnt.step == Steps.Untap);
-            return new TypedGameEventFilter<StartOfStepEvent>(evnt =>
-            {
-                if (evnt.activePlayer == card.owner && evnt.step == Steps.Untap)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            });
+            return new TypedGameEventFilter<StartOfStepEvent>(evnt => evnt.activePlayer == card.owner && evnt.step == Steps.Untap);
         }
     }
 

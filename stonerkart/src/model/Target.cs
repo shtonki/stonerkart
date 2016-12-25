@@ -201,10 +201,14 @@ namespace stonerkart
                     return new TargetColumn(re.resolveCard);
                 }
 
-
                 case Rule.ResolveControllerCard:
                 {
                     return new TargetColumn(re.resolveCard.controller.heroCard);
+                }
+
+                case Rule.VillainHeroes:
+                {
+                    return new TargetColumn(re.cards.Where(crd => crd.isHeroic && crd.controller != re.resolveCard.controller));
                 }
             }
             throw new Exception();
@@ -214,6 +218,8 @@ namespace stonerkart
         {
             ResolveControllerCard,
             ResolveCard,
+            
+            VillainHeroes,
         }
     }
 
@@ -263,10 +269,12 @@ namespace stonerkart
     struct ResolveEnv
     {
         public Card resolveCard;
+        public IEnumerable<Card> cards;
 
-        public ResolveEnv(Card resolveCard)
+        public ResolveEnv(Card resolveCard, IEnumerable<Card> cards)
         {
             this.resolveCard = resolveCard;
+            this.cards = cards;
         }
     }
 
@@ -288,6 +296,11 @@ namespace stonerkart
         public TargetColumn(params Targetable[] targets)
         {
             this.targets = targets;
+        }
+
+        public TargetColumn(IEnumerable<Targetable> ts) : this(ts.ToArray())
+        {
+            
         }
     }
     

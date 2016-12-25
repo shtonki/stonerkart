@@ -36,6 +36,29 @@ namespace stonerkart
 
             switch (ct)
             {
+                #region Illegal Goblin Laboratory
+                case CardTemplate.Illegal_Goblin_Laboratory:
+                {
+                    cardType = CardType.Creature;
+
+                    basePower = 0;
+                    baseToughness = 4;
+                    baseMovement = 0;
+
+                    chaosCost = 1;
+                    greyCost = 2;
+
+                    addTriggeredAbility(
+                        "At the end of your turn deal 1 damage to every enemy player.",
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new CardResolveRule(CardResolveRule.Rule.VillainHeroes)),
+                        new ZepperDoer(1),
+                        new Cost(),
+                        new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.End && e.activePlayer == controller),
+                        0,
+                        PileLocation.Field
+                        );
+                } break;
+                #endregion
                 #region Belwas
                 case CardTemplate.Belwas:
                 {
@@ -64,24 +87,17 @@ namespace stonerkart
                     orderCost = 3;
                     greyCost = 1;
 
+                    addTriggeredAbility(
+                        "Whenever this creature enters the battlefield under your control, draw two cards.",
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new DrawCardsDoer(2),
+                        new Cost(),
+                        new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
+                        0, 
+                        PileLocation.Field,
+                        TriggeredAbility.Timing.Post
+                        );
 
-                    Effect e = new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), new DrawCardsDoer(2));
-                    Cost c = new Cost();
-                    GameEventFilter t =
-                        new TypedGameEventFilter<MoveToPileEvent>(
-                            moveEvent =>
-                            {
-                                if (moveEvent.card == this && location.pile == PileLocation.Field)
-                                {
-                                    return true;
-                                }
-                                return false;
-                            });
-                    TriggeredAbility ta = new TriggeredAbility(
-                        this, PileLocation.Field, new []{e}, 0, 
-                        c, t, TriggeredAbility.Timing.Post, 
-                        "Whenever this creature enters the battlefield under your control, draw two cards.");
-                    triggeredAbilities.Add(ta);
                 } break;
                 #endregion
                 #region Yung Lich
@@ -97,25 +113,15 @@ namespace stonerkart
                     baseToughness = 2;
                     orderCost = 1;
                     deathCost = 1;
-
-
-                    Effect e = new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), new DrawCardsDoer(1));
-                    Cost c = new Cost();
-                    GameEventFilter t =
-                        new TypedGameEventFilter<MoveToPileEvent>(
-                            moveEvent =>
-                            {
-                                if (moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard && location.pile == PileLocation.Field)
-                                {
-                                    return true;
-                                }
-                                return false;
-                            });
-                    TriggeredAbility ta = new TriggeredAbility(
-                        this, PileLocation.Field, new[] { e }, 0,
-                        c, t, TriggeredAbility.Timing.Pre,
-                        "Whenever this creature enters the graveyard from the battlefield under your control, draw a card.");
-                    triggeredAbilities.Add(ta);
+                    addTriggeredAbility(
+                        "Whenever this creature enters the graveyard from the battlefield under your control, draw a card.",
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new DrawCardsDoer(1),
+                        new Cost(),
+                        new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard && location.pile == PileLocation.Field),
+                        0,
+                        PileLocation.Field
+                        );
                 } break;
                 #endregion
                 #region Cantrip
@@ -158,26 +164,18 @@ namespace stonerkart
                     lifeCost = 2;
                     greyCost = 2;
 
-                    Effect e =
-                        new Effect(
-                            new TargetRuleSet(
-                                new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                            new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)), 
-                            new ZepperDoer(-1));
-                    Cost c = new Cost();
-                    GameEventFilter t =
-                        new TypedGameEventFilter<MoveToPileEvent>(
-                            moveEvent =>
-                            {
-                                return (moveEvent.card.controller == this.controller && 
-                                    moveEvent.to.location.pile == PileLocation.Field && 
-                                    this.location.pile == PileLocation.Field);
-                            });
-                    TriggeredAbility ta = new TriggeredAbility(
-                        this, PileLocation.Field, new[] { e }, 0,
-                        c, t, TriggeredAbility.Timing.Pre,
-                        "Whenever a creature enters the battlefield under your control, gain 1 life.");
-                    triggeredAbilities.Add(ta);
+                    addTriggeredAbility(
+                        "Whenever a creature enters the battlefield under your control, gain 1 life.",
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
+                        new ZepperDoer(-1),
+                        new Cost(),
+                        new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
+                           moveEvent.card.controller == this.controller &&
+                           moveEvent.to.location.pile == PileLocation.Field &&
+                           this.location.pile == PileLocation.Field),
+                        0,
+                        PileLocation.Field
+                        );
                     } break;
                 #endregion
                 #region Nature Heroman
@@ -267,6 +265,12 @@ namespace stonerkart
                     mightCost = 2;
                 } break;
                 #endregion 
+
+                case CardTemplate.missingno:
+                {
+                    
+                } break;
+
                 default:
                     throw new Exception();
             }
@@ -321,5 +325,13 @@ namespace stonerkart
 
             name = ct.ToString().Replace("_a", "'").Replace('_', ' ');
         }
+
+        private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Cost cost, GameEventFilter filter, int castRange, PileLocation activeIn, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
+        {
+            Effect e = new Effect(trs, doer);
+            TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, cost, filter, timing, description);
+            triggeredAbilities.Add(ta);
+        }
+
     }
 }

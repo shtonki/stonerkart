@@ -104,6 +104,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Illegal_Goblin_Laboratory:
+                {
+                    return Resources.artUnstableMemeExperiment;
+                }
+
                 case CardTemplate.Bear_Cavalary:
                 {
                     return Resources.artBearCavalary;

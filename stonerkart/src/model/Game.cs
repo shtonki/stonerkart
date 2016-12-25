@@ -161,7 +161,7 @@ namespace stonerkart
                 if (defender == null)
                 {
                     mover.moveTo(destination);
-                    mover.movement.modify(-path.length, ModifiableSchmoo.intAdd, ModifiableSchmoo.never);
+                    mover.exhaust(-path.length);
                 }
                 else
                 {
@@ -218,11 +218,11 @@ namespace stonerkart
 
             Tile[] ts = new[]
             {
-                map.tileAt(4, 4),
-                map.tileAt(6, 6),
+                map.tileAt(5, 4),
+                map.tileAt(map.width - 6, map.height - 5),
             };
             int ix = 0;
-
+            Controller.redraw();
             foreach (Player p in players)
             {
                 if (ix >= ts.Length) throw new Exception();
@@ -693,7 +693,6 @@ namespace stonerkart
                     }
                     else if (lv == 1)
                     {
-                        Ability ab = chooseAbility(card);
                         stuff = ability = chooseAbility(card);
                     }
                     else if (lv == 2)
@@ -727,7 +726,7 @@ namespace stonerkart
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere;
 
-            bool canCastSlow = stack.Count == 0 && activePlayer == hero && (stepHandler.step == Steps.Main1 || stepHandler.step == Steps.Main1);
+            bool canCastSlow = stack.Count == 0 && activePlayer == hero && (stepHandler.step == Steps.Main1 || stepHandler.step == Steps.Main2);
             if (!canCastSlow)
             {
                 activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
@@ -780,7 +779,7 @@ namespace stonerkart
             for (int i = 0; i < ts.Length; i++)
             {
                 Effect effect = es[i];
-                ResolveEnv env = new ResolveEnv(card);
+                ResolveEnv env = new ResolveEnv(card, cards);
                 TargetMatrix matrix = effect.ts.fillResolve(ts[i], env, this);
 
                 events.AddRange(effect.doer.act(matrix.generateRows()));

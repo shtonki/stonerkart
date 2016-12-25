@@ -763,6 +763,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap artUnstableMemeExperiment {
+            get {
+                object obj = ResourceManager.GetObject("artUnstableMemeExperiment", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap artWolf {
             get {
                 object obj = ResourceManager.GetObject("artWolf", resourceCulture);

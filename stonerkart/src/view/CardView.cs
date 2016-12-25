@@ -166,7 +166,7 @@ namespace stonerkart
             this.nameBox.Location = new System.Drawing.Point(31, 15);
             this.nameBox.Name = "nameBox";
             this.nameBox.Opacity = 100;
-            this.nameBox.Size = new System.Drawing.Size(242, 33);
+            this.nameBox.Size = new System.Drawing.Size(242, 43);
             this.nameBox.TabIndex = 2;
             // 
             // toughnessBox
@@ -235,7 +235,7 @@ namespace stonerkart
             this.manaCostPanel1.Location = new System.Drawing.Point(280, 15);
             this.manaCostPanel1.Name = "manaCostPanel1";
             this.manaCostPanel1.Opacity = 100;
-            this.manaCostPanel1.Size = new System.Drawing.Size(161, 33);
+            this.manaCostPanel1.Size = new System.Drawing.Size(161, 43);
             this.manaCostPanel1.TabIndex = 6;
             // 
             // autoFontTextBox1

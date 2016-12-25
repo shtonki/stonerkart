@@ -137,11 +137,6 @@ namespace stonerkart
 
         public void remodify(GameEvent e)
         {
-            if (template == CardTemplate.Shibby_Shtank && e is EndOfStepEvent)
-            {
-                EndOfStepEvent x = (EndOfStepEvent)e;
-                int i = 0;
-            }
             foreach (Modifiable modifiable in modifiables)
             {
                 modifiable.check(e);
@@ -199,6 +194,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        missingno,
         Belwas,
         Zap,
         Kappa,
@@ -211,6 +207,7 @@ namespace stonerkart
         Unmake,
         Frothing_Goblin,
         Bear_Cavalary,
+        Illegal_Goblin_Laboratory,
     }
 
     enum CardType
