@@ -148,6 +148,11 @@ namespace stonerkart
     {
         private Func<Card, bool> filter;
 
+        public PryCardRule() : this(c => true)
+        {
+            
+        }
+
         public PryCardRule(Func<Card, bool> filter) : base(typeof(Card))
         {
             this.filter = filter;

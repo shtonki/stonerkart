@@ -33,6 +33,8 @@ namespace stonerkart
 
         public string typeText => typeTextEx();
 
+        public Card dummyFor;
+
         public IEnumerable<Ability> abilities => activatedAbilities.Cast<Ability>().Concat(triggeredAbilities);
         private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
         private List<TriggeredAbility> triggeredAbilities = new List<TriggeredAbility>();
@@ -42,7 +44,6 @@ namespace stonerkart
         /// array containing only ManaColour.Colourless.
         /// </summary>
         public List<ManaColour> colours => coloursEx();
-
 
         public bool isHeroic { get; }
 
@@ -161,6 +162,14 @@ namespace stonerkart
                 sb.Append("\r\n");
             }
             return sb.ToString();
+        }
+
+        public Card clone()
+        {
+            Card r = new Card(template, owner);
+            r.dummyFor = this;
+            r.isDummy = true;
+            return r;
         }
 
         private Location locationEx()

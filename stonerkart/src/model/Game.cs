@@ -69,9 +69,9 @@ namespace stonerkart
             setupHandlers();
         }
 
-        public Card createCard(CardTemplate ct, Pile pile, Player owner = null, bool dummy = false)
+        public Card createCard(CardTemplate ct, Pile pile, Player owner = null)
         {
-            Card r = new Card(ct, owner, dummy);
+            Card r = new Card(ct, owner);
             cards.Add(r);
             r.moveTo(pile);
             return r;
@@ -79,7 +79,10 @@ namespace stonerkart
 
         private Card createDummy(Card from, Pile pile)
         {
-            return createCard(from.template, pile, from.controller, true);
+            Card r = from.clone();
+            r.moveTo(pile);
+            cards.Add(r);
+            return r;
         }
 
         public int ord(Card c)
@@ -351,7 +354,7 @@ namespace stonerkart
                 }
                 activePlayer.stuntMana(pool);
                 Controller.setPrompt("Gain mana nerd");
-                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.max[(int)o.colour] != 6);
+                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.current[(int)o.colour] != 6);
                 activePlayer.unstuntMana();
 
                 selection = new ManaOrbSelection(v.colour);
@@ -682,7 +685,7 @@ namespace stonerkart
             if (p == hero)
             {
                 if (cancellable && !Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)) return null;
-                Tile from = p.heroCard.tile;
+                Tile from = card == null ? p.heroCard.tile : card.dummyFor.tile;
                 while (lv >= bt && r == null)
                 {
                     object stuff = null;

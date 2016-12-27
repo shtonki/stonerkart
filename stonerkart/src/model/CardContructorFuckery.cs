@@ -8,7 +8,7 @@ namespace stonerkart
 {
     partial class Card
     {
-        public Card(CardTemplate ct, Player owner = null, bool isDummy = false)
+        public Card(CardTemplate ct, Player owner = null)
         {
             template = ct;
             this.isDummy = isDummy;
@@ -268,8 +268,21 @@ namespace stonerkart
 
                 case CardTemplate.missingno:
                 {
-                    
-                } break;
+                    cardType = CardType.Creature;
+
+                    baseToughness = 1;
+
+                    addTriggeredAbility(
+                        "x",
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                        new ZepperDoer(1),
+                        new Cost(),
+                        new TypedGameEventFilter<PlaceOnTileEvent>(e => e.card == this),
+                        2,
+                        PileLocation.Field,
+                        TriggeredAbility.Timing.Post
+                        );
+                    } break;
 
                 default:
                     throw new Exception();
