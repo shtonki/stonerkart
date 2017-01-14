@@ -21,6 +21,21 @@ namespace stonerkart
 
     }
 
+    struct DoerToolKit
+    {
+        public bool activePlayer { get; }
+
+        public Action<int[]> sendChoices { get; }
+        public Func<int[]> receiveChoices { get; }
+
+        public DoerToolKit(bool activePlayer, Action<int[]> sendChoices, Func<int[]> receiveChoices)
+        {
+            this.activePlayer = activePlayer;
+            this.sendChoices = sendChoices;
+            this.receiveChoices = receiveChoices;
+        }
+    }
+
     abstract class Doer : TypeSigned
     {
         public Doer(params Type[] typeSignatureTypes) : base(typeSignatureTypes)

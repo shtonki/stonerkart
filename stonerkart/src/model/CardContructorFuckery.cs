@@ -155,6 +155,8 @@ namespace stonerkart
                 case CardTemplate.Temple_Healer:
                 {
                     cardType = CardType.Creature;
+                    race = Race.Human;
+                    subtype = Subtype.Cleric;
                     rarity = Rarity.Uncommon;
 
                     basePower = 3;

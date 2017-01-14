@@ -188,16 +188,10 @@ namespace stonerkart
             return name;
         }
 
-        private static Card[] flyweight = Enum.GetValues(typeof (CardTemplate)).Cast<CardTemplate>().Select(ct => (Card)null).ToArray();
+        private static Card[] flyweight = Enum.GetValues(typeof (CardTemplate)).Cast<CardTemplate>().Select(ct => new Card(ct)).ToArray();
         public static Card fromTemplate(CardTemplate ct)
         {
-            int ix = (int)ct;
-            if (flyweight[ix] == null)
-            {
-                Card c = new Card(ct);
-                flyweight[ix] = c;
-            }
-            return flyweight[ix];
+            return flyweight[(int)ct];
         }
     }
 

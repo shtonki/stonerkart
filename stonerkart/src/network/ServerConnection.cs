@@ -28,7 +28,7 @@ namespace stonerkart
         {
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            IAsyncResult result = socket.BeginConnect("82.196.98.15", 420, null, null);
+            IAsyncResult result = socket.BeginConnect("46.239.124.155", 420, null, null);
 
             bool success = result.AsyncWaitHandle.WaitOne(2500, true);
 
