@@ -87,7 +87,8 @@ namespace stonerkart
         {
             int l = columns.Aggregate(1, (current, c) => current*c.targets.Length);
             TargetRow[] r = new TargetRow[l];
-            if (l != 1) throw new Exception();
+            if (l == 0) return r;
+            if (l > 1) throw new Exception();
 
             Targetable[] i1 = new Targetable[columns.Length];
             for (int i = 0; i < columns.Length; i++)
@@ -112,6 +113,36 @@ namespace stonerkart
 
         public abstract TargetColumn? fillCastTargets(ChooseTargetToolbox f);
         public abstract TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c);
+    }
+
+    class AoeRule : TargetRule
+    {
+        private PryTileRule ruler;
+        private int radius;
+        private Func<Card, bool> cardFilter;
+
+
+        public AoeRule(Func<Tile, bool> filter, int radius, Func<Card, bool> cardFilter) : base(typeof(Card))
+        {
+            ruler = new PryTileRule(filter);
+            this.radius = radius;
+            this.cardFilter = cardFilter;
+        }
+
+        public override TargetColumn? fillCastTargets(ChooseTargetToolbox f)
+        {
+            return ruler.fillCastTargets(f);
+        }
+
+        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        {
+            if (c.targets.Length != 1) throw new Exception();
+            Tile centre = (Tile)c.targets[0];
+            var v = centre.withinDistance(radius).Where(t => t.card != null && cardFilter(t.card)).Select(t => t.card);
+            return new TargetColumn(v);
+        }
+
+        
     }
 
     class PryTileRule : TargetRule

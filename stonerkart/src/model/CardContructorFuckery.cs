@@ -270,20 +270,13 @@ namespace stonerkart
 
                 case CardTemplate.missingno:
                 {
-                    cardType = CardType.Creature;
+                    cardType = CardType.Instant;
 
-                    baseToughness = 1;
+                    castRange = 6;
+                    castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new AoeRule(t => true, 2, c => true)),
+                    new ZepperDoer(1));
+                    castDescription = "Return target non-heroic creature to its owner's hand.";
 
-                    addTriggeredAbility(
-                        "x",
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
-                        new ZepperDoer(1),
-                        new Cost(),
-                        new TypedGameEventFilter<PlaceOnTileEvent>(e => e.card == this),
-                        2,
-                        PileLocation.Field,
-                        TriggeredAbility.Timing.Post
-                        );
                     } break;
 
                 default:
