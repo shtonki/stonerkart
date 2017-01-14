@@ -14,19 +14,136 @@ namespace stonerkart
 
         public static Image artImage(CardTemplate ct)
         {
-            if (cache.ContainsKey(ct))
+            return xd<CardTemplate>(ct, artImageEx);
+        }
+
+        public static Image frameImage(ManaColour colour)
+        {
+            return xd<ManaColour>(colour, frameImageEx);
+        }
+
+        public static Image orbImage(ManaColour c)
+        {
+            //wrapped in tuple to diferentiate between frameImage caching
+            return xd<Tuple<ManaColour>>(new Tuple<ManaColour>(c), l => manaImageEx(l.Item1));
+        }
+
+        public static Image cardSetImage(CardSet cardSet, Rarity r)
+        {
+            return xd<Tuple<CardSet, Rarity>>(new Tuple<CardSet, Rarity>(cardSet, r), cardSetImageEx);
+        }
+
+        private static Image xd<T>(T o, Func<T, Image> f)
+        {
+            if (cache.ContainsKey(o))
             {
-                return cache[ct];
+                return cache[o];
             }
-            Image rt = artImageEx(ct);
-            cache[ct] = rt;
+            Image rt = f(o);
+            cache[o] = rt;
             return rt;
         }
 
-        public static Image artImageEx(CardTemplate ct)
+        private static Image cardSetImageEx(Tuple<CardSet, Rarity> tpl)
+        {
+            CardSet cs = tpl.Item1;
+            Rarity r = tpl.Item2;
+
+            Bitmap baseImage;
+            Color swapColour;
+
+            switch (cs)
+            {
+                case CardSet.FirstEdition:
+                {
+                    baseImage = Resources.setFirstedition;
+                } break;
+
+                default: throw new NotImplementedException();
+            }
+
+            switch (r)
+            {
+                case Rarity.Common:
+                {
+                    swapColour = Color.Black; 
+                } break;
+
+                case Rarity.Uncommon:
+                {
+                    swapColour = Color.DodgerBlue;
+                } break;
+
+                case Rarity.Rare:
+                {
+                    swapColour = Color.MediumVioletRed;
+                } break;
+
+                case Rarity.Legendary:
+                {
+                    swapColour = Color.DarkGoldenrod;
+                } break;
+
+                default: throw new NotImplementedException();
+            }
+
+            for (int x = 0; x < baseImage.Width; x++)
+            {
+                for (int y = 0; y < baseImage.Height; y++)
+                {
+                    Color gotColor = baseImage.GetPixel(x, y);
+                    gotColor = Color.FromArgb(gotColor.A, swapColour.R, swapColour.G, swapColour.B);
+                    baseImage.SetPixel(x, y, gotColor);
+                }
+            }
+
+            return baseImage;
+        }
+
+        private static Image artImageEx(CardTemplate ct)
         {
             switch (ct)
             {
+                case CardTemplate.Illegal_Goblin_Laboratory:
+                {
+                    return Resources.artUnstableMemeExperiment;
+                }
+
+                case CardTemplate.Bear_Cavalary:
+                {
+                    return Resources.artBearCavalary;
+                }
+
+                case CardTemplate.Frothing_Goblin:
+                {
+                    return Resources.artFrothingGoblin;
+                }
+
+                case CardTemplate.Unmake:
+                {
+                    return Resources.artUnmake;
+                }
+
+                case CardTemplate.Shibby_Shtank:
+                {
+                    return Resources.artEssenceOfClarity;
+                }
+
+                case CardTemplate.Risen_Abberation:
+                {
+                    return Resources.artSolemnAberration;
+                }
+
+                case CardTemplate.Nature_Heroman:
+                {
+                    return Resources.artLoneRanger;
+                }
+
+                case CardTemplate.Yung_Lich:
+                {
+                    return Resources.artYungLich;
+                }
+
                 case CardTemplate.Belwas:
                 {
                     return Resources.artBelwas;
@@ -42,77 +159,68 @@ namespace stonerkart
                     return Resources.artKappa;
                 }
 
+                case CardTemplate.Cantrip:
+                {
+                    return Resources.artAlterFate;
+                }
+
+                case CardTemplate.Temple_Healer:
+                {
+                    return Resources.artTempleHealer;
+                }
+
                 default:
                 {
-                    return Resources.orbLife;
+                    return Resources.artNothing;
                 }
             }
-        }
-
-
-        public static Image frameImage(ManaColour colour)
-        {
-            if (cache.ContainsKey(colour))
-            {
-                return cache[colour];
-            }
-            Image rt = frameImageEx(colour);
-            cache[colour] = rt;
-            return rt;
         }
 
         private static Image frameImageEx(ManaColour colour)
         {
             switch (colour)
             {
+                case ManaColour.Multi:
+                {
+                    return Resources.frameMulti;
+                }
+
                 case ManaColour.Death:
                 {
                     return Resources.frameDeath;
-                } break;
+                } 
 
                 case ManaColour.Life:
                 {
                     return Resources.lifeFrame;
-                } break;
+                } 
 
                 case ManaColour.Chaos:
                 {
                     return Resources.frameChaos;
-                } break;
+                } 
 
                 case ManaColour.Nature:
                 {
                     return Resources.frameNature;
-                } break;
+                } 
 
                 case ManaColour.Might:
                 {
                     return Resources.frameMight;
-                } break;
+                } 
                         
                 case ManaColour.Order:
                 {
                     return Resources.frameOrder;
-                } break;
+                } 
 
                 case ManaColour.Colourless:
                 {
                     return Resources.frameGrey;
-                } break;
+                } 
             }
             throw new Exception();
-        }
-
-        public static Image orbImage(ManaColour c)
-        {
-            Tuple<ManaColour> t = new Tuple<ManaColour>(c);
-            if (cache.ContainsKey(t))
-            {
-                return cache[t];
-            }
-            Image rt = manaImageEx(c);
-            cache[t] = rt;
-            return rt;
         }
 
         private static Image manaImageEx(ManaColour c)
@@ -139,6 +247,9 @@ namespace stonerkart
 
                 case ManaColour.Colourless:
                     return Properties.Resources.orbColourless;
+
+                case ManaColour.Multi:
+                    return Resources.orbMulti;
 
                 default:
                     throw new Exception();

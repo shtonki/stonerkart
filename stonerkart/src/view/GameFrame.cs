@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using stonerkart.src.view;
 
 namespace stonerkart
 {
@@ -33,7 +32,7 @@ namespace stonerkart
             mapEditorScreen = new MapEditor();
             deckEditorScreen = new DeckEditorPanel();
             loginPanel = new LoginScreen();
-            Closed += (_, __) => Environment.Exit(1);
+            Closed += (_, __) => Controller.quit();
             Resize += (_, __) =>
             {
                 int w = ClientSize.Width;
@@ -44,11 +43,14 @@ namespace stonerkart
             };
         }
 
-        public DraggablePanel showPanel(Control content)
+        public DraggablePanel showPanel(Control content, bool resizeable = true, bool closeable = true)
         {
-            DraggablePanel r = new DraggablePanel(content);
-            Controls.Add(r);
-            r.BringToFront();
+            DraggablePanel r = new DraggablePanel(content, resizeable, closeable);
+            this.memeout(() =>
+            {
+                Controls.Add(r);
+                r.BringToFront();
+            });
             return r;
         }
 
@@ -65,7 +67,7 @@ namespace stonerkart
                 };
                 for (int i = 0; i < bs.Length; i++)
                 {
-                    if (buttons.Length > i)
+                    if (buttons.Length > i && buttons[i] != ButtonOption.NOTHING)
                     {
                         bs[i].Visible = true;
                         bs[i].setOption(buttons[i]);

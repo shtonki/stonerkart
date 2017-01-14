@@ -41,6 +41,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -101,6 +102,7 @@
     <Compile Include="src\network\ServerConnection.cs" />
     <Compile Include="src\util\ImageLoader.cs" />
     <Compile Include="src\util\Observable.cs" />
+    <Compile Include="src\util\Settings.cs" />
     <Compile Include="src\view\AutoFontTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -159,7 +161,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="src\view\StepPanel.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="src\view\StickyPanel.cs">
       <SubType>UserControl</SubType>
@@ -220,7 +222,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="codemap.dgml" />
-    <None Include="Resources\14691083_189944301454153_378468379668925571_n.jpg" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -234,6 +235,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="musings.txt" />
+    <None Include="Resources\artUnstableMemeExperiment.png" />
+    <Content Include="rules.txt" />
+    <None Include="Resources\multi.png" />
+    <None Include="Resources\firstedition.png" />
     <None Include="Resources\frameMight.png" />
     <None Include="Resources\frameOrder.png" />
     <None Include="Resources\Namnlös.png" />
@@ -322,7 +327,6 @@
     <None Include="Resources\death.png" />
     <None Include="Resources\chaos.png" />
     <None Include="Resources\Image1.bmp" />
-    <None Include="Resources\1473797210360.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

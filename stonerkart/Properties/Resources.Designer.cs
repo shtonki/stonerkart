@@ -763,6 +763,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap artUnstableMemeExperiment {
+            get {
+                object obj = ResourceManager.GetObject("artUnstableMemeExperiment", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap artWolf {
             get {
                 object obj = ResourceManager.GetObject("artWolf", resourceCulture);
@@ -923,6 +933,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap orbMulti {
+            get {
+                object obj = ResourceManager.GetObject("orbMulti", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap orbNature {
             get {
                 object obj = ResourceManager.GetObject("orbNature", resourceCulture);
@@ -936,6 +956,16 @@ namespace stonerkart.Properties {
         internal static System.Drawing.Bitmap orbOrder {
             get {
                 object obj = ResourceManager.GetObject("orbOrder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap setFirstedition {
+            get {
+                object obj = ResourceManager.GetObject("setFirstedition", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

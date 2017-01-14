@@ -1,16 +1,146 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace stonerkart
 {
+    class ReduceResult<T>
+    {
+        public IEnumerable<T> values => d.Keys;
+
+        public int this[T t]    // Indexer declaration  
+        {
+            get { return d[t]; }
+        }
+
+        private Dictionary<T, int> d = new Dictionary<T, int>();
+
+        public ReduceResult(IEnumerable<T> e)
+        {
+            foreach (var t in e)
+            {
+                if (!d.ContainsKey(t)) d[t] = 0;
+                d[t] = d[t] + 1;
+            }
+        }
+    }
+
     static class G
     {
+        private static char[] hackish = G.range(0, 20).Select(v => (char)('\u2460' + v)).ToArray();
+
+        private static char[] hackedaf =
+            Enum.GetValues(typeof (ManaColour))
+                .Cast<ManaColour>()
+                .Select(c => (char)('\u24b6' + (c.ToString().ToLower())[0] - 97))
+                .ToArray();
+
+        public static ReduceResult<T> Reduce<T>(this IEnumerable<T> e)
+        {
+            return new ReduceResult<T>(e);
+        }
+
+        public static T[] Memesort<T>(this IEnumerable<T> es, Func<T, T, int> cmp)
+        {
+            T[] tl = es.ToArray();
+            Maymsort<T>(tl, 0, tl.Length - 1, cmp);
+            return tl;
+        }
+
+        public static void Maymsort<T>(T[] es, int left, int right, Func<T, T, int> cmp)
+        {
+            if (left >= right) return;
+
+            T pivot = es[left];
+
+            int i = left - 1;
+            int j = right + 1;
+            int r;
+            while (true)
+            {
+                do
+                {
+                    i++;
+                } while (cmp(es[i], pivot) < 0);
+
+                do
+                {
+                    j--;
+                } while (cmp(pivot, es[j]) < 0);
+
+                if (i >= j)
+                {
+                    r = j;
+                    break;
+                }
+
+                T io = es[i];
+                T jo = es[j];
+
+                T tmp = es[j];
+                es[j] = es[i];
+                es[i] = tmp;
+
+                if (cmp(es[i], jo) != 0 || cmp(es[j], io) != 0)
+                {
+                    //throw new Exception();
+                }
+            }
+
+            Maymsort<T>(es, left, r, cmp);
+            Maymsort<T>(es, r+1, right, cmp);
+        }
+
+        public static void Quicksort<T>(T[] elements, int left, int right, Func<T, T, int> cmp)
+        {
+            if (left >= right) return;
+
+            int i = left, j = right;
+            T pivot = elements[left + (right - left) / 2];
+
+            while (i <= j)
+            {
+                while (cmp(elements[i],pivot) < 0)
+                {
+                    i++;
+                }
+
+                while (cmp(elements[j],pivot) > 0)
+                {
+                    j--;
+                }
+
+                if (i <= j)
+                {
+                    // Swap
+                    T tmp = elements[i];
+                    elements[i] = elements[j];
+                    elements[j] = tmp;
+
+                    i++;
+                    j--;
+                }
+            }
+
+            // Recursive calls
+            if (left < j)
+            {
+                Quicksort(elements, left, j, cmp);
+            }
+
+            if (i < right)
+            {
+                Quicksort(elements, i, right, cmp);
+            }
+        }
 
         private static Dictionary<Image, Bitmap> imageCache = new Dictionary<Image, Bitmap>();
 
@@ -74,6 +204,46 @@ namespace stonerkart
                 gfx.DrawImage(image, new Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
             }
             return bmp;
+        }
+
+        public static char colourless(int i)
+        {
+            return hackish[i-1];
+        }
+
+        public static char coloured(ManaColour c)
+        {
+            return hackedaf[(int)c];
+        }
+
+        
+        public static IEnumerable<int> range(int min, int max)
+        {
+            int[] r = new int[max - min];
+
+            for (int i = 0; i < max - min; i++)
+            {
+                r[i] = min + i;
+            }
+
+            return r;
+        }
+
+        public static void clapTrap(object sender, UnhandledExceptionEventArgs e)
+        {
+            Form2 f = new Form2();
+            AutoFontTextBox b = new AutoFontTextBox();
+            b.Text = e.ExceptionObject.ToString();
+            f.Controls.Add(b);
+            f.Closed += (_, __) => Environment.Exit(2);
+            f.Resize += (_, __) => b.Size = f.ClientSize;
+            f.Size = new Size(600, 600);
+            Application.Run(f);
+        }
+
+        private class Form2 : Form
+        {
+            
         }
     }
 }

@@ -11,6 +11,8 @@ namespace stonerkart
         public List<Action<Clickable>> clickedCallbacks { get; } = new List<Action<Clickable>>();
         public List<Action<Clickable>> mouseEnteredCallbacks { get; } = new List<Action<Clickable>>();
 
+        public Func<CardView, CardView, int> comp { get; set; }
+
         public bool vertical { get; set; }
 
         public CardsPanel()
@@ -20,8 +22,11 @@ namespace stonerkart
             DoubleBuffered = true;
             Resize += (_, __) => layoutCards();
             MouseMove += xd;
-            //Capture = true;
+        }
 
+        public CardsPanel(Func<CardView, CardView, int> comp) : this()
+        {
+            this.comp = comp;
         }
 
         private void clicked(CardView c)
@@ -91,8 +96,11 @@ namespace stonerkart
             cv.MouseMove += xd;
             cv.MouseLeave += (a, b) => OnMouseLeave(b);
             
+            if (comp != null) cardViews.Sort((v1, v2) => comp(v1, v2));
+
             this.memeout(() => Controls.Add(cv));
         }
+
 
         private void removeCardView(Card c)
         {
@@ -169,11 +177,17 @@ namespace stonerkart
         {
             if (t.added)
             {
-                addCardView(t.card);
+                foreach (Card c in t.cards)
+                {
+                    addCardView(c);
+                }
             }
             else
             {
-                removeCardView(t.card);
+                foreach (Card c in t.cards)
+                {
+                    removeCardView(c);
+                }
             }
             layoutCards();
         }

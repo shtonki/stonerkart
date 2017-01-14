@@ -15,29 +15,39 @@ namespace stonerkart
         public Player owner { get; }
         public Player controller { get; }
         public CardTemplate template { get; }
+        public bool isDummy { get; private set; }
         public CardType cardType { get; }
         public Rarity rarity { get; }
-        public string breadText { get; }
+        public CardSet set { get; }
+        public Race? race { get; }
+        public Subtype? subtype { get; }
+        public int convertedManaCost => castManaCost.orbs.Count();
 
-        public Location location => pile.location;
+        public string breadText => breadTextEx();
+
+        public Location location => locationEx();
+
         public ActivatedAbility castAbility { get; }
         public int castRange => castAbility.castRange;
         public ManaSet castManaCost => castAbility.cost.getSubCost<ManaCost>().cost;
 
         public string typeText => typeTextEx();
 
-        public IEnumerable<Ability> abilities => activatedAbilities;
+        public Card dummyFor;
+
+        public IEnumerable<Ability> abilities => activatedAbilities.Cast<Ability>().Concat(triggeredAbilities);
         private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
         private List<TriggeredAbility> triggeredAbilities = new List<TriggeredAbility>();
-        public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).Cast<ActivatedAbility>().ToArray();
+        public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).ToArray();
         /// <summary>
         /// Returns a list containing the unique colours of the card. If the card has no mana cost it returns an 
         /// array containing only ManaColour.Colourless.
         /// </summary>
         public List<ManaColour> colours => coloursEx();
 
-
         public bool isHeroic { get; }
+
+        public bool hasPT => cardType == CardType.Creature;
         public Modifiable<int> power { get; }
         public Modifiable<int> toughness { get; }
         public Modifiable<int> movement { get; }
@@ -59,9 +69,10 @@ namespace stonerkart
             t.place(this);
         }
 
-        public void exhaust()
+        public void exhaust(int steps = -1)
         {
-            movement.modify(-movement, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(this));
+            int v = steps < 0 ? movement : steps;
+            movement.modify(-v, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(this));
         }
 
         private List<ManaColour> coloursEx()
@@ -110,18 +121,22 @@ namespace stonerkart
             IEnumerable<Ability> l;
             if (c == _TRIGGERED)
             {
-                l = triggeredAbilities.Cast<Ability>();
+                return triggeredAbilities[i];
             }
             else if (c == _ACTIVATED)
             {
-                l = activatedAbilities.Cast<Ability>();
+                return activatedAbilities[i];
             }
             else throw new Exception();
 
-            return l.ToArray()[i];
         }
 
-        public void reherp(GameEvent e)
+        public IEnumerable<TriggeredAbility> abilitiesTriggeredBy(GameEvent e)
+        {
+            return triggeredAbilities.Where(a => a.triggeredBy(e));
+        }
+
+        public void remodify(GameEvent e)
         {
             foreach (Modifiable modifiable in modifiables)
             {
@@ -129,12 +144,38 @@ namespace stonerkart
             }
         }
 
+
         private string typeTextEx()
         {
             string s = isHeroic ? "Heroic " : "";
             s += cardType.ToString(); 
 
             return s;
+        }
+
+        private string breadTextEx()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (Ability a in abilities)
+            {
+                sb.Append(a.description);
+                sb.Append("\r\n");
+            }
+            return sb.ToString();
+        }
+
+        public Card clone()
+        {
+            Card r = new Card(template, owner);
+            r.dummyFor = this;
+            r.isDummy = true;
+            return r;
+        }
+
+        private Location locationEx()
+        {
+            if (pile == null) throw new Exception();
+            return pile.location;
         }
 
         public void notify(int t)
@@ -146,13 +187,36 @@ namespace stonerkart
         {
             return name;
         }
+
+        private static Card[] flyweight = Enum.GetValues(typeof (CardTemplate)).Cast<CardTemplate>().Select(ct => (Card)null).ToArray();
+        public static Card fromTemplate(CardTemplate ct)
+        {
+            int ix = (int)ct;
+            if (flyweight[ix] == null)
+            {
+                Card c = new Card(ct);
+                flyweight[ix] = c;
+            }
+            return flyweight[ix];
+        }
     }
 
     enum CardTemplate
     {
+        missingno,
         Belwas,
         Zap,
         Kappa,
+        Cantrip,
+        Temple_Healer,
+        Yung_Lich,
+        Nature_Heroman,
+        Risen_Abberation,
+        Shibby_Shtank,
+        Unmake,
+        Frothing_Goblin,
+        Bear_Cavalary,
+        Illegal_Goblin_Laboratory,
     }
 
     enum CardType
@@ -174,5 +238,25 @@ namespace stonerkart
     {
         Instant,
         Slow,
+    }
+
+    enum CardSet
+    {
+        FirstEdition,
+    }
+
+    enum Race
+    {
+        Human,
+        Undead,
+        Lizard,
+        Goblin,
+    }
+
+    enum Subtype
+    {
+        Warrior,
+        Wizard,
+        Cleric,
     }
 }

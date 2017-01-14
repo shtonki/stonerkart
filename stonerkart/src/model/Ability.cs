@@ -12,23 +12,26 @@ namespace stonerkart
         public Effect[] effects;
         public int castRange;
         public Cost cost;
+        public string description;
 
-        public Ability(PileLocation activeIn, Effect[] effects, int castRange, Cost cost)
+        public Ability(PileLocation activeIn, Effect[] effects, int castRange, Cost cost, string description)
         {
             this.activeIn = activeIn;
             this.effects = effects;
             this.castRange = castRange;
             this.cost = cost;
+            this.description = description;
         }
     }
 
     class ActivatedAbility : Ability
     {
         public bool isInstant => castSpeed == CastSpeed.Instant;
-        public CastSpeed castSpeed;
+
+        private CastSpeed castSpeed;
 
 
-        public ActivatedAbility(PileLocation activeIn, int castRange, Cost cost, CastSpeed castSpeed, params Effect[] effects) : base(activeIn, effects, castRange, cost)
+        public ActivatedAbility(PileLocation activeIn, int castRange, Cost cost, CastSpeed castSpeed, string description, params Effect[] effects) : base(activeIn, effects, castRange, cost, description)
         {
             this.castSpeed = castSpeed;
         }
@@ -36,8 +39,22 @@ namespace stonerkart
 
     class TriggeredAbility : Ability
     {
-        public TriggeredAbility(PileLocation activeIn, Effect[] effects, int castRange, Cost cost) : base(activeIn, effects, castRange, cost)
+        public enum Timing { Pre, Post };
+
+        public Timing timing;
+        private GameEventFilter filter;
+        private Card card;
+
+        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Cost cost, GameEventFilter trigger, Timing timing, string description) : base(activeIn, effects, castRange, cost, description)
         {
+            this.card = card;
+            filter = trigger;
+            this.timing = timing;
+        }
+
+        public bool triggeredBy(GameEvent e)
+        {
+            return card.location.pile == activeIn && filter.filter(e);
         }
     }
     

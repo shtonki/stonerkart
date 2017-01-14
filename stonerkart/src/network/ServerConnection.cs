@@ -26,9 +26,18 @@ namespace stonerkart
 
         private static Socket generateSocket()
         {
-            EndPoint endpoint = new IPEndPoint(IPAddress.Parse("82.196.98.15"), 420);
-            Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endpoint);
+            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            IAsyncResult result = socket.BeginConnect("82.196.98.15", 420, null, null);
+
+            bool success = result.AsyncWaitHandle.WaitOne(2500, true);
+
+            if (!success)
+            {
+                socket.Close();
+                throw new ApplicationException("server fucked");
+            }
+
             return socket;
         }
     }

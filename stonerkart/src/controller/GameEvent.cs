@@ -6,23 +6,32 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    interface GameEvent
+    class GameEvent
     {
+        public int id { get; }
+        private static int idCtr = 0;
+
+        public GameEvent()
+        {
+            id = idCtr++;
+        }
     }
     
     class MoveToPileEvent : GameEvent
     {
-        public Pile pile;
+        public Pile to;
         public Card card;
+        public bool nullTile;
 
-        public MoveToPileEvent(Card card, Pile pile)
+        public MoveToPileEvent(Card card, Pile to, bool nullTile = true)
         {
-            this.pile = pile;
+            this.to = to;
             this.card = card;
+            this.nullTile = nullTile;
         }
     }
 
-    struct DamageEvent : GameEvent
+    class DamageEvent : GameEvent
     {
         public Card source;
         public Card target;
@@ -36,7 +45,7 @@ namespace stonerkart
         }
     }
 
-    struct PayCostsEvent : GameEvent
+    class PayCostsEvent : GameEvent
     {
         public Player player;
         public Ability ability;
@@ -50,7 +59,7 @@ namespace stonerkart
         }
     }
 
-    struct PlaceOnTileEvent : GameEvent
+    class PlaceOnTileEvent : GameEvent
     {
         public Card card { get; }
         public Tile tile { get; }
@@ -62,7 +71,7 @@ namespace stonerkart
         }
     }
 
-    struct MoveEvent : GameEvent
+    class MoveEvent : GameEvent
     {
         public Card card { get; }
         public Path path { get; }
@@ -74,7 +83,7 @@ namespace stonerkart
         }
     }
 
-    struct CastEvent : GameEvent
+    class CastEvent : GameEvent
     {
         public StackWrapper wrapper { get; }
 
@@ -84,7 +93,7 @@ namespace stonerkart
         }
     }
 
-    struct StartOfStepEvent : GameEvent
+    class StartOfStepEvent : GameEvent
     {
         public Player activePlayer;
         public Steps step { get; }
@@ -96,7 +105,7 @@ namespace stonerkart
         }
     }
 
-    struct EndOfStepEvent : GameEvent
+    class EndOfStepEvent : GameEvent
     {
         public Player activePlayer;
         public Steps step { get; }
@@ -108,7 +117,7 @@ namespace stonerkart
         }
     }
 
-    struct DrawEvent : GameEvent
+    class DrawEvent : GameEvent
     {
         public Player player { get; }
         public int cards { get; }

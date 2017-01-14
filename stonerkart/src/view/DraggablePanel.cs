@@ -26,7 +26,7 @@ namespace stonerkart
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
 
-        public DraggablePanel(Control content, bool resizeable = true, bool closeable = true)
+        public DraggablePanel(Control content, bool resizeable, bool closeable)
         {
             topPanel = new Panel();
             topPanel.BackColor = Color.Chocolate;

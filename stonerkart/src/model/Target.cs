@@ -6,11 +6,31 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class TargetRuleSet
+    abstract class TypeSigned
+    {
+        protected Type[] typeSignatureTypes;
+
+        public TypeSigned(IEnumerable<Type> typeSignatureTypes) : this(typeSignatureTypes.ToArray())
+        {
+
+        }
+
+        public TypeSigned(params Type[] typeSignatureTypes)
+        {
+            this.typeSignatureTypes = typeSignatureTypes;
+        }
+
+        public bool matchesTypeSignatureOf(TypeSigned other)
+        {
+            return typeSignatureTypes.SequenceEqual(other.typeSignatureTypes);
+        }
+    }
+
+    class TargetRuleSet : TypeSigned
     {
         public TargetRule[] rules;
 
-        public TargetRuleSet(params TargetRule[] rules)
+        public TargetRuleSet(params TargetRule[] rules) : base(rules.Select(r => r.targetType))
         {
             this.rules = rules;
         }
@@ -29,13 +49,13 @@ namespace stonerkart
             return new TargetMatrix(r);
         }
 
-        public TargetMatrix fillResolve(TargetMatrix tm, Card resolveCard, Game g)
+        public TargetMatrix fillResolve(TargetMatrix tm, ResolveEnv re, Game g)
         {
             TargetColumn[] r = tm.columns;
 
             for (int i = 0; i < rules.Length; i++)
             {
-                r[i] = rules[i].fillResolveTargets(new ResolveEnv(resolveCard), r[i]);
+                r[i] = rules[i].fillResolveTargets(re, r[i]);
             }
 
             return new TargetMatrix(r);
@@ -81,22 +101,29 @@ namespace stonerkart
         }
     }
 
-    interface TargetRule
+    abstract class TargetRule
     {
-        TargetColumn? fillCastTargets(ChooseTargetToolbox f);
-        TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c);
+        public Type targetType { get; set; }
+
+        public TargetRule(Type targetType)
+        {
+            this.targetType = targetType;
+        }
+
+        public abstract TargetColumn? fillCastTargets(ChooseTargetToolbox f);
+        public abstract TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c);
     }
 
     class PryTileRule : TargetRule
     {
         private Func<Tile, bool> filter;
 
-        public PryTileRule(Func<Tile, bool> filter)
+        public PryTileRule(Func<Tile, bool> filter) : base(typeof(Tile))
         {
             this.filter = filter;
         }
 
-        public TargetColumn? fillCastTargets(ChooseTargetToolbox box)
+        public override TargetColumn? fillCastTargets(ChooseTargetToolbox box)
         {
             while (true)
             {
@@ -111,7 +138,7 @@ namespace stonerkart
             }
         }
 
-        public TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
         {
             return c;
         }
@@ -121,12 +148,17 @@ namespace stonerkart
     {
         private Func<Card, bool> filter;
 
-        public PryCardRule(Func<Card, bool> filter)
+        public PryCardRule() : this(c => true)
+        {
+            
+        }
+
+        public PryCardRule(Func<Card, bool> filter) : base(typeof(Card))
         {
             this.filter = filter;
         }
 
-        public TargetColumn? fillCastTargets(ChooseTargetToolbox box)
+        public override TargetColumn? fillCastTargets(ChooseTargetToolbox box)
         {
             while (true)
             {
@@ -147,22 +179,24 @@ namespace stonerkart
             }
         }
 
-        public TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
         {
             return c;
         }
     }
 
-    class ResolveRule : TargetRule
+
+
+    class CardResolveRule : ResolveRule
     {
         private Rule rule;
 
-        public ResolveRule(Rule rule)
+        public CardResolveRule(Rule rule) : base(typeof(Card))
         {
             this.rule = rule;
         }
 
-        public TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
         {
             if (c.targets.Length != 0) throw new Exception();
             switch (rule)
@@ -171,28 +205,81 @@ namespace stonerkart
                 {
                     return new TargetColumn(re.resolveCard);
                 }
+
+                case Rule.ResolveControllerCard:
+                {
+                    return new TargetColumn(re.resolveCard.controller.heroCard);
+                }
+
+                case Rule.VillainHeroes:
+                {
+                    return new TargetColumn(re.cards.Where(crd => crd.isHeroic && crd.controller != re.resolveCard.controller));
+                }
             }
             throw new Exception();
         }
 
-        public TargetColumn? fillCastTargets(ChooseTargetToolbox box)
+        public enum Rule
+        {
+            ResolveControllerCard,
+            ResolveCard,
+            
+            VillainHeroes,
+        }
+    }
+
+    class PlayerResolveRule : ResolveRule
+    {
+        private Rule rule;
+
+        public PlayerResolveRule(Rule rule) : base(typeof(Player))
+        {
+            this.rule = rule;
+        }
+
+        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        {
+            if (c.targets.Length != 0) throw new Exception();
+            switch (rule)
+            {
+                case Rule.ResolveController:
+                {
+                    return new TargetColumn(re.resolveCard.controller);
+                }
+            }
+            throw new Exception();
+        }
+
+
+        public enum Rule
+        {
+            ResolveController,
+
+        }
+    }
+
+    abstract class ResolveRule : TargetRule
+    {
+        public ResolveRule(Type t) : base(t)
+        {
+        }
+
+        public override TargetColumn? fillCastTargets(ChooseTargetToolbox box)
         {
             return new TargetColumn(new Targetable[] {});
         }
 
-        public enum Rule
-        {
-            ResolveCard,
-        }
     }
 
     struct ResolveEnv
     {
         public Card resolveCard;
+        public IEnumerable<Card> cards;
 
-        public ResolveEnv(Card resolveCard)
+        public ResolveEnv(Card resolveCard, IEnumerable<Card> cards)
         {
             this.resolveCard = resolveCard;
+            this.cards = cards;
         }
     }
 
@@ -214,6 +301,11 @@ namespace stonerkart
         public TargetColumn(params Targetable[] targets)
         {
             this.targets = targets;
+        }
+
+        public TargetColumn(IEnumerable<Targetable> ts) : this(ts.ToArray())
+        {
+            
         }
     }
     

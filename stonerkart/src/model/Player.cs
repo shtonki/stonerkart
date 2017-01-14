@@ -11,10 +11,12 @@ namespace stonerkart
         public Card heroCard { get; private set; }
         public readonly Game game;
 
-        public readonly Pile deck;
-        public readonly Pile field;
-        public readonly Pile hand;
-        public readonly Pile graveyard;
+        public Pile deck { get; }
+        public Pile field { get; }
+        public Pile hand { get; }
+        public Pile graveyard { get; }
+
+        public Pile displaced { get; }
 
         public ManaPool manaPool { get; private set; }
 
@@ -27,8 +29,8 @@ namespace stonerkart
             deck = new Pile(new Location(this, PileLocation.Deck));
             field = new Pile(new Location(this, PileLocation.Field));
             hand = new Pile(new Location(this, PileLocation.Hand));
-            graveyard = new Pile(new Location(this, PileLocation.Hand));
-
+            graveyard = new Pile(new Location(this, PileLocation.Graveyard));
+            displaced = new Pile(new Location(this, PileLocation.Displaced));
 
             manaPool = new ManaPool();
         }
@@ -37,7 +39,6 @@ namespace stonerkart
         {
             if (heroCard != null) throw new Exception();
             heroCard = hc;
-            field.addTop(heroCard);
         }
 
         public void loadDeck(IEnumerable<Card> cards)
@@ -45,6 +46,30 @@ namespace stonerkart
             foreach (Card c in cards)
             {
                 deck.addTop(c);
+            }
+        }
+
+        public Pile pileFrom(PileLocation l)
+        {
+            switch (l)
+            {
+                case PileLocation.Deck:
+                    return deck;
+
+                case PileLocation.Hand:
+                    return hand;
+
+                case PileLocation.Displaced:
+                    return displaced;
+
+                case PileLocation.Field:
+                    return field;
+
+                case PileLocation.Graveyard:
+                    return graveyard;
+
+                default:
+                    throw new Exception();
             }
         }
 
@@ -116,6 +141,11 @@ namespace stonerkart
 
             manaPool.subtractCurrent(iz);
             notify(new PlayerChangedArgs(this));
+        }
+
+        public void setActive(bool b)
+        {
+            notify(new PlayerChangedArgs(b));
         }
     }
 }

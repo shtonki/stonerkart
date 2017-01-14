@@ -27,6 +27,21 @@ namespace stonerkart
             observers.Add(new WeakReference<Observer<T>>(o));
         }
 
+        public void removeObserver(Observer<T> o)
+        {
+            WeakReference<Observer<T>> rm = null;
+            foreach (var v in observers)
+            {
+                Observer<T> w = null;
+                v.TryGetTarget(out w);
+                if (w != null) rm = v;
+            }
+
+            if (rm == null) throw new Exception();
+
+            observers.Remove(rm);
+        }
+
         public bool tryUnsubscribe(Observer<T> o)
         {
             WeakReference<Observer<T>> a = null;

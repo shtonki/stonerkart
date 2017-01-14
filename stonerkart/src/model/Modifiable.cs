@@ -39,7 +39,7 @@ namespace stonerkart
         }
 
         public static TypedGameEventFilter<StartOfStepEvent> startOfEndStep = new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.End);
-        public static TypedGameEventFilter<GameEvent>        never = new TypedGameEventFilter<GameEvent>(e => false);
+        public static TypedGameEventFilter<GameEvent> never { get; } = new TypedGameEventFilter<GameEvent>(e => false);
 
         public static TypedGameEventFilter<StartOfStepEvent> startOfOwnersTurn(Card card)
         {
@@ -51,7 +51,7 @@ namespace stonerkart
     {
         private T baseValue;
         private T currentValue;
-        private List<ModifiableStruct<T>> modifiers;
+        public List<ModifiableStruct<T>> modifiers;
 
         public Modifiable(T baseValue)
         {

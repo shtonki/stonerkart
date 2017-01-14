@@ -38,11 +38,20 @@ namespace stonerkart
 
         }
 
-        public Card removeTop()
+        public void addRange(IEnumerable<Card> cs)
+        {
+            PileChangedMessage m = new PileChangedMessage(true, cs.ToArray());
+            foreach (Card c in cs)
+            {
+                cardList.Add(c);
+            }
+            notify(m);
+        }
+
+        public Card peek()
         {
             int c = cardList.Count;
             Card r = cardList[c - 1];
-            cardList.RemoveAt(c - 1);
             return r;
         }
 
@@ -58,6 +67,20 @@ namespace stonerkart
             notify(new PileChangedMessage(false, c));
         }
 
+        public Card removeTop()
+        {
+            Card r = cardList[cardList.Count - 1];
+            cardList.RemoveAt(cardList.Count - 1);
+            notify(new PileChangedMessage(false, r));
+            return r;
+        }
+
+        public void clear()
+        {
+            PileChangedMessage m = new PileChangedMessage(false, cardList.ToArray());
+            cardList.Clear();
+            notify(m);
+        }
 
         public void shuffle(Random rng)
         {
@@ -90,6 +113,7 @@ namespace stonerkart
         Stack,
         Deck,
         Graveyard,
+        Displaced
     }
 
     struct Location
@@ -107,12 +131,18 @@ namespace stonerkart
     struct PileChangedMessage
     {
         public readonly bool added;
-        public readonly Card card;
+        public readonly Card[] cards;
 
         public PileChangedMessage(bool added, Card card)
         {
             this.added = added;
-            this.card = card;
+            this.cards = new [] { card };
+        }
+
+        public PileChangedMessage(bool added, Card[] cards)
+        {
+            this.added = added;
+            this.cards = cards;
         }
     }
 

@@ -38,6 +38,11 @@ namespace stonerkart
             return r;
         }
 
+        public bool possible(Player p)
+        {
+            return costs.All(c => c.possible(p));
+        }
+
         public void cut(Player p, int[][] iz)
         {
             if (iz.Length != costs.Length) throw new Exception();
@@ -65,6 +70,8 @@ namespace stonerkart
         int[] measure(Player p, CostPayStruct s);
 
         void cut(Player p, int[] iz);
+
+        bool possible(Player p);
     }
 
     class ManaCost : SubCost
@@ -89,8 +96,21 @@ namespace stonerkart
             cost = new ManaSet(cs);
         }
 
+        public bool possible(Player p)
+        {
+            if (p.manaPool.current.orbs.Count < cost.orbs.Count) return false;
+            for (int i = 0; i < ManaSet.size; i++)
+            {
+                if ((ManaColour)i == ManaColour.Colourless) continue;
+                if (p.manaPool.current[i] < cost[i]) return false;
+            }
+            return true;
+        }
+
         public int[] measure(Player p, CostPayStruct s)
         {
+            if (!possible(p)) return null;
+
             ManaSet cost = this.cost.clone();
             for (int i = 0; i < ManaSet.size; i++)
             {
