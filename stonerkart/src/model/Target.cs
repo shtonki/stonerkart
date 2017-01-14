@@ -86,19 +86,33 @@ namespace stonerkart
         public TargetRow[] generateRows()
         {
             int l = columns.Aggregate(1, (current, c) => current*c.targets.Length);
+            int[] ms = columns.Select(c => c.targets.Length).ToArray();
+            int[] cs = columns.Select(c => 0).ToArray();
+
             TargetRow[] r = new TargetRow[l];
-            if (l == 0) return r;
-            if (l > 1) throw new Exception();
-
-            Targetable[] i1 = new Targetable[columns.Length];
-            for (int i = 0; i < columns.Length; i++)
+            int rc = 0;
+            while (true)
             {
-                i1[i] = columns[i].targets[0];
+                Targetable[] tr = new Targetable[columns.Length];
+                for (int i = 0; i < columns.Length; i++)
+                {
+                    tr[i] = columns[i].targets[cs[i]];
+                }
+                r[rc++] = new TargetRow(tr);
+
+                cs[columns.Length - 1]++;
+
+                for (int i = columns.Length - 1; i > 0; i--)
+                {
+                    if (cs[i] == ms[i])
+                    {
+                        cs[i] = 0;
+                        cs[i - 1]++;
+                    }
+                }
+
+                if (cs[0] == ms[0]) return r;
             }
-
-            r[0] = new TargetRow(i1);
-
-            return r;
         }
     }
 
