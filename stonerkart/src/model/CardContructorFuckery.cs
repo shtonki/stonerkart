@@ -28,6 +28,7 @@ namespace stonerkart
 
             int castRange = -1;
             Effect castEffect = null;
+            List<Effect> additionalCastEffects = new List<Effect>();
             string castDescription = "";
             CastSpeed castSpeed;
 
@@ -264,26 +265,37 @@ namespace stonerkart
                     baseToughness = 3;
                     mightCost = 2;
                 } break;
+                #endregion
+                #region Vengeful
+                case CardTemplate.Vengeful:
+                    {
+                        cardType = CardType.Creature;
+
+                        baseToughness = 1;
+
+                        ActivatedAbility a = new ActivatedAbility(PileLocation.Field, 5,
+                            new Cost(),
+                            CastSpeed.Instant,
+                            "swap places not kangz",
+                            new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule(card => !card.isHeroic)), new SwapWithCard()));
+                        activatedAbilities.Add(a);
+                    }
+                    break;
                 #endregion 
 
                 case CardTemplate.missingno:
-                {
-                    cardType = CardType.Creature;
+                    {
+                        cardType = CardType.Instant;
+                        rarity = Rarity.Common;
 
-                    baseToughness = 1;
+                        castRange = 10;
 
-                    addTriggeredAbility(
-                        "x",
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
-                        new ZepperDoer(1),
-                        new Cost(),
-                        new TypedGameEventFilter<PlaceOnTileEvent>(e => e.card == this),
-                        2,
-                        PileLocation.Field,
-                        TriggeredAbility.Timing.Post
-                        );
-                    } break;
-
+                        castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), new ZepperDoer(3));
+                        additionalCastEffects.Add(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)), new ZepperDoer(-3)));
+                        castDescription =
+                            "LIGHTNING HELIX DEALS 3 DAMAGE TO TARGET CREATURE OR PLAYER AND YOU GAIN 3 LIFE.";
+                    }
+                    break;
                 default:
                     throw new Exception();
             }
@@ -326,10 +338,10 @@ namespace stonerkart
                     new MoveToTileDoer());
             }
             else throw new Exception();
-
+            
             if (castEffect == null) throw new Exception();
-
-            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(cmc), castSpeed, castDescription, castEffect);
+            additionalCastEffects.Add(castEffect);
+            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(cmc), castSpeed, castDescription, additionalCastEffects.ToArray());
             activatedAbilities.Add(castAbility);
 
             this.owner = owner;

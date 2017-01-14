@@ -204,6 +204,7 @@ namespace stonerkart
     enum CardTemplate
     {
         missingno,
+        Vengeful,
         Belwas,
         Zap,
         Kappa,

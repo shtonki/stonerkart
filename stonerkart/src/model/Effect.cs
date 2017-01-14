@@ -65,6 +65,23 @@ namespace stonerkart
         }
     }
 
+    class SwapWithCard : SimpleDoer
+    {
+        public SwapWithCard() : base(typeof(Card), typeof(Card))
+        {
+
+        }
+
+        protected override GameEvent[] simpleAct(TargetRow row)
+        {
+            Card moved1 = (Card)row.ts[0];
+            Tile move1To = ((Card)row.ts[1]).tile;
+            Card moved2 = (Card)row.ts[1];
+            Tile move2To = ((Card)row.ts[0]).tile;
+            return new[] { new PlaceOnTileEvent(moved1, new Tile(null, 0, 0)), new PlaceOnTileEvent(moved2, move2To), new PlaceOnTileEvent(moved1, move1To)};
+        }
+    }
+
     class MoveToTileDoer : SimpleDoer
     {
         public MoveToTileDoer() : base(typeof(Card), typeof(Tile))
