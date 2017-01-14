@@ -44,15 +44,21 @@ namespace stonerkart
             byte[] theirBytes = new byte[72];
             socket.Receive(theirBytes);
 
+
+
             ECDiffieHellmanPublicKey tb = ECDiffieHellmanCngPublicKey.FromByteArray(theirBytes, CngKeyBlobFormat.GenericPublicBlob);
-            sharedSecret = myStuff.DeriveKeyMaterial(tb);
-            encryptSalt = hashMe(sharedSecret.Take(16).ToArray());
-            decryptSalt = hashMe(sharedSecret.Take(16).ToArray());
+            byte[] sharedSecret = myStuff.DeriveKeyMaterial(tb);
+            byte[] salt = hashMe(sharedSecret.Take(16).ToArray());
+
+            Rijndael rijndael = Rijndael.Create();
+            Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(sharedSecret, salt, 420);
+            rijndael.Key = pdb.GetBytes(32);
+            rijndael.IV = pdb.GetBytes(16);
+
+            encryptor = rijndael.CreateEncryptor();
+            decryptor = rijndael.CreateDecryptor();
         }
 
-        private byte[] sharedSecret;
-        private byte[] encryptSalt;
-        private byte[] decryptSalt;
 
         private byte[] hashMe(byte[] bs)
         {
@@ -60,19 +66,16 @@ namespace stonerkart
             return sha.ComputeHash(bs);
         }
 
+        private ICryptoTransform encryptor;
+        private ICryptoTransform decryptor;
+
+
         private byte[] encrypt(byte[] bs)
         {
-            encryptSalt = hashMe(encryptSalt);
-            byte[] salt = encryptSalt;
-
             MemoryStream memoryStream;
             CryptoStream cryptoStream;
-            Rijndael rijndael = Rijndael.Create();
-            Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(sharedSecret, salt, 420);
-            rijndael.Key = pdb.GetBytes(32);
-            rijndael.IV = pdb.GetBytes(16);
             memoryStream = new MemoryStream();
-            cryptoStream = new CryptoStream(memoryStream, rijndael.CreateEncryptor(), CryptoStreamMode.Write);
+            cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
             cryptoStream.Write(bs, 0, bs.Length);
             cryptoStream.Close();
             return memoryStream.ToArray();
@@ -80,17 +83,10 @@ namespace stonerkart
 
         private byte[] decrypt(byte[] bs)
         {
-            decryptSalt = hashMe(decryptSalt);
-            byte[] salt = decryptSalt;
-
             MemoryStream memoryStream;
             CryptoStream cryptoStream;
-            Rijndael rijndael = Rijndael.Create();
-            Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(sharedSecret, salt, 420);
-            rijndael.Key = pdb.GetBytes(32);
-            rijndael.IV = pdb.GetBytes(16);
             memoryStream = new MemoryStream();
-            cryptoStream = new CryptoStream(memoryStream, rijndael.CreateDecryptor(), CryptoStreamMode.Write);
+            cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Write);
             cryptoStream.Write(bs, 0, bs.Length);
             cryptoStream.Close();
             return memoryStream.ToArray();

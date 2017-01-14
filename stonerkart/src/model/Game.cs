@@ -675,6 +675,7 @@ namespace stonerkart
 
         private StackWrapper? cast(Player p, bool cancellable, Card card = null, Ability ability = null, TargetMatrix[] targets = null, int[][] costs = null)
         {
+            //fucked variables which keep control when and how one cancels the cast
             int lv = 0;
             int bt = 0;
 
@@ -684,7 +685,7 @@ namespace stonerkart
             StackWrapper? r = null;
             if (p == hero)
             {
-                if (cancellable && !Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)) return null;
+                if (cancellable && !stack.Any() && !Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)) return null;
                 Tile from = card == null ? p.heroCard.tile : card.dummyFor.tile;
                 while (lv >= bt && r == null)
                 {
