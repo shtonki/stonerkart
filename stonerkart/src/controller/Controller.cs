@@ -219,7 +219,7 @@ namespace stonerkart
 
         public static void clearHighlights(bool rd = true)
         {
-            foreach (var v in hled) v.color = Color.Firebrick;
+            foreach (var v in hled) v.color = Color.Black;
             hled.Clear();
             if (rd) redraw();
         }
