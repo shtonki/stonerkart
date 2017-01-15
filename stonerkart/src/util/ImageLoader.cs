@@ -119,6 +119,11 @@ namespace stonerkart
                     return Resources.artBearCavalary;
                 }
 
+                case CardTemplate.Cleansing_Fire:
+                {
+                    return Resources.artCleansingFire;
+                }
+
                 case CardTemplate.Rockhand_Ogre:
                 {
                     return Resources.artRockhandOgre;
