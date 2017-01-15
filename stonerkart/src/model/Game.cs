@@ -783,10 +783,12 @@ namespace stonerkart
             for (int i = 0; i < ts.Length; i++)
             {
                 Effect effect = es[i];
-                ResolveEnv env = new ResolveEnv(card, cards);
+                ResolveEnv env = new ResolveEnv(card, cards, selectCardFromCards);
                 TargetMatrix matrix = effect.ts.fillResolve(ts[i], env, this);
 
-                events.AddRange(effect.doer.act(matrix.generateRows()));
+                DoerToolKit dkt = new DoerToolKit(selectCardFromCards, activePlayer == hero, null, null);
+
+                events.AddRange(effect.doer.act(dkt, matrix.generateRows()));
             }
 
             GameTransaction gt = new GameTransaction(events);
@@ -869,6 +871,22 @@ namespace stonerkart
             Controller.setPrompt(prompt, options);
             ShibbuttonStuff s = (ShibbuttonStuff)waitFor(new InputEventFilter((c, o) => c is Shibbutton));
             return s.option;
+        }
+
+        private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)
+        {
+            CardsPanel p = new CardsPanel();
+            p.clickedCallbacks.Add(clicked);
+            p.setCards(cards);
+            return Controller.showControl(p, true, closeable);
+        }
+
+        private Card selectCardFromCards(IEnumerable<Card> cards)
+        {
+            var v = showCards(cards, false);
+            Card r = (Card)waitForButtonOr<Card>(c => cards.Contains((c)));
+            v.close();
+            return r;
         }
     }
 

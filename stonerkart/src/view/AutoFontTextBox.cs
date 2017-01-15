@@ -98,8 +98,6 @@ namespace stonerkart
             Refresh();
         }
 
-        private int inc = 0;
-
         private ManualResetEventSlim parallelHackWaiter = new ManualResetEventSlim(false);
         private Font parallelHackValue = null;
 

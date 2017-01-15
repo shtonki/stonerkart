@@ -307,6 +307,13 @@ namespace stonerkart
 
                 case CardTemplate.missingno:
                 {
+                    cardType = CardType.Instant;
+
+                    castEffect =
+                        new Effect(
+                            new TargetRuleSet(new SelectCardRule(PileLocation.Deck,
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                            new ToOwners(PileLocation.Deck));
                 } break;
 
                 default:
@@ -355,8 +362,10 @@ namespace stonerkart
             else throw new Exception();
             
             if (castEffect == null) throw new Exception("these don't show up anyway");
-            additionalCastEffects.Add(castEffect);
-            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(cmc), castSpeed, castDescription, additionalCastEffects.ToArray());
+            List<Effect> es = new List<Effect>();
+            es.Add(castEffect);
+            es.AddRange(additionalCastEffects);
+            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(cmc), castSpeed, castDescription, es.ToArray());
             activatedAbilities.Add(castAbility);
 
             this.owner = owner;

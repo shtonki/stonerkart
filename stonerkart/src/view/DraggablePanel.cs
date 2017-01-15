@@ -74,7 +74,7 @@ namespace stonerkart
 
         public void close()
         {
-            Parent.Controls.Remove(this);
+            this.memeout(() => { Parent.Controls.Remove(this); });
             closed = true;
         }
 
