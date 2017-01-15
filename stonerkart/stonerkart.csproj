@@ -236,6 +236,8 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <None Include="Resources\artUnstableMemeExperiment.png" />
+    <None Include="Resources\artGoblinGrenade.png" />
+    <None Include="Resources\artCleansingFire.png" />
     <Content Include="rules.txt" />
     <None Include="Resources\multi.png" />
     <None Include="Resources\firstedition.png" />

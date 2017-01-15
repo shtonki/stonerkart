@@ -101,7 +101,6 @@ namespace stonerkart
             // 
             // hexPanel
             // 
-            this.hexPanel.BackColor = System.Drawing.Color.Aqua;
             this.hexPanel.Location = new System.Drawing.Point(217, 3);
             this.hexPanel.Name = "hexPanel";
             this.hexPanel.Size = new System.Drawing.Size(688, 507);

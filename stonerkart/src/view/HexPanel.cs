@@ -22,7 +22,7 @@ namespace stonerkart
         public HexPanel(Map m)
         {
             DoubleBuffered = true;
-            BackColor = Color.Aqua;
+            BackColor = Color.DarkGray;
 
             map = new Map(1, 1, false, false);
 
@@ -142,10 +142,10 @@ namespace stonerkart
             base.OnPaint(e);
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
-            
-            using (Pen pen = new Pen(Color.Black, 4))
+
+            foreach (var tv in tileViews)
             {
-                foreach (var tv in tileViews)
+                using (Pen pen = new Pen(tv.color, 2))
                 {
                     g.DrawPolygon(pen, tv.poly);
                     if (tv.tile.card != null)
@@ -184,7 +184,7 @@ namespace stonerkart
                     }
                     else
                     {
-                        using (Brush b = new SolidBrush(tv.color))
+                        using (Brush b = new SolidBrush(Color.DimGray))
                             g.FillPolygon(b, tv.poly);
                     }
                 }

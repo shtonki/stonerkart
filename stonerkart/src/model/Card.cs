@@ -198,6 +198,8 @@ namespace stonerkart
     enum CardTemplate
     {
         missingno,
+        Goblin_Grenade,
+        Cleansing_Fire,
         Belwas,
         Zap,
         Kappa,
@@ -208,7 +210,7 @@ namespace stonerkart
         Risen_Abberation,
         Shibby_Shtank,
         Unmake,
-        Frothing_Goblin,
+        Rockhand_Ogre,
         Bear_Cavalary,
         Illegal_Goblin_Laboratory,
     }

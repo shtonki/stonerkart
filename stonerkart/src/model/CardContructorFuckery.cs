@@ -28,6 +28,7 @@ namespace stonerkart
 
             int castRange = -1;
             Effect castEffect = null;
+            List<Effect> additionalCastEffects = new List<Effect>();
             string castDescription = "";
             CastSpeed castSpeed;
 
@@ -242,12 +243,11 @@ namespace stonerkart
                     castDescription = "Return target non-heroic creature to its owner's hand.";
                 } break;
                 #endregion
-                #region Frothing Goblin
-                case CardTemplate.Frothing_Goblin:
+                #region Rockhand Ogre
+                case CardTemplate.Rockhand_Ogre:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Uncommon;
-                    race = Race.Goblin;
 
                     baseMovement = 2;
                     basePower = 2;
@@ -266,28 +266,53 @@ namespace stonerkart
                     baseToughness = 3;
                     mightCost = 2;
                 } break;
-                #endregion 
+                #endregion
+
+                case CardTemplate.Cleansing_Fire:
+                {
+                    cardType = CardType.Instant;
+                    rarity = Rarity.Rare;
+
+                    chaosCost = 1;
+                    lifeCost = 1;
+
+                    castRange = 4;
+                    castEffect =
+                        new Effect(
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                            new ZepperDoer(3));
+                    additionalCastEffects.Add(
+                        new Effect(
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                                new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
+                            new ZepperDoer(-3)));
+                    castDescription = "Deal 3 damage to target creature. You gain 3 life.";
+
+
+                } break;
+
+                case CardTemplate.Goblin_Grenade:
+                {
+                    cardType = CardType.Instant;
+
+                    chaosCost = 2;
+                    greyCost = 1;
+
+                    castRange = 5;
+                    castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new AoeRule(t => true, 2, c => true)),
+                    new ZepperDoer(1));
+                    castDescription = "Deal 1 damage to all creatures within 2 tiles of target tile.";
+
+                } break;
 
                 case CardTemplate.missingno:
                 {
-                    cardType = CardType.Creature;
-
-                    baseToughness = 1;
-
-                    addTriggeredAbility(
-                        "x",
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
-                        new ZepperDoer(1),
-                        new Cost(),
-                        new TypedGameEventFilter<PlaceOnTileEvent>(e => e.card == this),
-                        2,
-                        PileLocation.Field,
-                        TriggeredAbility.Timing.Post
-                        );
-                    } break;
+                } break;
 
                 default:
-                    throw new Exception();
+                {
+                    throw new Exception("missing cardtemplate in switch");
+                }
             }
 
 
@@ -328,10 +353,10 @@ namespace stonerkart
                     new MoveToTileDoer());
             }
             else throw new Exception();
-
-            if (castEffect == null) throw new Exception();
-
-            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(cmc), castSpeed, castDescription, castEffect);
+            
+            if (castEffect == null) throw new Exception("these don't show up anyway");
+            additionalCastEffects.Add(castEffect);
+            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(cmc), castSpeed, castDescription, additionalCastEffects.ToArray());
             activatedAbilities.Add(castAbility);
 
             this.owner = owner;

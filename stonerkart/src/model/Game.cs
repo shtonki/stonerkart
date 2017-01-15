@@ -47,7 +47,7 @@ namespace stonerkart
             }
 
             random = new Random(ngs.randomSeed);
-            map = new Map(21, 13, false, false);
+            map = new Map(15, 9, false, false);
             cards = new List<Card>();
             players = new List<Player>();
 
@@ -164,7 +164,7 @@ namespace stonerkart
                 if (defender == null)
                 {
                     mover.moveTo(destination);
-                    mover.exhaust(-path.length);
+                    mover.exhaust(path.length);
                 }
                 else
                 {
@@ -221,8 +221,8 @@ namespace stonerkart
 
             Tile[] ts = new[]
             {
-                map.tileAt(5, 4),
-                map.tileAt(map.width - 6, map.height - 5),
+                map.tileAt(4, 3),
+                map.tileAt(map.width - 6, map.height - 4),
             };
             int ix = 0;
             Controller.redraw();

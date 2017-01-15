@@ -17,7 +17,7 @@ namespace stonerkart
         public TileView(Tile tile)
         {
             this.tile = tile;
-            color = Color.Firebrick;
+            color = Color.Black;
         }
 
         public Stuff getStuff()
