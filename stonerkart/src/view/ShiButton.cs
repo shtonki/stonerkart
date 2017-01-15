@@ -6,8 +6,6 @@ namespace stonerkart
     class Shibbutton : Button, Clickable
     {
         public ShibbuttonStuff stuff { get; set; }
-        //private object hackEx() { return Text; }
-        private Func<object> f;
 
         public Shibbutton() : this(ButtonOption.Nigra)
         {

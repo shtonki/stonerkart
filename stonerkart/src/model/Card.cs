@@ -118,7 +118,6 @@ namespace stonerkart
             i = v & 0x00FF;
             c = v & 0xFF00;
 
-            IEnumerable<Ability> l;
             if (c == _TRIGGERED)
             {
                 return triggeredAbilities[i];

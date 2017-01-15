@@ -43,7 +43,7 @@ namespace stonerkart
             };
         }
 
-        public DraggablePanel showPanel(Control content, bool resizeable = true, bool closeable = true)
+        public DraggablePanel showPanel(Control content, bool resizeable, bool closeable)
         {
             DraggablePanel r = new DraggablePanel(content, resizeable, closeable);
             this.memeout(() =>

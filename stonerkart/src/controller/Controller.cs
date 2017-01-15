@@ -170,13 +170,13 @@ namespace stonerkart
             }
             else
             {
-                friendsList = gameFrame.showPanel(friendsListPanel);
+                friendsList = showControl(friendsListPanel);
             }
         }
 
-        public static DraggablePanel showControl(Control c)
+        public static DraggablePanel showControl(Control c, bool resizeable = true, bool closeable = true)
         {
-            return gameFrame.showPanel(c);
+            return gameFrame.showPanel(c, resizeable, closeable);
         }
 
         public static void addArrow(List<Tile> l)
@@ -215,7 +215,6 @@ namespace stonerkart
         
 
         private static List<TileView> hled = new List<TileView>();
-        public static Color? highlightColor;
 
         public static void clearHighlights(bool rd = true)
         {

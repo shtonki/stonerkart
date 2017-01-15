@@ -129,6 +129,32 @@ namespace stonerkart
         public abstract TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c);
     }
 
+    class SelectCardRule : TargetRule
+    {
+        private TargetRule pg;
+        private PileLocation l;
+
+        public SelectCardRule(PileLocation location, TargetRule playerGenerator) : base(typeof(Card))
+        {
+            pg = playerGenerator;
+            l = location;
+        }
+
+        public override TargetColumn? fillCastTargets(ChooseTargetToolbox f)
+        {
+            return pg.fillCastTargets(f);
+        }
+
+        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        {
+            TargetColumn r = pg.fillResolveTargets(re, c);
+            if (r.targets.Length != 1) throw new Exception();
+            Player p = (Player)r.targets[0];
+            Card crd = re.selector(p.pileFrom(l));
+            return new TargetColumn(crd);
+        }
+    }
+
     class AoeRule : TargetRule
     {
         private PryTileRule ruler;
@@ -320,11 +346,13 @@ namespace stonerkart
     {
         public Card resolveCard;
         public IEnumerable<Card> cards;
+        public Func<IEnumerable<Card>, Card> selector;
 
-        public ResolveEnv(Card resolveCard, IEnumerable<Card> cards)
+        public ResolveEnv(Card resolveCard, IEnumerable<Card> cards, Func<IEnumerable<Card>, Card> selector)
         {
             this.resolveCard = resolveCard;
             this.cards = cards;
+            this.selector = selector;
         }
     }
 

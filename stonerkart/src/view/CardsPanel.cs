@@ -75,6 +75,11 @@ namespace stonerkart
             foreach (var v in p) addCardView(v);
         }
 
+        public void setCards(IEnumerable<Card> cards)
+        {
+            foreach (Card c in cards) addCardView(c);
+        }
+
         protected override void OnMouseLeave(EventArgs e)
         {
             if (!(ClientRectangle.Contains(PointToClient(Control.MousePosition))))

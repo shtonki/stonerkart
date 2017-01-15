@@ -109,7 +109,7 @@ namespace stonerkart
             {
                 read = socket.EndReceive(r);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 closed();
                 return;
