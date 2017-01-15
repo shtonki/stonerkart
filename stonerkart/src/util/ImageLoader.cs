@@ -104,6 +104,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Goblin_Grenade:
+                {
+                    return Resources.artGoblinGrenade;
+                }
+
                 case CardTemplate.Illegal_Goblin_Laboratory:
                 {
                     return Resources.artUnstableMemeExperiment;
@@ -114,9 +119,9 @@ namespace stonerkart
                     return Resources.artBearCavalary;
                 }
 
-                case CardTemplate.Frothing_Goblin:
+                case CardTemplate.Rockhand_Ogre:
                 {
-                    return Resources.artFrothingGoblin;
+                    return Resources.artRockhandOgre;
                 }
 
                 case CardTemplate.Unmake:

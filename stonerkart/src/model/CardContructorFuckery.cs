@@ -242,12 +242,11 @@ namespace stonerkart
                     castDescription = "Return target non-heroic creature to its owner's hand.";
                 } break;
                 #endregion
-                #region Frothing Goblin
-                case CardTemplate.Frothing_Goblin:
+                #region Rockhand Ogre
+                case CardTemplate.Rockhand_Ogre:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Uncommon;
-                    race = Race.Goblin;
 
                     baseMovement = 2;
                     basePower = 2;
@@ -268,19 +267,35 @@ namespace stonerkart
                 } break;
                 #endregion 
 
-                case CardTemplate.missingno:
+                case CardTemplate.Cleansing_Fire:
+                {
+                    cardType = CardType.Instant;
+                    rarity = Rarity.Rare;
+
+                    castRange = 4;
+                } break;
+
+                case CardTemplate.Goblin_Grenade:
                 {
                     cardType = CardType.Instant;
 
-                    castRange = 6;
+                    chaosCost = 2;
+                    greyCost = 1;
+
+                    castRange = 5;
                     castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new AoeRule(t => true, 2, c => true)),
                     new ZepperDoer(1));
-                    castDescription = "Return target non-heroic creature to its owner's hand.";
+                    castDescription = "Deal 1 damage to all creatures within 2 tiles of target tile.";
 
-                    } break;
+                } break;
+
+                case CardTemplate.missingno:
+                {
+                    
+                } break;
 
                 default:
-                    throw new Exception();
+                    throw new Exception("missing cardtemplate in switch");
             }
 
 
