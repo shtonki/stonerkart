@@ -239,7 +239,7 @@ namespace stonerkart
                     greyCost = 1;
 
                     castEffect = new Effect(new TargetRuleSet(new PryCardRule(c => !c.isHeroic)), 
-                        new ToOwners(PileLocation.Hand));
+                        new ToOwnersDoer(PileLocation.Hand));
                     castDescription = "Return target non-heroic creature to its owner's hand.";
                 } break;
                 #endregion
@@ -267,7 +267,7 @@ namespace stonerkart
                     mightCost = 2;
                 } break;
                 #endregion
-
+                #region Cleansing Fire
                 case CardTemplate.Cleansing_Fire:
                 {
                     cardType = CardType.Instant;
@@ -290,7 +290,8 @@ namespace stonerkart
 
 
                 } break;
-
+                #endregion
+                #region Goblin Grenade
                 case CardTemplate.Goblin_Grenade:
                 {
                     cardType = CardType.Instant;
@@ -304,18 +305,53 @@ namespace stonerkart
                     castDescription = "Deal 1 damage to all creatures within 2 tiles of target tile.";
 
                 } break;
+                #endregion
 
                 case CardTemplate.missingno:
                 {
+                } break;
+
+                case CardTemplate.Graverobber_Syrdin:
+                {
+                    cardType = CardType.Creature;
+
+                    baseMovement = 2;
+                    basePower = 3;
+                    baseToughness = 3;
+
+                    deathCost = 1;
+                    lifeCost = 1;
+                    natureCost = 1;
+
+                    addTriggeredAbility(
+                        "Whenever this creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
+                        new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                        new ToOwnersDoer(PileLocation.Hand), 
+                        new Cost(),
+                        new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Field),
+                        0,
+                        PileLocation.Field,
+                        TriggeredAbility.Timing.Post
+                        );
+
+                    } break;
+
+                #region Alter Fate
+                case CardTemplate.Alter_Fate:
+                { 
                     cardType = CardType.Instant;
+
+                    orderCost = 1;
 
                     castEffect =
                         new Effect(
                             new TargetRuleSet(new SelectCardRule(PileLocation.Deck,
                                 new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
-                            new ToOwners(PileLocation.Deck));
+                            new ToOwnersDoer(PileLocation.Deck));
+                    castDescription =
+                        "Search your deck for a card. Shuffle your deck then put the selected card on top.";
                 } break;
-
+                #endregion
                 default:
                 {
                     throw new Exception("missing cardtemplate in switch");

@@ -122,6 +122,11 @@ namespace stonerkart
 
         private void setupHandlers()
         {
+            geFilters.Add(new GameEventHandler<ShuffleDeckEvent>(e =>
+            {
+                e.player.deck.shuffle(random);
+            }));
+
             geFilters.Add(new GameEventHandler<PlaceOnTileEvent>(e =>
             {
                 if (e.tile.card != null) throw new Exception();
