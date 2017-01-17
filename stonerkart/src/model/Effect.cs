@@ -131,19 +131,24 @@ namespace stonerkart
         }
     }
 
-    class ToOwners : SimpleDoer
+    class ToOwnersDoer : SimpleDoer
     {
         public PileLocation pileLocation;
 
-        public ToOwners(PileLocation pileLocation) : base(typeof(Card))
+        public ToOwnersDoer(PileLocation pileLocation) : base(typeof(Card))
         {
             this.pileLocation = pileLocation;
         }
 
         protected override GameEvent[] simpleAct(DoerToolKit dkt, TargetRow row)
         {
-                Card c = (Card)row.ts[0];
-                return new[] { new MoveToPileEvent(c, c.owner.pileFrom(pileLocation))};
+            Card c = (Card)row.ts[0];
+
+            var e = new MoveToPileEvent(c, c.owner.pileFrom(pileLocation));
+            return c.pile.location.pile == PileLocation.Deck
+                ? new GameEvent[] {new ShuffleDeckEvent(c.owner), e}
+                : new GameEvent[] {e};
+
         }
     }
 }

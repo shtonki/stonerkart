@@ -16,7 +16,17 @@ namespace stonerkart
             id = idCtr++;
         }
     }
-    
+
+    class ShuffleDeckEvent : GameEvent
+    {
+        public Player player;
+
+        public ShuffleDeckEvent(Player player)
+        {
+            this.player = player;
+        }
+    }
+
     class MoveToPileEvent : GameEvent
     {
         public Pile to;

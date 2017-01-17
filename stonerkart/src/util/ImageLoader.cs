@@ -104,6 +104,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Alter_Fate:
+                {
+                    return Resources.artAlterTime;
+                }
+
                 case CardTemplate.Goblin_Grenade:
                 {
                     return Resources.artGoblinGrenade;
