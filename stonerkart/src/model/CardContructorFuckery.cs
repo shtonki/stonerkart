@@ -311,7 +311,32 @@ namespace stonerkart
                 {
                 } break;
 
+                case CardTemplate.Graverobber_Syrdin:
+                {
+                    cardType = CardType.Creature;
 
+                    baseMovement = 2;
+                    basePower = 3;
+                    baseToughness = 3;
+
+                    deathCost = 1;
+                    lifeCost = 1;
+                    natureCost = 1;
+
+                    addTriggeredAbility(
+                        "Whenever this creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
+                        new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                        new ToOwnersDoer(PileLocation.Hand), 
+                        new Cost(),
+                        new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Field),
+                        0,
+                        PileLocation.Field,
+                        TriggeredAbility.Timing.Post
+                        );
+
+                    } break;
+
+                #region Alter Fate
                 case CardTemplate.Alter_Fate:
                 { 
                     cardType = CardType.Instant;
@@ -326,7 +351,7 @@ namespace stonerkart
                     castDescription =
                         "Search your deck for a card. Shuffle your deck then put the selected card on top.";
                 } break;
-
+                #endregion
                 default:
                 {
                     throw new Exception("missing cardtemplate in switch");

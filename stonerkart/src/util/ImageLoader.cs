@@ -104,6 +104,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Graverobber_Syrdin:
+                {
+                    return Resources.artGraverobberSyrdin;
+                }
+
                 case CardTemplate.Alter_Fate:
                 {
                     return Resources.artAlterTime;

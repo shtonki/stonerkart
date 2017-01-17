@@ -238,6 +238,7 @@
     <None Include="Resources\artUnstableMemeExperiment.png" />
     <None Include="Resources\artGoblinGrenade.png" />
     <None Include="Resources\artCleansingFire.png" />
+    <None Include="Resources\artGraverobberSyrdin.png" />
     <Content Include="rules.txt" />
     <None Include="Resources\multi.png" />
     <None Include="Resources\firstedition.png" />
