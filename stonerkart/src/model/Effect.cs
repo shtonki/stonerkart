@@ -66,6 +66,27 @@ namespace stonerkart
         protected abstract GameEvent[] simpleAct(DoerToolKit dkt, TargetRow row);
     }
 
+    class GainBonusManaDoer : SimpleDoer
+    {
+        public IEnumerable<ManaColour> colour;
+
+        public GainBonusManaDoer(ManaColour colour) : base(typeof(Player))
+        {
+            this.colour = new[] { colour};
+        }
+
+        public GainBonusManaDoer(params ManaColour[] colour) : base(typeof(Player))
+        {
+            this.colour = colour;
+        }
+
+        protected override GameEvent[] simpleAct(DoerToolKit dkt, TargetRow ts)
+        {
+            Player p = (Player)ts.ts[0];
+            return colour.Select(c => new GainBonusManaEvent(p, c)).ToArray();
+        }
+    }
+
     class DrawCardsDoer : SimpleDoer
     {
         public int cards;

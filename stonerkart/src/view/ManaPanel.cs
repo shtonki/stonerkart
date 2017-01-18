@@ -40,11 +40,11 @@ namespace stonerkart
                 for (int j = 0; j < maxMana; j++)
                 {
                     ManaButton.Visibility v;
-                    if (p.current[i] > j)
+                    if (p.currentMana((ManaColour)i) > j)
                     {
                         v = ManaButton.Visibility.Full;
                     }
-                    else if (p.max[i] > j)
+                    else if (p.maxMana((ManaColour)i) > j)
                     {
                         v = ManaButton.Visibility.Faded;
                     }

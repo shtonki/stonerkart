@@ -197,6 +197,7 @@ namespace stonerkart
     enum CardTemplate
     {
         missingno,
+        One_With_Nature,
         Graverobber_Syrdin,
         Alter_Fate,
         Goblin_Grenade,

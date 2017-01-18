@@ -17,6 +17,18 @@ namespace stonerkart
         }
     }
 
+    class GainBonusManaEvent : GameEvent
+    {
+        public Player player;
+        public ManaColour colour;
+
+        public GainBonusManaEvent(Player player, ManaColour colour)
+        {
+            this.player = player;
+            this.colour = colour;
+        }
+    }
+
     class ShuffleDeckEvent : GameEvent
     {
         public Player player;
