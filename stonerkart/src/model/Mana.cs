@@ -9,19 +9,51 @@ namespace stonerkart
 {
     class ManaPool
     {
-        public ManaSet max { get; private set; }
-        public ManaSet current { get; private set; }
+        public IEnumerable<ManaColour> orbs => current.orbs.Concat(bonus);
+
+        private ManaSet max { get; set; }
+        private ManaSet current { get; set; }
+
+        private List<ManaColour> bonus { get; set; }
 
         public ManaPool()
         {
             max = new ManaSet();
             current = new ManaSet();
+            bonus = new List<ManaColour>();
         }
 
         public ManaPool(ManaSet max, ManaSet current)
         {
             this.max = max;
             this.current = current;
+            bonus = new List<ManaColour>();
+        }
+
+        public void gainMana(ManaColour c)
+        {
+            max[c]++;
+            current[c]++;
+        }
+
+        public int currentMana(ManaColour c, bool withBonus = true)
+        {
+            return current[c] + (withBonus ? 1 : 0)*bonus.Count(v => v == c);
+        }
+
+        public int maxMana(ManaColour c)
+        {
+            return max[c];
+        }
+
+        public void addMana(ManaColour c, int cnt = 1)
+        {
+            current[c] += cnt;
+        }
+
+        public void addMax(ManaColour c, int cnt = 1)
+        {
+            max[c] += cnt;
         }
 
         public void reset()
@@ -34,7 +66,31 @@ namespace stonerkart
 
         public void subtractCurrent(ManaSet costs)
         {
+            List<ManaColour> r = new List<ManaColour>();
+            foreach (ManaColour mc in bonus)
+            {
+                if (costs[(int)mc] > 0)
+                {
+                    r.Add(mc);
+                    costs[(int)mc]--;
+                }
+            }
+            foreach (var c in r)
+            {
+                bonus.Remove(c);
+            }
+
             current = current - costs;
+        }
+
+        public void addBonusMana(ManaColour c)
+        {
+            bonus.Add(c);
+        }
+
+        public void resetBonus()
+        {
+            bonus.Clear();
         }
 
         public ManaPool clone()

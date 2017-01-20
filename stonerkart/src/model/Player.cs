@@ -73,76 +73,80 @@ namespace stonerkart
             }
         }
 
+        #region mana voodoo
         public void resetMana()
         {
             manaPool.reset();
             notify(new PlayerChangedArgs(this));
         }
 
-        private ManaPool original;
+        public ManaPool fake;
         public void stuntMana(ManaPool newPool)
         {
-            fixOriginal();
-
-            manaPool = newPool;
+            fake = newPool;
 
             notify(new PlayerChangedArgs(this));
         }
 
         public void stuntCurrentDiff(ManaColour mc, int d)
         {
-            fixOriginal();
+            fake.addMana(mc, d);
 
-            manaPool.current[mc] += d;
+            notify(new PlayerChangedArgs(this));
+        }
+
+        public void stuntMaxDiff(ManaColour mc, int d)
+        {
+            fake.addMax(mc, d);
 
             notify(new PlayerChangedArgs(this));
         }
 
         public void stuntCurrentLoss(ManaSet set)
         {
-            fixOriginal();
-
-            manaPool.subtractCurrent(set);
+            fake.subtractCurrent(set);
 
             notify(new PlayerChangedArgs(this));
         }
 
         public void unstuntMana()
         {
-            if (original == null) throw new Exception();
-            manaPool = original;
-            original = null;
+            fake = null;
 
             notify(new PlayerChangedArgs(this));
         }
 
-        private void fixOriginal()
-        {
-            if (original == null)
-            {
-                original = manaPool.clone();
-                manaPool = manaPool.clone();
-            }
-        }
 
         public void gainMana(ManaColour c)
         {
-            if (original != null) throw new Exception();
+            if (fake != null) throw new Exception();
 
-            manaPool.max[c]++;
-            manaPool.current[c]++;
+            manaPool.gainMana(c);
 
             notify(new PlayerChangedArgs(this));
         }
 
         public void payMana(ManaSet iz)
         {
-            if (original != null) throw new Exception();
+            if (fake != null) throw new Exception();
 
             manaPool.subtractCurrent(iz);
             notify(new PlayerChangedArgs(this));
         }
 
+        public void gainBonusMana(ManaColour c)
+        {
+            manaPool.addBonusMana(c);
+            notify(new PlayerChangedArgs(this));
+        }
+
+        public void clearBonusMana()
+        {
+            manaPool.resetBonus();
+            notify(new PlayerChangedArgs(this));
+        }
+
+        #endregion
         public void setActive(bool b)
         {
             notify(new PlayerChangedArgs(b));

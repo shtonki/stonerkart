@@ -98,11 +98,11 @@ namespace stonerkart
 
         public bool possible(Player p)
         {
-            if (p.manaPool.current.orbs.Count < cost.orbs.Count) return false;
+            if (p.manaPool.orbs.Count() < cost.orbs.Count) return false;
             for (int i = 0; i < ManaSet.size; i++)
             {
                 if ((ManaColour)i == ManaColour.Colourless) continue;
-                if (p.manaPool.current[i] < cost[i]) return false;
+                if (p.manaPool.currentMana((ManaColour)i) < cost[i]) return false;
             }
             return true;
         }
@@ -115,12 +115,11 @@ namespace stonerkart
             for (int i = 0; i < ManaSet.size; i++)
             {
                 if ((ManaColour)i == ManaColour.Colourless) continue;
-                if (p.manaPool.current[i] < cost[i]) return null;
+                if (p.manaPool.currentMana((ManaColour)i) < cost[i]) return null;
             }
 
-            ManaSet pool = p.manaPool.current;
-            List<ManaColour> poolOrbs = pool.orbs;
-            List<ManaColour> costOrbs = cost.orbs;
+            IEnumerable<ManaColour> poolOrbs = p.manaPool.orbs;
+            IEnumerable<ManaColour> costOrbs = cost.orbs;
 
             int diff = costOrbs.Count() - poolOrbs.Count();
 
@@ -141,7 +140,7 @@ namespace stonerkart
                         {
                             ManaOrb orb = (ManaOrb)v;
                             ManaColour colour = orb.colour;
-                            if (pool[colour] - cost[colour] > 0)
+                            if (p.manaPool.currentMana(colour) - cost[colour] > 0)
                             {
                                 cost[colour]++;
                                 cost[ManaColour.Colourless]--;
@@ -162,7 +161,7 @@ namespace stonerkart
                     return cost.ToArray();
                 }
 
-                return pool.ToArray(); // we have the same amount of mana as the cost
+                return cost.ToArray(); // we have the same amount of mana as the cost
 
             }
             else

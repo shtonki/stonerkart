@@ -27,7 +27,7 @@ namespace stonerkart
             }
             else
             {
-                manaPanel1.setLightUp(t.player.manaPool);
+                manaPanel1.setLightUp(t.player.fake == null ? t.player.manaPool : t.player.fake);
             }
         }
 

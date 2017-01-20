@@ -104,6 +104,16 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.One_With_Nature:
+                {
+                    return Resources.artOneWithNature;
+                }
+
+                case CardTemplate.missingno:
+                {
+                    return Resources.artHypnotist;
+                }
+
                 case CardTemplate.Graverobber_Syrdin:
                 {
                     return Resources.artGraverobberSyrdin;

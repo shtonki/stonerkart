@@ -307,10 +307,19 @@ namespace stonerkart
                 } break;
                 #endregion
 
-                case CardTemplate.missingno:
+                case CardTemplate.One_With_Nature:
                 {
+                    cardType = CardType.Sorcery;
+
+                    natureCost = 1;
+
+                    castEffect = new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), 
+                        new GainBonusManaDoer(ManaColour.Nature, ManaColour.Nature, ManaColour.Nature));
+                    castDescription = String.Format("You gain {0}{0}{0} until the end of the step.",
+                        G.coloured(ManaColour.Nature));
                 } break;
 
+                #region Graverobber Syrdin
                 case CardTemplate.Graverobber_Syrdin:
                 {
                     cardType = CardType.Creature;
@@ -335,7 +344,7 @@ namespace stonerkart
                         );
 
                     } break;
-
+                #endregion
                 #region Alter Fate
                 case CardTemplate.Alter_Fate:
                 { 
@@ -352,6 +361,12 @@ namespace stonerkart
                         "Search your deck for a card. Shuffle your deck then put the selected card on top.";
                 } break;
                 #endregion
+
+                    case CardTemplate.missingno:
+                {
+                    
+                } break;
+
                 default:
                 {
                     throw new Exception("missing cardtemplate in switch");

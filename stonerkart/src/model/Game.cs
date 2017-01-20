@@ -122,6 +122,11 @@ namespace stonerkart
 
         private void setupHandlers()
         {
+            geFilters.Add(new GameEventHandler<GainBonusManaEvent>(e =>
+            {
+                e.player.gainBonusMana(e.colour);
+            }));
+
             geFilters.Add(new GameEventHandler<ShuffleDeckEvent>(e =>
             {
                 e.player.deck.shuffle(random);
@@ -336,6 +341,11 @@ namespace stonerkart
             }
 
             handleTransaction(new EndOfStepEvent(activePlayer, step));
+
+            foreach (Player p in players)
+            {
+                p.clearBonusMana();
+            }
         }
 
         private void untapStep()
@@ -352,14 +362,17 @@ namespace stonerkart
             if (activePlayer == hero)
             {
                 ManaPool pool = activePlayer.manaPool.clone();
+                
+                activePlayer.stuntMana(pool);
+
                 for (int i = 0; i < ManaSet.size; i++)
                 {
                     if ((ManaColour)i == ManaColour.Colourless) continue;
-                    pool.max[i]++;
+                    activePlayer.stuntMaxDiff((ManaColour)i, 1);
                 }
-                activePlayer.stuntMana(pool);
+
                 Controller.setPrompt("Gain mana nerd");
-                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.current[(int)o.colour] != 6);
+                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.currentMana(o.colour) != 6);
                 activePlayer.unstuntMana();
 
                 selection = new ManaOrbSelection(v.colour);
