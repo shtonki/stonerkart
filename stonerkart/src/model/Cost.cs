@@ -6,15 +6,7 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    struct CostPayStruct
-    {
-        public Func<Stuff> getStuff { get; }
-
-        public CostPayStruct(Func<Stuff> getStuff)
-        {
-            this.getStuff = getStuff;
-        }
-    }
+    
 
     class Cost
     {
@@ -25,11 +17,12 @@ namespace stonerkart
             this.costs = costs;
         }
 
-        public int[][] measure(Player p, CostPayStruct str)
+        public int[][] measure(Player p, HackStruct str)
         {
             int[][] r = new int[costs.Length][];
             for (int i = 0; i < costs.Length; i++)
             {
+                if (!costs[i].possible(p)) return null;
                 int[] v = costs[i].measure(p, str);
                 if (v == null) return null;
                 r[i] = v;
@@ -43,13 +36,15 @@ namespace stonerkart
             return costs.All(c => c.possible(p));
         }
 
-        public void cut(Player p, int[][] iz)
+        public IEnumerable<GameEvent> cut(Player p, HackStruct s, int[][] iz)
         {
+            List<GameEvent> rt = new List<GameEvent>();
             if (iz.Length != costs.Length) throw new Exception();
             for (int i = 0; i < costs.Length; i++)
             {
-                costs[i].cut(p, iz[i]);
+                rt.AddRange(costs[i].cut(p, s, iz[i]));
             }
+            return rt;
         }
 
         public T getSubCost<T>()
@@ -67,9 +62,9 @@ namespace stonerkart
 
     interface SubCost
     {
-        int[] measure(Player p, CostPayStruct s);
+        int[] measure(Player p, HackStruct s);
 
-        void cut(Player p, int[] iz);
+        IEnumerable<GameEvent> cut(Player p, HackStruct s, int[] iz);
 
         bool possible(Player p);
     }
@@ -107,10 +102,8 @@ namespace stonerkart
             return true;
         }
 
-        public int[] measure(Player p, CostPayStruct s)
+        public int[] measure(Player p, HackStruct s)
         {
-            if (!possible(p)) return null;
-
             ManaSet cost = this.cost.clone();
             for (int i = 0; i < ManaSet.size; i++)
             {
@@ -170,9 +163,40 @@ namespace stonerkart
             }
         }
 
-        public void cut(Player p, int[] iz)
+        public IEnumerable<GameEvent> cut(Player p, HackStruct s, int[] iz)
         {
-            p.payMana(new ManaSet(iz));
+            return new GameEvent[] {new PayManaEvent(p, new ManaSet(iz)) };
+        }
+    }
+
+    class SelectAndMoveCost : SubCost
+    {
+        private Func<Card, bool> predicate;
+        private PileLocation frm;
+        private PileLocation to;
+
+        public SelectAndMoveCost(Func<Card, bool> predicate, PileLocation frm, PileLocation to)
+        {
+            this.predicate = predicate;
+            this.frm = frm;
+            this.to = to;
+        }
+
+        public int[] measure(Player p, HackStruct s)
+        {
+            Card c = s.selectCard(p.pileFrom(frm), true);
+            if (c == null) return null;
+            return new[] {s.ordC(c)};
+        }
+
+        public IEnumerable<GameEvent> cut(Player p, HackStruct s, int[] iz)
+        {
+            return new[] {new MoveToPileEvent(s.Cord(iz[0]), p.pileFrom(to)),};
+        }
+
+        public bool possible(Player p)
+        {
+            return p.pileFrom(frm).Count(predicate) > 0;
         }
     }
 }

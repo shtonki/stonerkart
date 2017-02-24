@@ -12,12 +12,12 @@ namespace stonerkart
         public int y => tile.y;
         public Point centre => new Point((int)poly[1].X, (int)((poly[0].Y + poly[3].Y)/2));
 
-        public Color color { get; set; }
+        public Color colour { get; set; }
 
         public TileView(Tile tile)
         {
             this.tile = tile;
-            color = Color.Black;
+            colour = Color.Black;
         }
 
         public Stuff getStuff()

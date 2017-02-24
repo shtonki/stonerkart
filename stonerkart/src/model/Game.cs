@@ -122,6 +122,11 @@ namespace stonerkart
 
         private void setupHandlers()
         {
+            geFilters.Add(new GameEventHandler<PayManaEvent>(e =>
+            {
+                e.player.payMana(e.manaSet);
+            }));
+
             geFilters.Add(new GameEventHandler<GainBonusManaEvent>(e =>
             {
                 e.player.gainBonusMana(e.colour);
@@ -139,11 +144,6 @@ namespace stonerkart
                 e.card.moveTo(e.tile);
                 e.card.moveTo(e.card.controller.field);
                 e.card.exhaust();
-            }));
-
-            geFilters.Add(new GameEventHandler<PayCostsEvent>(e =>
-            { 
-                e.ability.cost.cut(e.player, e.costs);
             }));
 
             geFilters.Add(new GameEventHandler<DrawEvent>(e =>
@@ -511,7 +511,6 @@ namespace stonerkart
                 }
             }
 
-
             foreach (GameEvent e in gameEvents)
             {
                 foreach (GameEventHandler handler in geFilters)
@@ -657,7 +656,7 @@ namespace stonerkart
                 }
                 else if (v is Card)
                 {
-                    return (Card)v;
+                    return (Card)v; 
                 }
                 else if (v is Tile)
                 {
@@ -681,7 +680,9 @@ namespace stonerkart
         private void playerCasts(Player p, StackWrapper w)
         {
             GameTransaction gt = new GameTransaction();
-            gt.addEvent(new PayCostsEvent(p, w.ability, w.costs));
+            gt.addEvents(w.ability.cost.cut(p, makeHackStruct(), w.costs));
+            handleTransaction(gt);
+            gt = new GameTransaction();
             gt.addEvent(new CastEvent(w));
             handleTransaction(gt);
         }
@@ -723,7 +724,7 @@ namespace stonerkart
                     }
                     else if (lv == 3)
                     {
-                        CostPayStruct s = new CostPayStruct(waitForAnything);
+                        HackStruct s = makeHackStruct(waitForAnything);
                         stuff = costs = ability.cost.measure(p, s);
                     }
                     else if (lv == 4)
@@ -770,7 +771,7 @@ namespace stonerkart
             Controller.highlight(v, Color.Green);
             Controller.setPrompt("target nigra", ButtonOption.Cancel);
 
-            ChooseTargetToolbox box = new ChooseTargetToolbox(generateStuff(v));
+            HackStruct box = makeHackStruct(generateStuff(v));
 
             for (int i = 0; i < ms.Length; i++)
             {
@@ -801,10 +802,10 @@ namespace stonerkart
             for (int i = 0; i < ts.Length; i++)
             {
                 Effect effect = es[i];
-                ResolveEnv env = new ResolveEnv(card, cards, selectCardFromCards);
+                ResolveEnv env = new ResolveEnv(card, cards, makeHackStruct());
                 TargetMatrix matrix = effect.ts.fillResolve(ts[i], env, this);
 
-                DoerToolKit dkt = new DoerToolKit(selectCardFromCards, activePlayer == hero, null, null);
+                HackStruct dkt = makeHackStruct();
 
                 events.AddRange(effect.doer.act(dkt, matrix.generateRows()));
             }
@@ -891,6 +892,18 @@ namespace stonerkart
             return s.option;
         }
 
+        private HackStruct makeHackStruct()
+        {
+            return new HackStruct(selectCardFromCards, hero, hero == activePlayer, null, null, waitForAnything, ord, ord,
+                ord, cardFromOrd, playerFromOrd, tileFromOrd);
+        }
+
+        private HackStruct makeHackStruct(Func<Stuff> f)
+        {
+            return new HackStruct(selectCardFromCards, hero, hero == activePlayer, null, null, f, ord, ord, ord,
+                cardFromOrd, playerFromOrd, tileFromOrd);
+        }
+
         private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)
         {
             CardsPanel p = new CardsPanel();
@@ -899,12 +912,22 @@ namespace stonerkart
             return Controller.showControl(p, true, closeable);
         }
 
-        private Card selectCardFromCards(IEnumerable<Card> cards)
+        private Card selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount)
         {
+            if (cardCount != 1) throw new NotImplementedException();
+            Controller.setPrompt("Select card", cancelable ? new ButtonOption[]{ButtonOption.Cancel, } : new ButtonOption[]{ButtonOption.NOTHING});
             var v = showCards(cards, false);
-            Card r = (Card)waitForButtonOr<Card>(c => cards.Contains((c)));
+            Stuff r = waitForButtonOr<Card>(c => cards.Contains((c)));
             v.close();
-            return r;
+            if (r is Card)
+            {
+                return (Card)r;
+            }
+            if (r is ShibbuttonStuff)
+            {
+                return null;
+            }
+            throw new Exception();
         }
     }
 
@@ -921,6 +944,50 @@ namespace stonerkart
             this.ability = ability;
             this.matricies = matricies;
             this.costs = costs;
+        }
+    }
+
+
+    struct HackStruct
+    {
+        public Player hero { get; }
+        public bool activePlayer { get; }
+        public Action<int[]> sendChoices { get; }
+        public Func<int[]> receiveChoices { get; }
+        public Func<Stuff> getStuff { get; }
+        public Func<Card, int> ordC { get; }
+        public Func<Player, int> ordP { get; }
+        public Func<Tile, int> ordT { get; }
+        public Func <int, Card> Cord { get; }
+        public Func <int, Player> Pord { get; }
+        public Func <int, Tile> Tord { get; }
+        public Func<IEnumerable<Card>, bool, int, Card> selectCardEx;
+
+
+        public HackStruct(Func<IEnumerable<Card>, bool, int, Card> selectCardEx, Player hero, bool activePlayer, Action<int[]> sendChoices, Func<int[]> receiveChoices, Func<Stuff> getStuff, Func<Card, int> ordC, Func<Player, int> ordP, Func<Tile, int> ordT, Func<int, Card> cord, Func<int, Player> pord, Func<int, Tile> tord)
+        {
+            this.selectCardEx = selectCardEx;
+            this.hero = hero;
+            this.activePlayer = activePlayer;
+            this.sendChoices = sendChoices;
+            this.receiveChoices = receiveChoices;
+            this.getStuff = getStuff;
+            this.ordC = ordC;
+            this.ordP = ordP;
+            this.ordT = ordT;
+            Cord = cord;
+            Pord = pord;
+            Tord = tord;
+        }
+
+        public Card selectCard(IEnumerable<Card> cs, bool cancelable = false, int cardCount = 1)
+        {
+            return selectCardEx(cs, cancelable, cardCount);
+        }
+
+        public Card SelectCardSynchronized(IEnumerable<Card> cs)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -957,6 +1024,11 @@ namespace stonerkart
         public void addEvent(GameEvent e)
         {
             events.Add(e);
+        }
+
+        public void addEvents(IEnumerable<GameEvent> es)
+        {
+            events.AddRange(es);
         }
     }
 

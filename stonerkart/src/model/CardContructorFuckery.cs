@@ -32,6 +32,7 @@ namespace stonerkart
             string castDescription = "";
             CastSpeed castSpeed;
 
+            List<SubCost> additionalCastSubCosts = new List<SubCost>();
 
             #region oophell
 
@@ -362,9 +363,13 @@ namespace stonerkart
                 } break;
                 #endregion
 
-                    case CardTemplate.missingno:
+                case CardTemplate.missingno:
                 {
-                    
+                    cardType = CardType.Creature;
+                    deathCost = 1;
+                    basePower = 3;
+                    baseToughness = 3;
+                    additionalCastSubCosts.Add(new SelectAndMoveCost(c => true, PileLocation.Hand, PileLocation.Graveyard));
                 } break;
 
                 default:
@@ -414,9 +419,13 @@ namespace stonerkart
             
             if (castEffect == null) throw new Exception("these don't show up anyway");
             List<Effect> es = new List<Effect>();
+
             es.Add(castEffect);
             es.AddRange(additionalCastEffects);
-            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(cmc), castSpeed, castDescription, es.ToArray());
+
+            additionalCastSubCosts.Add(cmc);
+
+            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(additionalCastSubCosts.ToArray()), castSpeed, castDescription, es.ToArray());
             activatedAbilities.Add(castAbility);
 
             this.owner = owner;

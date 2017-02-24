@@ -21,22 +21,6 @@ namespace stonerkart
 
     }
 
-    struct DoerToolKit
-    {
-        public bool activePlayer { get; }
-
-        public Action<int[]> sendChoices { get; }
-        public Func<int[]> receiveChoices { get; }
-        public Func<IEnumerable<Card>, Card>  selectCard;
-
-        public DoerToolKit(Func<IEnumerable<Card>, Card> selectCard, bool activePlayer, Action<int[]> sendChoices, Func<int[]> receiveChoices)
-        {
-            this.selectCard = selectCard;
-            this.activePlayer = activePlayer;
-            this.sendChoices = sendChoices;
-            this.receiveChoices = receiveChoices;
-        }
-    }
 
     abstract class Doer : TypeSigned
     {
@@ -44,7 +28,7 @@ namespace stonerkart
         {
         }
 
-        public abstract GameEvent[] act(DoerToolKit dkt, TargetRow[] ts);
+        public abstract GameEvent[] act(HackStruct dkt, TargetRow[] ts);
     }
 
     abstract class SimpleDoer : Doer
@@ -53,7 +37,7 @@ namespace stonerkart
         {
         }
 
-        public override GameEvent[] act(DoerToolKit dkt, TargetRow[] ts)
+        public override GameEvent[] act(HackStruct dkt, TargetRow[] ts)
         {
             List<GameEvent> r = new List<GameEvent>();
             foreach (TargetRow row in ts)
@@ -63,7 +47,7 @@ namespace stonerkart
             return r.ToArray();
         }
 
-        protected abstract GameEvent[] simpleAct(DoerToolKit dkt, TargetRow row);
+        protected abstract GameEvent[] simpleAct(HackStruct dkt, TargetRow row);
     }
 
     class GainBonusManaDoer : SimpleDoer
@@ -80,7 +64,7 @@ namespace stonerkart
             this.colour = colour;
         }
 
-        protected override GameEvent[] simpleAct(DoerToolKit dkt, TargetRow ts)
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow ts)
         {
             Player p = (Player)ts.ts[0];
             return colour.Select(c => new GainBonusManaEvent(p, c)).ToArray();
@@ -96,7 +80,7 @@ namespace stonerkart
             this.cards = cards;
         }
 
-        protected override GameEvent[] simpleAct(DoerToolKit dkt, TargetRow row)
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Player player = (Player)row.ts[0];
             return new[] {new DrawEvent(player, cards)};
@@ -110,7 +94,7 @@ namespace stonerkart
 
         }
 
-        protected override GameEvent[] simpleAct(DoerToolKit dkt, TargetRow row)
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Card moved1 = (Card)row.ts[0];
             Tile move1To = ((Card)row.ts[1]).tile;
@@ -127,7 +111,7 @@ namespace stonerkart
 
         }
 
-        protected override GameEvent[] simpleAct(DoerToolKit dkt, TargetRow row)
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Card moved = (Card)row.ts[0];
             Tile moveTo = (Tile)row.ts[1];
@@ -144,7 +128,7 @@ namespace stonerkart
             this.damage = damage;
         }
 
-        protected override GameEvent[] simpleAct(DoerToolKit dkt, TargetRow row)
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Card damager = (Card)row.ts[0];
             Card damaged = (Card)row.ts[1];
@@ -161,7 +145,7 @@ namespace stonerkart
             this.pileLocation = pileLocation;
         }
 
-        protected override GameEvent[] simpleAct(DoerToolKit dkt, TargetRow row)
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Card c = (Card)row.ts[0];
 

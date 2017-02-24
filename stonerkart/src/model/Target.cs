@@ -35,7 +35,7 @@ namespace stonerkart
             this.rules = rules;
         }
 
-        public TargetMatrix fillCast(ChooseTargetToolbox str)
+        public TargetMatrix fillCast(HackStruct str)
         {
             TargetColumn[] r = new TargetColumn[rules.Length];
 
@@ -62,17 +62,7 @@ namespace stonerkart
         }
 
     }
-
-
-    struct ChooseTargetToolbox
-    {
-        public Func<Stuff> getTargetable { get; }
-
-        public ChooseTargetToolbox(Func<Stuff> getTargetable)
-        {
-            this.getTargetable = getTargetable;
-        }
-    }
+    
 
     class TargetMatrix
     {
@@ -125,7 +115,7 @@ namespace stonerkart
             this.targetType = targetType;
         }
 
-        public abstract TargetColumn? fillCastTargets(ChooseTargetToolbox f);
+        public abstract TargetColumn? fillCastTargets(HackStruct f);
         public abstract TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c);
     }
 
@@ -140,7 +130,7 @@ namespace stonerkart
             l = location;
         }
 
-        public override TargetColumn? fillCastTargets(ChooseTargetToolbox f)
+        public override TargetColumn? fillCastTargets(HackStruct f)
         {
             return pg.fillCastTargets(f);
         }
@@ -150,7 +140,7 @@ namespace stonerkart
             TargetColumn r = pg.fillResolveTargets(re, c);
             if (r.targets.Length != 1) throw new Exception();
             Player p = (Player)r.targets[0];
-            Card crd = re.selector(p.pileFrom(l));
+            Card crd = re.hs.selectCard(p.pileFrom(l));
             return new TargetColumn(crd);
         }
     }
@@ -169,7 +159,7 @@ namespace stonerkart
             this.cardFilter = cardFilter;
         }
 
-        public override TargetColumn? fillCastTargets(ChooseTargetToolbox f)
+        public override TargetColumn? fillCastTargets(HackStruct f)
         {
             return ruler.fillCastTargets(f);
         }
@@ -194,11 +184,11 @@ namespace stonerkart
             this.filter = filter;
         }
 
-        public override TargetColumn? fillCastTargets(ChooseTargetToolbox box)
+        public override TargetColumn? fillCastTargets(HackStruct box)
         {
             while (true)
             {
-                Stuff v = box.getTargetable();
+                Stuff v = box.getStuff();
 
                 var b = v as ShibbuttonStuff;
                 if (b?.option == ButtonOption.Cancel) return null;
@@ -229,11 +219,11 @@ namespace stonerkart
             this.filter = filter;
         }
 
-        public override TargetColumn? fillCastTargets(ChooseTargetToolbox box)
+        public override TargetColumn? fillCastTargets(HackStruct box)
         {
             while (true)
             {
-                Stuff v = box.getTargetable();
+                Stuff v = box.getStuff();
 
                 if (v is ShibbuttonStuff)
                 {
@@ -335,7 +325,7 @@ namespace stonerkart
         {
         }
 
-        public override TargetColumn? fillCastTargets(ChooseTargetToolbox box)
+        public override TargetColumn? fillCastTargets(HackStruct box)
         {
             return new TargetColumn(new Targetable[] {});
         }
@@ -346,13 +336,13 @@ namespace stonerkart
     {
         public Card resolveCard;
         public IEnumerable<Card> cards;
-        public Func<IEnumerable<Card>, Card> selector;
+        public HackStruct hs;
 
-        public ResolveEnv(Card resolveCard, IEnumerable<Card> cards, Func<IEnumerable<Card>, Card> selector)
+        public ResolveEnv(Card resolveCard, IEnumerable<Card> cards, HackStruct hs)
         {
             this.resolveCard = resolveCard;
             this.cards = cards;
-            this.selector = selector;
+            this.hs = hs;
         }
     }
 

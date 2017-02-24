@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace stonerkart
 {
     /// <summary>
-    /// Collection of functions for controlling the flow of the game, UI etc.
+    /// 
     /// </summary>
     static class Controller
     {
@@ -218,14 +218,14 @@ namespace stonerkart
 
         public static void clearHighlights(bool rd = true)
         {
-            foreach (var v in hled) v.color = Color.Black;
+            foreach (var v in hled) v.colour = Color.Black;
             hled.Clear();
             if (rd) redraw();
         }
 
         private static void highlight(TileView tv, Color c)
         {
-            tv.color = c;
+            tv.colour = c;
             hled.Add(tv);
         }
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace stonerkart
 {
     /// <summary>
-    /// 
+    /// Mostly defunct afaik
     /// </summary>
     static class Console
     {

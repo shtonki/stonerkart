@@ -156,6 +156,7 @@ namespace stonerkart
                 }
             }
             if (width <= 0 || height <= 0) return new Bitmap(image);
+            return new Bitmap(image, new Size(width, height));
             var destRect = new Rectangle(0, 0, width, height);
             var destImage = new Bitmap(width, height);
 
@@ -177,7 +178,8 @@ namespace stonerkart
             }
             imageCache[image] = destImage;
             return destImage;
-        }
+
+    }
 
         public static Image SetImageOpacity(Image image, float opacity)
         {
