@@ -106,6 +106,7 @@ namespace stonerkart
         }
 
         public bool stunthack;
+        public ManaSet stunthackset;
         public void stuntMana()
         {
             stunthack = true;
@@ -115,6 +116,13 @@ namespace stonerkart
         public void unstuntMana()
         {
             stunthack = false;
+            stunthackset = null;
+            notify(new PlayerChangedArgs(this));
+        }
+
+        public void stuntLoss(ManaSet l)
+        {
+            stunthackset = l;
             notify(new PlayerChangedArgs(this));
         }
 

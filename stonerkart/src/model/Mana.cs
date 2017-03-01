@@ -11,8 +11,8 @@ namespace stonerkart
     {
         public IEnumerable<ManaColour> orbs => current.colours.Concat(bonus);
 
-        private ManaSet max { get; set; }
-        private ManaSet current { get; set; }
+        public ManaSet max { get; private set; }
+        public ManaSet current { get; private set; }
 
         private List<ManaColour> bonus { get; set; }
 
@@ -132,6 +132,11 @@ namespace stonerkart
             
         }
 
+        public void add(ManaOrb orb)
+        {
+            manas[(int)orb.colour]++;
+        }
+
         public static ManaSet operator -(ManaSet c1, ManaSet c2)
         {
             int[] a = new int[ManaSet.size];
@@ -180,7 +185,7 @@ namespace stonerkart
 
         public ManaSet clone()
         {
-            return new ManaSet(manas);
+            return new ManaSet((int[])manas.Clone());
         }
     }
 

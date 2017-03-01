@@ -76,6 +76,8 @@ namespace stonerkart
         public TargetRow[] generateRows()
         {
             int l = columns.Aggregate(1, (current, c) => current*c.targets.Length);
+            if (l == 0) return new TargetRow[] {};
+
             int[] ms = columns.Select(c => c.targets.Length).ToArray();
             int[] cs = columns.Select(c => 0).ToArray();
 
@@ -195,9 +197,64 @@ namespace stonerkart
             
         }
 
-        public override TargetColumn? fillCastTargets(HackStruct f)
+        public override TargetColumn? fillCastTargets(HackStruct hs)
         {
-            return new TargetColumn(ms.orbs);
+            Player p = hs.activePlayer;
+            ManaSet cost = ms.clone();
+            for (int i = 0; i < ManaSet.size; i++)
+            {
+                if ((ManaColour)i == ManaColour.Colourless) continue;
+                if (p.manaPool.currentMana((ManaColour)i) < cost[i]) return null;
+            }
+
+            IEnumerable<ManaColour> poolOrbs = p.manaPool.orbs;
+            IEnumerable<ManaColour> costOrbs = cost.orbs.Select(o => o.colour);
+
+            int diff = costOrbs.Count() - poolOrbs.Count();
+
+            if (diff > 0) return null;
+
+            if (cost[ManaColour.Colourless] > 0)
+            {
+                if (diff < 0) // we have more total mana than the cost
+                {
+                    Controller.setPrompt("Cast using what mana", ButtonOption.Cancel);
+                    ManaSet colours = cost.clone();
+                    colours[ManaColour.Colourless] = 0;
+                    p.stuntLoss(colours);
+                    while (cost[ManaColour.Colourless] > 0)
+                    {
+                        var v = hs.getStuff();
+                        if (v is ManaOrb)
+                        {
+                            ManaOrb orb = (ManaOrb)v;
+                            ManaColour colour = orb.colour;
+                            if (p.manaPool.currentMana(colour) - cost[colour] > 0)
+                            {
+                                cost[colour]++;
+                                cost[ManaColour.Colourless]--;
+                                colours[colour]++;
+                                p.stuntLoss(colours);
+                            }
+                        }
+                        if (v is ShibbuttonStuff)
+                        {
+                            ShibbuttonStuff b = (ShibbuttonStuff)v;
+                            if (b.option == ButtonOption.Cancel)
+                            {
+                                p.unstuntMana();
+                                return null;
+                            }
+                        }
+                    }
+                    p.unstuntMana();
+                }
+                else
+                {
+                    cost = hs.activePlayer.manaPool.current;
+                }
+            }
+            return new TargetColumn(cost.orbs);
         }
 
         public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)

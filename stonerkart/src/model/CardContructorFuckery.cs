@@ -368,7 +368,7 @@ namespace stonerkart
                 case CardTemplate.missingno:
                 {
                     cardType = CardType.Creature;
-                    deathCost = 1;
+                    greyCost = 2;
                     basePower = 3;
                     baseToughness = 3;
                     //additionalCastCosts.Add(new SelectAndMoveCost(c => true, PileLocation.Hand, PileLocation.Graveyard));

@@ -28,7 +28,7 @@ namespace stonerkart
             }
             else
             {
-                manaPanel1.setPool(t.player.manaPool, t.player.stunthack);
+                manaPanel1.setPool(t.player.manaPool, t.player.stunthack, t.player.stunthackset);
             }
         }
         
