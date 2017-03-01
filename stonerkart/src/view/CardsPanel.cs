@@ -25,9 +25,9 @@ namespace stonerkart
             MouseMove += xd;
         }
 
-        public CardsPanel(Func<CardView, CardView, int> comp) : this()
+        public CardsPanel(Pile p) : this()
         {
-            this.comp = comp;
+            setPile(p);
         }
 
         private void clicked(CardView c)
@@ -185,7 +185,7 @@ namespace stonerkart
             });
         }
 
-        public void notify(PileChangedMessage t)
+        public void notify(object o, PileChangedMessage t)
         {
             if (t.added)
             {

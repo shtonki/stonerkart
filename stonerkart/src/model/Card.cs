@@ -180,7 +180,7 @@ namespace stonerkart
             return pile.location;
         }
 
-        public void notify(int t)
+        public void notify(object o, int t)
         {
             notify(new CardChangedMessage());
         }

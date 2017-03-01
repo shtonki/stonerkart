@@ -912,10 +912,7 @@ namespace stonerkart
 
         private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)
         {
-            CardsPanel p = new CardsPanel();
-            p.clickedCallbacks.Add(clicked);
-            p.setCards(cards);
-            return Controller.showControl(p, true, closeable);
+            return Controller.showCards(cards, closeable, clicked);
         }
 
         private Card selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount)

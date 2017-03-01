@@ -133,17 +133,16 @@ namespace stonerkart
         public readonly bool added;
         public readonly Card[] cards;
 
-        public PileChangedMessage(bool added, Card card)
+        public PileChangedMessage(bool added, Card card) : this(added, new[] { card})
         {
-            this.added = added;
-            this.cards = new [] { card };
         }
 
-        public PileChangedMessage(bool added, Card[] cards)
+        public PileChangedMessage(bool added, Card[] cards) : this()
         {
             this.added = added;
             this.cards = cards;
         }
+
     }
 
 }
