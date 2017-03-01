@@ -1,5 +1,6 @@
 ﻿missing features:
 see if opponent redrew or not
+enforce hero color
 
 #nottriggered
 things that are raised from the dead have their race set to undead

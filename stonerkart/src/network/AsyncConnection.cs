@@ -11,7 +11,7 @@ namespace stonerkart
 {
     abstract class AsyncConnection
     {
-        private Socket socket;
+        protected Socket socket;
         private byte[] buffer = new byte[1024];
         private StringBuilder builder;
 
