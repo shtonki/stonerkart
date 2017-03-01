@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,6 +33,7 @@ namespace stonerkart
             string castDescription = "";
             CastSpeed castSpeed;
 
+            List<Effect> additionalCastCosts = new List<Effect>();
 
             #region oophell
 
@@ -53,7 +55,7 @@ namespace stonerkart
                         "At the end of your turn deal 1 damage to every enemy player.",
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new CardResolveRule(CardResolveRule.Rule.VillainHeroes)),
                         new ZepperDoer(1),
-                        new Cost(),
+                        new Foo(),
                         new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.End && e.activePlayer == controller),
                         0,
                         PileLocation.Field
@@ -92,7 +94,7 @@ namespace stonerkart
                         "Whenever this creature enters the battlefield under your control, draw two cards.",
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                         new DrawCardsDoer(2),
-                        new Cost(),
+                        new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
                         0, 
                         PileLocation.Field,
@@ -118,7 +120,7 @@ namespace stonerkart
                         "Whenever this creature enters the graveyard from the battlefield under your control, draw a card.",
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                         new DrawCardsDoer(1),
-                        new Cost(),
+                        new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard && location.pile == PileLocation.Field),
                         0,
                         PileLocation.Field
@@ -171,7 +173,7 @@ namespace stonerkart
                         "Whenever a creature enters the battlefield under your control, gain 1 life.",
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
                         new ZepperDoer(-1),
-                        new Cost(),
+                        new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
                            moveEvent.card.controller == this.controller &&
                            moveEvent.to.location.pile == PileLocation.Field &&
@@ -220,8 +222,9 @@ namespace stonerkart
                     basePower = 1;
                     baseToughness = 20;
 
+                    
                     ActivatedAbility a = new ActivatedAbility(PileLocation.Field, 0, 
-                        new Cost(new ManaCost(0, 0, 0, 0, 0, 2, 2)),
+                        fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
                         CastSpeed.Instant, 
                         String.Format("{1}{0}{0}: Draw a card", G.coloured(ManaColour.Order), G.colourless(2)),
                         new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), new DrawCardsDoer(1)));
@@ -336,7 +339,7 @@ namespace stonerkart
                         "Whenever this creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
                         new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
                         new ToOwnersDoer(PileLocation.Hand), 
-                        new Cost(),
+                        new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Field),
                         0,
                         PileLocation.Field,
@@ -362,9 +365,13 @@ namespace stonerkart
                 } break;
                 #endregion
 
-                    case CardTemplate.missingno:
+                case CardTemplate.missingno:
                 {
-                    
+                    cardType = CardType.Creature;
+                    greyCost = 2;
+                    basePower = 3;
+                    baseToughness = 3;
+                    //additionalCastCosts.Add(new SelectAndMoveCost(c => true, PileLocation.Hand, PileLocation.Graveyard));
                 } break;
 
                 default:
@@ -376,7 +383,15 @@ namespace stonerkart
 
             #endregion
 
-            ManaCost cmc = new ManaCost(chaosCost, deathCost, lifeCost, mightCost, natureCost, orderCost, greyCost);
+            int[] x = new int[ManaSet.size];
+            x[(int)ManaColour.Chaos] = chaosCost;
+            x[(int)ManaColour.Colourless] = greyCost;
+            x[(int)ManaColour.Death] = deathCost;
+            x[(int)ManaColour.Life] = lifeCost;
+            x[(int)ManaColour.Might] = mightCost;
+            x[(int)ManaColour.Nature] = natureCost;
+            x[(int)ManaColour.Order] = orderCost;
+            castManaCost = new ManaSet(x);
 
             power = new Modifiable<int>(basePower);
             power.addObserver(this);
@@ -414,9 +429,13 @@ namespace stonerkart
             
             if (castEffect == null) throw new Exception("these don't show up anyway");
             List<Effect> es = new List<Effect>();
+
             es.Add(castEffect);
             es.AddRange(additionalCastEffects);
-            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Cost(cmc), castSpeed, castDescription, es.ToArray());
+
+            additionalCastCosts.Add(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new ManaCostRule(castManaCost)), new PayManaDoer()));
+
+            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Foo(additionalCastCosts.ToArray()), castSpeed, castDescription, es.ToArray());
             activatedAbilities.Add(castAbility);
 
             this.owner = owner;
@@ -426,11 +445,18 @@ namespace stonerkart
             name = ct.ToString().Replace("_a", "'").Replace('_', ' ');
         }
 
-        private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Cost cost, GameEventFilter filter, int castRange, PileLocation activeIn, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
+        private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo foo, GameEventFilter filter, int castRange, PileLocation activeIn, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
         {
             Effect e = new Effect(trs, doer);
-            TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, cost, filter, timing, description);
+            TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, foo, filter, timing, description);
             triggeredAbilities.Add(ta);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] //yagni said no one ever
+        private static Foo fooFromManaCost(params ManaColour[] cs)
+        {
+            return new Foo(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                new ManaCostRule()), new PayManaDoer()));
         }
 
     }

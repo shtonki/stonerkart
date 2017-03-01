@@ -12,6 +12,8 @@ namespace stonerkart
     {
         public ManaPanel manaPanel1;
 
+        private bool stunt;
+
         public PlayerPanel()
         {
             InitializeComponent();
@@ -23,14 +25,13 @@ namespace stonerkart
             {
                 Color c = t.active.Value ? StepPanel.on : StepPanel.off;
                 BackColor = c;
-                //manaPanel1.BackColor = c;
             }
             else
             {
-                manaPanel1.setLightUp(t.player.fake == null ? t.player.manaPool : t.player.fake);
+                manaPanel1.setPool(t.player.manaPool, t.player.stunthack, t.player.stunthackset);
             }
         }
-
+        
         private void InitializeComponent()
         {
             this.manaPanel1 = new stonerkart.ManaPanel();

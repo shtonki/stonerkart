@@ -9,12 +9,12 @@ namespace stonerkart
     abstract class Ability
     {
         public PileLocation activeIn;
-        public Effect[] effects;
+        public Foo effects;
+        public Foo cost;
         public int castRange;
-        public Cost cost;
         public string description;
 
-        public Ability(PileLocation activeIn, Effect[] effects, int castRange, Cost cost, string description)
+        public Ability(PileLocation activeIn, Foo effects, int castRange, Foo cost, string description)
         {
             this.activeIn = activeIn;
             this.effects = effects;
@@ -31,7 +31,7 @@ namespace stonerkart
         private CastSpeed castSpeed;
 
 
-        public ActivatedAbility(PileLocation activeIn, int castRange, Cost cost, CastSpeed castSpeed, string description, params Effect[] effects) : base(activeIn, effects, castRange, cost, description)
+        public ActivatedAbility(PileLocation activeIn, int castRange, Foo cost, CastSpeed castSpeed, string description, params Effect[] effects) : base(activeIn, new Foo(effects), castRange, cost, description)
         {
             this.castSpeed = castSpeed;
         }
@@ -45,7 +45,7 @@ namespace stonerkart
         private GameEventFilter filter;
         private Card card;
 
-        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Cost cost, GameEventFilter trigger, Timing timing, string description) : base(activeIn, effects, castRange, cost, description)
+        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Foo cost, GameEventFilter trigger, Timing timing, string description) : base(activeIn, new Foo(effects), castRange, cost, description)
         {
             this.card = card;
             filter = trigger;

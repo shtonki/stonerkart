@@ -35,7 +35,7 @@ namespace stonerkart
             this.rules = rules;
         }
 
-        public TargetMatrix fillCast(ChooseTargetToolbox str)
+        public TargetMatrix fillCast(HackStruct str)
         {
             TargetColumn[] r = new TargetColumn[rules.Length];
 
@@ -49,30 +49,20 @@ namespace stonerkart
             return new TargetMatrix(r);
         }
 
-        public TargetMatrix fillResolve(TargetMatrix tm, ResolveEnv re, Game g)
+        public TargetMatrix fillResolve(TargetMatrix tm, HackStruct hs)
         {
             TargetColumn[] r = tm.columns;
 
             for (int i = 0; i < rules.Length; i++)
             {
-                r[i] = rules[i].fillResolveTargets(re, r[i]);
+                r[i] = rules[i].fillResolveTargets(hs, r[i]);
             }
 
             return new TargetMatrix(r);
         }
 
     }
-
-
-    struct ChooseTargetToolbox
-    {
-        public Func<Stuff> getTargetable { get; }
-
-        public ChooseTargetToolbox(Func<Stuff> getTargetable)
-        {
-            this.getTargetable = getTargetable;
-        }
-    }
+    
 
     class TargetMatrix
     {
@@ -86,6 +76,8 @@ namespace stonerkart
         public TargetRow[] generateRows()
         {
             int l = columns.Aggregate(1, (current, c) => current*c.targets.Length);
+            if (l == 0) return new TargetRow[] {};
+
             int[] ms = columns.Select(c => c.targets.Length).ToArray();
             int[] cs = columns.Select(c => 0).ToArray();
 
@@ -125,10 +117,11 @@ namespace stonerkart
             this.targetType = targetType;
         }
 
-        public abstract TargetColumn? fillCastTargets(ChooseTargetToolbox f);
-        public abstract TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c);
+        public abstract TargetColumn? fillCastTargets(HackStruct f);
+        public abstract TargetColumn fillResolveTargets(HackStruct re, TargetColumn c);
+        //public abstract bool possible(HackStruct hs);
     }
-
+    
     class SelectCardRule : TargetRule
     {
         private TargetRule pg;
@@ -140,21 +133,21 @@ namespace stonerkart
             l = location;
         }
 
-        public override TargetColumn? fillCastTargets(ChooseTargetToolbox f)
+        public override TargetColumn? fillCastTargets(HackStruct f)
         {
             return pg.fillCastTargets(f);
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct hs, TargetColumn c)
         {
-            TargetColumn r = pg.fillResolveTargets(re, c);
+            TargetColumn r = pg.fillResolveTargets(hs, c);
             if (r.targets.Length != 1) throw new Exception();
             Player p = (Player)r.targets[0];
-            Card crd = re.selector(p.pileFrom(l));
+            Card crd = hs.selectCard(p.pileFrom(l));
             return new TargetColumn(crd);
         }
     }
-
+    
     class AoeRule : TargetRule
     {
         private PryTileRule ruler;
@@ -169,12 +162,12 @@ namespace stonerkart
             this.cardFilter = cardFilter;
         }
 
-        public override TargetColumn? fillCastTargets(ChooseTargetToolbox f)
+        public override TargetColumn? fillCastTargets(HackStruct f)
         {
             return ruler.fillCastTargets(f);
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             if (c.targets.Length != 1) throw new Exception();
             Tile centre = (Tile)c.targets[0];
@@ -183,6 +176,91 @@ namespace stonerkart
         }
 
         
+    }
+
+    class ManaCostRule : TargetRule
+    {
+        private ManaSet ms;
+
+        public ManaCostRule(ManaSet ms) : base(typeof(ManaOrb))
+        {
+            this.ms = ms;
+        }
+
+        public ManaCostRule(params ManaColour[] cs) : this(new ManaSet(cs))
+        {
+
+        }
+
+        public ManaCostRule(int[] cs) : this(new ManaSet(cs))
+        {
+            
+        }
+
+        public override TargetColumn? fillCastTargets(HackStruct hs)
+        {
+            Player p = hs.activePlayer;
+            ManaSet cost = ms.clone();
+            for (int i = 0; i < ManaSet.size; i++)
+            {
+                if ((ManaColour)i == ManaColour.Colourless) continue;
+                if (p.manaPool.currentMana((ManaColour)i) < cost[i]) return null;
+            }
+
+            IEnumerable<ManaColour> poolOrbs = p.manaPool.orbs;
+            IEnumerable<ManaColour> costOrbs = cost.orbs.Select(o => o.colour);
+
+            int diff = costOrbs.Count() - poolOrbs.Count();
+
+            if (diff > 0) return null;
+
+            if (cost[ManaColour.Colourless] > 0)
+            {
+                if (diff < 0) // we have more total mana than the cost
+                {
+                    Controller.setPrompt("Cast using what mana", ButtonOption.Cancel);
+                    ManaSet colours = cost.clone();
+                    colours[ManaColour.Colourless] = 0;
+                    p.stuntLoss(colours);
+                    while (cost[ManaColour.Colourless] > 0)
+                    {
+                        var v = hs.getStuff();
+                        if (v is ManaOrb)
+                        {
+                            ManaOrb orb = (ManaOrb)v;
+                            ManaColour colour = orb.colour;
+                            if (p.manaPool.currentMana(colour) - cost[colour] > 0)
+                            {
+                                cost[colour]++;
+                                cost[ManaColour.Colourless]--;
+                                colours[colour]++;
+                                p.stuntLoss(colours);
+                            }
+                        }
+                        if (v is ShibbuttonStuff)
+                        {
+                            ShibbuttonStuff b = (ShibbuttonStuff)v;
+                            if (b.option == ButtonOption.Cancel)
+                            {
+                                p.unstuntMana();
+                                return null;
+                            }
+                        }
+                    }
+                    p.unstuntMana();
+                }
+                else
+                {
+                    cost = hs.activePlayer.manaPool.current;
+                }
+            }
+            return new TargetColumn(cost.orbs);
+        }
+
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
+        {
+            return c;
+        }
     }
 
     class PryTileRule : TargetRule
@@ -194,11 +272,11 @@ namespace stonerkart
             this.filter = filter;
         }
 
-        public override TargetColumn? fillCastTargets(ChooseTargetToolbox box)
+        public override TargetColumn? fillCastTargets(HackStruct box)
         {
             while (true)
             {
-                Stuff v = box.getTargetable();
+                Stuff v = box.getStuff();
 
                 var b = v as ShibbuttonStuff;
                 if (b?.option == ButtonOption.Cancel) return null;
@@ -209,7 +287,7 @@ namespace stonerkart
             }
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             return c;
         }
@@ -229,11 +307,11 @@ namespace stonerkart
             this.filter = filter;
         }
 
-        public override TargetColumn? fillCastTargets(ChooseTargetToolbox box)
+        public override TargetColumn? fillCastTargets(HackStruct box)
         {
             while (true)
             {
-                Stuff v = box.getTargetable();
+                Stuff v = box.getStuff();
 
                 if (v is ShibbuttonStuff)
                 {
@@ -250,7 +328,7 @@ namespace stonerkart
             }
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             return c;
         }
@@ -267,7 +345,7 @@ namespace stonerkart
             this.rule = rule;
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             if (c.targets.Length != 0) throw new Exception();
             switch (rule)
@@ -308,7 +386,7 @@ namespace stonerkart
             this.rule = rule;
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             if (c.targets.Length != 0) throw new Exception();
             switch (rule)
@@ -335,35 +413,24 @@ namespace stonerkart
         {
         }
 
-        public override TargetColumn? fillCastTargets(ChooseTargetToolbox box)
+        public override TargetColumn? fillCastTargets(HackStruct box)
         {
             return new TargetColumn(new Targetable[] {});
         }
 
     }
 
-    struct ResolveEnv
-    {
-        public Card resolveCard;
-        public IEnumerable<Card> cards;
-        public Func<IEnumerable<Card>, Card> selector;
-
-        public ResolveEnv(Card resolveCard, IEnumerable<Card> cards, Func<IEnumerable<Card>, Card> selector)
-        {
-            this.resolveCard = resolveCard;
-            this.cards = cards;
-            this.selector = selector;
-        }
-    }
 
     struct TargetRow
     {
-        public Targetable[] ts;
+        private Targetable[] ts;
 
         public TargetRow(Targetable[] ts)
         {
             this.ts = ts;
         }
+
+        public Targetable this[int ix] => ts[ix];
     }
     
 

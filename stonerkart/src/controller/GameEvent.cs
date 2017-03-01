@@ -67,20 +67,6 @@ namespace stonerkart
         }
     }
 
-    class PayCostsEvent : GameEvent
-    {
-        public Player player;
-        public Ability ability;
-        public int[][] costs;
-
-        public PayCostsEvent(Player player, Ability ability, int[][] costs)
-        {
-            this.player = player;
-            this.ability = ability;
-            this.costs = costs;
-        }
-    }
-
     class PlaceOnTileEvent : GameEvent
     {
         public Card card { get; }
@@ -102,6 +88,18 @@ namespace stonerkart
         {
             this.card = card;
             this.path = path;
+        }
+    }
+
+    class PayManaEvent : GameEvent
+    {
+        public ManaSet manaSet { get; }
+        public Player player;
+
+        public PayManaEvent(Player player, ManaSet manaSet)
+        {
+            this.player = player;
+            this.manaSet = manaSet;
         }
     }
 

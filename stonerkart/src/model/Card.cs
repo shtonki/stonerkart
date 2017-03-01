@@ -21,7 +21,7 @@ namespace stonerkart
         public CardSet set { get; }
         public Race? race { get; }
         public Subtype? subtype { get; }
-        public int convertedManaCost => castManaCost.orbs.Count();
+        public int convertedManaCost => castManaCost.colours.Count();
 
         public string breadText => breadTextEx();
 
@@ -29,7 +29,7 @@ namespace stonerkart
 
         public ActivatedAbility castAbility { get; }
         public int castRange => castAbility.castRange;
-        public ManaSet castManaCost => castAbility.cost.getSubCost<ManaCost>().cost;
+        public ManaSet castManaCost { get; }
 
         public string typeText => typeTextEx();
 
@@ -78,7 +78,7 @@ namespace stonerkart
         private List<ManaColour> coloursEx()
         {
             if (forceColour.HasValue) return new List<ManaColour>(new ManaColour[] { forceColour.Value });
-            HashSet<ManaColour> hs = new HashSet<ManaColour>(castManaCost.orbs.Where(x => x != ManaColour.Colourless));
+            HashSet<ManaColour> hs = new HashSet<ManaColour>(castManaCost.colours.Where(x => x != ManaColour.Colourless));
             if (hs.Count == 0) return new List<ManaColour>(new ManaColour[] {ManaColour.Colourless,});
             
             return hs.ToList();

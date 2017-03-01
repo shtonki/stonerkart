@@ -9,8 +9,9 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
-    
-
+    /// <summary>
+    /// 
+    /// </summary>
     class GameFrame : Form
     {
         public Screen mainMenuPanel { get; private set; }

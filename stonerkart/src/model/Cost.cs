@@ -6,70 +6,71 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    struct CostPayStruct
+    class Foo
     {
-        public Func<Stuff> getStuff { get; }
+        protected Effect[] effects;
 
-        public CostPayStruct(Func<Stuff> getStuff)
+        public Foo()
         {
-            this.getStuff = getStuff;
+            effects = new Effect[0];
+        }
+
+        public Foo(params Effect[] effects)
+        {
+            this.effects = effects;
+        }
+
+        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] ts)
+        {
+            List<GameEvent> rt = new List<GameEvent>();
+            for (int i = 0; i < ts.Length; i++)
+            {
+                Effect effect = effects[i];
+                TargetMatrix matrix = effect.ts.fillResolve(ts[i], hs);
+                
+                rt.AddRange(effect.doer.act(hs, matrix.generateRows()));
+            }
+            return rt;
+        }
+
+        public TargetMatrix[] fillCast(HackStruct hs)
+        {
+            TargetMatrix[] rt = new TargetMatrix[effects.Length];
+
+            for (int i = 0; i < effects.Length; i++)
+            {
+                rt[i] = effects[i].fillCast(hs);
+                if (rt[i] == null) return null;
+            }
+
+            return rt;
+        }
+
+        public TargetMatrix[] fillResolve(TargetMatrix[] tms, HackStruct hs)
+        {
+            TargetMatrix[] rt = new TargetMatrix[effects.Length];
+
+            for (int i = 0; i < effects.Length; i++)
+            {
+                rt[i] = effects[i].fillResolve(tms[i], hs);
+                if (rt[i] == null) return null;
+            }
+
+            return rt;
+        }
+
+        public bool possible(HackStruct hs)
+        {
+            return effects.All(e => e.possible(hs));
         }
     }
 
-    class Cost
-    {
-        private SubCost[] costs;
-
-        public Cost(params SubCost[] costs)
-        {
-            this.costs = costs;
-        }
-
-        public int[][] measure(Player p, CostPayStruct str)
-        {
-            int[][] r = new int[costs.Length][];
-            for (int i = 0; i < costs.Length; i++)
-            {
-                int[] v = costs[i].measure(p, str);
-                if (v == null) return null;
-                r[i] = v;
-            }
-
-            return r;
-        }
-
-        public bool possible(Player p)
-        {
-            return costs.All(c => c.possible(p));
-        }
-
-        public void cut(Player p, int[][] iz)
-        {
-            if (iz.Length != costs.Length) throw new Exception();
-            for (int i = 0; i < costs.Length; i++)
-            {
-                costs[i].cut(p, iz[i]);
-            }
-        }
-
-        public T getSubCost<T>()
-        {
-            foreach (var v in costs)
-            {
-                if (v is T)
-                {
-                    return (T)v;
-                }
-            }
-            throw new Exception("Card has no mana cost idiot");
-        }
-    }
-
+    /*
     interface SubCost
     {
-        int[] measure(Player p, CostPayStruct s);
+        int[] measure(Player p, HackStruct s);
 
-        void cut(Player p, int[] iz);
+        IEnumerable<GameEvent> cut(Player p, HackStruct s, int[] iz);
 
         bool possible(Player p);
     }
@@ -107,10 +108,8 @@ namespace stonerkart
             return true;
         }
 
-        public int[] measure(Player p, CostPayStruct s)
+        public int[] measure(Player p, HackStruct s)
         {
-            if (!possible(p)) return null;
-
             ManaSet cost = this.cost.clone();
             for (int i = 0; i < ManaSet.size; i++)
             {
@@ -170,9 +169,41 @@ namespace stonerkart
             }
         }
 
-        public void cut(Player p, int[] iz)
+        public IEnumerable<GameEvent> cut(Player p, HackStruct s, int[] iz)
         {
-            p.payMana(new ManaSet(iz));
+            return new GameEvent[] {new PayManaEvent(p, new ManaSet(iz)) };
         }
     }
+
+    class SelectAndMoveCost : SubCost
+    {
+        private Func<Card, bool> predicate;
+        private PileLocation frm;
+        private PileLocation to;
+
+        public SelectAndMoveCost(Func<Card, bool> predicate, PileLocation frm, PileLocation to)
+        {
+            this.predicate = predicate;
+            this.frm = frm;
+            this.to = to;
+        }
+
+        public int[] measure(Player p, HackStruct s)
+        {
+            Card c = s.selectCard(p.pileFrom(frm), true);
+            if (c == null) return null;
+            return new[] {s.ordC(c)};
+        }
+
+        public IEnumerable<GameEvent> cut(Player p, HackStruct s, int[] iz)
+        {
+            return new[] {new MoveToPileEvent(s.Cord(iz[0]), p.pileFrom(to)),};
+        }
+
+        public bool possible(Player p)
+        {
+            return p.pileFrom(frm).Count(predicate) > 0;
+        }
+    }
+*/
 }

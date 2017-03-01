@@ -145,7 +145,7 @@ namespace stonerkart
 
             foreach (var tv in tileViews)
             {
-                using (Pen pen = new Pen(tv.color, 2))
+                using (Pen pen = new Pen(tv.colour, 2))
                 {
                     g.DrawPolygon(pen, tv.poly);
                     if (tv.tile.card != null)
@@ -157,16 +157,16 @@ namespace stonerkart
                         var m = new Matrix();
                         m.Translate(x + dw * ((float)75 / 78), y + dh * ((float)35 / 51));
                         bh.Transform = m;
-                        
+
                         g.FillPolygon(bh, tv.poly);
 
-                        int b = (int)((tv.poly[3].Y - tv.poly[0].Y)/2);
-                        int a = (int)((tv.poly[2].X - tv.poly[0].X)/4);
-                        Font f = new Font("Ariel Black", 1 + (b+a) / 5, FontStyle.Bold);
+                        int b = (int)((tv.poly[3].Y - tv.poly[0].Y) / 2);
+                        int a = (int)((tv.poly[2].X - tv.poly[0].X) / 4);
+                        Font f = new Font("Ariel Black", 1 + (b + a) / 5, FontStyle.Bold);
                         float vxR = tv.poly[0].X;
                         float vxL = tv.poly[2].X - a;
-                        float vy = (4*tv.poly[0].Y + 6*tv.poly[3].Y)/10;
-                        float vxM = tv.poly[4].X - a/2;
+                        float vy = (4 * tv.poly[0].Y + 6 * tv.poly[3].Y) / 10;
+                        float vxM = tv.poly[4].X - a / 2;
                         float vyB = tv.poly[4].Y - b;
                         int yp = 5;
                         int xp = -1;
@@ -178,13 +178,13 @@ namespace stonerkart
 
                         g.FillEllipse(filler, vxL, vy, a, b);
                         g.DrawString(card.toughness.ToString().PadLeft(2), f, Brushes.Black, vxL + xp, vy + yp);
-                        
+
                         g.FillEllipse(filler, vxM, vyB, a, b);
-                        g.DrawString(card.power.ToString().PadLeft(2),  f, Brushes.Black, vxM + xp, vyB + yp);
+                        g.DrawString(card.power.ToString().PadLeft(2), f, Brushes.Black, vxM + xp, vyB + yp);
                     }
                     else
                     {
-                        using (Brush b = new SolidBrush(Color.DimGray))
+                        using (Brush b = new SolidBrush(tv.colour.Name == "Black" ? Color.DimGray : tv.colour))
                             g.FillPolygon(b, tv.poly);
                     }
                 }

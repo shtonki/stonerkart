@@ -80,47 +80,8 @@ namespace stonerkart
             notify(new PlayerChangedArgs(this));
         }
 
-        public ManaPool fake;
-        public void stuntMana(ManaPool newPool)
-        {
-            fake = newPool;
-
-            notify(new PlayerChangedArgs(this));
-        }
-
-        public void stuntCurrentDiff(ManaColour mc, int d)
-        {
-            fake.addMana(mc, d);
-
-            notify(new PlayerChangedArgs(this));
-        }
-
-        public void stuntMaxDiff(ManaColour mc, int d)
-        {
-            fake.addMax(mc, d);
-
-            notify(new PlayerChangedArgs(this));
-        }
-
-        public void stuntCurrentLoss(ManaSet set)
-        {
-            fake.subtractCurrent(set);
-
-            notify(new PlayerChangedArgs(this));
-        }
-
-        public void unstuntMana()
-        {
-            fake = null;
-
-            notify(new PlayerChangedArgs(this));
-        }
-
-
         public void gainMana(ManaColour c)
         {
-            if (fake != null) throw new Exception();
-
             manaPool.gainMana(c);
 
             notify(new PlayerChangedArgs(this));
@@ -128,8 +89,6 @@ namespace stonerkart
 
         public void payMana(ManaSet iz)
         {
-            if (fake != null) throw new Exception();
-
             manaPool.subtractCurrent(iz);
             notify(new PlayerChangedArgs(this));
         }
@@ -143,6 +102,27 @@ namespace stonerkart
         public void clearBonusMana()
         {
             manaPool.resetBonus();
+            notify(new PlayerChangedArgs(this));
+        }
+
+        public bool stunthack;
+        public ManaSet stunthackset;
+        public void stuntMana()
+        {
+            stunthack = true;
+            notify(new PlayerChangedArgs(this));
+        }
+
+        public void unstuntMana()
+        {
+            stunthack = false;
+            stunthackset = null;
+            notify(new PlayerChangedArgs(this));
+        }
+
+        public void stuntLoss(ManaSet l)
+        {
+            stunthackset = l;
             notify(new PlayerChangedArgs(this));
         }
 

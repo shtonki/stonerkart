@@ -60,7 +60,7 @@ namespace stonerkart
         public GamePanel() : this(null)
         {
         }
-
+        
         private void setHightlight(Stuff stuff)
         {
             if (stuff == null) return;
