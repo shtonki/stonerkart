@@ -945,7 +945,57 @@ namespace stonerkart
         {
             return connection.receiveAction<ChoiceSelection>().choices;
         }
+
+        public void setTargetHighlight(Card c)
+        {
+            StackWrapper? w = null;
+
+            foreach (var v in wrapperStack)
+            {
+                if (v.card == c)
+                {
+                    w = v;
+                    break;
+                }
+            }
+
+            if (w == null) return;
+            StackWrapper wr = w.Value;
+
+            List<Tile> tiles = new List<Tile>();
+            foreach (TargetMatrix tm in wr.matricies)
+            {
+                foreach (TargetColumn cl in tm.columns)
+                {
+                    tiles.AddRange(tilesFromTargetables(cl.targets));
+                }
+            }
+            Controller.highlight(tiles, Color.Indigo);
+        }
+
+        private static IEnumerable<Tile> tilesFromTargetables(Targetable[] ts)
+        {
+            List<Tile> rt = new List<Tile>();
+            foreach (var t in ts)
+            {
+                if (t is Tile)
+                {
+                    rt.Add((Tile)t);
+                }
+                if (t is Card)
+                {
+                    Card c = (Card)t;
+                    if (c.tile != null) { rt.Add(c.tile); }
+                }
+                if (t is Player)
+                {
+                    rt.Add(((Player)t).heroCard.tile);
+                }
+            }
+            return rt;
+        }
     }
+
 
     struct StackWrapper
     {

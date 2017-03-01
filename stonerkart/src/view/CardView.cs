@@ -38,14 +38,14 @@ namespace stonerkart
             powerBox.justifyText = Justify.Right;
 
             card = c;
-            ihavedowns();
+            sickmemes();
 
         }
 
         public void setCard(CardTemplate ct)
         {
             card = new Card(ct, null);
-            ihavedowns();
+            sickmemes();
         }
 
         public void setCard(Card c)
@@ -53,10 +53,10 @@ namespace stonerkart
             card.tryUnsubscribe(this);
             card = c;
             card.addObserver(this);
-            ihavedowns();
+            sickmemes();
         }
 
-        private void ihavedowns()
+        private void sickmemes()
         {
             this.memeout(() =>
             {
@@ -108,7 +108,7 @@ namespace stonerkart
 
         public void notify(CardChangedMessage t)
         {
-            ihavedowns();
+            sickmemes();
         }
 
         public Stuff getStuff()

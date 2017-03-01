@@ -147,7 +147,6 @@ namespace stonerkart
             {
                 using (Pen pen = new Pen(tv.colour, 2))
                 {
-                    g.DrawPolygon(pen, tv.poly);
                     if (tv.tile.card != null)
                     {
                         Card card = tv.tile.card;
@@ -187,6 +186,7 @@ namespace stonerkart
                         using (Brush b = new SolidBrush(tv.colour.Name == "Black" ? Color.DimGray : tv.colour))
                             g.FillPolygon(b, tv.poly);
                     }
+                    g.DrawPolygon(pen, tv.poly);
                 }
                 foreach (var t in ts)
                 {

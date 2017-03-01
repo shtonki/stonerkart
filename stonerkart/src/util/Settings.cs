@@ -148,6 +148,7 @@ namespace stonerkart
 
         static Settings()
         {
+            return;
             settingDict = new Dictionary<string, Setting>();
 
             foreach (Setting s in settings)
