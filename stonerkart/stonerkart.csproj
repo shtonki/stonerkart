@@ -240,6 +240,10 @@
     <None Include="Resources\artCleansingFire.png" />
     <None Include="Resources\artGraverobberSyrdin.png" />
     <None Include="Resources\teleport.png" />
+    <None Include="Resources\buttonDeck.png" />
+    <None Include="Resources\buttonExile.png" />
+    <None Include="Resources\buttonGraveyard.png" />
+    <None Include="Resources\buttonHand.png" />
     <Content Include="rules.txt" />
     <None Include="Resources\multi.png" />
     <None Include="Resources\firstedition.png" />

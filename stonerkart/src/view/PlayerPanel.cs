@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,7 +18,21 @@ namespace stonerkart
         private Button deckButton;
         private bool stunt;
 
-        private Tuple<PileLocation, Button>[] hack;
+        private hackery[] hack;
+
+        private struct hackery
+        {
+            public readonly Button b;
+            public readonly PileLocation pl;
+            public readonly Image img;
+
+            public hackery(Button b, PileLocation pl, Image img)
+            {
+                this.b = b;
+                this.pl = pl;
+                this.img = img;
+            }
+        }
 
         private Player hackp;
 
@@ -26,16 +41,26 @@ namespace stonerkart
             InitializeComponent();
             hack = new[]
             {
-                new Tuple<PileLocation, Button>(PileLocation.Graveyard, graveyardButton),
-                new Tuple<PileLocation, Button>(PileLocation.Hand, handButton),
-                new Tuple<PileLocation, Button>(PileLocation.Displaced, exileButton),
-                new Tuple<PileLocation, Button>(PileLocation.Deck, deckButton),
+                new hackery(graveyardButton, PileLocation.Graveyard, Properties.Resources.buttonGraveyard),
+                new hackery(handButton, PileLocation.Hand, Properties.Resources.buttonHand),
+                new hackery(exileButton, PileLocation.Displaced, Properties.Resources.buttonExile),
+                new hackery(deckButton, PileLocation.Deck, Properties.Resources.buttonDeck),
             };
 
-            foreach (Tuple<PileLocation, Button> t in hack)
+            foreach (hackery t in hack)
             {
-                var t1 = t;
-                t.Item2.MouseClick += (_, __) => koen(t1.Item1);
+                PileLocation pl = t.pl;
+                Button b = t.b;
+                Image i = t.img;
+
+                b.BackColor = Color.Bisque;
+                if (pl == PileLocation.Graveyard || pl == PileLocation.Displaced) b.MouseClick += (_, __) => koen(pl);
+                b.Resize += (_, __) =>
+                {
+                    var vx = G.ResizeImage(i, b.Width, b.Height);
+                    b.Font = new Font("Lucid Sans Unicode", b.Width/4, FontStyle.Bold);
+                    b.Image = vx;
+                };
             }
         }
 
@@ -49,10 +74,10 @@ namespace stonerkart
             }
             if (t.pileChanged.HasValue)
             {
-                foreach (Tuple<PileLocation, Button> tpl in hack)
+                foreach (hackery h in hack)
                 {
-                    Pile p = hackp.pileFrom(tpl.Item1);
-                    Button b = tpl.Item2;
+                    Pile p = hackp.pileFrom(h.pl);
+                    Button b = h.b;
                     b.memeout(() =>
                     {
                         b.Text = p.Count.ToString();
