@@ -212,7 +212,6 @@ namespace stonerkart
         {
             gameFrame.setPrompt(prompt, options);
         }
-        
 
         private static List<TileView> hled = new List<TileView>();
 

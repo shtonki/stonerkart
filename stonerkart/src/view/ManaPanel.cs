@@ -14,6 +14,8 @@ namespace stonerkart
         private ManaButton[][] images;
         public readonly List<Action<Clickable>> callbacks = new List<Action<Clickable>>();
 
+        private bool stuntEx;
+
         public ManaPanel()
         {
             BackColor = Color.DarkGray;
@@ -33,8 +35,9 @@ namespace stonerkart
             layoutPicures();
         }
 
-        public void setLightUp(ManaPool p)
+        public void setPool(ManaPool p, bool stunt = false)
         {
+            int s = stunt ? 1 : 0;
             for (int i = 0; i < ManaSet.size; i++)
             {
                 for (int j = 0; j < maxMana; j++)
@@ -44,7 +47,7 @@ namespace stonerkart
                     {
                         v = ManaButton.Visibility.Full;
                     }
-                    else if (p.maxMana((ManaColour)i) > j)
+                    else if ((p.maxMana((ManaColour)i) + (stunt ? 1 : 0)) > j)
                     {
                         v = ManaButton.Visibility.Faded;
                     }

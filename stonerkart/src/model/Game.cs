@@ -361,18 +361,11 @@ namespace stonerkart
 
             if (activePlayer == hero)
             {
-                ManaPool pool = activePlayer.manaPool.clone();
-                
-                activePlayer.stuntMana(pool);
-
-                for (int i = 0; i < ManaSet.size; i++)
-                {
-                    if ((ManaColour)i == ManaColour.Colourless) continue;
-                    activePlayer.stuntMaxDiff((ManaColour)i, 1);
-                }
+                activePlayer.stuntMana();
 
                 Controller.setPrompt("Gain mana nerd");
                 ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.currentMana(o.colour) != 6);
+
                 activePlayer.unstuntMana();
 
                 selection = new ManaOrbSelection(v.colour);
