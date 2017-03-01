@@ -145,7 +145,7 @@ namespace stonerkart
 
             foreach (var tv in tileViews)
             {
-                using (Pen pen = new Pen(tv.colour, 2))
+                using (Pen pen = new Pen(tv.colour, 3))
                 {
                     if (tv.tile.card != null)
                     {

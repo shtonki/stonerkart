@@ -52,6 +52,7 @@ namespace stonerkart
                     g.setTargetHighlight((Card)s);
                 }
             });
+            stackPanel.mouseLeftCallbacks.Add(c => g.clearTargetHighlight());
 
             shibbutton2.MouseDown += (_, __) => g.clicked(shibbutton2);
             shibbutton3.MouseDown += (_, __) => g.clicked(shibbutton3);

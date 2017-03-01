@@ -48,7 +48,7 @@ namespace stonerkart
             }
 
             random = new Random(ngs.randomSeed);
-            map = new Map(15, 9, false, false);
+            map = new Map(16, 9, false, false);
             cards = new List<Card>();
             players = new List<Player>();
 
@@ -944,6 +944,11 @@ namespace stonerkart
         private int[] receiveChoices()
         {
             return connection.receiveAction<ChoiceSelection>().choices;
+        }
+
+        public void clearTargetHighlight()
+        {
+            Controller.clearHighlights();
         }
 
         public void setTargetHighlight(Card c)
