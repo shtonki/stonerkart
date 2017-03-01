@@ -62,22 +62,24 @@ namespace stonerkart
                         switch (targetType)
                         {
                             case 'c':
-                                {
-                                    target = g.cardFromOrd(targetOrd);
-                                }
-                                break;
+                            {
+                                target = g.cardFromOrd(targetOrd);
+                            } break;
 
                             case 't':
-                                {
-                                    target = g.tileFromOrd(targetOrd);
-                                }
-                                break;
+                            {
+                                target = g.tileFromOrd(targetOrd);
+                            } break;
 
                             case 'p':
-                                {
-                                    target = g.playerFromOrd(targetOrd);
-                                }
-                                break;
+                            {
+                                target = g.playerFromOrd(targetOrd);
+                            } break;
+
+                            case 'm':
+                            {
+                                target = new ManaOrb((ManaColour)targetOrd);
+                            } break;
 
                             default: throw new Exception();
                         }
@@ -138,6 +140,15 @@ namespace stonerkart
                             sb.Append('p');
                             sb.Append(g.ord((Player)v));
                         }
+                        else if (v is ManaOrb)
+                        {
+                            sb.Append('m');
+                            sb.Append((int)((ManaOrb)v).colour);
+                        }
+                        else
+                        {
+                            throw new Exception();
+                        }
                         sb.Append(',');
                     }
                     if (sb[sb.Length - 1] == ',') sb.Length--;
@@ -190,8 +201,9 @@ namespace stonerkart
 
         public MoveSelection(Game g, string s)
         {
-            string[] ss = s.Split(';');
             moves = new List<Tuple<Card, Path>>();
+            if (s.Length == 0) return;
+            string[] ss = s.Split(';');
 
             foreach (string str in ss)
             {
@@ -211,6 +223,7 @@ namespace stonerkart
 
         public string toString(Game g)
         {
+            if (moves.Count == 0) return "";
             StringBuilder sb = new StringBuilder();
 
             foreach (var v in moves)
