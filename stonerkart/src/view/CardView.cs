@@ -106,7 +106,7 @@ namespace stonerkart
             });
         }
 
-        public void notify(CardChangedMessage t)
+        public void notify(object o, CardChangedMessage t)
         {
             sickmemes();
         }

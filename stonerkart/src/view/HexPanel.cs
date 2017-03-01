@@ -183,7 +183,7 @@ namespace stonerkart
                     }
                     else
                     {
-                        using (Brush b = new SolidBrush(tv.colour.Name == "Black" ? Color.DimGray : tv.colour))
+                        using (Brush b = new SolidBrush(Color.DimGray))
                             g.FillPolygon(b, tv.poly);
                     }
                     g.DrawPolygon(pen, tv.poly);

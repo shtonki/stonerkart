@@ -8,7 +8,7 @@ namespace stonerkart
 {
     interface Observer<T>
     {
-        void notify(T t);
+        void notify(object o, T t);
     }
     
 
@@ -65,7 +65,7 @@ namespace stonerkart
             {
                 Observer<T> w = null;
                 v.TryGetTarget(out w);
-                w?.notify(t);
+                w?.notify(this, t);
             }
         }
     }

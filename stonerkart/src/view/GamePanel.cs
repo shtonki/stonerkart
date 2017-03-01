@@ -193,7 +193,7 @@ namespace stonerkart
             this.stackPanel.comp = null;
             this.stackPanel.Location = new System.Drawing.Point(7, 314);
             this.stackPanel.Name = "stackPanel";
-            this.stackPanel.Size = new System.Drawing.Size(147, 213);
+            this.stackPanel.Size = new System.Drawing.Size(135, 213);
             this.stackPanel.TabIndex = 10;
             this.stackPanel.vertical = false;
             // 
@@ -202,7 +202,7 @@ namespace stonerkart
             this.heroPanel.BackColor = System.Drawing.Color.DarkViolet;
             this.heroPanel.Location = new System.Drawing.Point(4, 533);
             this.heroPanel.Name = "heroPanel";
-            this.heroPanel.Size = new System.Drawing.Size(139, 132);
+            this.heroPanel.Size = new System.Drawing.Size(207, 132);
             this.heroPanel.TabIndex = 11;
             // 
             // villainPanel
@@ -210,7 +210,7 @@ namespace stonerkart
             this.villainPanel.BackColor = System.Drawing.Color.DarkViolet;
             this.villainPanel.Location = new System.Drawing.Point(7, 176);
             this.villainPanel.Name = "villainPanel";
-            this.villainPanel.Size = new System.Drawing.Size(136, 132);
+            this.villainPanel.Size = new System.Drawing.Size(204, 132);
             this.villainPanel.TabIndex = 12;
             // 
             // stepPanel1

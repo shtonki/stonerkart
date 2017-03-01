@@ -11,7 +11,7 @@ namespace stonerkart
 {
     public class DraggablePanel : Panel
     {
-        public bool closed;
+        public bool closed { get; private set; }
 
         private Panel topPanel;
         private Panel resizeButton;
