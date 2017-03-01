@@ -224,7 +224,7 @@ namespace stonerkart
 
                     
                     ActivatedAbility a = new ActivatedAbility(PileLocation.Field, 0, 
-                        fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
+                        fooFromManaCost(),//ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
                         CastSpeed.Instant, 
                         String.Format("{1}{0}{0}: Draw a card", G.coloured(ManaColour.Order), G.colourless(2)),
                         new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), new DrawCardsDoer(1)));
@@ -368,7 +368,7 @@ namespace stonerkart
                 case CardTemplate.missingno:
                 {
                     cardType = CardType.Creature;
-                    greyCost = 2;
+                    greyCost = 1;
                     basePower = 3;
                     baseToughness = 3;
                     //additionalCastCosts.Add(new SelectAndMoveCost(c => true, PileLocation.Hand, PileLocation.Graveyard));
@@ -456,7 +456,7 @@ namespace stonerkart
         private static Foo fooFromManaCost(params ManaColour[] cs)
         {
             return new Foo(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                new ManaCostRule()), new PayManaDoer()));
+                new ManaCostRule(cs)), new PayManaDoer()));
         }
 
     }

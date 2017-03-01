@@ -244,7 +244,21 @@ namespace stonerkart
             }
 
             int xi = random.Next();
-            activePlayerIndex = xi%players.Count;
+            if (connection is DummyConnection) xi = ord(hero);
+            Player flipwinner = players[xi%players.Count];
+            ButtonOption bopt;
+            if (flipwinner == hero)
+            {
+                bopt = waitForButton("Do you wish to go first?", ButtonOption.Yes, ButtonOption.No);
+                connection.sendAction(new ChoiceSelection((int)bopt));
+            }
+            else
+            {
+                Controller.setPrompt("Oppenent won the flip and is choosing whether to go first.");
+                ChoiceSelection v = connection.receiveAction<ChoiceSelection>();
+                bopt = (ButtonOption)v.choices[0];
+            }
+            activePlayerIndex = (xi + (bopt == ButtonOption.Yes ? 0 : 1))%players.Count;
 
             int[] draws = {5, 5, 4, 3, 2, 1};
 
@@ -268,6 +282,7 @@ namespace stonerkart
                     }
                     else
                     {
+                        Controller.setPrompt("Opponent is mulliganing");
                         cs = connection.receiveAction<ChoiceSelection>();
                     }
 
@@ -643,19 +658,23 @@ namespace stonerkart
             while (true)
             {
                 var v = waitForAnything();
+                Card c = null;
                 if (v is ShibbuttonStuff)
                 {
                     return null;
                 }
                 else if (v is Card)
                 {
-                    return (Card)v; 
+                    c = (Card)v;
                 }
                 else if (v is Tile)
                 {
                     Tile t = (Tile)v;
-                    if (t.card != null) return t.card;
+                    if (t.card != null) c = t.card;
                 }
+
+                if (c != null && f(c)) return c;
+
             }
         }
 
@@ -702,34 +721,37 @@ namespace stonerkart
             StackWrapper? r = null;
             if (p == hero)
             {
-                if (cancellable && !stack.Any() && !Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)) return null;
-                Tile from = card == null ? p.heroCard.tile : card.dummyFor.tile;
-                while (lv >= bt && r == null)
+                if (!(cancellable && !stack.Any() &&
+                      !Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
                 {
-                    object stuff = null;
-                    if (lv == 0)
+                    Tile from = card == null ? p.heroCard.tile : card.dummyFor.tile;
+                    while (lv >= bt && r == null)
                     {
-                        stuff = card = getCard(c => c.controller == p, "Cast a card");
-                        if (cancellable && stuff == null) return null;
+                        object stuff = null;
+                        if (lv == 0)
+                        {
+                            stuff = card = getCard(c => c.controller == p, "Cast a card");
+                            if (cancellable && stuff == null) break;
+                        }
+                        else if (lv == 1)
+                        {
+                            stuff = ability = chooseAbility(card);
+                        }
+                        else if (lv == 2)
+                        {
+                            stuff = targets = getCastTargets(ability, from);
+                        }
+                        else if (lv == 3)
+                        {
+                            HackStruct s = makeHackStruct(waitForAnything);
+                            stuff = costs = ability.cost.fillCast(s);
+                        }
+                        else if (lv == 4)
+                        {
+                            stuff = r = new StackWrapper(card, ability, targets, costs);
+                        }
+                        lv = stuff == null ? bt : lv + 1;
                     }
-                    else if (lv == 1)
-                    {
-                        stuff = ability = chooseAbility(card);
-                    }
-                    else if (lv == 2)
-                    {
-                        stuff = targets = getCastTargets(ability, from);
-                    }
-                    else if (lv == 3)
-                    {
-                        HackStruct s = makeHackStruct(waitForAnything);
-                        stuff = costs = ability.cost.fillCast(s);
-                    }
-                    else if (lv == 4)
-                    {
-                        stuff = r = new StackWrapper(card, ability, targets, costs);
-                    }
-                    lv = stuff == null ? bt : lv+1;
                 }
                 connection.sendAction(new CastSelection(r));
             }

@@ -41,14 +41,15 @@ namespace stonerkart
             if (lossStunt == null) lossStunt = new ManaSet();
             for (int i = 0; i < ManaSet.size; i++)
             {
+                ManaColour c = (ManaColour)i;
                 for (int j = 0; j < maxMana; j++)
                 {
                     ManaButton.Visibility v;
-                    if ((p.currentMana((ManaColour)i) - lossStunt[i]) > j)
+                    if ((p.currentMana(c) - lossStunt[i]) > j)
                     {
                         v = ManaButton.Visibility.Full;
                     }
-                    else if ((p.maxMana((ManaColour)i) + (stunt ? 1 : 0)) > j)
+                    else if ((p.maxMana(c) + (c == ManaColour.Colourless ? 0 : (stunt ? 1 : 0))) > j)
                     {
                         v = ManaButton.Visibility.Faded;
                     }

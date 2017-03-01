@@ -81,7 +81,7 @@ namespace stonerkart
                 b.SetBounds(0, i * 20, p.Size.Width, 20);
             }
 
-            dp = Controller.showControl(p);
+            dp = Controller.showControl(p, true, false);
         }
 
         public static void saveDeck(Deck d, string name)
