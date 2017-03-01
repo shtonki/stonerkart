@@ -309,7 +309,20 @@ namespace stonerkart
 
                 } break;
                 #endregion
+                #region Teleport
+                case CardTemplate.Teleport:
+                {
+                    cardType = CardType.Sorcery;
 
+                    orderCost = 2;
+                    castRange = 6;
+                    castEffect = new Effect(
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
+                                new PryTileRule(f => f.passable)), new MoveToTileDoer());
+                    castDescription = "Move your hero to target tile.";
+                } break;
+                #endregion
+                #region One With Nature
                 case CardTemplate.One_With_Nature:
                 {
                     cardType = CardType.Sorcery;
@@ -321,7 +334,7 @@ namespace stonerkart
                     castDescription = String.Format("You gain {0}{0}{0} until the end of the step.",
                         G.coloured(ManaColour.Nature));
                 } break;
-
+                #endregion
                 #region Graverobber Syrdin
                 case CardTemplate.Graverobber_Syrdin:
                 {

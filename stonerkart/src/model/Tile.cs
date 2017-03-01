@@ -18,6 +18,8 @@ namespace stonerkart
 
         public Card card { get; private set; }
 
+        public bool passable => card == null;
+
         private readonly XYCoord xyCoord;
         private readonly ABCCoord abcCoord;
 

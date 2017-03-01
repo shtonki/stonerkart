@@ -483,7 +483,7 @@ namespace stonerkart
                     Card defender = path.to.card;
 
                     gt.addEvent(new DamageEvent(mover, defender, mover.power));
-                    if (!defender.isHeroic) gt.addEvent(new DamageEvent(defender, mover, defender.power));
+                    if (defender.canRetaliate) gt.addEvent(new DamageEvent(defender, mover, defender.power));
                 }
                 
                 gt.addEvent(new MoveEvent(card, path));
@@ -975,7 +975,7 @@ namespace stonerkart
                     tiles.AddRange(tilesFromTargetables(cl.targets));
                 }
             }
-            Controller.highlight(tiles, Color.Indigo);
+            Controller.highlight(tiles, Color.OrangeRed);
         }
 
         private static IEnumerable<Tile> tilesFromTargetables(Targetable[] ts)

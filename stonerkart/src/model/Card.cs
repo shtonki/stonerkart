@@ -23,6 +23,9 @@ namespace stonerkart
         public Subtype? subtype { get; }
         public int convertedManaCost => castManaCost.colours.Count();
 
+        public bool isExhausted => movement == 0;
+        public bool canRetaliate => !isExhausted && !isHeroic;
+
         public string breadText => breadTextEx();
 
         public Location location => locationEx();
@@ -215,6 +218,7 @@ namespace stonerkart
         Rockhand_Ogre,
         Bear_Cavalary,
         Illegal_Goblin_Laboratory,
+        Teleport,
     }
 
     enum CardType
