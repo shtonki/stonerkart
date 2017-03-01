@@ -224,7 +224,7 @@ namespace stonerkart
 
                     
                     ActivatedAbility a = new ActivatedAbility(PileLocation.Field, 0, 
-                        fooFromManaCost(),//ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
+                        fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
                         CastSpeed.Instant, 
                         String.Format("{1}{0}{0}: Draw a card", G.coloured(ManaColour.Order), G.colourless(2)),
                         new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), new DrawCardsDoer(1)));
