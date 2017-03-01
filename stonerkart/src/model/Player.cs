@@ -32,6 +32,12 @@ namespace stonerkart
             graveyard = new Pile(new Location(this, PileLocation.Graveyard));
             displaced = new Pile(new Location(this, PileLocation.Displaced));
 
+            deck.addObserver(this);
+            field.addObserver(this);
+            hand.addObserver(this);
+            graveyard.addObserver(this);
+            displaced.addObserver(this);
+
             manaPool = new ManaPool();
         }
 
@@ -135,7 +141,7 @@ namespace stonerkart
         public void notify(object o, PileChangedMessage t)
         {
             Pile p = (Pile)o;
-            //notify(new PlayerChangedArgs(p.location.pile));
+            notify(new PlayerChangedArgs(p.location.pile));
         }
     }
 }
