@@ -42,6 +42,7 @@ namespace stonerkart
                 menuBar1.Location = new Point(0, h - menuBar1.Height);
                 mainPanel.Size = new Size(w, h - menuBar1.Height);
             };
+
         }
 
         public DraggablePanel showPanel(Control content, bool resizeable, bool closeable)
