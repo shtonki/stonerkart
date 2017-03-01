@@ -143,7 +143,7 @@ namespace stonerkart
             TargetColumn r = pg.fillResolveTargets(hs, c);
             if (r.targets.Length != 1) throw new Exception();
             Player p = (Player)r.targets[0];
-            Card crd = hs.selectCard(p.pileFrom(l));
+            Card crd = hs.selectCardSynchronized(p.pileFrom(l));
             return new TargetColumn(crd);
         }
     }

@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -282,7 +283,7 @@ namespace stonerkart
                     }
                     else
                     {
-                        Controller.setPrompt("Opponent is mulliganing");
+                        Controller.setPrompt("Opponent is redrawing.");
                         cs = connection.receiveAction<ChoiceSelection>();
                     }
 
@@ -892,19 +893,19 @@ namespace stonerkart
 
         private HackStruct makeHackStruct()
         {
-            return new HackStruct(selectCardFromCards, hero, activePlayer, null, null, waitForAnything, ord, ord,
+            return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, waitForAnything, ord, ord,
                 ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, null);
         }
 
         private HackStruct makeHackStruct(Func<Stuff> f)
         {
-            return new HackStruct(selectCardFromCards, hero, activePlayer, null, null, f, ord, ord, ord,
+            return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, f, ord, ord, ord,
                 cardFromOrd, playerFromOrd, tileFromOrd, cards, null);
         }
 
         private HackStruct makeHackStruct(Card c)
         {
-            return new HackStruct(selectCardFromCards, hero, activePlayer, null, null, waitForAnything, ord, ord,
+            return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, waitForAnything, ord, ord,
                 ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, c);
         }
         
@@ -934,6 +935,16 @@ namespace stonerkart
             }
             throw new Exception();
         }
+
+        private void sendChoices(int[] cs)
+        {
+            connection.sendAction(new ChoiceSelection(cs));
+        }
+
+        private int[] receiveChoices()
+        {
+            return connection.receiveAction<ChoiceSelection>().choices;
+        }
     }
 
     struct StackWrapper
@@ -961,6 +972,7 @@ namespace stonerkart
         public bool heroIsActive => hero == activePlayer;
 
         public Player resolveController => resolveCard.controller;
+        public bool heroIsResolver => hero == resolveController;
         public Card resolveCard { get; }
         public IEnumerable<Card> cards { get; }
 
@@ -1001,14 +1013,25 @@ namespace stonerkart
             this.resolveCard = resolveCard;
         }
 
-        public Card selectCard(IEnumerable<Card> cs, bool cancelable = false, int cardCount = 1)
-        {
-            return selectCardEx(cs, cancelable, cardCount);
-        }
 
-        public Card SelectCardSynchronized(IEnumerable<Card> cs)
+        public Card selectCardSynchronized(IEnumerable<Card> cs)
         {
-            throw new NotImplementedException();
+            Card c;
+            if (heroIsResolver)
+            {
+                Controller.setPrompt("Choose a card.");
+                c = selectCardEx(cs, false, 1);
+                int s = ordC(c);
+                sendChoices(new int[] {s});
+            }
+            else
+            {
+                Controller.setPrompt("Opponent is choosing a card.");
+                int[] v = receiveChoices();
+                Debug.Assert(v.Length == 1);
+                c = Cord(v[0]);
+            }
+            return c;
         }
     }
 
