@@ -9,7 +9,7 @@ namespace stonerkart
 {
     class ManaPool
     {
-        public IEnumerable<ManaColour> orbs => current.orbs.Concat(bonus);
+        public IEnumerable<ManaColour> orbs => current.colours.Concat(bonus);
 
         private ManaSet max { get; set; }
         private ManaSet current { get; set; }
@@ -102,31 +102,34 @@ namespace stonerkart
     class ManaSet : IEnumerable<int>
     {
         public const int size = 7;
-        private List<int> manas;
+        private int[] manas;
 
-        public List<ManaColour> orbs => orbsEx();
-
-        
+        public List<ManaColour> colours => coloursEx();
+        public IEnumerable<ManaOrb> orbs => colours.Select(c => new ManaOrb(c));
 
         public ManaSet()
         {
-            manas = new List<int>(new int[size]);
+            manas = new int[size];
         }
 
-        public ManaSet(IEnumerable<int> e)
+        public ManaSet(int[] e)
         {
             if (e.Count() != size) throw new Exception();
-            manas = new List<int>(e);
+            manas = e;
         }
 
         public ManaSet(IEnumerable<ManaColour> cs)
         {
-            int[] vs = new int[size];
+            manas = new int[size];
             foreach (ManaColour c in cs)
             {
-                vs[(int)c]++;
+                manas[(int)c]++;
             }
-            manas = new List<int>(vs);
+        }
+
+        public ManaSet(params ManaColour[] cs) : this((IEnumerable<ManaColour>)cs)
+        {
+            
         }
 
         public static ManaSet operator -(ManaSet c1, ManaSet c2)
@@ -151,7 +154,7 @@ namespace stonerkart
             set { manas[(int)i] = value; }
         }
 
-        private List<ManaColour> orbsEx()
+        private List<ManaColour> coloursEx()
         {
             List<ManaColour> l = new List<ManaColour>();
             for (int i = 0; i < ManaSet.size; i++)
@@ -167,7 +170,7 @@ namespace stonerkart
 
         public IEnumerator<int> GetEnumerator()
         {
-            return manas.GetEnumerator();
+            return new List<int>(manas).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -181,8 +184,10 @@ namespace stonerkart
         }
     }
 
-
-    class ManaOrb : Stuff
+    /// <summary>
+    /// Nothing fancier than a wrapper around ManaColour allowing ManaOrb to implement Stuff and Targetable
+    /// </summary>
+    class ManaOrb : Stuff, Targetable
     {
         public ManaColour colour { get; }
 

@@ -49,13 +49,13 @@ namespace stonerkart
             return new TargetMatrix(r);
         }
 
-        public TargetMatrix fillResolve(TargetMatrix tm, ResolveEnv re, Game g)
+        public TargetMatrix fillResolve(TargetMatrix tm, HackStruct hs)
         {
             TargetColumn[] r = tm.columns;
 
             for (int i = 0; i < rules.Length; i++)
             {
-                r[i] = rules[i].fillResolveTargets(re, r[i]);
+                r[i] = rules[i].fillResolveTargets(hs, r[i]);
             }
 
             return new TargetMatrix(r);
@@ -116,9 +116,10 @@ namespace stonerkart
         }
 
         public abstract TargetColumn? fillCastTargets(HackStruct f);
-        public abstract TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c);
+        public abstract TargetColumn fillResolveTargets(HackStruct re, TargetColumn c);
+        //public abstract bool possible(HackStruct hs);
     }
-
+    
     class SelectCardRule : TargetRule
     {
         private TargetRule pg;
@@ -135,16 +136,16 @@ namespace stonerkart
             return pg.fillCastTargets(f);
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct hs, TargetColumn c)
         {
-            TargetColumn r = pg.fillResolveTargets(re, c);
+            TargetColumn r = pg.fillResolveTargets(hs, c);
             if (r.targets.Length != 1) throw new Exception();
             Player p = (Player)r.targets[0];
-            Card crd = re.hs.selectCard(p.pileFrom(l));
+            Card crd = hs.selectCard(p.pileFrom(l));
             return new TargetColumn(crd);
         }
     }
-
+    
     class AoeRule : TargetRule
     {
         private PryTileRule ruler;
@@ -164,7 +165,7 @@ namespace stonerkart
             return ruler.fillCastTargets(f);
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             if (c.targets.Length != 1) throw new Exception();
             Tile centre = (Tile)c.targets[0];
@@ -173,6 +174,36 @@ namespace stonerkart
         }
 
         
+    }
+
+    class ManaCostRule : TargetRule
+    {
+        private ManaSet ms;
+
+        public ManaCostRule(ManaSet ms) : base(typeof(ManaOrb))
+        {
+            this.ms = ms;
+        }
+
+        public ManaCostRule(params ManaColour[] cs) : this(new ManaSet(cs))
+        {
+
+        }
+
+        public ManaCostRule(int[] cs) : this(new ManaSet(cs))
+        {
+            
+        }
+
+        public override TargetColumn? fillCastTargets(HackStruct f)
+        {
+            return new TargetColumn(ms.orbs);
+        }
+
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
+        {
+            return c;
+        }
     }
 
     class PryTileRule : TargetRule
@@ -199,7 +230,7 @@ namespace stonerkart
             }
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             return c;
         }
@@ -240,7 +271,7 @@ namespace stonerkart
             }
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             return c;
         }
@@ -257,7 +288,7 @@ namespace stonerkart
             this.rule = rule;
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             if (c.targets.Length != 0) throw new Exception();
             switch (rule)
@@ -298,7 +329,7 @@ namespace stonerkart
             this.rule = rule;
         }
 
-        public override TargetColumn fillResolveTargets(ResolveEnv re, TargetColumn c)
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             if (c.targets.Length != 0) throw new Exception();
             switch (rule)
@@ -332,28 +363,17 @@ namespace stonerkart
 
     }
 
-    struct ResolveEnv
-    {
-        public Card resolveCard;
-        public IEnumerable<Card> cards;
-        public HackStruct hs;
-
-        public ResolveEnv(Card resolveCard, IEnumerable<Card> cards, HackStruct hs)
-        {
-            this.resolveCard = resolveCard;
-            this.cards = cards;
-            this.hs = hs;
-        }
-    }
 
     struct TargetRow
     {
-        public Targetable[] ts;
+        private Targetable[] ts;
 
         public TargetRow(Targetable[] ts)
         {
             this.ts = ts;
         }
+
+        public Targetable this[int ix] => ts[ix];
     }
     
 

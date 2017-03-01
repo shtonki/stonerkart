@@ -27,15 +27,10 @@ namespace stonerkart
         { 
         }
 
-        public CardView(CardTemplate ct) : this (xddebug(ct))
+        public CardView(CardTemplate ct) : this (new Card(ct))
         {
         }
 
-        private static Card xddebug(CardTemplate ct)
-        {
-            Card rt = new Card(ct);
-            return rt;
-        }
         public CardView(Card c)
         {
             InitializeComponent();

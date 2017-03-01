@@ -6,60 +6,66 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    
-
-    class Cost
+    class Foo
     {
-        private SubCost[] costs;
+        protected Effect[] effects;
 
-        public Cost(params SubCost[] costs)
+        public Foo()
         {
-            this.costs = costs;
+            effects = new Effect[0];
         }
 
-        public int[][] measure(Player p, HackStruct str)
+        public Foo(params Effect[] effects)
         {
-            int[][] r = new int[costs.Length][];
-            for (int i = 0; i < costs.Length; i++)
-            {
-                if (!costs[i].possible(p)) return null;
-                int[] v = costs[i].measure(p, str);
-                if (v == null) return null;
-                r[i] = v;
-            }
-
-            return r;
+            this.effects = effects;
         }
 
-        public bool possible(Player p)
-        {
-            return costs.All(c => c.possible(p));
-        }
-
-        public IEnumerable<GameEvent> cut(Player p, HackStruct s, int[][] iz)
+        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] ts)
         {
             List<GameEvent> rt = new List<GameEvent>();
-            if (iz.Length != costs.Length) throw new Exception();
-            for (int i = 0; i < costs.Length; i++)
+            for (int i = 0; i < ts.Length; i++)
             {
-                rt.AddRange(costs[i].cut(p, s, iz[i]));
+                Effect effect = effects[i];
+                TargetMatrix matrix = effect.ts.fillResolve(ts[i], hs);
+                
+                rt.AddRange(effect.doer.act(hs, matrix.generateRows()));
             }
             return rt;
         }
 
-        public T getSubCost<T>()
+        public TargetMatrix[] fillCast(HackStruct hs)
         {
-            foreach (var v in costs)
+            TargetMatrix[] rt = new TargetMatrix[effects.Length];
+
+            for (int i = 0; i < effects.Length; i++)
             {
-                if (v is T)
-                {
-                    return (T)v;
-                }
+                rt[i] = effects[i].fillCast(hs);
+                if (rt[i] == null) return null;
             }
-            throw new Exception("Card has no mana cost idiot");
+
+            return rt;
+        }
+
+        public TargetMatrix[] fillResolve(TargetMatrix[] tms, HackStruct hs)
+        {
+            TargetMatrix[] rt = new TargetMatrix[effects.Length];
+
+            for (int i = 0; i < effects.Length; i++)
+            {
+                rt[i] = effects[i].fillResolve(tms[i], hs);
+                if (rt[i] == null) return null;
+            }
+
+            return rt;
+        }
+
+        public bool possible(HackStruct hs)
+        {
+            return effects.All(e => e.possible(hs));
         }
     }
 
+    /*
     interface SubCost
     {
         int[] measure(Player p, HackStruct s);
@@ -199,4 +205,5 @@ namespace stonerkart
             return p.pileFrom(frm).Count(predicate) > 0;
         }
     }
+*/
 }

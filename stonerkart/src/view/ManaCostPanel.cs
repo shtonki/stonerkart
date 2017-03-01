@@ -21,7 +21,7 @@ namespace stonerkart
         public void setCost(ManaSet cs)
         {
             colourless = cs[ManaColour.Colourless];
-            colouredCosts = cs.orbs.Where(x => x != ManaColour.Colourless).ToList();
+            colouredCosts = cs.colours.Where(x => x != ManaColour.Colourless).ToList();
         }
 
         protected override void OnPaint(PaintEventArgs e)
