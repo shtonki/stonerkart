@@ -51,9 +51,9 @@ namespace stonerkart
         public bool isHeroic { get; }
 
         public bool hasPT => cardType == CardType.Creature;
-        public Modifiable<int> power { get; }
-        public Modifiable<int> toughness { get; }
-        public Modifiable<int> movement { get; }
+        public ModifiableIntGE power { get; }
+        public ModifiableIntGE toughness { get; }
+        public ModifiableIntGE movement { get; }
 
         private ManaColour? forceColour;
         private Modifiable[] modifiables;
@@ -75,7 +75,7 @@ namespace stonerkart
         public void exhaust(int steps = -1)
         {
             int v = steps < 0 ? movement : steps;
-            movement.modify(-v, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(this));
+            movement.modify(v, Operations.sub, ModifiableIntGE.startOfOwnersTurn(this));
         }
 
         private List<ManaColour> coloursEx()

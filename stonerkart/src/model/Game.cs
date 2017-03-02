@@ -188,7 +188,7 @@ namespace stonerkart
 
             geFilters.Add(new GameEventHandler<DamageEvent>(e =>
             {
-                e.target.toughness.modify(-e.amount, ModifiableSchmoo.intAdd, ModifiableSchmoo.never);
+                e.target.toughness.modify(e.amount, Operations.sub, ModifiableIntGE.never());
             }));
 
             geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>

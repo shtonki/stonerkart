@@ -244,7 +244,6 @@
     <None Include="Resources\buttonExile.png" />
     <None Include="Resources\buttonGraveyard.png" />
     <None Include="Resources\buttonHand.png" />
-    <Content Include="rules.txt" />
     <None Include="Resources\multi.png" />
     <None Include="Resources\firstedition.png" />
     <None Include="Resources\frameMight.png" />

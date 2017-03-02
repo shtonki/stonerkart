@@ -282,7 +282,12 @@ namespace stonerkart
 
     struct CardChangedMessage
     {
+        public Modifiable modified { get; }
 
+        public CardChangedMessage(Modifiable modified)
+        {
+            this.modified = modified;
+        }
     }
 
     class SetArtPanel : TransparentPanel
