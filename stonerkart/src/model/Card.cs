@@ -42,21 +42,25 @@ namespace stonerkart
         private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
         private List<TriggeredAbility> triggeredAbilities = new List<TriggeredAbility>();
         public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).ToArray();
-        /// <summary>
-        /// Returns a list containing the unique colours of the card. If the card has no mana cost it returns an 
-        /// array containing only ManaColour.Colourless.
-        /// </summary>
+        
         public List<ManaColour> colours => coloursEx();
 
         public bool isHeroic { get; }
 
         public bool hasPT => cardType == CardType.Creature;
-        public Modifiable<int> power { get; }
-        public Modifiable<int> toughness { get; }
-        public Modifiable<int> movement { get; }
+        public ModifiableIntGE power { get; }
+        public ModifiableIntGE toughness { get; }
+        public ModifiableIntGE movement { get; }
 
         private ManaColour? forceColour;
         private Modifiable[] modifiables;
+
+        public bool canAttack(Card defender)
+        {
+            if (defender.cardType != CardType.Creature) return false;
+
+            return true;
+        }
 
         public void moveTo(Pile p)
         {
@@ -75,9 +79,13 @@ namespace stonerkart
         public void exhaust(int steps = -1)
         {
             int v = steps < 0 ? movement : steps;
-            movement.modify(-v, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(this));
+            movement.modify(v, Operations.sub, ModifiableIntGE.startOfOwnersTurn(this));
         }
 
+        /// <summary>
+        /// Returns a list containing the unique colours of the card. If the card has no mana cost it returns an 
+        /// array containing only ManaColour.Colourless.
+        /// </summary>
         private List<ManaColour> coloursEx()
         {
             if (forceColour.HasValue) return new List<ManaColour>(new ManaColour[] { forceColour.Value });
@@ -226,6 +234,7 @@ namespace stonerkart
         Creature,
         Instant,
         Sorcery,
+        Relic,
     }
 
     enum Rarity

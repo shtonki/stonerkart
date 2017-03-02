@@ -188,7 +188,7 @@ namespace stonerkart
 
             geFilters.Add(new GameEventHandler<DamageEvent>(e =>
             {
-                e.target.toughness.modify(-e.amount, ModifiableSchmoo.intAdd, ModifiableSchmoo.never);
+                e.target.toughness.modify(e.amount, Operations.sub, ModifiableIntGE.never());
             }));
 
             geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>
@@ -441,8 +441,10 @@ namespace stonerkart
 
                     var options = map.dijkstra(from).Where(too =>
                         too.length <= card.movement &&
-                        too.to.enterableBy(card) &&
-                        (too.to.card != null || !paths.Select(p => p.Item2.to).Contains(too.to))
+                        (
+                          too.to.card == null ||
+                          (from.card.canAttack(too.to.card) && !paths.Select(p => p.Item2.to).Contains(too.to))
+                        )
                         ).ToList();
 
                     Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.to)));

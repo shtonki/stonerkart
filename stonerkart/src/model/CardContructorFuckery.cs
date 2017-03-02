@@ -42,14 +42,10 @@ namespace stonerkart
                 #region Illegal Goblin Laboratory
                 case CardTemplate.Illegal_Goblin_Laboratory:
                 {
-                    cardType = CardType.Creature;
-
-                    basePower = 0;
-                    baseToughness = 4;
-                    baseMovement = 0;
+                    cardType = CardType.Relic;
 
                     chaosCost = 1;
-                    greyCost = 2;
+                    //greyCost = 2;
 
                     addTriggeredAbility(
                         "At the end of your turn deal 1 damage to every enemy player.",
@@ -406,11 +402,11 @@ namespace stonerkart
             x[(int)ManaColour.Order] = orderCost;
             castManaCost = new ManaSet(x);
 
-            power = new Modifiable<int>(basePower);
+            power = new ModifiableIntGE(basePower);
             power.addObserver(this);
-            toughness = new Modifiable<int>(baseToughness);
+            toughness = new ModifiableIntGE(baseToughness);
             toughness.addObserver(this);
-            movement = new Modifiable<int>(baseMovement);
+            movement = new ModifiableIntGE(baseMovement);
             movement.addObserver(this);
 
             modifiables = new Modifiable[]
@@ -429,7 +425,7 @@ namespace stonerkart
             {
                 castSpeed = CastSpeed.Slow;
             }
-            else if (cardType == CardType.Creature)
+            else if (cardType == CardType.Creature || cardType == CardType.Relic)
             {
                 castSpeed = CastSpeed.Slow;
                 castRange = 2;

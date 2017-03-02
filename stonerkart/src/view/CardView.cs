@@ -95,6 +95,10 @@ namespace stonerkart
                     castRangeSlashMovementBox.Text = card.movement.ToString();
                     autoFontTextBox1.Text = "/";
                 }
+                else if (card.cardType == CardType.Relic)
+                {
+                    
+                }
                 else
                 {
                     castRangeSlashMovementBox.Text = card.castRange > 0 ? card.castRange.ToString() : "";
@@ -282,7 +286,12 @@ namespace stonerkart
 
     struct CardChangedMessage
     {
+        public Modifiable modified { get; }
 
+        public CardChangedMessage(Modifiable modified)
+        {
+            this.modified = modified;
+        }
     }
 
     class SetArtPanel : TransparentPanel

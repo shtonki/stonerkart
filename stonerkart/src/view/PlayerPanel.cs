@@ -58,7 +58,7 @@ namespace stonerkart
                 b.Resize += (_, __) =>
                 {
                     var vx = G.ResizeImage(i, b.Width, b.Height);
-                    b.Font = new Font("Lucid Sans Unicode", b.Width/4, FontStyle.Bold);
+                    b.Font = new Font("Lucid Sans Unicode", b.Width/5+1, FontStyle.Bold);
                     b.Image = vx;
                 };
             }
