@@ -45,7 +45,7 @@ namespace stonerkart
                     cardType = CardType.Relic;
 
                     chaosCost = 1;
-                    //greyCost = 2;
+                    greyCost = 2;
 
                     addTriggeredAbility(
                         "At the end of your turn deal 1 damage to every enemy player.",
@@ -219,12 +219,16 @@ namespace stonerkart
                     baseToughness = 20;
 
                     
-                    ActivatedAbility a = new ActivatedAbility(PileLocation.Field, 0, 
-                        fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
-                        CastSpeed.Instant, 
+                    addActivatedAbility(
                         String.Format("{1}{0}{0}: Draw a card", G.coloured(ManaColour.Order), G.colourless(2)),
-                        new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), new DrawCardsDoer(1)));
-                    activatedAbilities.Add(a);
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new DrawCardsDoer(1),
+                        fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
+                        0,
+                        PileLocation.Field, 
+                        CastSpeed.Instant
+                        );
+
                 } break;
                 #endregion
                 #region Unmake
@@ -445,7 +449,7 @@ namespace stonerkart
             additionalCastCosts.Add(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new ManaCostRule(castManaCost)), new PayManaDoer()));
 
             castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Foo(additionalCastCosts.ToArray()), castSpeed, castDescription, es.ToArray());
-            activatedAbilities.Add(castAbility);
+            abilities.Add(castAbility);
 
             this.owner = owner;
             controller = owner;
@@ -458,7 +462,14 @@ namespace stonerkart
         {
             Effect e = new Effect(trs, doer);
             TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, foo, filter, timing, description);
-            triggeredAbilities.Add(ta);
+            abilities.Add(ta);
+        }
+
+        private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo foo, int castRange, PileLocation activeIn, CastSpeed castSpeed)
+        {
+            Effect e = new Effect(trs, doer);
+            ActivatedAbility ta = new ActivatedAbility(activeIn, castRange, foo, castSpeed, description, e);
+            abilities.Add(ta);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)] //yagni said no one ever

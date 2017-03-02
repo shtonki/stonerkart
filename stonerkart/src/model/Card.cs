@@ -38,9 +38,9 @@ namespace stonerkart
 
         public Card dummyFor;
 
-        public IEnumerable<Ability> abilities => activatedAbilities.Cast<Ability>().Concat(triggeredAbilities);
-        private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
-        private List<TriggeredAbility> triggeredAbilities = new List<TriggeredAbility>();
+        public IEnumerable<ActivatedAbility> activatedAbilities => abilities.Where(a => a is ActivatedAbility).Cast<ActivatedAbility>();
+        public IEnumerable<TriggeredAbility> triggeredAbilities => abilities.Where(a => a is TriggeredAbility).Cast<TriggeredAbility>();
+        private List<Ability> abilities = new List<Ability>();
         public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).ToArray();
         
         public List<ManaColour> colours => coloursEx();
@@ -95,50 +95,14 @@ namespace stonerkart
             return hs.ToList();
         }
 
-
-        private const int _ACTIVATED = 0x100;
-        private const int _TRIGGERED = 0x101;
         public int abilityOrd(Ability a)
         {
-            int c, i;
-            if (a is ActivatedAbility)
-            {
-                ActivatedAbility ab = (ActivatedAbility)a;
-                i = activatedAbilities.IndexOf(ab);
-                if (i == -1) throw new Exception();
-                c = _ACTIVATED;
-            }
-            else if (a is TriggeredAbility)
-            {
-                TriggeredAbility ab = (TriggeredAbility)a;
-                i = triggeredAbilities.IndexOf(ab);
-                if (i == -1) throw new Exception();
-                c = _ACTIVATED;
-            }
-            else
-            {
-                throw new Exception();
-            }
-            return c | i;
+            return abilities.IndexOf(a);
         }
 
         public Ability abilityFromOrd(int v)
         {
-            int c, i;
-
-            i = v & 0x00FF;
-            c = v & 0xFF00;
-
-            if (c == _TRIGGERED)
-            {
-                return triggeredAbilities[i];
-            }
-            else if (c == _ACTIVATED)
-            {
-                return activatedAbilities[i];
-            }
-            else throw new Exception();
-
+            return abilities[v];
         }
 
         public IEnumerable<TriggeredAbility> abilitiesTriggeredBy(GameEvent e)

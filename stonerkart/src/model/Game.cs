@@ -516,9 +516,14 @@ namespace stonerkart
             {
                 foreach (Card card in triggerableCards)
                 {
-                    var abilities = card.abilitiesTriggeredBy(e);
                     var card1 = card;
-                    pendAbilities(abilities.Where(a => a.timing == TriggeredAbility.Timing.Pre).Select(a => new PendingAbilityStruct(a, card1)));
+                    if (true && card.template == CardTemplate.Illegal_Goblin_Laboratory && e is EndOfStepEvent &&
+                        ((EndOfStepEvent)e).step == Steps.End)
+                    {
+                        TriggeredAbility v = card.triggeredAbilities.ToArray()[0];
+                        v.triggeredBy(e);
+                    }
+                    pendAbilities(card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Pre).Select(a => new PendingAbilityStruct(a, card1)));
                 }
             }
 
@@ -598,7 +603,7 @@ namespace stonerkart
             List<Card> trashcan = new List<Card>();
             foreach (Card c in fieldCards)
             {
-                if (c.toughness <= 0)
+                if (c.toughness <= 0 && c.cardType == CardType.Creature)
                 {
                     trashcan.Add(c);
                 }
@@ -817,7 +822,7 @@ namespace stonerkart
             {
                 card.pile.remove(card);
             }
-            else if (card.cardType == CardType.Creature)
+            else if (card.cardType == CardType.Creature || card.cardType == CardType.Relic)
             {
                 gt.addEvent(new MoveToPileEvent(card, card.controller.field, false));
             }
