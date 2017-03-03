@@ -173,10 +173,11 @@ namespace stonerkart
                 friendsList = showControl(friendsListPanel);
             }
         }
+        
 
         public static DraggablePanel showControl(Control c, bool resizeable = true, bool closeable = true)
         {
-            return gameFrame.showPanel(c, resizeable, closeable);
+            return gameFrame.showControl(c, resizeable, closeable);
         }
 
         private static Dictionary<Pile, DraggablePanel> cachex = new Dictionary<Pile, DraggablePanel>();
@@ -239,6 +240,11 @@ namespace stonerkart
             e.WaitOne();
             r.Load -= a;
             return r;
+        }
+
+        public static void toggleOptionPanel()
+        {
+            gameFrame.toggleOptionPanel();
         }
 
         public static void setPrompt(string prompt, params ButtonOption[] options)

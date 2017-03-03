@@ -15,6 +15,7 @@ namespace stonerkart
         public MenuBar()
         {
             InitializeComponent();
+            optionsButton.Click += (__, _) => Controller.toggleOptionPanel();
         }
 
         public void enableFriendsButton()

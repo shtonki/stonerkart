@@ -158,5 +158,14 @@ namespace stonerkart
             ResponseBody rb = new ResponseBody(m.body);
             return rb.code == ResponseBody.ResponseCode.OK;
         }
+
+        public static bool submitBug(string s)
+        {
+            BugReportBody b = new BugReportBody(s);
+            serverConnection.send(new Message(servername, Message.MessageType.BUGREPORT, b));
+            Message m = awaitResponseMessage();
+            ResponseBody rb = new ResponseBody(m.body);
+            return rb.code == ResponseBody.ResponseCode.OK;
+        }
     }
 }

@@ -68,9 +68,9 @@ namespace stonerkart
     {
         public TargetColumn[] columns;
 
-        public TargetMatrix(TargetColumn[] columns)
+        public TargetMatrix(IEnumerable<TargetColumn> columns)
         {
-            this.columns = columns;
+            this.columns = columns.ToArray();
         }
 
         public TargetRow[] generateRows()

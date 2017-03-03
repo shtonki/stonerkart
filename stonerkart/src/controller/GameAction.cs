@@ -41,55 +41,47 @@ namespace stonerkart
             this.wrapper = wrapper;
         }
 
-        private static TargetMatrix[] xd(String s, Game g)
+        private static TargetMatrix[] matriciesFromString(String s, Game g)
         {
-            if (s.Length == 0) return new TargetMatrix[0];
+            int i = 0;
+
             List<TargetMatrix> matricies = new List<TargetMatrix>();
-            string[] matrixStrings = s.Split('.');
-            foreach (string matrixString in matrixStrings)
+            List<TargetColumn> columns = null;
+            List<Targetable> targets = null;
+
+            while (i < s.Length)
             {
-                List<TargetColumn> columns = new List<TargetColumn>();
-                string[] colStrings = matrixString.Split(':');
-                foreach (string colString in colStrings)
+                char c = s[i++];
+                switch (c)
                 {
-                    List<Targetable> targets = new List<Targetable>();
-                    string[] targetStrings = colString.Split(',');
-                    foreach (string targetString in targetStrings)
+                    case '{':
                     {
-                        if (targetString.Length == 0) continue;
-                        char targetType = targetString[0];
-                        int targetOrd = Int32.Parse(targetString.Substring(1));
-                        Targetable target;
-                        switch (targetType)
-                        {
-                            case 'c':
-                            {
-                                target = g.cardFromOrd(targetOrd);
-                            } break;
+                        if (columns != null) throw new Exception();
+                        columns = new List<TargetColumn>();
+                    } break;
 
-                            case 't':
-                            {
-                                target = g.tileFromOrd(targetOrd);
-                            } break;
+                    case '}':
+                    {
+                        if (columns == null) throw new Exception();
+                        matricies.Add(new TargetMatrix(columns));
+                        columns = null;
+                    } break;
 
-                            case 'p':
-                            {
-                                target = g.playerFromOrd(targetOrd);
-                            } break;
+                    case '[':
+                    {
+                        if (targets != null) throw new Exception();
+                        targets = new List<Targetable>();
+                    } break;
 
-                            case 'm':
-                            {
-                                target = new ManaOrb((ManaColour)targetOrd);
-                            } break;
-
-                            default: throw new Exception();
-                        }
-                        targets.Add(target);
-                    }
-                    columns.Add(new TargetColumn(targets.ToArray()));
+                    case ']':
+                    {
+                        if (targets == null) throw new Exception();
+                        columns.Add(new TargetColumn(targets));
+                        targets = null;
+                    } break;
                 }
-                matricies.Add(new TargetMatrix(columns.ToArray()));
             }
+            
             return matricies.ToArray();
         }
 
@@ -110,20 +102,22 @@ namespace stonerkart
                 Ability ability = card.abilityFromOrd(abilityOrd);
 
 
-                TargetMatrix[] targetMatricies = xd(ss[2], g);
+                TargetMatrix[] targetMatricies = matriciesFromString(ss[2], g);
 
-                TargetMatrix[] costs = xd(ss[3], g);
+                TargetMatrix[] costs = matriciesFromString(ss[3], g);
 
                 wrapper = new StackWrapper(card, ability, targetMatricies, costs);
             }
         }
 
-        private static void xd(StringBuilder sb, TargetMatrix[] ms, Game g)
+        private static void matriciesToString(StringBuilder sb, TargetMatrix[] ms, Game g)
         {
             foreach (TargetMatrix tm in ms)
             {
+                sb.Append('{');
                 foreach (TargetColumn col in tm.columns)
                 {
+                    sb.Append('[');
                     foreach (Targetable v in col.targets)
                     {
                         if (v is Card)
@@ -153,9 +147,11 @@ namespace stonerkart
                         sb.Append(',');
                     }
                     if (sb[sb.Length - 1] == ',') sb.Length--;
+                    sb.Append(']');
                     sb.Append(':');
                 }
                 if (sb[sb.Length - 1] == ':') sb.Length--;
+                sb.Append('}');
                 sb.Append('.');
             }
             if (sb[sb.Length - 1] == '.') sb.Length--;
@@ -182,9 +178,9 @@ namespace stonerkart
                 sb.Append(abilityOrd);
                 sb.Append(';');
 
-                xd(sb, wp.matricies, g);
+                matriciesToString(sb, wp.matricies, g);
 
-                xd(sb, wp.costMatricies, g);
+                matriciesToString(sb, wp.costMatricies, g);
 
                 return sb.ToString();
             }

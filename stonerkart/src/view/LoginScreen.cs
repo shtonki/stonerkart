@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace stonerkart
 {
@@ -21,6 +22,11 @@ namespace stonerkart
             InitializeComponent();
             autoFontTextBox1.Text = "Username";
             autoFontTextBox2.Text = "Password";
+        }
+
+        public IEnumerable<MenuItem> getMenuPanel()
+        {
+            return new List<MenuItem>();
         }
 
         private void InitializeComponent()
