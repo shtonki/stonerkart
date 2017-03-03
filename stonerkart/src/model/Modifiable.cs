@@ -6,114 +6,119 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    interface Modifiable
+    class Modifiable
     {
-        void check(GameEvent e);
-        object getValue();
-    }
+        public int baseValue;
+        public int? minValue;
+        public int? maxValue;
 
-    struct ModifiableStruct<T>
-    {
-        public T modifier { get; }
-        public Func<T, T, T> modifyFunction { get; }
-        public GameEventFilter unmodifyCondition { get; }
+        public int value => getValue();
 
-        public ModifiableStruct(T modifier, Func<T, T, T> modifyFunction, GameEventFilter unmodifyCondition)
+        private List<ModifierStruct> modifiers = new List<ModifierStruct>();
+        private int cachedValue;
+        private bool dirty = true;
+
+
+        public Modifiable(int baseValue, int? minValue = null, int? maxValue = null)
         {
-            this.modifier = modifier;
-            this.modifyFunction = modifyFunction;
-            this.unmodifyCondition = unmodifyCondition;
-        }
-    }
-
-    static class ModifiableSchmoo
-    {
-        public static int intAdd(int i1, int i2)
-        {
-            return i1 + i2;
+            this.baseValue = baseValue;
+            this.minValue = minValue;
+            this.maxValue = maxValue;
         }
 
-        public static int intSet(int i1, int i2)
+        public static implicit operator int(Modifiable m)
         {
-            return i2;
+            return m.value;
         }
 
-        public static TypedGameEventFilter<StartOfStepEvent> startOfEndStep = new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.End);
-        public static TypedGameEventFilter<GameEvent> never { get; } = new TypedGameEventFilter<GameEvent>(e => false);
-
-        public static TypedGameEventFilter<StartOfStepEvent> startOfOwnersTurn(Card card)
-        {
-            return new TypedGameEventFilter<StartOfStepEvent>(evnt => evnt.activePlayer == card.owner && evnt.step == Steps.Untap);
-        }
-    }
-
-    class Modifiable<T> : Observable<int>, Modifiable
-    {
-        private T baseValue;
-        private T currentValue;
-        public List<ModifiableStruct<T>> modifiers;
-
-        public Modifiable(T baseValue)
-        {
-            setBaseValue(baseValue);
-            modifiers = new List<ModifiableStruct<T>>();
-            reherp();
-        }
-
-        public static implicit operator T(Modifiable<T> m)
-        {
-            return (T)m.getValue();
-        }
-
-        public void setBaseValue(T v)
-        {
-            baseValue = v;
-        }
-
-        public void modify(T o, Func<T, T, T> f, GameEventFilter filter)
-        {
-            modifiers.Add(new ModifiableStruct<T>(o, f, filter));
-            reherp();
-        }
-
-        public object getValue()
-        {
-            return currentValue;
-        }
-
-        /// <summary>
-        /// Checks if the given GameEvent fulfills any of the modifiers release condition
-        /// and if it does it updates the current value as well as the modifier list.
-        /// </summary>
-        /// <param name="e"></param>
         public void check(GameEvent e)
         {
-            bool dirty = false;
-            List<ModifiableStruct<T>> l = new List<ModifiableStruct<T>>(modifiers.Count);
-            foreach (ModifiableStruct<T> v in modifiers)
+            List<ModifierStruct> rm = new List<ModifierStruct>();
+            foreach (var v in modifiers)
             {
-                if (v.unmodifyCondition.filter(e))
+                if (v.filter.filter(e))
                 {
+                    rm.Add(v);
                     dirty = true;
                 }
-                else
+            }
+
+            if (dirty)
+            {
+                foreach (var v in rm)
                 {
-                    l.Add(v);
+                    modifiers.Remove(v);
                 }
             }
-            modifiers = l;
-            if (dirty) reherp();
         }
 
-        private void reherp()
+        public void modify(int v, Func<int, int, int> f, GameEventFilter fltr)
         {
-            currentValue = modifiers.Aggregate(baseValue, (current, m) => m.modifyFunction(current, m.modifier));
-            notify(0);
+            modify(new ModifierStruct(v, f, fltr));
+        }
+
+        public void modifyAdd(int v, GameEventFilter f)
+        {
+            modify(v, (a, b) => a + b, f);
+        }
+
+        public void modifySubtract(int v, GameEventFilter f)
+        {
+            modifyAdd(-v, f);
+        }
+
+        public void recount()
+        {
+            int v = baseValue;
+
+            foreach (ModifierStruct m in modifiers)
+            {
+                v = m.operation(v, m.modifier);
+            }
+
+            cachedValue = v;
+            dirty = false;
+        }
+
+        private int getValue()
+        {
+            if (dirty) recount();
+            return cachedValue;
+        }
+
+        private void modify(ModifierStruct ms)
+        {
+            modifiers.Add(ms);
+        }
+
+
+        protected struct ModifierStruct
+        {
+            public readonly int modifier;
+            public readonly Func<int, int, int> operation;
+            public readonly GameEventFilter filter;
+            public readonly bool forceRecount;
+
+            public ModifierStruct(int modifier, Func<int, int, int> operation, GameEventFilter filter, bool forceRecount)
+            {
+                this.modifier = modifier;
+                this.operation = operation;
+                this.filter = filter;
+                this.forceRecount = forceRecount;
+            }
+
+            public ModifierStruct(int modifier, Func<int, int, int> operation, GameEventFilter filter) : this()
+            {
+                this.modifier = modifier;
+                this.operation = operation;
+                this.filter = filter;
+            }
         }
 
         public override string ToString()
         {
-            return getValue().ToString();
+            return value.ToString();
         }
     }
+
 }

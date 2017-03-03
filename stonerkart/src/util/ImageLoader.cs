@@ -104,6 +104,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Teleport:
+                {
+                    return Resources.artTeleport;
+                }
+
                 case CardTemplate.One_With_Nature:
                 {
                     return Resources.artOneWithNature;

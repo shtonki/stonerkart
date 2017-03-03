@@ -179,6 +179,39 @@ namespace stonerkart
             return gameFrame.showPanel(c, resizeable, closeable);
         }
 
+        private static Dictionary<Pile, DraggablePanel> cachex = new Dictionary<Pile, DraggablePanel>();
+        public static void toggleShowPile(Player p, PileLocation pl)
+        {
+            Pile pile = p.pileFrom(pl);
+            if (cachex.ContainsKey(pile))
+            {
+                DraggablePanel v = cachex[pile];
+                if (!v.closed)
+                {
+                    v.close();
+                    cachex.Remove(pile);
+                    return;
+                }
+            }
+            DraggablePanel dp= showPile(pile, true, c => { });
+            cachex[pile] = dp;
+        }
+
+        public static DraggablePanel showPile(Pile p, bool closeable, Action<Clickable> clicked)
+        {
+            CardsPanel cp = new CardsPanel(p);
+            cp.clickedCallbacks.Add(clicked);
+            return Controller.showControl(cp, true, closeable);
+        }
+
+        public static DraggablePanel showCards(IEnumerable<Card> cards, bool closeable, Action<Clickable> clicked)
+        {
+            CardsPanel p = new CardsPanel();
+            p.clickedCallbacks.Add(clicked);
+            p.setCards(cards);
+            return Controller.showControl(p, true, closeable);
+        }
+
         public static void addArrow(List<Tile> l)
         {
             hexPanel.ts.Add(l);

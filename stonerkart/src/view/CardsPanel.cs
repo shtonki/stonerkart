@@ -10,6 +10,7 @@ namespace stonerkart
         private List<CardView> cardViews;
         public List<Action<Clickable>> clickedCallbacks { get; } = new List<Action<Clickable>>();
         public List<Action<Clickable>> mouseEnteredCallbacks { get; } = new List<Action<Clickable>>();
+        public List<Action<Clickable>> mouseLeftCallbacks { get; } = new List<Action<Clickable>>();
 
         public Func<CardView, CardView, int> comp { get; set; }
 
@@ -24,9 +25,9 @@ namespace stonerkart
             MouseMove += xd;
         }
 
-        public CardsPanel(Func<CardView, CardView, int> comp) : this()
+        public CardsPanel(Pile p) : this()
         {
-            this.comp = comp;
+            setPile(p);
         }
 
         private void clicked(CardView c)
@@ -37,6 +38,11 @@ namespace stonerkart
         private void entered(CardView c)
         {
             foreach (var cb in mouseEnteredCallbacks) cb(c);
+        }
+
+        private void left(CardView c)
+        {
+            foreach (var cb in mouseLeftCallbacks) cb(c);
         }
 
         private CardView frontCard;
@@ -99,8 +105,9 @@ namespace stonerkart
             cv.MouseDown += (_, __) => clicked(cv);
             cv.MouseEnter += (_, __) => entered(cv);
             cv.MouseMove += xd;
+            cv.MouseLeave += (_, __) => left(cv);
             cv.MouseLeave += (a, b) => OnMouseLeave(b);
-            
+
             if (comp != null) cardViews.Sort((v1, v2) => comp(v1, v2));
 
             this.memeout(() => Controls.Add(cv));
@@ -178,7 +185,7 @@ namespace stonerkart
             });
         }
 
-        public void notify(PileChangedMessage t)
+        public void notify(object o, PileChangedMessage t)
         {
             if (t.added)
             {

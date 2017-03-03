@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace stonerkart
 {
@@ -148,6 +149,10 @@ namespace stonerkart
 
         static Settings()
         {
+            if (System.ComponentModel.LicenseManager.UsageMode == System.ComponentModel.LicenseUsageMode.Designtime)
+            {
+                return;
+            }
             settingDict = new Dictionary<string, Setting>();
 
             foreach (Setting s in settings)

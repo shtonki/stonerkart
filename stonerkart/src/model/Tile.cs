@@ -18,6 +18,8 @@ namespace stonerkart
 
         public Card card { get; private set; }
 
+        public bool passable => card == null;
+
         private readonly XYCoord xyCoord;
         private readonly ABCCoord abcCoord;
 
@@ -50,7 +52,7 @@ namespace stonerkart
 
         public bool enterableBy(Card c)
         {
-            return card == null || card.owner != c.owner;
+            return card == null || c.canAttack(card);
         }
 
         public List<Tile> withinDistance(int distance, int mindistance = 0)

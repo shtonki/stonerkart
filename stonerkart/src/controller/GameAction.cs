@@ -43,6 +43,7 @@ namespace stonerkart
 
         private static TargetMatrix[] xd(String s, Game g)
         {
+            if (s.Length == 0) return new TargetMatrix[0];
             List<TargetMatrix> matricies = new List<TargetMatrix>();
             string[] matrixStrings = s.Split('.');
             foreach (string matrixString in matrixStrings)

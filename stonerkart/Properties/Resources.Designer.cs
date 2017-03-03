@@ -773,6 +773,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap artTeleport {
+            get {
+                object obj = ResourceManager.GetObject("artTeleport", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap artTempleHealer {
             get {
                 object obj = ResourceManager.GetObject("artTempleHealer", resourceCulture);
@@ -826,6 +836,46 @@ namespace stonerkart.Properties {
         internal static System.Drawing.Bitmap artZap {
             get {
                 object obj = ResourceManager.GetObject("artZap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap buttonDeck {
+            get {
+                object obj = ResourceManager.GetObject("buttonDeck", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap buttonExile {
+            get {
+                object obj = ResourceManager.GetObject("buttonExile", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap buttonGraveyard {
+            get {
+                object obj = ResourceManager.GetObject("buttonGraveyard", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap buttonHand {
+            get {
+                object obj = ResourceManager.GetObject("buttonHand", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

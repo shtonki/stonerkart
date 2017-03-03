@@ -6,9 +6,20 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    interface GameEventFilter
+    abstract class GameEventFilter
     {
-        bool filter(GameEvent e);
+        public abstract bool filter(GameEvent e);
+
+        public static GameEventFilter startOfOwnersTurn(Card c)
+        {
+            return new TypedGameEventFilter<StartOfStepEvent>(
+                e => e.activePlayer == c.controller && e.step == Steps.Untap);
+        }
+
+        public static GameEventFilter never()
+        {
+            return new StaticGameEventFilter(() => false);
+        }
     }
 
     class TypedGameEventFilter<T> : GameEventFilter where T : GameEvent
@@ -24,13 +35,28 @@ namespace stonerkart
             this.f = f;
         }
 
-        public bool filter(GameEvent e)
+        public override bool filter(GameEvent e)
         {
             if (e is T)
             {
                 return f((T)e);
             }
             return false;
+        }
+    }
+
+    class StaticGameEventFilter : GameEventFilter
+    {
+        private Func<bool> f;
+
+        public StaticGameEventFilter(Func<bool> f)
+        {
+            this.f = f;
+        }
+
+        public override bool filter(GameEvent e)
+        {
+            return f();
         }
     }
 }

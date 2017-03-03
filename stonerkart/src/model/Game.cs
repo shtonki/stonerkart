@@ -48,7 +48,7 @@ namespace stonerkart
             }
 
             random = new Random(ngs.randomSeed);
-            map = new Map(15, 9, false, false);
+            map = new Map(16, 9, false, false);
             cards = new List<Card>();
             players = new List<Player>();
 
@@ -158,6 +158,7 @@ namespace stonerkart
             geFilters.Add(new GameEventHandler<CastEvent>(e =>
             {
                 Card c = e.wrapper.card;
+                if (!e.wrapper.isCastAbility) c = createDummy(c, c.owner.displaced);
 
                 wrapperStack.Push(e.wrapper);
                 c.moveTo(stack);
@@ -188,7 +189,7 @@ namespace stonerkart
 
             geFilters.Add(new GameEventHandler<DamageEvent>(e =>
             {
-                e.target.toughness.modify(-e.amount, ModifiableSchmoo.intAdd, ModifiableSchmoo.never);
+                e.target.toughness.modifySubtract(e.amount, GameEventFilter.never());
             }));
 
             geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>
@@ -441,8 +442,10 @@ namespace stonerkart
 
                     var options = map.dijkstra(from).Where(too =>
                         too.length <= card.movement &&
-                        too.to.enterableBy(card) &&
-                        (too.to.card != null || !paths.Select(p => p.Item2.to).Contains(too.to))
+                        (
+                          too.to.card == null ||
+                          (from.card.canAttack(too.to.card) && !paths.Select(p => p.Item2.to).Contains(too.to))
+                        )
                         ).ToList();
 
                     Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.to)));
@@ -483,7 +486,7 @@ namespace stonerkart
                     Card defender = path.to.card;
 
                     gt.addEvent(new DamageEvent(mover, defender, mover.power));
-                    if (!defender.isHeroic) gt.addEvent(new DamageEvent(defender, mover, defender.power));
+                    if (defender.canRetaliate) gt.addEvent(new DamageEvent(defender, mover, defender.power));
                 }
                 
                 gt.addEvent(new MoveEvent(card, path));
@@ -514,9 +517,14 @@ namespace stonerkart
             {
                 foreach (Card card in triggerableCards)
                 {
-                    var abilities = card.abilitiesTriggeredBy(e);
                     var card1 = card;
-                    pendAbilities(abilities.Where(a => a.timing == TriggeredAbility.Timing.Pre).Select(a => new PendingAbilityStruct(a, card1)));
+                    if (true && card.template == CardTemplate.Illegal_Goblin_Laboratory && e is EndOfStepEvent &&
+                        ((EndOfStepEvent)e).step == Steps.End)
+                    {
+                        TriggeredAbility v = card.triggeredAbilities.ToArray()[0];
+                        v.triggeredBy(e);
+                    }
+                    pendAbilities(card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Pre).Select(a => new PendingAbilityStruct(a, card1)));
                 }
             }
 
@@ -529,7 +537,7 @@ namespace stonerkart
 
                 foreach (Card card in cards)
                 {
-                    card.remodify(e);
+                    card.handleEvent(e);
                 }
             }
 
@@ -552,10 +560,15 @@ namespace stonerkart
 
         private void enforceRules()
         {
+            foreach (Card c in cards)
+            {
+                c.updateState();
+            }
+
             do
             {
                 handlePendingTrigs();
-                trashcanDeadCreatures();
+                trashcanDeadCreatures(); //todo suspect
             } while (pendingTriggeredAbilities.Count > 0);
             Controller.redraw();
         }
@@ -582,7 +595,7 @@ namespace stonerkart
 
                     foreach (PendingAbilityStruct str in abilityList)
                     {
-                        var v = cast(p, false, createDummy(str.card, p.displaced), str.ability);
+                        var v = cast(p, false, str.card, str.ability);
                         if (!v.HasValue) throw new Exception();
                         playerCasts(p, v.Value);
                     }
@@ -596,7 +609,7 @@ namespace stonerkart
             List<Card> trashcan = new List<Card>();
             foreach (Card c in fieldCards)
             {
-                if (c.toughness <= 0)
+                if (c.toughness <= 0 && c.cardType == CardType.Creature)
                 {
                     trashcan.Add(c);
                 }
@@ -637,7 +650,7 @@ namespace stonerkart
                         }
 
                         StackWrapper wrapper = wrapperStack.Pop();
-                        if (wrapper.card != stack.peekTop()) throw new Exception();
+                        if (wrapper.card != stack.peekTop() && wrapper.card != stack.peekTop().dummyFor) throw new Exception();
                         resolve(wrapper);
                         c = 0;
 
@@ -712,7 +725,7 @@ namespace stonerkart
 
         private StackWrapper? cast(Player p, bool cancellable, Card card = null, Ability ability = null, TargetMatrix[] targets = null, TargetMatrix[] costs = null)
         {
-            //fucked variables which keep control when and how one cancels the cast
+            //fucked variables which control when and how one cancels the cast
             int lv = 0;
             int bt = 0;
 
@@ -725,7 +738,7 @@ namespace stonerkart
                 if (!(cancellable && !stack.Any() &&
                       !Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
                 {
-                    Tile from = card == null ? p.heroCard.tile : card.dummyFor.tile;
+                    Tile from = card == null ? p.heroCard.tile : card.tile;
                     while (lv >= bt && r == null)
                     {
                         object stuff = null;
@@ -800,28 +813,31 @@ namespace stonerkart
 
         private void resolve(StackWrapper wrapper)
         {
+            Card stackpopped = stack.peekTop();
             Card card = wrapper.card;
             TargetMatrix[] ts = wrapper.matricies;
             Foo foo = wrapper.ability.effects;
 
+            if (stackpopped.isDummy && stackpopped.dummyFor != card) throw new Exception();
+
             List<GameEvent> events = new List<GameEvent>();
 
-            HackStruct env = makeHackStruct(card);
             events.AddRange(foo.resolve(makeHackStruct(card), ts));
 
             GameTransaction gt = new GameTransaction(events);
 
-            if (card.isDummy)
+
+            if (stackpopped.isDummy)
             {
-                card.pile.remove(card);
+                stackpopped.pile.remove(stackpopped);
             }
-            else if (card.cardType == CardType.Creature)
+            else if (stackpopped.cardType == CardType.Creature || stackpopped.cardType == CardType.Relic)
             {
-                gt.addEvent(new MoveToPileEvent(card, card.controller.field, false));
+                gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.controller.field, false));
             }
             else
             {
-                gt.addEvent(new MoveToPileEvent(card, card.owner.graveyard, false));
+                gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.owner.graveyard, false));
             }
 
             handleTransaction(gt);
@@ -912,10 +928,7 @@ namespace stonerkart
 
         private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)
         {
-            CardsPanel p = new CardsPanel();
-            p.clickedCallbacks.Add(clicked);
-            p.setCards(cards);
-            return Controller.showControl(p, true, closeable);
+            return Controller.showCards(cards, closeable, clicked);
         }
 
         private Card selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount)
@@ -945,7 +958,62 @@ namespace stonerkart
         {
             return connection.receiveAction<ChoiceSelection>().choices;
         }
+
+        public void clearTargetHighlight()
+        {
+            Controller.clearHighlights();
+        }
+
+        public void setTargetHighlight(Card c)
+        {
+            StackWrapper? w = null;
+
+            foreach (var v in wrapperStack)
+            {
+                if (v.card == c)
+                {
+                    w = v;
+                    break;
+                }
+            }
+
+            if (w == null) return;
+            StackWrapper wr = w.Value;
+
+            List<Tile> tiles = new List<Tile>();
+            foreach (TargetMatrix tm in wr.matricies)
+            {
+                foreach (TargetColumn cl in tm.columns)
+                {
+                    tiles.AddRange(tilesFromTargetables(cl.targets));
+                }
+            }
+            Controller.highlight(tiles, Color.OrangeRed);
+        }
+
+        private static IEnumerable<Tile> tilesFromTargetables(Targetable[] ts)
+        {
+            List<Tile> rt = new List<Tile>();
+            foreach (var t in ts)
+            {
+                if (t is Tile)
+                {
+                    rt.Add((Tile)t);
+                }
+                if (t is Card)
+                {
+                    Card c = (Card)t;
+                    if (c.tile != null) { rt.Add(c.tile); }
+                }
+                if (t is Player)
+                {
+                    rt.Add(((Player)t).heroCard.tile);
+                }
+            }
+            return rt;
+        }
     }
+
 
     struct StackWrapper
     {
@@ -953,6 +1021,8 @@ namespace stonerkart
         public readonly Ability ability;
         public readonly TargetMatrix[] matricies;
         public readonly TargetMatrix[] costMatricies;
+
+        public bool isCastAbility => card.isCastAbility(ability);
 
         public StackWrapper(Card card, Ability ability, TargetMatrix[] matricies, TargetMatrix[] costMatricies)
         {

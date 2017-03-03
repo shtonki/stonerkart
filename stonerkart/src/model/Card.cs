@@ -23,6 +23,9 @@ namespace stonerkart
         public Subtype? subtype { get; }
         public int convertedManaCost => castManaCost.colours.Count();
 
+        public bool isExhausted => movement == 0;
+        public bool canRetaliate => !isExhausted && !isHeroic;
+
         public string breadText => breadTextEx();
 
         public Location location => locationEx();
@@ -35,25 +38,29 @@ namespace stonerkart
 
         public Card dummyFor;
 
-        public IEnumerable<Ability> abilities => activatedAbilities.Cast<Ability>().Concat(triggeredAbilities);
-        private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
-        private List<TriggeredAbility> triggeredAbilities = new List<TriggeredAbility>();
+        public IEnumerable<ActivatedAbility> activatedAbilities => abilities.Where(a => a is ActivatedAbility).Cast<ActivatedAbility>();
+        public IEnumerable<TriggeredAbility> triggeredAbilities => abilities.Where(a => a is TriggeredAbility).Cast<TriggeredAbility>();
+        private List<Ability> abilities = new List<Ability>();
         public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).ToArray();
-        /// <summary>
-        /// Returns a list containing the unique colours of the card. If the card has no mana cost it returns an 
-        /// array containing only ManaColour.Colourless.
-        /// </summary>
+        
         public List<ManaColour> colours => coloursEx();
 
         public bool isHeroic { get; }
 
         public bool hasPT => cardType == CardType.Creature;
-        public Modifiable<int> power { get; }
-        public Modifiable<int> toughness { get; }
-        public Modifiable<int> movement { get; }
+        public Modifiable power { get; }
+        public Modifiable toughness { get; }
+        public Modifiable movement { get; }
 
         private ManaColour? forceColour;
         private Modifiable[] modifiables;
+
+        public bool canAttack(Card defender)
+        {
+            if (defender.cardType != CardType.Creature) return false;
+
+            return true;
+        }
 
         public void moveTo(Pile p)
         {
@@ -72,9 +79,13 @@ namespace stonerkart
         public void exhaust(int steps = -1)
         {
             int v = steps < 0 ? movement : steps;
-            movement.modify(-v, ModifiableSchmoo.intAdd, ModifiableSchmoo.startOfOwnersTurn(this));
+            movement.modifyAdd(v, GameEventFilter.startOfOwnersTurn(this));
         }
 
+        /// <summary>
+        /// Returns a list containing the unique colours of the card. If the card has no mana cost it returns an 
+        /// array containing only ManaColour.Colourless.
+        /// </summary>
         private List<ManaColour> coloursEx()
         {
             if (forceColour.HasValue) return new List<ManaColour>(new ManaColour[] { forceColour.Value });
@@ -84,50 +95,23 @@ namespace stonerkart
             return hs.ToList();
         }
 
+        public bool isCastAbility(Ability a)
+        {
+            return castAbility == a;
+        }
 
-        private const int _ACTIVATED = 0x100;
-        private const int _TRIGGERED = 0x101;
         public int abilityOrd(Ability a)
         {
-            int c, i;
-            if (a is ActivatedAbility)
+            if (abilities.IndexOf(a) < 0)
             {
-                ActivatedAbility ab = (ActivatedAbility)a;
-                i = activatedAbilities.IndexOf(ab);
-                if (i == -1) throw new Exception();
-                c = _ACTIVATED;
+                int i = 2;
             }
-            else if (a is TriggeredAbility)
-            {
-                TriggeredAbility ab = (TriggeredAbility)a;
-                i = triggeredAbilities.IndexOf(ab);
-                if (i == -1) throw new Exception();
-                c = _ACTIVATED;
-            }
-            else
-            {
-                throw new Exception();
-            }
-            return c | i;
+            return abilities.IndexOf(a);
         }
 
         public Ability abilityFromOrd(int v)
         {
-            int c, i;
-
-            i = v & 0x00FF;
-            c = v & 0xFF00;
-
-            if (c == _TRIGGERED)
-            {
-                return triggeredAbilities[i];
-            }
-            else if (c == _ACTIVATED)
-            {
-                return activatedAbilities[i];
-            }
-            else throw new Exception();
-
+            return abilities[v];
         }
 
         public IEnumerable<TriggeredAbility> abilitiesTriggeredBy(GameEvent e)
@@ -135,7 +119,7 @@ namespace stonerkart
             return triggeredAbilities.Where(a => a.triggeredBy(e));
         }
 
-        public void remodify(GameEvent e)
+        public void handleEvent(GameEvent e)
         {
             foreach (Modifiable modifiable in modifiables)
             {
@@ -143,6 +127,13 @@ namespace stonerkart
             }
         }
 
+        public void updateState()
+        {
+            foreach (Modifiable modifiable in modifiables)
+            {
+                modifiable.recount();
+            }
+        }
 
         private string typeTextEx()
         {
@@ -177,7 +168,7 @@ namespace stonerkart
             return pile.location;
         }
 
-        public void notify(int t)
+        public void notify(object o, int t)
         {
             notify(new CardChangedMessage());
         }
@@ -215,6 +206,7 @@ namespace stonerkart
         Rockhand_Ogre,
         Bear_Cavalary,
         Illegal_Goblin_Laboratory,
+        Teleport,
     }
 
     enum CardType
@@ -222,6 +214,7 @@ namespace stonerkart
         Creature,
         Instant,
         Sorcery,
+        Relic,
     }
 
     enum Rarity

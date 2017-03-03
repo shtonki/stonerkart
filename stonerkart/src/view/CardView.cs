@@ -38,14 +38,14 @@ namespace stonerkart
             powerBox.justifyText = Justify.Right;
 
             card = c;
-            ihavedowns();
+            sickmemes();
 
         }
 
         public void setCard(CardTemplate ct)
         {
             card = new Card(ct, null);
-            ihavedowns();
+            sickmemes();
         }
 
         public void setCard(Card c)
@@ -53,10 +53,10 @@ namespace stonerkart
             card.tryUnsubscribe(this);
             card = c;
             card.addObserver(this);
-            ihavedowns();
+            sickmemes();
         }
 
-        private void ihavedowns()
+        private void sickmemes()
         {
             this.memeout(() =>
             {
@@ -95,6 +95,10 @@ namespace stonerkart
                     castRangeSlashMovementBox.Text = card.movement.ToString();
                     autoFontTextBox1.Text = "/";
                 }
+                else if (card.cardType == CardType.Relic)
+                {
+                    
+                }
                 else
                 {
                     castRangeSlashMovementBox.Text = card.castRange > 0 ? card.castRange.ToString() : "";
@@ -106,9 +110,9 @@ namespace stonerkart
             });
         }
 
-        public void notify(CardChangedMessage t)
+        public void notify(object o, CardChangedMessage t)
         {
-            ihavedowns();
+            sickmemes();
         }
 
         public Stuff getStuff()
@@ -282,7 +286,12 @@ namespace stonerkart
 
     struct CardChangedMessage
     {
+        public Modifiable modified { get; }
 
+        public CardChangedMessage(Modifiable modified)
+        {
+            this.modified = modified;
+        }
     }
 
     class SetArtPanel : TransparentPanel

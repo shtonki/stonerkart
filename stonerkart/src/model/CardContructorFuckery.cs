@@ -42,14 +42,10 @@ namespace stonerkart
                 #region Illegal Goblin Laboratory
                 case CardTemplate.Illegal_Goblin_Laboratory:
                 {
-                    cardType = CardType.Creature;
-
-                    basePower = 0;
-                    baseToughness = 4;
-                    baseMovement = 0;
+                    cardType = CardType.Relic;
 
                     chaosCost = 1;
-                    greyCost = 2;
+                    greyCost = 0;
 
                     addTriggeredAbility(
                         "At the end of your turn deal 1 damage to every enemy player.",
@@ -223,12 +219,16 @@ namespace stonerkart
                     baseToughness = 20;
 
                     
-                    ActivatedAbility a = new ActivatedAbility(PileLocation.Field, 0, 
-                        fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
-                        CastSpeed.Instant, 
+                    addActivatedAbility(
                         String.Format("{1}{0}{0}: Draw a card", G.coloured(ManaColour.Order), G.colourless(2)),
-                        new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), new DrawCardsDoer(1)));
-                    activatedAbilities.Add(a);
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new DrawCardsDoer(1),
+                        fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
+                        0,
+                        PileLocation.Field, 
+                        CastSpeed.Instant
+                        );
+
                 } break;
                 #endregion
                 #region Unmake
@@ -309,7 +309,20 @@ namespace stonerkart
 
                 } break;
                 #endregion
+                #region Teleport
+                case CardTemplate.Teleport:
+                {
+                    cardType = CardType.Sorcery;
 
+                    orderCost = 2;
+                    castRange = 6;
+                    castEffect = new Effect(
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
+                                new PryTileRule(f => f.passable)), new MoveToTileDoer());
+                    castDescription = "Move your hero to target tile.";
+                } break;
+                #endregion
+                #region One With Nature
                 case CardTemplate.One_With_Nature:
                 {
                     cardType = CardType.Sorcery;
@@ -321,7 +334,7 @@ namespace stonerkart
                     castDescription = String.Format("You gain {0}{0}{0} until the end of the step.",
                         G.coloured(ManaColour.Nature));
                 } break;
-
+                #endregion
                 #region Graverobber Syrdin
                 case CardTemplate.Graverobber_Syrdin:
                 {
@@ -393,12 +406,9 @@ namespace stonerkart
             x[(int)ManaColour.Order] = orderCost;
             castManaCost = new ManaSet(x);
 
-            power = new Modifiable<int>(basePower);
-            power.addObserver(this);
-            toughness = new Modifiable<int>(baseToughness);
-            toughness.addObserver(this);
-            movement = new Modifiable<int>(baseMovement);
-            movement.addObserver(this);
+            power = new Modifiable(basePower);
+            toughness = new Modifiable(baseToughness);
+            movement = new Modifiable(baseMovement);
 
             modifiables = new Modifiable[]
             {
@@ -416,7 +426,7 @@ namespace stonerkart
             {
                 castSpeed = CastSpeed.Slow;
             }
-            else if (cardType == CardType.Creature)
+            else if (cardType == CardType.Creature || cardType == CardType.Relic)
             {
                 castSpeed = CastSpeed.Slow;
                 castRange = 2;
@@ -436,7 +446,7 @@ namespace stonerkart
             additionalCastCosts.Add(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new ManaCostRule(castManaCost)), new PayManaDoer()));
 
             castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Foo(additionalCastCosts.ToArray()), castSpeed, castDescription, es.ToArray());
-            activatedAbilities.Add(castAbility);
+            abilities.Add(castAbility);
 
             this.owner = owner;
             controller = owner;
@@ -449,7 +459,14 @@ namespace stonerkart
         {
             Effect e = new Effect(trs, doer);
             TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, foo, filter, timing, description);
-            triggeredAbilities.Add(ta);
+            abilities.Add(ta);
+        }
+
+        private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo foo, int castRange, PileLocation activeIn, CastSpeed castSpeed)
+        {
+            Effect e = new Effect(trs, doer);
+            ActivatedAbility ta = new ActivatedAbility(activeIn, castRange, foo, castSpeed, description, e);
+            abilities.Add(ta);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)] //yagni said no one ever

@@ -145,9 +145,8 @@ namespace stonerkart
 
             foreach (var tv in tileViews)
             {
-                using (Pen pen = new Pen(tv.colour, 2))
+                using (Pen pen = new Pen(tv.colour, 3))
                 {
-                    g.DrawPolygon(pen, tv.poly);
                     if (tv.tile.card != null)
                     {
                         Card card = tv.tile.card;
@@ -173,20 +172,24 @@ namespace stonerkart
 
                         Brush filler = card.owner.isHero ? Brushes.Green : Brushes.Red;
 
-                        g.FillEllipse(filler, vxR, vy, a, b);
-                        g.DrawString(card.movement.ToString().PadLeft(2), f, Brushes.Black, vxR + xp, vy + yp);
+                        if (card.hasPT)
+                        {
+                            g.FillEllipse(filler, vxR, vy, a, b);
+                            g.DrawString(card.movement.ToString().PadLeft(2), f, Brushes.Black, vxR + xp, vy + yp);
 
-                        g.FillEllipse(filler, vxL, vy, a, b);
-                        g.DrawString(card.toughness.ToString().PadLeft(2), f, Brushes.Black, vxL + xp, vy + yp);
+                            g.FillEllipse(filler, vxL, vy, a, b);
+                            g.DrawString(card.toughness.ToString().PadLeft(2), f, Brushes.Black, vxL + xp, vy + yp);
 
-                        g.FillEllipse(filler, vxM, vyB, a, b);
-                        g.DrawString(card.power.ToString().PadLeft(2), f, Brushes.Black, vxM + xp, vyB + yp);
+                            g.FillEllipse(filler, vxM, vyB, a, b);
+                            g.DrawString(card.power.ToString().PadLeft(2), f, Brushes.Black, vxM + xp, vyB + yp);
+                        }
                     }
                     else
                     {
-                        using (Brush b = new SolidBrush(tv.colour.Name == "Black" ? Color.DimGray : tv.colour))
+                        using (Brush b = new SolidBrush(Color.DimGray))
                             g.FillPolygon(b, tv.poly);
                     }
+                    g.DrawPolygon(pen, tv.poly);
                 }
                 foreach (var t in ts)
                 {
