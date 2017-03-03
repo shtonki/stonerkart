@@ -26,7 +26,7 @@ namespace stonerkart
 
         public StepHandler stepHandler;
 
-        private List<GameEventHandler> geFilters = new List<GameEventHandler>();
+        private GameEventHandlerBuckets baseHandler = new GameEventHandlerBuckets();
         private Stack<StackWrapper> wrapperStack = new Stack<StackWrapper>();
 
         private IEnumerable<Card> triggerableCards => cards.Where(card => card.location.pile != PileLocation.Deck && !card.isDummy);
@@ -123,22 +123,22 @@ namespace stonerkart
 
         private void setupHandlers()
         {
-            geFilters.Add(new GameEventHandler<PayManaEvent>(e =>
+            baseHandler.Add(new TypedGameEventHandler<PayManaEvent>(e =>
             {
                 e.player.payMana(e.manaSet);
             }));
 
-            geFilters.Add(new GameEventHandler<GainBonusManaEvent>(e =>
+            baseHandler.Add(new TypedGameEventHandler<GainBonusManaEvent>(e =>
             {
                 e.player.gainBonusMana(e.colour);
             }));
 
-            geFilters.Add(new GameEventHandler<ShuffleDeckEvent>(e =>
+            baseHandler.Add(new TypedGameEventHandler<ShuffleDeckEvent>(e =>
             {
                 e.player.deck.shuffle(random);
             }));
 
-            geFilters.Add(new GameEventHandler<PlaceOnTileEvent>(e =>
+            baseHandler.Add(new TypedGameEventHandler<PlaceOnTileEvent>(e =>
             {
                 if (e.tile.card != null) throw new Exception();
 
@@ -147,7 +147,7 @@ namespace stonerkart
                 e.card.exhaust();
             }));
 
-            geFilters.Add(new GameEventHandler<DrawEvent>(e =>
+            baseHandler.Add(new TypedGameEventHandler<DrawEvent>(e =>
             {
                 for (int i = 0; i < e.cards; i++)
                 {
@@ -155,7 +155,7 @@ namespace stonerkart
                 }
             }));
 
-            geFilters.Add(new GameEventHandler<CastEvent>(e =>
+            baseHandler.Add(new TypedGameEventHandler<CastEvent>(e =>
             {
                 Card c = e.wrapper.card;
                 if (!e.wrapper.isCastAbility) c = createDummy(c, c.owner.displaced);
@@ -166,7 +166,7 @@ namespace stonerkart
                 Controller.redraw();
             }));
 
-            geFilters.Add(new GameEventHandler<MoveEvent>(e =>
+            baseHandler.Add(new TypedGameEventHandler<MoveEvent>(e =>
             {
                 Path path = e.path;
                 Card mover = path.from.card;
@@ -187,12 +187,12 @@ namespace stonerkart
                 }
             }));
 
-            geFilters.Add(new GameEventHandler<DamageEvent>(e =>
+            baseHandler.Add(new TypedGameEventHandler<DamageEvent>(e =>
             {
                 e.target.toughness.modifySubtract(e.amount, GameEventFilter.never());
             }));
 
-            geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>
+            baseHandler.Add(new TypedGameEventHandler<MoveToPileEvent>(e =>
             {
                 if (e.nullTile && e.card.tile != null)
                 {
@@ -530,10 +530,7 @@ namespace stonerkart
 
             foreach (GameEvent e in gameEvents)
             {
-                foreach (GameEventHandler handler in geFilters)
-                {
-                    handler.handle(e);
-                }
+                baseHandler.handle(e);
 
                 foreach (Card card in cards)
                 {

@@ -88,20 +88,16 @@ namespace stonerkart
                     powerBox.Text = toughnessBox.Text =
                         castRangeSlashMovementBox.Text = autoFontTextBox1.Text = "";
                 }
-                else if (card.cardType == CardType.Creature)
+                else if (card.hasPT)
                 {
                     powerBox.Text = card.power.ToString();
                     toughnessBox.Text = card.toughness.ToString();
                     castRangeSlashMovementBox.Text = card.movement.ToString();
                     autoFontTextBox1.Text = "/";
                 }
-                else if (card.cardType == CardType.Relic)
-                {
-                    
-                }
                 else
                 {
-                    castRangeSlashMovementBox.Text = card.castRange > 0 ? card.castRange.ToString() : "";
+                    castRangeSlashMovementBox.Text = ((card.cardType == CardType.Instant || card.cardType == CardType.Instant) && card.castRange > 0) ? card.castRange.ToString() : "";
                     powerBox.Text = "";
                     toughnessBox.Text = "";
                     autoFontTextBox1.Text = "";
