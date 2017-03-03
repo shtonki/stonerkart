@@ -189,7 +189,7 @@ namespace stonerkart
 
             geFilters.Add(new GameEventHandler<DamageEvent>(e =>
             {
-                e.target.toughness.modify(e.amount, Operations.sub, ModifiableIntGE.never());
+                e.target.toughness.modifySubtract(e.amount, GameEventFilter.never());
             }));
 
             geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>
@@ -537,7 +537,7 @@ namespace stonerkart
 
                 foreach (Card card in cards)
                 {
-                    card.remodify(e);
+                    card.handleEvent(e);
                 }
             }
 
@@ -560,10 +560,15 @@ namespace stonerkart
 
         private void enforceRules()
         {
+            foreach (Card c in cards)
+            {
+                c.updateState();
+            }
+
             do
             {
                 handlePendingTrigs();
-                trashcanDeadCreatures();
+                trashcanDeadCreatures(); //todo suspect
             } while (pendingTriggeredAbilities.Count > 0);
             Controller.redraw();
         }

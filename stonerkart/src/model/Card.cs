@@ -48,9 +48,9 @@ namespace stonerkart
         public bool isHeroic { get; }
 
         public bool hasPT => cardType == CardType.Creature;
-        public ModifiableIntGE power { get; }
-        public ModifiableIntGE toughness { get; }
-        public ModifiableIntGE movement { get; }
+        public Modifiable power { get; }
+        public Modifiable toughness { get; }
+        public Modifiable movement { get; }
 
         private ManaColour? forceColour;
         private Modifiable[] modifiables;
@@ -79,7 +79,7 @@ namespace stonerkart
         public void exhaust(int steps = -1)
         {
             int v = steps < 0 ? movement : steps;
-            movement.modify(v, Operations.sub, ModifiableIntGE.startOfOwnersTurn(this));
+            movement.modifyAdd(v, GameEventFilter.startOfOwnersTurn(this));
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace stonerkart
             return triggeredAbilities.Where(a => a.triggeredBy(e));
         }
 
-        public void remodify(GameEvent e)
+        public void handleEvent(GameEvent e)
         {
             foreach (Modifiable modifiable in modifiables)
             {
@@ -127,6 +127,13 @@ namespace stonerkart
             }
         }
 
+        public void updateState()
+        {
+            foreach (Modifiable modifiable in modifiables)
+            {
+                modifiable.recount();
+            }
+        }
 
         private string typeTextEx()
         {

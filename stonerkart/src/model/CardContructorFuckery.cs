@@ -406,12 +406,9 @@ namespace stonerkart
             x[(int)ManaColour.Order] = orderCost;
             castManaCost = new ManaSet(x);
 
-            power = new ModifiableIntGE(basePower);
-            power.addObserver(this);
-            toughness = new ModifiableIntGE(baseToughness);
-            toughness.addObserver(this);
-            movement = new ModifiableIntGE(baseMovement);
-            movement.addObserver(this);
+            power = new Modifiable(basePower);
+            toughness = new Modifiable(baseToughness);
+            movement = new Modifiable(baseMovement);
 
             modifiables = new Modifiable[]
             {
