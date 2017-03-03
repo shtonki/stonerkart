@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,13 +14,11 @@ namespace stonerkart
     {
         protected Socket socket;
         private byte[] buffer = new byte[1024];
-        private StringBuilder builder;
 
         public AsyncConnection(Socket socket)
         {
             this.socket = socket;
             fixKey();
-            builder = new StringBuilder();
             xd();
         }
 
@@ -102,6 +101,7 @@ namespace stonerkart
             socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, rc, buffer);
         }
 
+        private List<byte> bz = new List<byte>();
         private void rc(IAsyncResult r)
         {
             int read;
@@ -115,13 +115,13 @@ namespace stonerkart
                 return;
             }
 
-
-            builder.Append(Encoding.ASCII.GetString(decrypt(buffer, read)));
+            bz.AddRange(buffer.Take(read));
 
             if (read < buffer.Length)
             {
-                Message m = new Message(builder.ToString());
-                builder = new StringBuilder();
+                string s = Encoding.ASCII.GetString(decrypt(bz.ToArray()));
+                Message m = new Message(s);
+                bz = new List<byte>();
                 handle(m);
             }
 
