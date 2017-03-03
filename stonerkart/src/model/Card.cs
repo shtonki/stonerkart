@@ -92,7 +92,7 @@ namespace stonerkart
 
         public void dealDamage(int d)
         {
-            damageTaken += Math.Max(damageTaken + d, 0);
+            damageTaken = Math.Max(damageTaken + d, 0);
             notify(new CardChangedMessage(Toughness));
         }
 
