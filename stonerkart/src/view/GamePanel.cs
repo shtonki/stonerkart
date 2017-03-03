@@ -101,6 +101,12 @@ namespace stonerkart
             }
         }
 
+        public IEnumerable<MenuItem> getMenuPanel()
+        {
+            return new List<MenuItem>();
+
+        }
+
         private void InitializeComponent()
         {
             this.hexPanel = new stonerkart.HexPanel();

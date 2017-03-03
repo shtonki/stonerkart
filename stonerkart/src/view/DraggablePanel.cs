@@ -28,6 +28,8 @@ namespace stonerkart
 
         public DraggablePanel(Control content, bool resizeable, bool closeable)
         {
+            Size = new Size(content.Width, content.Height + 20);
+
             topPanel = new Panel();
             topPanel.BackColor = Color.Chocolate;
             Controls.Add(topPanel);
@@ -68,7 +70,7 @@ namespace stonerkart
             closeButton.MouseClick += (_, __) => close();
 
             Resize += (_, __) => layoutShit();
-
+            
             layoutShit();
         }
 

@@ -14,7 +14,7 @@ namespace stonerkart
         /// <summary>
         /// Prints each element in the given array the Console intersperced with a ' '.
         /// </summary>
-        /// <param name="os">List of objects to print</param>
+        /// <param text="os">List of objects to print</param>
         public static void Write(params object[] os)
         {
             printEx(false, os);
@@ -23,7 +23,7 @@ namespace stonerkart
         /// <summary>
         /// Prints each element in the given array the Console intersperced with a ' ' and terminating with a new line.
         /// </summary>
-        /// <param name="os">List of objects to print</param>
+        /// <param text="os">List of objects to print</param>
         public static void WriteLine(params object[] os)
         {
             printEx(true, os);
@@ -32,8 +32,8 @@ namespace stonerkart
         /// <summary>
         /// Used internally to format each input and then print it to the console.
         /// </summary>
-        /// <param name="newLine">Whether to append a new line at the end of the string.</param>
-        /// <param name="os">List of objects to print</param>
+        /// <param text="newLine">Whether to append a new line at the end of the string.</param>
+        /// <param text="os">List of objects to print</param>
         private static void printEx(bool newLine, params object[] os)
         {
             if (os == null || os.Length == 0)

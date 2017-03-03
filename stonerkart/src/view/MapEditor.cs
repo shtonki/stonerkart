@@ -19,6 +19,11 @@ namespace stonerkart
             //hexPanel2.callbacks.Add(tileClicked);
         }
 
+        public IEnumerable<MenuItem> getMenuPanel()
+        {
+            return new List<MenuItem>();
+        }
+
         private void tileClicked(TileView tv)
         {
         }

@@ -32,7 +32,8 @@ namespace stonerkart
             int h = Size.Height;
             int w = Size.Width;
             int dh = h;
-            int dw = h;
+            int v = colouredCosts.Count + (colourless > 0 ? 1 : 0); 
+            int dw = Math.Min(h, v == 0 ? h : w/v);
 
             int j = 0;
 
