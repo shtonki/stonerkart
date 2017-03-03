@@ -23,7 +23,7 @@ namespace stonerkart
         public Subtype? subtype { get; }
         public int convertedManaCost => castManaCost.colours.Count();
 
-        public bool isExhausted => movement == 0;
+        public bool isExhausted => Movement == 0;
         public bool canRetaliate => !isExhausted && !isHeroic;
 
         public string breadText => breadTextEx();
@@ -48,12 +48,21 @@ namespace stonerkart
         public bool isHeroic { get; }
 
         public bool hasPT => cardType == CardType.Creature;
-        public Modifiable power { get; }
-        public Modifiable toughness { get; }
-        public Modifiable movement { get; }
+
+        public int power => Power;
+        public int toughness => Toughness - damageTaken;
+        public int movement => Movement - fatigue;
+
+        private Modifiable Power;
+        private Modifiable Toughness;
+        private Modifiable Movement;
+
+        private int damageTaken;
+        private int fatigue;
 
         private ManaColour? forceColour;
         private Modifiable[] modifiables;
+
 
         public bool canAttack(Card defender)
         {
@@ -78,9 +87,15 @@ namespace stonerkart
 
         public void exhaust(int steps = -1)
         {
-            int v = steps < 0 ? movement : steps;
-            movement.modifyAdd(v, GameEventFilter.startOfOwnersTurn(this));
+            fatigue += steps < 0 ? Movement : steps;
         }
+
+        public void dealDamage(int d)
+        {
+            damageTaken += Math.Max(damageTaken + d, 0);
+            notify(new CardChangedMessage(Toughness));
+        }
+
 
         /// <summary>
         /// Returns a list containing the unique colours of the card. If the card has no mana cost it returns an 
@@ -119,8 +134,12 @@ namespace stonerkart
             return triggeredAbilities.Where(a => a.triggeredBy(e));
         }
 
+
         public void handleEvent(GameEvent e)
         {
+            GameEventFilter sickhack = new TypedGameEventFilter<StartOfStepEvent>(a => a.step == Steps.Replenish && a.activePlayer == controller);
+            if (sickhack.filter(e)) fatigue = 0;
+
             foreach (Modifiable modifiable in modifiables)
             {
                 modifiable.check(e);

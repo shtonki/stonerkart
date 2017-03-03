@@ -88,7 +88,7 @@ namespace stonerkart
             }
             
             Resize += (_, __) => xd();
-            notify(null, Steps.Untap);
+            notify(null, Steps.Replenish);
         }
 
         public void notify(object o, Steps t)

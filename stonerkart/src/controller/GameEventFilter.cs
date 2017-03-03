@@ -13,7 +13,7 @@ namespace stonerkart
         public static GameEventFilter startOfOwnersTurn(Card c)
         {
             return new TypedGameEventFilter<StartOfStepEvent>(
-                e => e.activePlayer == c.controller && e.step == Steps.Untap);
+                e => e.activePlayer == c.controller && e.step == Steps.Replenish);
         }
 
         public static GameEventFilter never()
