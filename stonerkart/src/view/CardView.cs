@@ -97,15 +97,19 @@ namespace stonerkart
                 }
                 else if (card.cardType == CardType.Relic)
                 {
-                    
+                    castRangeSlashMovementBox.Text = "";
+                    powerBox.Text = "";
+                    toughnessBox.Text = "";
+                    autoFontTextBox1.Text = "";
                 }
-                else
+                else if (card.cardType == CardType.Instant || card.cardType == CardType.Sorcery)
                 {
                     castRangeSlashMovementBox.Text = card.castRange > 0 ? card.castRange.ToString() : "";
                     powerBox.Text = "";
                     toughnessBox.Text = "";
                     autoFontTextBox1.Text = "";
                 }
+                else throw new Exception();
                 Invalidate();
             });
         }
