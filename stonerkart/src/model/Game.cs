@@ -660,8 +660,8 @@ namespace stonerkart
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="f"></param>
-        /// <param name="prompt"></param>
+        /// <param text="f"></param>
+        /// <param text="prompt"></param>
         /// <returns></returns>
         private Card getCard(Func<Card, bool> f, string prompt)
         {
@@ -703,8 +703,8 @@ namespace stonerkart
         /// <summary>
         /// Wrapper function which one calls when one wants a Player to put a card on the stack using the information in a  StackWrapper's.
         /// </summary>
-        /// <param name="p">The Player who is to cast the spell/ability.</param>
-        /// <param name="w">The StackWrapper containing the relevant information.</param>
+        /// <param text="p">The Player who is to cast the spell/ability.</param>
+        /// <param text="w">The StackWrapper containing the relevant information.</param>
         private void playerCasts(Player p, StackWrapper w)
         {
             GameTransaction gt = new GameTransaction();

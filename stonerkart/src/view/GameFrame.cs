@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using stonerkart.src.view;
 
 namespace stonerkart
 {
@@ -22,8 +23,8 @@ namespace stonerkart
 
         public Screen mapEditorScreen { get; private set; }
         public Screen deckEditorScreen { get; private set; }
-        public Control active;
-        
+        public Control activeScreen { get; private set; }
+        public Screen activeScreenS => (Screen)activeScreen;
 
         public GameFrame()
         {
@@ -45,7 +46,7 @@ namespace stonerkart
 
         }
 
-        public DraggablePanel showPanel(Control content, bool resizeable, bool closeable)
+        public DraggablePanel showControl(Control content, bool resizeable, bool closeable)
         {
             DraggablePanel r = new DraggablePanel(content, resizeable, closeable);
             this.memeout(() =>
@@ -91,16 +92,75 @@ namespace stonerkart
 
         public void transitionTo(Screen s)
         {
+            if (optionPanel != null) toggleOptionPanel();
+
             this.memeout(() =>
             {
-                if (active != null)
+                if (activeScreen != null)
                 {
-                    mainPanel.Controls.Remove(active);
+                    mainPanel.Controls.Remove(activeScreen);
                 }
-                active = (Control)s;
-                active.Dock = DockStyle.Fill;
-                mainPanel.Controls.Add(active);
+                activeScreen = (Control)s;
+                activeScreen.Dock = DockStyle.Fill;
+                mainPanel.Controls.Add(activeScreen);
             });
+        }
+
+        private void showBugReportScreen()
+        {
+            DraggablePanel v = null;
+            BugReportPanel c = new BugReportPanel();
+            c.submitButton.Click += (__, _) =>
+            {
+                v.close();
+                Network.submitBug(c.bugText.Text);
+            };
+            c.cancelButton.Click += (__, _) =>
+            {
+                v.close();
+            };
+            v = showControl(c, false, false);
+        }
+
+        private DraggablePanel optionPanel;
+        public void toggleOptionPanel()
+        {
+            if (optionPanel == null)
+            {
+                Panel p = menuFromItems(activeScreenS.getMenuPanel());
+                optionPanel = showControl(p, false, true);
+            }
+            else
+            {
+                optionPanel.close();
+                optionPanel = null;
+            }
+        }
+
+        private Panel menuFromItems(IEnumerable<MenuItem> mis)
+        {
+            MenuItem mi = new MenuItem("Report Bug", showBugReportScreen);
+            MenuItem[] dflts = new[] { mi };
+
+            Panel p = new Panel();
+            MenuItem[] items = mis.Concat(dflts).ToArray();
+
+            p.Size = new Size(220, 20 + 50 * items.Count());
+            int i = 0;
+            foreach (var m in items)
+            {
+                Button b = new Button();
+                b.Text = m.title;
+                b.Size = new Size(200, 50);
+                b.Location = new Point(10, 10 + i * 50);
+                b.Click += (__, _) =>
+                {
+                    toggleOptionPanel();
+                    m.action();
+                };
+                p.Controls.Add(b);
+            }
+            return p;
         }
 
         private void InitializeComponent()
@@ -138,6 +198,19 @@ namespace stonerkart
 
     interface Screen
     {
+        IEnumerable<MenuItem> getMenuPanel();
+    }
+
+    struct MenuItem
+    {
+        public string title;
+        public Action action;
+
+        public MenuItem(string title, Action action)
+        {
+            this.title = title;
+            this.action = action;
+        }
     }
 
     public static class xd

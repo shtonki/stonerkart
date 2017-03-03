@@ -17,6 +17,10 @@ namespace stonerkart
 
         public Foo(params Effect[] effects)
         {
+            if (effects.Count() > 1)
+            {
+                int i = 2;
+            }
             this.effects = effects;
         }
 

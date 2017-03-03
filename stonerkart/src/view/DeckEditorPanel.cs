@@ -242,6 +242,11 @@ namespace stonerkart
             }
         }
 
+        public IEnumerable<MenuItem> getMenuPanel()
+        {
+            return new List<MenuItem>();
+        }
+
         private void InitializeComponent()
         {
             this.cardView1 = new stonerkart.CardView();

@@ -49,7 +49,6 @@ namespace stonerkart
 
         public enum MessageType
         {
-            ECHO,
             LOGIN,
             REGISTER,
             RESPONSE,
@@ -58,6 +57,7 @@ namespace stonerkart
             ACCEPTCHALLENGE,
             NEWGAME,
             GAMEMESSAGE,
+            BUGREPORT,
         }
     }
 
@@ -134,6 +134,21 @@ namespace stonerkart
         public string toBody()
         {
             return name;
+        }
+    }
+
+    class BugReportBody : MessageBody
+    {
+        public string text;
+
+        public BugReportBody(string text)
+        {
+            this.text = text;
+        }
+
+        public string toBody()
+        {
+            return text;
         }
     }
 

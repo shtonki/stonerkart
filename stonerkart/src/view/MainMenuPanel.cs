@@ -17,6 +17,11 @@ namespace stonerkart
             InitializeComponent();
         }
 
+        public IEnumerable<MenuItem> getMenuPanel()
+        {
+            return new List<MenuItem>();
+        }
+
         private void InitializeComponent()
         {
             this.button1 = new System.Windows.Forms.Button();
