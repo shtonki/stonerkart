@@ -189,7 +189,7 @@ namespace stonerkart
 
             geFilters.Add(new GameEventHandler<DamageEvent>(e =>
             {
-                e.target.toughness.modifySubtract(e.amount, GameEventFilter.never());
+                e.target.dealDamage(e.amount);
             }));
 
             geFilters.Add(new GameEventHandler<MoveToPileEvent>(e =>
@@ -326,7 +326,7 @@ namespace stonerkart
             handleTransaction(new StartOfStepEvent(activePlayer, step));
             switch (step)
             {
-                case Steps.Untap:
+                case Steps.Replenish:
                 {
                     untapStep();
                 } break;
@@ -1111,7 +1111,7 @@ namespace stonerkart
 
         public void nextStep()
         {
-            if (step == Steps.End) step = Steps.Untap;
+            if (step == Steps.End) step = Steps.Replenish;
             else step = (Steps)(((int)step)+1);
             notify(step);
         }
@@ -1160,7 +1160,7 @@ namespace stonerkart
 
     enum Steps
     {
-        Untap,
+        Replenish,
         Draw,
         Main1,
         Move,

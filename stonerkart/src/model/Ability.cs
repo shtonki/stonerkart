@@ -22,6 +22,8 @@ namespace stonerkart
             this.cost = cost;
             this.description = description;
         }
+
+
     }
 
     class ActivatedAbility : Ability
