@@ -158,6 +158,7 @@ namespace stonerkart
             geFilters.Add(new GameEventHandler<CastEvent>(e =>
             {
                 Card c = e.wrapper.card;
+                if (!e.wrapper.isCastAbility) c = createDummy(c, c.owner.displaced);
 
                 wrapperStack.Push(e.wrapper);
                 c.moveTo(stack);
@@ -589,7 +590,7 @@ namespace stonerkart
 
                     foreach (PendingAbilityStruct str in abilityList)
                     {
-                        var v = cast(p, false, createDummy(str.card, p.displaced), str.ability);
+                        var v = cast(p, false, str.card, str.ability);
                         if (!v.HasValue) throw new Exception();
                         playerCasts(p, v.Value);
                     }
@@ -644,7 +645,7 @@ namespace stonerkart
                         }
 
                         StackWrapper wrapper = wrapperStack.Pop();
-                        if (wrapper.card != stack.peekTop()) throw new Exception();
+                        if (wrapper.card != stack.peekTop() && wrapper.card != stack.peekTop().dummyFor) throw new Exception();
                         resolve(wrapper);
                         c = 0;
 
@@ -719,7 +720,7 @@ namespace stonerkart
 
         private StackWrapper? cast(Player p, bool cancellable, Card card = null, Ability ability = null, TargetMatrix[] targets = null, TargetMatrix[] costs = null)
         {
-            //fucked variables which keep control when and how one cancels the cast
+            //fucked variables which control when and how one cancels the cast
             int lv = 0;
             int bt = 0;
 
@@ -732,7 +733,7 @@ namespace stonerkart
                 if (!(cancellable && !stack.Any() &&
                       !Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
                 {
-                    Tile from = card == null ? p.heroCard.tile : card.dummyFor.tile;
+                    Tile from = card == null ? p.heroCard.tile : card.tile;
                     while (lv >= bt && r == null)
                     {
                         object stuff = null;
@@ -807,28 +808,31 @@ namespace stonerkart
 
         private void resolve(StackWrapper wrapper)
         {
+            Card stackpopped = stack.peekTop();
             Card card = wrapper.card;
             TargetMatrix[] ts = wrapper.matricies;
             Foo foo = wrapper.ability.effects;
 
+            if (stackpopped.isDummy && stackpopped.dummyFor != card) throw new Exception();
+
             List<GameEvent> events = new List<GameEvent>();
 
-            HackStruct env = makeHackStruct(card);
             events.AddRange(foo.resolve(makeHackStruct(card), ts));
 
             GameTransaction gt = new GameTransaction(events);
 
-            if (card.isDummy)
+
+            if (stackpopped.isDummy)
             {
-                card.pile.remove(card);
+                stackpopped.pile.remove(stackpopped);
             }
-            else if (card.cardType == CardType.Creature || card.cardType == CardType.Relic)
+            else if (stackpopped.cardType == CardType.Creature || stackpopped.cardType == CardType.Relic)
             {
-                gt.addEvent(new MoveToPileEvent(card, card.controller.field, false));
+                gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.controller.field, false));
             }
             else
             {
-                gt.addEvent(new MoveToPileEvent(card, card.owner.graveyard, false));
+                gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.owner.graveyard, false));
             }
 
             handleTransaction(gt);
@@ -1012,6 +1016,8 @@ namespace stonerkart
         public readonly Ability ability;
         public readonly TargetMatrix[] matricies;
         public readonly TargetMatrix[] costMatricies;
+
+        public bool isCastAbility => card.isCastAbility(ability);
 
         public StackWrapper(Card card, Ability ability, TargetMatrix[] matricies, TargetMatrix[] costMatricies)
         {

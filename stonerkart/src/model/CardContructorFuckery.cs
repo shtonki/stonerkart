@@ -45,7 +45,7 @@ namespace stonerkart
                     cardType = CardType.Relic;
 
                     chaosCost = 1;
-                    greyCost = 2;
+                    greyCost = 0;
 
                     addTriggeredAbility(
                         "At the end of your turn deal 1 damage to every enemy player.",

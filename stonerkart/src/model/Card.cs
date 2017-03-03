@@ -95,8 +95,17 @@ namespace stonerkart
             return hs.ToList();
         }
 
+        public bool isCastAbility(Ability a)
+        {
+            return castAbility == a;
+        }
+
         public int abilityOrd(Ability a)
         {
+            if (abilities.IndexOf(a) < 0)
+            {
+                int i = 2;
+            }
             return abilities.IndexOf(a);
         }
 
