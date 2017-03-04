@@ -80,6 +80,16 @@ namespace stonerkart
             return true;
         }
 
+        public bool canDamage(Card defender)
+        {
+            return true;
+        }
+
+        public bool canTarget(Card target)
+        {
+            return true;
+        }
+
         public void moveTo(Pile p)
         {
             pile?.remove(this);
@@ -99,7 +109,7 @@ namespace stonerkart
             fatigue += steps < 0 ? Movement : steps;
         }
 
-        public void dealDamage(int d)
+        public void damage(int d)
         {
             damageTaken = Math.Max(damageTaken + d, 0);
             notify(new CardChangedMessage(Toughness));
@@ -229,6 +239,22 @@ namespace stonerkart
                             return a.step == Steps.Replenish && a.activePlayer == controller;
                         }), e => fatigue = 0);
 
+
+            r.add(new TypedGameEventHandler<ApplyModifierEvent>(e =>
+            {
+                Modifiable m;
+                switch (e.stat)
+                {
+                    case ModifiableStats.Movement: m = Movement; break;
+                    case ModifiableStats.Toughness: m = Toughness; break;
+                    case ModifiableStats.Power: m = Power; break;
+
+                    default: throw new Exception();
+                }
+
+                m.modify(e.modifier);
+            }));
+
             r.add(new TypedGameEventHandler<PlaceOnTileEvent>(e =>
             {
                 if (e.tile.card != null) throw new Exception();
@@ -243,10 +269,14 @@ namespace stonerkart
                 Path path = e.path;
                 Tile destination = path.to;
                 moveTo(destination);
-                exhaust(path.attacking == null ? path.length : movement);
+                exhaust(path.attacking ? movement : path.length);
             }));
 
-            r.add(new TypedGameEventHandler<DamageEvent>(e => { dealDamage(e.amount); }));
+            r.add(new TypedGameEventHandler<DamageEvent>(e =>
+            {
+                if (e.source.canDamage(e.target))
+                e.target.damage(e.amount);
+            }));
 
             r.add(new TypedGameEventHandler<MoveToPileEvent>(e =>
             {

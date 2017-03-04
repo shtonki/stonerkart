@@ -248,4 +248,19 @@ namespace stonerkart
             
         }
     }
+
+    static class LL
+    {
+        public static Func<int, int, int> add { get; } = (a, b) => a + b;
+
+
+        public static GameEventFilter startOfOwnersTurn(Card c)
+        {
+            return new TypedGameEventFilter<StartOfStepEvent>(
+                e => e.activePlayer == c.controller && e.step == Steps.Replenish);
+        }
+
+
+        public static GameEventFilter never { get; } = new StaticGameEventFilter(() => false);
+    }
 }

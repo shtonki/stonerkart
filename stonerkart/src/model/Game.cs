@@ -444,19 +444,17 @@ namespace stonerkart
 
             foreach (var v in paths)
             {
-                Card card = v.Item1;
+                Card mover = v.Item1;
                 Path path = v.Item2;
+                Card defender = path.last.card;
 
-                if (path.to.card != null)
+                if (path.attacking && mover.canAttack(defender))
                 {
-                    Card mover = card;
-                    Card defender = path.to.card;
-
                     gt.addEvent(new DamageEvent(mover, defender, mover.power));
                     if (defender.canRetaliate) gt.addEvent(new DamageEvent(defender, mover, defender.power));
                 }
                 
-                gt.addEvent(new MoveEvent(card, path));
+                gt.addEvent(new MoveEvent(mover, path));
             }
 
             handleTransaction(gt);
