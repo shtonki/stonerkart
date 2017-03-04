@@ -144,6 +144,7 @@ namespace stonerkart
 
         public void handleEvent(GameEvent e)
         {
+            shitterhack.handle(e);
             if (!(e is CardedEvent && ((CardedEvent)e).getCard() == this)) return;
 
             eventHandler.handle(e);
@@ -213,61 +214,70 @@ namespace stonerkart
             return flyweight[(int)ct];
         }
 
+        private TypedGameEventHandler<StartOfStepEvent> shitterhack;
+
         private GameEventHandlerBuckets generatedlft()
         {
             GameEventHandlerBuckets r = new GameEventHandlerBuckets();
 
-            GameEventFilter rslashmemeeconomy = new TypedGameEventFilter<StartOfStepEvent>(a => a.step == Steps.Replenish && a.activePlayer == controller);
-
-            r.add(new TypedGameEventHandler<StartOfStepEvent>(rslashmemeeconomy, e => fatigue = 0));
+            shitterhack =
+                new TypedGameEventHandler<StartOfStepEvent>(
+                    new TypedGameEventFilter<StartOfStepEvent>(
+                        a =>
+                        {
+                            int v = 2;
+                            return a.step == Steps.Replenish && a.activePlayer == controller;
+                        }), e => fatigue = 0);
 
             r.add(new TypedGameEventHandler<PlaceOnTileEvent>(e =>
             {
                 if (e.tile.card != null) throw new Exception();
 
-                e.card.moveTo(e.tile);
-                e.card.moveTo(e.card.controller.field);
-                e.card.exhaust();
+                moveTo(e.tile);
+                moveTo(e.card.controller.field);
+                exhaust();
             }));
 
             r.add(new TypedGameEventHandler<MoveEvent>(e =>
             {
                 Path path = e.path;
-                Card mover = path.from.card;
                 Tile destination = path.to;
                 Card defender = destination.card;
 
                 if (defender == null)
                 {
-                    mover.moveTo(destination);
-                    mover.exhaust(path.length);
+                    moveTo(destination);
+                    exhaust(path.length);
                 }
                 else
                 {
-                    if (path.penultimate.card != null && path.penultimate.card != mover) throw new Exception();
+                    if (path.penultimate.card != null && path.penultimate.card != this) throw new Exception();
 
-                    mover.moveTo(path.penultimate);
-                    mover.exhaust();
+                    moveTo(path.penultimate);
+                    exhaust();
                 }
             }));
 
-            r.add(new TypedGameEventHandler<DamageEvent>(e => { e.target.dealDamage(e.amount); }));
+            r.add(new TypedGameEventHandler<DamageEvent>(e => { dealDamage(e.amount); }));
 
             r.add(new TypedGameEventHandler<MoveToPileEvent>(e =>
             {
-                if (e.nullTile && e.card.tile != null)
+                if (e.nullTile && tile != null)
                 {
-                    e.card.tile.removeCard();
-                    e.card.tile = null;
+                    tile.removeCard();
+                    tile = null;
                 }
-                e.card.moveTo(e.to);
+                moveTo(e.to);
             }));
             
             return r;
         }
     }
 
-    internal enum CardTemplate
+    enum ModifiableStats { Power, Toughness, Movement };
+
+
+    enum CardTemplate
     {
         missingno,
         One_sWith_sNature,

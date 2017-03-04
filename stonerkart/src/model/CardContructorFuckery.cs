@@ -453,7 +453,7 @@ namespace stonerkart
 
             name = ct.ToString().Replace("_a", "'").Replace("_s", " ");
 
-
+            eventHandler = generatedlft();
         }
 
         private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo foo, GameEventFilter filter, int castRange, PileLocation activeIn, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)

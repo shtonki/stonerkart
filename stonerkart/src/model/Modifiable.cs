@@ -52,6 +52,11 @@ namespace stonerkart
             }
         }
 
+        public void modify(ModifierStruct ms)
+        {
+            modifiers.Add(ms);
+        }
+
         public void modify(int v, Func<int, int, int> f, GameEventFilter fltr)
         {
             modify(new ModifierStruct(v, f, fltr));
@@ -86,39 +91,25 @@ namespace stonerkart
             return cachedValue;
         }
 
-        private void modify(ModifierStruct ms)
-        {
-            modifiers.Add(ms);
-        }
 
-
-        protected struct ModifierStruct
-        {
-            public readonly int modifier;
-            public readonly Func<int, int, int> operation;
-            public readonly GameEventFilter filter;
-            public readonly bool forceRecount;
-
-            public ModifierStruct(int modifier, Func<int, int, int> operation, GameEventFilter filter, bool forceRecount)
-            {
-                this.modifier = modifier;
-                this.operation = operation;
-                this.filter = filter;
-                this.forceRecount = forceRecount;
-            }
-
-            public ModifierStruct(int modifier, Func<int, int, int> operation, GameEventFilter filter) : this()
-            {
-                this.modifier = modifier;
-                this.operation = operation;
-                this.filter = filter;
-            }
-        }
+        
 
         public override string ToString()
         {
             return value.ToString();
         }
     }
+    struct ModifierStruct
+    {
+        public readonly int modifier;
+        public readonly Func<int, int, int> operation;
+        public readonly GameEventFilter filter;
 
+        public ModifierStruct(int modifier, Func<int, int, int> operation, GameEventFilter filter) : this()
+        {
+            this.modifier = modifier;
+            this.operation = operation;
+            this.filter = filter;
+        }
+    }
 }

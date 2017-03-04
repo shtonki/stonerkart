@@ -6,15 +6,8 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class GameEvent
+    interface GameEvent
     {
-        public int id { get; }
-        private static int idCtr = 0;
-
-        public GameEvent()
-        {
-            id = idCtr++;
-        }
     }
 
     interface CardedEvent
@@ -22,10 +15,10 @@ namespace stonerkart
         Card getCard();
     }
 
-    class GainBonusManaEvent : GameEvent
+    struct GainBonusManaEvent : GameEvent
     {
-        public Player player;
-        public ManaColour colour;
+        public Player player { get; }
+        public ManaColour colour { get; }
 
         public GainBonusManaEvent(Player player, ManaColour colour)
         {
@@ -34,9 +27,9 @@ namespace stonerkart
         }
     }
 
-    class ShuffleDeckEvent : GameEvent
+    struct ShuffleDeckEvent : GameEvent
     {
-        public Player player;
+        public Player player { get; }
 
         public ShuffleDeckEvent(Player player)
         {
@@ -44,11 +37,30 @@ namespace stonerkart
         }
     }
 
-    class MoveToPileEvent : GameEvent, CardedEvent
+    struct ApplyModifierEvent : GameEvent, CardedEvent
     {
-        public Pile to;
-        public Card card;
-        public bool nullTile;
+        public Card card { get; }
+        public ModifiableStats modifiableStats { get; }
+        public ModifierStruct modifier { get; }
+
+        public ApplyModifierEvent(Card card, ModifiableStats modifiableStats, ModifierStruct modifier)
+        {
+            this.card = card;
+            this.modifiableStats = modifiableStats;
+            this.modifier = modifier;
+        }
+
+        public Card getCard()
+        {
+            return card;
+        }
+    }
+
+    struct MoveToPileEvent : GameEvent, CardedEvent
+    {
+        public Pile to { get; }
+        public Card card { get; }
+        public bool nullTile { get; }
 
         public MoveToPileEvent(Card card, Pile to, bool nullTile = true)
         {
@@ -63,11 +75,11 @@ namespace stonerkart
         }
     }
 
-    class DamageEvent : GameEvent, CardedEvent
+    struct DamageEvent : GameEvent, CardedEvent
     {
-        public Card source;
-        public Card target;
-        public int amount;
+        public Card source { get; }
+        public Card target { get; }
+        public int amount { get; }
 
         public DamageEvent(Card source, Card target, int amount)
         {
@@ -82,7 +94,7 @@ namespace stonerkart
         }
     }
 
-    class PlaceOnTileEvent : GameEvent, CardedEvent
+    struct PlaceOnTileEvent : GameEvent, CardedEvent
     {
         public Card card { get; }
         public Tile tile { get; }
@@ -99,7 +111,7 @@ namespace stonerkart
         }
     }
 
-    class MoveEvent : GameEvent, CardedEvent
+    struct MoveEvent : GameEvent, CardedEvent
     {
         public Card card { get; }
         public Path path { get; }
@@ -116,10 +128,10 @@ namespace stonerkart
         }
     }
 
-    class PayManaEvent : GameEvent
+    struct PayManaEvent : GameEvent
     {
         public ManaSet manaSet { get; }
-        public Player player;
+        public Player player { get; }
 
         public PayManaEvent(Player player, ManaSet manaSet)
         {
@@ -128,7 +140,7 @@ namespace stonerkart
         }
     }
 
-    class CastEvent : GameEvent
+    struct CastEvent : GameEvent
     {
         public StackWrapper wrapper { get; }
 
@@ -138,9 +150,9 @@ namespace stonerkart
         }
     }
 
-    class StartOfStepEvent : GameEvent
+    struct StartOfStepEvent : GameEvent
     {
-        public Player activePlayer;
+        public Player activePlayer { get; }
         public Steps step { get; }
 
         public StartOfStepEvent(Player activePlayer, Steps step)
@@ -150,9 +162,9 @@ namespace stonerkart
         }
     }
 
-    class EndOfStepEvent : GameEvent
+    struct EndOfStepEvent : GameEvent
     {
-        public Player activePlayer;
+        public Player activePlayer { get; }
         public Steps step { get; }
 
         public EndOfStepEvent(Player activePlayer, Steps step)
@@ -162,7 +174,7 @@ namespace stonerkart
         }
     }
 
-    class DrawEvent : GameEvent
+    struct DrawEvent : GameEvent
     {
         public Player player { get; }
         public int cards { get; }
