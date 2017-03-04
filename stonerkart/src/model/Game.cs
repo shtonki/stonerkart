@@ -878,19 +878,19 @@ namespace stonerkart
         private HackStruct makeHackStruct()
         {
             return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, waitForAnything, ord, ord,
-                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, null);
+                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, null, null);
         }
 
         private HackStruct makeHackStruct(Func<Stuff> f)
         {
             return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, f, ord, ord, ord,
-                cardFromOrd, playerFromOrd, tileFromOrd, cards, null);
+                cardFromOrd, playerFromOrd, tileFromOrd, cards, null, null);
         }
 
         private HackStruct makeHackStruct(Card c)
         {
             return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, waitForAnything, ord, ord,
-                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, c);
+                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, c, null);
         }
         
 
@@ -1009,10 +1009,6 @@ namespace stonerkart
         public Player activePlayer { get; }
         public bool heroIsActive => hero == activePlayer;
 
-        public Player resolveController => resolveCard.controller;
-        public bool heroIsResolver => hero == resolveController;
-        public Card resolveCard { get; }
-        public IEnumerable<Card> cards { get; }
 
         public Func<Card, int> ordC { get; }
         public Func<Player, int> ordP { get; }
@@ -1021,6 +1017,13 @@ namespace stonerkart
         public Func <int, Player> Pord { get; }
         public Func <int, Tile> Tord { get; }
 
+
+        //resolve shit
+        public Player resolveController => resolveCard.controller;
+        public bool heroIsResolver => hero == resolveController;
+        public Card resolveCard { get; }
+        public IEnumerable<Card> cards { get; }
+        public TargetMatrix previousTargets { get; set; }
 
         //network stuff
         public Action<int[]> sendChoices { get; }
@@ -1032,8 +1035,8 @@ namespace stonerkart
 
 
         private Func<IEnumerable<Card>, bool, int, Card> selectCardEx;
-
-        public HackStruct(Func<IEnumerable<Card>, bool, int, Card> selectCardEx, Player hero, Player activePlayer, Action<int[]> sendChoices, Func<int[]> receiveChoices, Func<Stuff> getStuff, Func<Card, int> ordC, Func<Player, int> ordP, Func<Tile, int> ordT, Func<int, Card> cord, Func<int, Player> pord, Func<int, Tile> tord, IEnumerable<Card> cards, Card resolveCard)
+        
+        public HackStruct(Func<IEnumerable<Card>, bool, int, Card> selectCardEx, Player hero, Player activePlayer, Action<int[]> sendChoices, Func<int[]> receiveChoices, Func<Stuff> getStuff, Func<Card, int> ordC, Func<Player, int> ordP, Func<Tile, int> ordT, Func<int, Card> cord, Func<int, Player> pord, Func<int, Tile> tord, IEnumerable<Card> cards, Card resolveCard, TargetMatrix previousTargets)
         {
             this.selectCardEx = selectCardEx;
             this.hero = hero;
@@ -1049,6 +1052,7 @@ namespace stonerkart
             Tord = tord;
             this.cards = cards;
             this.resolveCard = resolveCard;
+            this.previousTargets = previousTargets;
         }
 
 

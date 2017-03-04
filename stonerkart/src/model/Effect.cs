@@ -171,6 +171,10 @@ namespace stonerkart
     {
         public int damage;
 
+        /// <summary>
+        /// Card source, Card victim
+        /// </summary>
+        /// <param name="damage"></param>
         public ZepperDoer(int damage) : base(typeof(Card), typeof(Card))
         {
             this.damage = damage;

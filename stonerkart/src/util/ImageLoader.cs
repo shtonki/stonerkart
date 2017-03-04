@@ -104,6 +104,7 @@ namespace stonerkart
         {
             switch (ct)
             {
+
                 case CardTemplate.Damage_sWard:
                 {
                     return Resources.artDamageWard;
@@ -119,9 +120,9 @@ namespace stonerkart
                     return Resources.artOneWithNature;
                 }
 
-                case CardTemplate.missingno:
+                case CardTemplate.Survival_sInstincts:
                 {
-                    return Resources.artHypnotist;
+                    return Resources.artSurvivalInstincts;
                 }
 
                 case CardTemplate.Graverobber_sSyrdin:

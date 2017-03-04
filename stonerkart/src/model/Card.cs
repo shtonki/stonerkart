@@ -154,15 +154,16 @@ namespace stonerkart
 
         public void handleEvent(GameEvent e)
         {
-            shitterhack.handle(e);
-            if (!(e is CardedEvent && ((CardedEvent)e).getCard() == this)) return;
-
-            eventHandler.handle(e);
-
             foreach (Modifiable modifiable in modifiables)
             {
                 modifiable.check(e);
             }
+
+            shitterhack.handle(e);
+
+            if (!(e is CardedEvent && ((CardedEvent)e).getCard() == this)) return;
+
+            eventHandler.handle(e);
         }
 
         public void updateState()
@@ -298,6 +299,7 @@ namespace stonerkart
     enum CardTemplate
     {
         missingno,
+        Survival_sInstincts,
         Damage_sWard,
         One_sWith_sNature,
         Graverobber_sSyrdin,

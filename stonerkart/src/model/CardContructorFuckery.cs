@@ -392,6 +392,20 @@ namespace stonerkart
                 } break;
 
 
+                case CardTemplate.Survival_sInstincts:
+                {
+                    cardType = CardType.Instant;
+
+                    castRange = 3;
+                    natureCost = 2;
+                    castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
+                        new ZepperDoer(-2));
+                    additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1), 
+                        new ModifyDoer(ModifiableStats.Power, 2, LL.add, LL.endOfTurn)));
+                    castDescription =
+                        "Target creature is healed for 2 and gains 2 power until the end of this turn.";
+                } break;
+
                 case CardTemplate.missingno:
                 {
                     

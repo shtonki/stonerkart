@@ -17,23 +17,23 @@ namespace stonerkart
 
         public Foo(params Effect[] effects)
         {
-            if (effects.Count() > 1)
-            {
-                int i = 2;
-            }
             this.effects = effects;
         }
 
         public IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] ts)
         {
             List<GameEvent> rt = new List<GameEvent>();
+
             for (int i = 0; i < ts.Length; i++)
             {
                 Effect effect = effects[i];
                 TargetMatrix matrix = effect.ts.fillResolve(ts[i], hs);
-                
+                hs.previousTargets = matrix;
+
                 rt.AddRange(effect.doer.act(hs, matrix.generateRows()));
             }
+            hs.previousTargets = null;
+
             return rt;
         }
 

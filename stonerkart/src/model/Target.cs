@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,12 +31,16 @@ namespace stonerkart
     {
         public TargetRule[] rules;
 
+        protected TargetRuleSet(IEnumerable<Type> typeSignatureTypes) : base(typeSignatureTypes)
+        {
+        }
+
         public TargetRuleSet(params TargetRule[] rules) : base(rules.Select(r => r.targetType))
         {
             this.rules = rules;
         }
 
-        public TargetMatrix fillCast(HackStruct str)
+        public virtual TargetMatrix fillCast(HackStruct str)
         {
             TargetColumn[] r = new TargetColumn[rules.Length];
 
@@ -49,20 +54,21 @@ namespace stonerkart
             return new TargetMatrix(r);
         }
 
-        public TargetMatrix fillResolve(TargetMatrix tm, HackStruct hs)
+        public virtual TargetMatrix fillResolve(TargetMatrix tm, HackStruct hs)
         {
             TargetColumn[] r = tm.columns;
 
             for (int i = 0; i < rules.Length; i++)
             {
-                r[i] = rules[i].fillResolveTargets(hs, r[i]);
+                var column = rules[i].fillResolveTargets(hs, r[i]);
+                r[i] = column;
             }
+
 
             return new TargetMatrix(r);
         }
 
     }
-    
 
     class TargetMatrix
     {
@@ -147,7 +153,22 @@ namespace stonerkart
             return new TargetColumn(crd);
         }
     }
-    
+
+    class CopyPreviousRule<T> : ResolveRule
+    {
+        private int column;
+
+        public CopyPreviousRule(int column) : base(typeof(T))
+        {
+            this.column = column;
+        }
+
+        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
+        {
+            return re.previousTargets.columns[column];
+        }
+    }
+
     class AoeRule : TargetRule
     {
         private PryTileRule ruler;
@@ -333,8 +354,6 @@ namespace stonerkart
             return c;
         }
     }
-
-
 
     class CardResolveRule : ResolveRule
     {
