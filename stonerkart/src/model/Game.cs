@@ -123,31 +123,22 @@ namespace stonerkart
 
         private void setupHandlers()
         {
-            baseHandler.Add(new TypedGameEventHandler<PayManaEvent>(e =>
+            baseHandler.add(new TypedGameEventHandler<PayManaEvent>(e =>
             {
                 e.player.payMana(e.manaSet);
             }));
 
-            baseHandler.Add(new TypedGameEventHandler<GainBonusManaEvent>(e =>
+            baseHandler.add(new TypedGameEventHandler<GainBonusManaEvent>(e =>
             {
                 e.player.gainBonusMana(e.colour);
             }));
 
-            baseHandler.Add(new TypedGameEventHandler<ShuffleDeckEvent>(e =>
+            baseHandler.add(new TypedGameEventHandler<ShuffleDeckEvent>(e =>
             {
                 e.player.deck.shuffle(random);
             }));
-
-            baseHandler.Add(new TypedGameEventHandler<PlaceOnTileEvent>(e =>
-            {
-                if (e.tile.card != null) throw new Exception();
-
-                e.card.moveTo(e.tile);
-                e.card.moveTo(e.card.controller.field);
-                e.card.exhaust();
-            }));
-
-            baseHandler.Add(new TypedGameEventHandler<DrawEvent>(e =>
+            
+            baseHandler.add(new TypedGameEventHandler<DrawEvent>(e =>
             {
                 for (int i = 0; i < e.cards; i++)
                 {
@@ -155,7 +146,7 @@ namespace stonerkart
                 }
             }));
 
-            baseHandler.Add(new TypedGameEventHandler<CastEvent>(e =>
+            baseHandler.add(new TypedGameEventHandler<CastEvent>(e =>
             {
                 Card c = e.wrapper.card;
                 if (!e.wrapper.isCastAbility) c = createDummy(c, c.owner.displaced);
@@ -164,42 +155,6 @@ namespace stonerkart
                 c.moveTo(stack);
 
                 Controller.redraw();
-            }));
-
-            baseHandler.Add(new TypedGameEventHandler<MoveEvent>(e =>
-            {
-                Path path = e.path;
-                Card mover = path.from.card;
-                Tile destination = path.to;
-                Card defender = destination.card;
-
-                if (defender == null)
-                {
-                    mover.moveTo(destination);
-                    mover.exhaust(path.length);
-                }
-                else
-                {
-                    if (path.penultimate.card != null && path.penultimate.card != mover) throw new Exception();
-
-                    mover.moveTo(path.penultimate);
-                    mover.exhaust();
-                }
-            }));
-
-            baseHandler.Add(new TypedGameEventHandler<DamageEvent>(e =>
-            {
-                e.target.dealDamage(e.amount);
-            }));
-
-            baseHandler.Add(new TypedGameEventHandler<MoveToPileEvent>(e =>
-            {
-                if (e.nullTile && e.card.tile != null)
-                {
-                    e.card.tile.removeCard();
-                    e.card.tile = null;
-                }
-                e.card.moveTo(e.to);
             }));
         }
 
@@ -432,30 +387,42 @@ namespace stonerkart
                     if (from == null) break;
 
                     Card card = from.card;
-                    var tpl = paths.Find(tuple => tuple.Item1 == card);
+                    var tpl = paths.Find(tuple => tuple.Item1 == card); //find out if card already has plans to move
 
-                    if (tpl != null)
+                    if (tpl != null)  //if it does cancel said plans
                     {
                         Controller.removeArrow(tpl.Item2);
                         paths.Remove(tpl);
                     }
 
-                    var options = map.dijkstra(from).Where(too =>
-                        too.length <= card.movement &&
+                    var options = map.dijkstra(from).Where(path =>
+                    {
+                        var a = path.length <= card.movement;
+                        //&&
+                        var b = 
                         (
-                          too.to.card == null ||
-                          (from.card.canAttack(too.to.card) && !paths.Select(p => p.Item2.to).Contains(too.to))
-                        )
-                        ).ToList();
+                            path.last.card == null ||
+                            from.card.canAttack(path.last.card)
+                            );
+                        //&&
+                        var c = !paths.Any(p => p.Item2.to == path.to);
+                        if (!b)
+                        {
+                            int v = 2;
+                        }
+                        return a && b && c;
+                    }).ToList();
 
-                    Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.to)));
-                    var to = getTile(tile => tile == from || options.Select(p => p.to).Contains(tile), "Move to where?");
+                    //IEnumerable<>
+
+                    Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.last)));
+                    var to = getTile(tile => tile == from || options.Select(p => p.last).Contains(tile), "Move to where?");
                     Controller.clearHighlights();
                     if (to == null) break;
 
                     if (to != from)
                     {
-                        var path = options.First(p => p.to == to);
+                        var path = options.First(p => p.last == to);
                         Controller.addArrow(path);
                         paths.Add(new Tuple<Card, Path>(card, path));
                     }
@@ -477,19 +444,17 @@ namespace stonerkart
 
             foreach (var v in paths)
             {
-                Card card = v.Item1;
+                Card mover = v.Item1;
                 Path path = v.Item2;
+                Card defender = path.last.card;
 
-                if (path.to.card != null)
+                if (path.attacking && mover.canAttack(defender))
                 {
-                    Card mover = card;
-                    Card defender = path.to.card;
-
                     gt.addEvent(new DamageEvent(mover, defender, mover.power));
                     if (defender.canRetaliate) gt.addEvent(new DamageEvent(defender, mover, defender.power));
                 }
                 
-                gt.addEvent(new MoveEvent(card, path));
+                gt.addEvent(new MoveEvent(mover, path));
             }
 
             handleTransaction(gt);
@@ -518,7 +483,7 @@ namespace stonerkart
                 foreach (Card card in triggerableCards)
                 {
                     var card1 = card;
-                    if (true && card.template == CardTemplate.Illegal_Goblin_Laboratory && e is EndOfStepEvent &&
+                    if (true && card.template == CardTemplate.Illegal_sGoblin_sLaboratory && e is EndOfStepEvent &&
                         ((EndOfStepEvent)e).step == Steps.End)
                     {
                         TriggeredAbility v = card.triggeredAbilities.ToArray()[0];
@@ -689,6 +654,12 @@ namespace stonerkart
             }
         }
 
+        /// <summary>
+        /// Returns null when the OK button is pressed else it returns a tile when it is clicked
+        /// </summary>
+        /// <param name="f">Filters allowable tiles</param>
+        /// <param name="prompt">The string to prompt to the user</param>
+        /// <returns></returns>
         private Tile getTile(Func<Tile, bool> f, string prompt)
         {
             Controller.setPrompt(prompt, ButtonOption.OK);
@@ -907,19 +878,19 @@ namespace stonerkart
         private HackStruct makeHackStruct()
         {
             return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, waitForAnything, ord, ord,
-                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, null);
+                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, null, null);
         }
 
         private HackStruct makeHackStruct(Func<Stuff> f)
         {
             return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, f, ord, ord, ord,
-                cardFromOrd, playerFromOrd, tileFromOrd, cards, null);
+                cardFromOrd, playerFromOrd, tileFromOrd, cards, null, null);
         }
 
         private HackStruct makeHackStruct(Card c)
         {
             return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, waitForAnything, ord, ord,
-                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, c);
+                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, c, null);
         }
         
 
@@ -1038,10 +1009,6 @@ namespace stonerkart
         public Player activePlayer { get; }
         public bool heroIsActive => hero == activePlayer;
 
-        public Player resolveController => resolveCard.controller;
-        public bool heroIsResolver => hero == resolveController;
-        public Card resolveCard { get; }
-        public IEnumerable<Card> cards { get; }
 
         public Func<Card, int> ordC { get; }
         public Func<Player, int> ordP { get; }
@@ -1050,6 +1017,13 @@ namespace stonerkart
         public Func <int, Player> Pord { get; }
         public Func <int, Tile> Tord { get; }
 
+
+        //resolve shit
+        public Player resolveController => resolveCard.controller;
+        public bool heroIsResolver => hero == resolveController;
+        public Card resolveCard { get; }
+        public IEnumerable<Card> cards { get; }
+        public TargetMatrix previousTargets { get; set; }
 
         //network stuff
         public Action<int[]> sendChoices { get; }
@@ -1061,8 +1035,8 @@ namespace stonerkart
 
 
         private Func<IEnumerable<Card>, bool, int, Card> selectCardEx;
-
-        public HackStruct(Func<IEnumerable<Card>, bool, int, Card> selectCardEx, Player hero, Player activePlayer, Action<int[]> sendChoices, Func<int[]> receiveChoices, Func<Stuff> getStuff, Func<Card, int> ordC, Func<Player, int> ordP, Func<Tile, int> ordT, Func<int, Card> cord, Func<int, Player> pord, Func<int, Tile> tord, IEnumerable<Card> cards, Card resolveCard)
+        
+        public HackStruct(Func<IEnumerable<Card>, bool, int, Card> selectCardEx, Player hero, Player activePlayer, Action<int[]> sendChoices, Func<int[]> receiveChoices, Func<Stuff> getStuff, Func<Card, int> ordC, Func<Player, int> ordP, Func<Tile, int> ordT, Func<int, Card> cord, Func<int, Player> pord, Func<int, Tile> tord, IEnumerable<Card> cards, Card resolveCard, TargetMatrix previousTargets)
         {
             this.selectCardEx = selectCardEx;
             this.hero = hero;
@@ -1078,6 +1052,7 @@ namespace stonerkart
             Tord = tord;
             this.cards = cards;
             this.resolveCard = resolveCard;
+            this.previousTargets = previousTargets;
         }
 
 

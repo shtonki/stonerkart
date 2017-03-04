@@ -104,52 +104,58 @@ namespace stonerkart
         {
             switch (ct)
             {
+
+                case CardTemplate.Damage_sWard:
+                {
+                    return Resources.artDamageWard;
+                }
+
                 case CardTemplate.Teleport:
                 {
                     return Resources.artTeleport;
                 }
 
-                case CardTemplate.One_With_Nature:
+                case CardTemplate.One_sWith_sNature:
                 {
                     return Resources.artOneWithNature;
                 }
 
-                case CardTemplate.missingno:
+                case CardTemplate.Survival_sInstincts:
                 {
-                    return Resources.artHypnotist;
+                    return Resources.artSurvivalInstincts;
                 }
 
-                case CardTemplate.Graverobber_Syrdin:
+                case CardTemplate.Graverobber_sSyrdin:
                 {
                     return Resources.artGraverobberSyrdin;
                 }
 
-                case CardTemplate.Alter_Fate:
+                case CardTemplate.Alter_sFate:
                 {
                     return Resources.artAlterTime;
                 }
 
-                case CardTemplate.Goblin_Grenade:
+                case CardTemplate.Goblin_sGrenade:
                 {
                     return Resources.artGoblinGrenade;
                 }
 
-                case CardTemplate.Illegal_Goblin_Laboratory:
+                case CardTemplate.Illegal_sGoblin_sLaboratory:
                 {
                     return Resources.artUnstableMemeExperiment;
                 }
 
-                case CardTemplate.Bear_Cavalary:
+                case CardTemplate.Bear_sCavalary:
                 {
                     return Resources.artBearCavalary;
                 }
 
-                case CardTemplate.Cleansing_Fire:
+                case CardTemplate.Cleansing_sFire:
                 {
                     return Resources.artCleansingFire;
                 }
 
-                case CardTemplate.Rockhand_Ogre:
+                case CardTemplate.Rockhand_sOgre:
                 {
                     return Resources.artRockhandOgre;
                 }
@@ -159,22 +165,22 @@ namespace stonerkart
                     return Resources.artUnmake;
                 }
 
-                case CardTemplate.Shibby_Shtank:
+                case CardTemplate.Shibby_sShtank:
                 {
                     return Resources.artEssenceOfClarity;
                 }
 
-                case CardTemplate.Risen_Abberation:
+                case CardTemplate.Risen_sAbberation:
                 {
                     return Resources.artSolemnAberration;
                 }
 
-                case CardTemplate.Nature_Heroman:
+                case CardTemplate.Nature_sHeroman:
                 {
                     return Resources.artLoneRanger;
                 }
 
-                case CardTemplate.Yung_Lich:
+                case CardTemplate.Yung_sLich:
                 {
                     return Resources.artYungLich;
                 }
@@ -199,7 +205,7 @@ namespace stonerkart
                     return Resources.artAlterFate;
                 }
 
-                case CardTemplate.Temple_Healer:
+                case CardTemplate.Temple_sHealer:
                 {
                     return Resources.artTempleHealer;
                 }

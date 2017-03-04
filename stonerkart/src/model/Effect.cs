@@ -68,6 +68,24 @@ namespace stonerkart
         protected abstract GameEvent[] simpleAct(HackStruct dkt, TargetRow row);
     }
 
+    class ModifyDoer : SimpleDoer
+    {
+        public ModifiableStats modifiableStats;
+        public ModifierStruct modifier;
+
+        public ModifyDoer(ModifiableStats modifiableStats, int value, Func<int, int, int> f, GameEventFilter until) : base(typeof(Card))
+        {
+            this.modifiableStats = modifiableStats;
+            modifier = new ModifierStruct(value, f, until);
+        }
+
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        {
+            Card card = (Card)row[0];
+            return new GameEvent[] {new ApplyModifierEvent(card, modifiableStats, modifier)};
+        }
+    }
+
     class GainBonusManaDoer : SimpleDoer
     {
         public IEnumerable<ManaColour> colour;
@@ -80,7 +98,7 @@ namespace stonerkart
         protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow ts)
         {
             Player p = (Player)ts[0];
-            return colour.Select(c => new GainBonusManaEvent(p, c)).ToArray();
+            return colour.Select(c => new GainBonusManaEvent(p, c)).Cast<GameEvent>().ToArray();
         }
     }
 
@@ -113,7 +131,7 @@ namespace stonerkart
         protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Player player = (Player)row[0];
-            return new[] {new DrawEvent(player, cards)};
+            return new GameEvent[] {new DrawEvent(player, cards)};
         }
     }
 
@@ -130,7 +148,7 @@ namespace stonerkart
             Tile move1To = ((Card)row[1]).tile;
             Card moved2 = (Card)row[1];
             Tile move2To = ((Card)row[0]).tile;
-            return new[] { new PlaceOnTileEvent(moved1, new Tile(null, 0, 0)), new PlaceOnTileEvent(moved2, move2To), new PlaceOnTileEvent(moved1, move1To)};
+            return new GameEvent[] { new PlaceOnTileEvent(moved1, new Tile(null, 0, 0)), new PlaceOnTileEvent(moved2, move2To), new PlaceOnTileEvent(moved1, move1To)};
         }
     }
 
@@ -145,7 +163,7 @@ namespace stonerkart
         {
             Card moved = (Card)row[0];
             Tile moveTo = (Tile)row[1];
-            return new[] {new PlaceOnTileEvent(moved, moveTo)};
+            return new GameEvent[] {new PlaceOnTileEvent(moved, moveTo)};
         }
     }
 
@@ -153,6 +171,10 @@ namespace stonerkart
     {
         public int damage;
 
+        /// <summary>
+        /// Card source, Card victim
+        /// </summary>
+        /// <param name="damage"></param>
         public ZepperDoer(int damage) : base(typeof(Card), typeof(Card))
         {
             this.damage = damage;
@@ -162,7 +184,7 @@ namespace stonerkart
         {
             Card damager = (Card)row[0];
             Card damaged = (Card)row[1];
-            return new[] {new DamageEvent(damager, damaged, damage)};
+            return new GameEvent[] {new DamageEvent(damager, damaged, damage)};
         }
     }
 

@@ -118,7 +118,7 @@ namespace stonerkart
             drawCards();
             button3_Click(null, null);
 
-            heroic = CardTemplate.Shibby_Shtank;
+            heroic = CardTemplate.Shibby_sShtank;
         }
 
         private CardTemplate heroic

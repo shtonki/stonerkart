@@ -46,7 +46,7 @@ namespace stonerkart
             this.optionsButton.Name = "optionsButton";
             this.optionsButton.Size = new System.Drawing.Size(64, 37);
             this.optionsButton.TabIndex = 1;
-            this.optionsButton.Text = "button2";
+            this.optionsButton.Text = "Options";
             this.optionsButton.UseVisualStyleBackColor = true;
             // 
             // MenuBar

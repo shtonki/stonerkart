@@ -66,8 +66,8 @@ namespace stonerkart
                 {
                     Label l = new Label();
                     l.BackColor = Color.Aqua;
-                    Controls.Add(l);
-                    ls.Add(l);
+                    Controls.add(l);
+                    ls.add(l);
                 }
             }
 

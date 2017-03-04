@@ -40,7 +40,7 @@ namespace stonerkart
             switch (ct)
             {
                 #region Illegal Goblin Laboratory
-                case CardTemplate.Illegal_Goblin_Laboratory:
+                case CardTemplate.Illegal_sGoblin_sLaboratory:
                 {
                     cardType = CardType.Relic;
 
@@ -100,7 +100,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Yung Lich
-                case CardTemplate.Yung_Lich:
+                case CardTemplate.Yung_sLich:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Rare;
@@ -151,7 +151,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Temple Healer
-                case CardTemplate.Temple_Healer:
+                case CardTemplate.Temple_sHealer:
                 {
                     cardType = CardType.Creature;
                     race = Race.Human;
@@ -180,7 +180,7 @@ namespace stonerkart
                     } break;
                 #endregion
                 #region Nature Heroman
-                case CardTemplate.Nature_Heroman:
+                case CardTemplate.Nature_sHeroman:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Legendary;
@@ -192,7 +192,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Risen Abberation
-                case CardTemplate.Risen_Abberation:
+                case CardTemplate.Risen_sAbberation:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
@@ -205,7 +205,7 @@ namespace stonerkart
                     } break;
                 #endregion
                 #region Shibby Shtank
-                case CardTemplate.Shibby_Shtank:
+                case CardTemplate.Shibby_sShtank:
                 {
                     cardType = CardType.Creature;
                     race = Race.Human;
@@ -247,7 +247,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Rockhand Ogre
-                case CardTemplate.Rockhand_Ogre:
+                case CardTemplate.Rockhand_sOgre:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Uncommon;
@@ -259,7 +259,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Bear Cavalary
-                case CardTemplate.Bear_Cavalary:
+                case CardTemplate.Bear_sCavalary:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
@@ -271,7 +271,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Cleansing Fire
-                case CardTemplate.Cleansing_Fire:
+                case CardTemplate.Cleansing_sFire:
                 {
                     cardType = CardType.Instant;
                     rarity = Rarity.Rare;
@@ -295,7 +295,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Goblin Grenade
-                case CardTemplate.Goblin_Grenade:
+                case CardTemplate.Goblin_sGrenade:
                 {
                     cardType = CardType.Instant;
 
@@ -323,7 +323,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region One With Nature
-                case CardTemplate.One_With_Nature:
+                case CardTemplate.One_sWith_sNature:
                 {
                     cardType = CardType.Sorcery;
 
@@ -336,7 +336,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Graverobber Syrdin
-                case CardTemplate.Graverobber_Syrdin:
+                case CardTemplate.Graverobber_sSyrdin:
                 {
                     cardType = CardType.Creature;
 
@@ -362,7 +362,7 @@ namespace stonerkart
                     } break;
                 #endregion
                 #region Alter Fate
-                case CardTemplate.Alter_Fate:
+                case CardTemplate.Alter_sFate:
                 { 
                     cardType = CardType.Instant;
 
@@ -378,13 +378,37 @@ namespace stonerkart
                 } break;
                 #endregion
 
+                case CardTemplate.Damage_sWard:
+                {
+                    cardType = CardType.Instant;
+
+                    lifeCost = 1;
+                    castRange = 5;
+                    castEffect = new Effect(
+                        new TargetRuleSet(new PryCardRule()),
+                        new ModifyDoer(ModifiableStats.Toughness, 3, LL.add, LL.never));
+                    castDescription = "Target creature gains 3 toughness.";
+
+                } break;
+
+
+                case CardTemplate.Survival_sInstincts:
+                {
+                    cardType = CardType.Instant;
+
+                    castRange = 3;
+                    natureCost = 2;
+                    castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
+                        new ZepperDoer(-2));
+                    additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1), 
+                        new ModifyDoer(ModifiableStats.Power, 2, LL.add, LL.endOfTurn)));
+                    castDescription =
+                        "Target creature is healed for 2 and gains 2 power until the end of this turn.";
+                } break;
+
                 case CardTemplate.missingno:
                 {
-                    cardType = CardType.Creature;
-                    greyCost = 1;
-                    basePower = 3;
-                    baseToughness = 3;
-                    //additionalCastCosts.Add(new SelectAndMoveCost(c => true, PileLocation.Hand, PileLocation.Graveyard));
+                    
                 } break;
 
                 default:
@@ -451,8 +475,9 @@ namespace stonerkart
             this.owner = owner;
             controller = owner;
 
+            name = ct.ToString().Replace("_a", "'").Replace("_s", " ");
 
-            name = ct.ToString().Replace("_a", "'").Replace('_', ' ');
+            eventHandler = generatedlft();
         }
 
         private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo foo, GameEventFilter filter, int castRange, PileLocation activeIn, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
