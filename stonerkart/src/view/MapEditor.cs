@@ -16,7 +16,7 @@ namespace stonerkart
         public MapEditor() 
         {
             InitializeComponent();
-            //hexPanel2.callbacks.Add(tileClicked);
+            //hexPanel2.callbacks.add(tileClicked);
         }
 
         public IEnumerable<MenuItem> getMenuPanel()

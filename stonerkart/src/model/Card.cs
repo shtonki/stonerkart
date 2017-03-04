@@ -1,9 +1,13 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Threading.Tasks;
+
+#endregion
 
 namespace stonerkart
 {
@@ -38,11 +42,15 @@ namespace stonerkart
 
         public Card dummyFor;
 
-        public IEnumerable<ActivatedAbility> activatedAbilities => abilities.Where(a => a is ActivatedAbility).Cast<ActivatedAbility>();
-        public IEnumerable<TriggeredAbility> triggeredAbilities => abilities.Where(a => a is TriggeredAbility).Cast<TriggeredAbility>();
+        public IEnumerable<ActivatedAbility> activatedAbilities
+            => abilities.Where(a => a is ActivatedAbility).Cast<ActivatedAbility>();
+
+        public IEnumerable<TriggeredAbility> triggeredAbilities
+            => abilities.Where(a => a is TriggeredAbility).Cast<TriggeredAbility>();
+
         private List<Ability> abilities = new List<Ability>();
         public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).ToArray();
-        
+
         public List<ManaColour> colours => coloursEx();
 
         public bool isHeroic { get; }
@@ -63,6 +71,7 @@ namespace stonerkart
         private ManaColour? forceColour;
         private Modifiable[] modifiables;
 
+        private GameEventHandlerBuckets eventHandler;
 
         public bool canAttack(Card defender)
         {
@@ -96,17 +105,16 @@ namespace stonerkart
             notify(new CardChangedMessage(Toughness));
         }
 
-
         /// <summary>
         /// Returns a list containing the unique colours of the card. If the card has no mana cost it returns an 
         /// array containing only ManaColour.Colourless.
         /// </summary>
         private List<ManaColour> coloursEx()
         {
-            if (forceColour.HasValue) return new List<ManaColour>(new ManaColour[] { forceColour.Value });
+            if (forceColour.HasValue) return new List<ManaColour>(new[] {forceColour.Value});
             HashSet<ManaColour> hs = new HashSet<ManaColour>(castManaCost.colours.Where(x => x != ManaColour.Colourless));
-            if (hs.Count == 0) return new List<ManaColour>(new ManaColour[] {ManaColour.Colourless,});
-            
+            if (hs.Count == 0) return new List<ManaColour>(new[] {ManaColour.Colourless});
+
             return hs.ToList();
         }
 
@@ -134,11 +142,11 @@ namespace stonerkart
             return triggeredAbilities.Where(a => a.triggeredBy(e));
         }
 
-
         public void handleEvent(GameEvent e)
         {
-            GameEventFilter sickhack = new TypedGameEventFilter<StartOfStepEvent>(a => a.step == Steps.Replenish && a.activePlayer == controller);
-            if (sickhack.filter(e)) fatigue = 0;
+            if (!(e is CardedEvent && ((CardedEvent)e).getCard() == this)) return;
+
+            eventHandler.handle(e);
 
             foreach (Modifiable modifiable in modifiables)
             {
@@ -157,7 +165,7 @@ namespace stonerkart
         private string typeTextEx()
         {
             string s = isHeroic ? "Heroic " : "";
-            s += cardType.ToString(); 
+            s += cardType.ToString();
 
             return s;
         }
@@ -197,76 +205,131 @@ namespace stonerkart
             return name;
         }
 
-        private static Card[] flyweight = Enum.GetValues(typeof (CardTemplate)).Cast<CardTemplate>().Select(ct => new Card(ct)).ToArray();
+        private static Card[] flyweight =
+            Enum.GetValues(typeof (CardTemplate)).Cast<CardTemplate>().Select(ct => new Card(ct)).ToArray();
+
         public static Card fromTemplate(CardTemplate ct)
         {
             return flyweight[(int)ct];
         }
+
+        private GameEventHandlerBuckets generatedlft()
+        {
+            GameEventHandlerBuckets r = new GameEventHandlerBuckets();
+
+            GameEventFilter rslashmemeeconomy = new TypedGameEventFilter<StartOfStepEvent>(a => a.step == Steps.Replenish && a.activePlayer == controller);
+
+            r.add(new TypedGameEventHandler<StartOfStepEvent>(rslashmemeeconomy, e => fatigue = 0));
+
+            r.add(new TypedGameEventHandler<PlaceOnTileEvent>(e =>
+            {
+                if (e.tile.card != null) throw new Exception();
+
+                e.card.moveTo(e.tile);
+                e.card.moveTo(e.card.controller.field);
+                e.card.exhaust();
+            }));
+
+            r.add(new TypedGameEventHandler<MoveEvent>(e =>
+            {
+                Path path = e.path;
+                Card mover = path.from.card;
+                Tile destination = path.to;
+                Card defender = destination.card;
+
+                if (defender == null)
+                {
+                    mover.moveTo(destination);
+                    mover.exhaust(path.length);
+                }
+                else
+                {
+                    if (path.penultimate.card != null && path.penultimate.card != mover) throw new Exception();
+
+                    mover.moveTo(path.penultimate);
+                    mover.exhaust();
+                }
+            }));
+
+            r.add(new TypedGameEventHandler<DamageEvent>(e => { e.target.dealDamage(e.amount); }));
+
+            r.add(new TypedGameEventHandler<MoveToPileEvent>(e =>
+            {
+                if (e.nullTile && e.card.tile != null)
+                {
+                    e.card.tile.removeCard();
+                    e.card.tile = null;
+                }
+                e.card.moveTo(e.to);
+            }));
+            
+            return r;
+        }
     }
 
-    enum CardTemplate
+    internal enum CardTemplate
     {
         missingno,
-        One_With_Nature,
-        Graverobber_Syrdin,
-        Alter_Fate,
-        Goblin_Grenade,
-        Cleansing_Fire,
+        One_sWith_sNature,
+        Graverobber_sSyrdin,
+        Alter_sFate,
+        Goblin_sGrenade,
+        Cleansing_sFire,
         Belwas,
         Zap,
         Kappa,
         Cantrip,
-        Temple_Healer,
-        Yung_Lich,
-        Nature_Heroman,
-        Risen_Abberation,
-        Shibby_Shtank,
+        Temple_sHealer,
+        Yung_sLich,
+        Nature_sHeroman,
+        Risen_sAbberation,
+        Shibby_sShtank,
         Unmake,
-        Rockhand_Ogre,
-        Bear_Cavalary,
-        Illegal_Goblin_Laboratory,
-        Teleport,
+        Rockhand_sOgre,
+        Bear_sCavalary,
+        Illegal_sGoblin_sLaboratory,
+        Teleport
     }
 
-    enum CardType
+    internal enum CardType
     {
         Creature,
         Instant,
         Sorcery,
-        Relic,
+        Relic
     }
 
-    enum Rarity
+    internal enum Rarity
     {
         Common,
         Uncommon,
         Rare,
-        Legendary,
+        Legendary
     }
 
-    enum CastSpeed
+    internal enum CastSpeed
     {
         Instant,
-        Slow,
+        Slow
     }
 
-    enum CardSet
+    internal enum CardSet
     {
-        FirstEdition,
+        FirstEdition
     }
 
-    enum Race
+    internal enum Race
     {
         Human,
         Undead,
         Lizard,
-        Goblin,
+        Goblin
     }
 
-    enum Subtype
+    internal enum Subtype
     {
         Warrior,
         Wizard,
-        Cleric,
+        Cleric
     }
 }

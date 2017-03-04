@@ -38,7 +38,7 @@ namespace stonerkart
         {
         }
 
-        public void Add<T>(TypedGameEventHandler<T> h) where T : GameEvent
+        public void add<T>(TypedGameEventHandler<T> h) where T : GameEvent
         {
             Type t = typeof(T);
             if (handlers.ContainsKey(t)) throw new Exception();

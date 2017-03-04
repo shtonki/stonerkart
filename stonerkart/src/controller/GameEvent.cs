@@ -17,6 +17,11 @@ namespace stonerkart
         }
     }
 
+    interface CardedEvent
+    {
+        Card getCard();
+    }
+
     class GainBonusManaEvent : GameEvent
     {
         public Player player;
@@ -39,7 +44,7 @@ namespace stonerkart
         }
     }
 
-    class MoveToPileEvent : GameEvent
+    class MoveToPileEvent : GameEvent, CardedEvent
     {
         public Pile to;
         public Card card;
@@ -51,9 +56,14 @@ namespace stonerkart
             this.card = card;
             this.nullTile = nullTile;
         }
+
+        public Card getCard()
+        {
+            return card;
+        }
     }
 
-    class DamageEvent : GameEvent
+    class DamageEvent : GameEvent, CardedEvent
     {
         public Card source;
         public Card target;
@@ -65,9 +75,14 @@ namespace stonerkart
             this.target = target;
             this.amount = amount;
         }
+
+        public Card getCard()
+        {
+            return source;
+        }
     }
 
-    class PlaceOnTileEvent : GameEvent
+    class PlaceOnTileEvent : GameEvent, CardedEvent
     {
         public Card card { get; }
         public Tile tile { get; }
@@ -77,9 +92,14 @@ namespace stonerkart
             this.card = card;
             this.tile = tile;
         }
+
+        public Card getCard()
+        {
+            return card;
+        }
     }
 
-    class MoveEvent : GameEvent
+    class MoveEvent : GameEvent, CardedEvent
     {
         public Card card { get; }
         public Path path { get; }
@@ -88,6 +108,11 @@ namespace stonerkart
         {
             this.card = card;
             this.path = path;
+        }
+
+        public Card getCard()
+        {
+            return card;
         }
     }
 

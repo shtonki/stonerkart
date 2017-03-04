@@ -123,31 +123,22 @@ namespace stonerkart
 
         private void setupHandlers()
         {
-            baseHandler.Add(new TypedGameEventHandler<PayManaEvent>(e =>
+            baseHandler.add(new TypedGameEventHandler<PayManaEvent>(e =>
             {
                 e.player.payMana(e.manaSet);
             }));
 
-            baseHandler.Add(new TypedGameEventHandler<GainBonusManaEvent>(e =>
+            baseHandler.add(new TypedGameEventHandler<GainBonusManaEvent>(e =>
             {
                 e.player.gainBonusMana(e.colour);
             }));
 
-            baseHandler.Add(new TypedGameEventHandler<ShuffleDeckEvent>(e =>
+            baseHandler.add(new TypedGameEventHandler<ShuffleDeckEvent>(e =>
             {
                 e.player.deck.shuffle(random);
             }));
-
-            baseHandler.Add(new TypedGameEventHandler<PlaceOnTileEvent>(e =>
-            {
-                if (e.tile.card != null) throw new Exception();
-
-                e.card.moveTo(e.tile);
-                e.card.moveTo(e.card.controller.field);
-                e.card.exhaust();
-            }));
-
-            baseHandler.Add(new TypedGameEventHandler<DrawEvent>(e =>
+            
+            baseHandler.add(new TypedGameEventHandler<DrawEvent>(e =>
             {
                 for (int i = 0; i < e.cards; i++)
                 {
@@ -155,7 +146,7 @@ namespace stonerkart
                 }
             }));
 
-            baseHandler.Add(new TypedGameEventHandler<CastEvent>(e =>
+            baseHandler.add(new TypedGameEventHandler<CastEvent>(e =>
             {
                 Card c = e.wrapper.card;
                 if (!e.wrapper.isCastAbility) c = createDummy(c, c.owner.displaced);
@@ -164,42 +155,6 @@ namespace stonerkart
                 c.moveTo(stack);
 
                 Controller.redraw();
-            }));
-
-            baseHandler.Add(new TypedGameEventHandler<MoveEvent>(e =>
-            {
-                Path path = e.path;
-                Card mover = path.from.card;
-                Tile destination = path.to;
-                Card defender = destination.card;
-
-                if (defender == null)
-                {
-                    mover.moveTo(destination);
-                    mover.exhaust(path.length);
-                }
-                else
-                {
-                    if (path.penultimate.card != null && path.penultimate.card != mover) throw new Exception();
-
-                    mover.moveTo(path.penultimate);
-                    mover.exhaust();
-                }
-            }));
-
-            baseHandler.Add(new TypedGameEventHandler<DamageEvent>(e =>
-            {
-                e.target.dealDamage(e.amount);
-            }));
-
-            baseHandler.Add(new TypedGameEventHandler<MoveToPileEvent>(e =>
-            {
-                if (e.nullTile && e.card.tile != null)
-                {
-                    e.card.tile.removeCard();
-                    e.card.tile = null;
-                }
-                e.card.moveTo(e.to);
             }));
         }
 
@@ -518,7 +473,7 @@ namespace stonerkart
                 foreach (Card card in triggerableCards)
                 {
                     var card1 = card;
-                    if (true && card.template == CardTemplate.Illegal_Goblin_Laboratory && e is EndOfStepEvent &&
+                    if (true && card.template == CardTemplate.Illegal_sGoblin_sLaboratory && e is EndOfStepEvent &&
                         ((EndOfStepEvent)e).step == Steps.End)
                     {
                         TriggeredAbility v = card.triggeredAbilities.ToArray()[0];
