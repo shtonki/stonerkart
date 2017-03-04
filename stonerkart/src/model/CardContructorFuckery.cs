@@ -378,6 +378,17 @@ namespace stonerkart
                 } break;
                 #endregion
 
+                case CardTemplate.Fresh_sFox:
+                {
+                    cardType = CardType.Creature;
+
+                    baseToughness = 2;
+                    basePower = 3;
+                    baseMovement = 3;
+
+                    natureCost = 2;
+                } break;
+
                 case CardTemplate.Damage_sWard:
                 {
                     cardType = CardType.Instant;

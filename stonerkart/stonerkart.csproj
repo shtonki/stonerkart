@@ -242,6 +242,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="musings.txt" />
+    <None Include="Resources\artFreshFox.png" />
     <None Include="Resources\artSurvivalInstincts.png" />
     <None Include="Resources\bg.png" />
     <None Include="Resources\artUnstableMemeExperiment.png" />

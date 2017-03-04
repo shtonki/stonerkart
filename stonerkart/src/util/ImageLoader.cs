@@ -105,6 +105,11 @@ namespace stonerkart
             switch (ct)
             {
 
+                case CardTemplate.Fresh_sFox:
+                {
+                    return Resources.artFreshFox;
+                }
+
                 case CardTemplate.Damage_sWard:
                 {
                     return Resources.artDamageWard;
