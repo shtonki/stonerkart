@@ -396,22 +396,15 @@ namespace stonerkart
                     }
 
                     var options = map.dijkstra(from).Where(path =>
-                    {
-                        var a = path.length <= card.movement;
-                        //&&
-                        var b = 
+                        path.length <= card.movement
+                        &&
                         (
                             path.last.card == null ||
                             from.card.canAttack(path.last.card)
-                            );
-                        //&&
-                        var c = !paths.Any(p => p.Item2.to == path.to);
-                        if (!b)
-                        {
-                            int v = 2;
-                        }
-                        return a && b && c;
-                    }).ToList();
+                        )
+                        &&
+                        !paths.Any(p => p.Item2.to == path.to)
+                    ).ToList();
 
                     //IEnumerable<>
 
@@ -435,6 +428,10 @@ namespace stonerkart
                 Controller.setPrompt("Opponent is moving");
                 MoveSelection v = connection.receiveAction<MoveSelection>();
                 paths = v.moves;
+                foreach (var p in paths)
+                {
+                    Controller.addArrow(p.Item2);
+                }
             }
 
             //todo raise MoveDeclared events lmfao

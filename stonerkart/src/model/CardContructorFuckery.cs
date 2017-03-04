@@ -44,8 +44,8 @@ namespace stonerkart
                 {
                     cardType = CardType.Relic;
 
-                    chaosCost = 1;
-                    greyCost = 0;
+                    chaosCost = 2;
+                    greyCost = 1;
 
                     addTriggeredAbility(
                         "At the end of your turn deal 1 damage to every enemy player.",
@@ -383,7 +383,7 @@ namespace stonerkart
                     cardType = CardType.Instant;
 
                     lifeCost = 1;
-                    castRange = 5;
+                    castRange = 4;
                     castEffect = new Effect(
                         new TargetRuleSet(new PryCardRule()),
                         new ModifyDoer(ModifiableStats.Toughness, 3, LL.add, LL.never));
