@@ -229,6 +229,22 @@ namespace stonerkart
                             return a.step == Steps.Replenish && a.activePlayer == controller;
                         }), e => fatigue = 0);
 
+
+            r.add(new TypedGameEventHandler<ApplyModifierEvent>(e =>
+            {
+                Modifiable m;
+                switch (e.stat)
+                {
+                    case ModifiableStats.Movement: m = Movement; break;
+                    case ModifiableStats.Toughness: m = Toughness; break;
+                    case ModifiableStats.Power: m = Power; break;
+
+                    default: throw new Exception();
+                }
+
+                m.modify(e.modifier);
+            }));
+
             r.add(new TypedGameEventHandler<PlaceOnTileEvent>(e =>
             {
                 if (e.tile.card != null) throw new Exception();

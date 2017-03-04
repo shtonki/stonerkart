@@ -40,13 +40,13 @@ namespace stonerkart
     struct ApplyModifierEvent : GameEvent, CardedEvent
     {
         public Card card { get; }
-        public ModifiableStats modifiableStats { get; }
+        public ModifiableStats stat { get; }
         public ModifierStruct modifier { get; }
 
-        public ApplyModifierEvent(Card card, ModifiableStats modifiableStats, ModifierStruct modifier)
+        public ApplyModifierEvent(Card card, ModifiableStats stat, ModifierStruct modifier)
         {
             this.card = card;
-            this.modifiableStats = modifiableStats;
+            this.stat = stat;
             this.modifier = modifier;
         }
 

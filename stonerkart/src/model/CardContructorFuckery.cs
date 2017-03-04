@@ -380,12 +380,15 @@ namespace stonerkart
 
                 case CardTemplate.missingno:
                 {
-                    cardType = CardType.Creature;
-                    greyCost = 1;
-                    basePower = 3;
-                    baseToughness = 3;
-                    //additionalCastCosts.add(new SelectAndMoveCost(c => true, PileLocation.Hand, PileLocation.Graveyard));
-                } break;
+                    cardType = CardType.Instant;
+
+                    lifeCost = 1;
+                    castRange = 7;
+
+                        castEffect = new Effect(
+                            new TargetRuleSet(new PryCardRule()), 
+                            new ModifyDoer(ModifiableStats.Toughness, 2, ));
+                    } break;
 
                 default:
                 {
