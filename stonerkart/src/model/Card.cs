@@ -242,20 +242,8 @@ namespace stonerkart
             {
                 Path path = e.path;
                 Tile destination = path.to;
-                Card defender = destination.card;
-
-                if (defender == null)
-                {
-                    moveTo(destination);
-                    exhaust(path.length);
-                }
-                else
-                {
-                    if (path.penultimate.card != null && path.penultimate.card != this) throw new Exception();
-
-                    moveTo(path.penultimate);
-                    exhaust();
-                }
+                moveTo(destination);
+                exhaust(path.attacking == null ? path.length : movement);
             }));
 
             r.add(new TypedGameEventHandler<DamageEvent>(e => { dealDamage(e.amount); }));

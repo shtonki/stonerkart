@@ -137,6 +137,7 @@ namespace stonerkart
                     l.Add(c);
                     c = dict[c].Item2;
                 }
+
                 l.Reverse();
                 r.Add(new Path(l, v.Value.Item1));
             }
@@ -160,17 +161,18 @@ namespace stonerkart
         }
     }
 
-    class Path
+    struct Path
     {
-        public readonly int length;
+        public int length { get; }
         public Tile from => tiles[0];
-        public Tile to => tiles[tiles.Count() - 1];
-        public Tile penultimate => tiles[tiles.Count() - 2];
-        private readonly List<Tile> tiles;
+        public Tile to => attacking == null ? last : tiles[tiles.Count - 2];
+        public Tile last => tiles[tiles.Count - 1];
+        public Tile attacking => (last.card == from.card || last.card == null) ? null : last;
+
+        private List<Tile> tiles;
 
         public Path(List<Tile> tiles, int length)
         {
-            if (tiles == null || tiles.Count == 0) throw new Exception();
             if (length < 0) throw new Exception();
             this.tiles = tiles;
             this.length = length;

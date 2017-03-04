@@ -387,30 +387,42 @@ namespace stonerkart
                     if (from == null) break;
 
                     Card card = from.card;
-                    var tpl = paths.Find(tuple => tuple.Item1 == card);
+                    var tpl = paths.Find(tuple => tuple.Item1 == card); //find out if card already has plans to move
 
-                    if (tpl != null)
+                    if (tpl != null)  //if it does cancel said plans
                     {
                         Controller.removeArrow(tpl.Item2);
                         paths.Remove(tpl);
                     }
 
-                    var options = map.dijkstra(from).Where(too =>
-                        too.length <= card.movement &&
+                    var options = map.dijkstra(from).Where(path =>
+                    {
+                        var a = path.length <= card.movement;
+                        //&&
+                        var b = 
                         (
-                          too.to.card == null ||
-                          (from.card.canAttack(too.to.card) && !paths.Select(p => p.Item2.to).Contains(too.to))
-                        )
-                        ).ToList();
+                            path.last.card == null ||
+                            from.card.canAttack(path.last.card)
+                            );
+                        //&&
+                        var c = !paths.Any(p => p.Item2.to == path.to);
+                        if (!b)
+                        {
+                            int v = 2;
+                        }
+                        return a && b && c;
+                    }).ToList();
 
-                    Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.to)));
-                    var to = getTile(tile => tile == from || options.Select(p => p.to).Contains(tile), "Move to where?");
+                    //IEnumerable<>
+
+                    Controller.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.last)));
+                    var to = getTile(tile => tile == from || options.Select(p => p.last).Contains(tile), "Move to where?");
                     Controller.clearHighlights();
                     if (to == null) break;
 
                     if (to != from)
                     {
-                        var path = options.First(p => p.to == to);
+                        var path = options.First(p => p.last == to);
                         Controller.addArrow(path);
                         paths.Add(new Tuple<Card, Path>(card, path));
                     }
@@ -644,6 +656,12 @@ namespace stonerkart
             }
         }
 
+        /// <summary>
+        /// Returns null when the OK button is pressed else it returns a tile when it is clicked
+        /// </summary>
+        /// <param name="f">Filters allowable tiles</param>
+        /// <param name="prompt">The string to prompt to the user</param>
+        /// <returns></returns>
         private Tile getTile(Func<Tile, bool> f, string prompt)
         {
             Controller.setPrompt(prompt, ButtonOption.OK);
