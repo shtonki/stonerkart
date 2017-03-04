@@ -51,33 +51,79 @@ namespace stonerkart
 
             while (i < s.Length)
             {
-                char c = s[i++];
+                Func<char> nextChar = () => s[i++];
+                char c = nextChar();
                 switch (c)
                 {
                     case '{':
                     {
                         if (columns != null) throw new Exception();
                         columns = new List<TargetColumn>();
-                    } break;
+                    }
+                        break;
 
                     case '}':
                     {
                         if (columns == null) throw new Exception();
                         matricies.Add(new TargetMatrix(columns));
                         columns = null;
-                    } break;
+                    }
+                        break;
 
                     case '[':
                     {
                         if (targets != null) throw new Exception();
                         targets = new List<Targetable>();
-                    } break;
+                    }
+                        break;
 
                     case ']':
                     {
                         if (targets == null) throw new Exception();
                         columns.Add(new TargetColumn(targets));
                         targets = null;
+                    }
+                        break;
+
+
+                default:
+                    {
+                        //let's abuse switches
+                        StringBuilder sb = new StringBuilder();
+                        while (true)
+                        {
+                            char x = nextChar();
+                            if (x == 'x') break;
+                            sb.Append(x);
+                        }
+                        int targetOrd = Int32.Parse(sb.ToString());
+                        Targetable target = null;
+                        switch (c)
+                        {
+                            case 'c':
+                            {
+                                target = g.cardFromOrd(targetOrd);
+                            } break;
+
+                            case 't':
+                            {
+                                target = g.tileFromOrd(targetOrd);
+                            } break;
+
+                            case 'p':
+                            {
+                                target = g.playerFromOrd(targetOrd);
+                            } break;
+
+                            case 'm':
+                            {
+                                target = new ManaOrb((ManaColour)targetOrd);
+                            } break;
+                        }
+
+                        if (target == null) throw new Exception();
+
+                        targets.Add(target);
                     } break;
                 }
             }
@@ -144,18 +190,12 @@ namespace stonerkart
                         {
                             throw new Exception();
                         }
-                        sb.Append(',');
+                        sb.Append('x');
                     }
-                    if (sb[sb.Length - 1] == ',') sb.Length--;
                     sb.Append(']');
-                    sb.Append(':');
                 }
-                if (sb[sb.Length - 1] == ':') sb.Length--;
                 sb.Append('}');
-                sb.Append('.');
             }
-            if (sb[sb.Length - 1] == '.') sb.Length--;
-            sb.Append(";");
         }
 
         public string toString(Game g)
@@ -179,6 +219,7 @@ namespace stonerkart
                 sb.Append(';');
 
                 matriciesToString(sb, wp.matricies, g);
+                sb.Append(';');
 
                 matriciesToString(sb, wp.costMatricies, g);
 

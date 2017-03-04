@@ -165,9 +165,9 @@ namespace stonerkart
     {
         public int length { get; }
         public Tile from => tiles[0];
-        public Tile to => attacking == null ? last : tiles[tiles.Count - 2];
+        public Tile to => tiles[Math.Max(0, tiles.Count - (attacking ? 2 : 1))];
         public Tile last => tiles[tiles.Count - 1];
-        public Tile attacking => (last.card == from.card || last.card == null) ? null : last;
+        public bool attacking => last.card != from.card && last.card != null;
 
         private List<Tile> tiles;
 

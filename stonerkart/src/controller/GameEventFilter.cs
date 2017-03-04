@@ -10,16 +10,6 @@ namespace stonerkart
     {
         public abstract bool filter(GameEvent e);
 
-        public static GameEventFilter startOfOwnersTurn(Card c)
-        {
-            return new TypedGameEventFilter<StartOfStepEvent>(
-                e => e.activePlayer == c.controller && e.step == Steps.Replenish);
-        }
-
-        public static GameEventFilter never()
-        {
-            return new StaticGameEventFilter(() => false);
-        }
     }
 
     class TypedGameEventFilter<T> : GameEventFilter where T : GameEvent

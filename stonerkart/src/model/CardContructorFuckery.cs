@@ -387,7 +387,7 @@ namespace stonerkart
 
                         castEffect = new Effect(
                             new TargetRuleSet(new PryCardRule()), 
-                            new ModifyDoer(ModifiableStats.Toughness, 2, ));
+                            new ModifyDoer(ModifiableStats.Toughness, 2, LL.add, LL.never));
                     } break;
 
                 default:

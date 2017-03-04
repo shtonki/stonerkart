@@ -80,6 +80,16 @@ namespace stonerkart
             return true;
         }
 
+        public bool canDamage(Card defender)
+        {
+            return true;
+        }
+
+        public bool canTarget(Card target)
+        {
+            return true;
+        }
+
         public void moveTo(Pile p)
         {
             pile?.remove(this);
@@ -99,7 +109,7 @@ namespace stonerkart
             fatigue += steps < 0 ? Movement : steps;
         }
 
-        public void dealDamage(int d)
+        public void damage(int d)
         {
             damageTaken = Math.Max(damageTaken + d, 0);
             notify(new CardChangedMessage(Toughness));
@@ -259,10 +269,14 @@ namespace stonerkart
                 Path path = e.path;
                 Tile destination = path.to;
                 moveTo(destination);
-                exhaust(path.attacking == null ? path.length : movement);
+                exhaust(path.attacking ? movement : path.length);
             }));
 
-            r.add(new TypedGameEventHandler<DamageEvent>(e => { dealDamage(e.amount); }));
+            r.add(new TypedGameEventHandler<DamageEvent>(e =>
+            {
+                if (e.source.canDamage(e.target))
+                e.target.damage(e.amount);
+            }));
 
             r.add(new TypedGameEventHandler<MoveToPileEvent>(e =>
             {
