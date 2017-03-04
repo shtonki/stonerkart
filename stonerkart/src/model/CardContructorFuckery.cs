@@ -378,17 +378,24 @@ namespace stonerkart
                 } break;
                 #endregion
 
-                case CardTemplate.missingno:
+                case CardTemplate.Damage_sWard:
                 {
                     cardType = CardType.Instant;
 
                     lifeCost = 1;
-                    castRange = 7;
+                    castRange = 5;
+                    castEffect = new Effect(
+                        new TargetRuleSet(new PryCardRule()),
+                        new ModifyDoer(ModifiableStats.Toughness, 3, LL.add, LL.never));
+                    castDescription = "Target creature gains 3 toughness.";
 
-                        castEffect = new Effect(
-                            new TargetRuleSet(new PryCardRule()), 
-                            new ModifyDoer(ModifiableStats.Toughness, 2, LL.add, LL.never));
-                    } break;
+                } break;
+
+
+                case CardTemplate.missingno:
+                {
+                    
+                } break;
 
                 default:
                 {

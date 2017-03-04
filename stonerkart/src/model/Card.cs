@@ -298,6 +298,7 @@ namespace stonerkart
     enum CardTemplate
     {
         missingno,
+        Damage_sWard,
         One_sWith_sNature,
         Graverobber_sSyrdin,
         Alter_sFate,

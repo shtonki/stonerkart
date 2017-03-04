@@ -104,6 +104,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Damage_sWard:
+                {
+                    return Resources.artDamageWard;
+                }
+
                 case CardTemplate.Teleport:
                 {
                     return Resources.artTeleport;
