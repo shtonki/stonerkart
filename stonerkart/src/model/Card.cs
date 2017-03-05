@@ -72,6 +72,8 @@ namespace stonerkart
         private ManaColour? forceColour;
         private Modifiable[] modifiables;
 
+        private List<KeywordAbility> keywordAbilities;
+
         private GameEventHandlerBuckets eventHandler;
 
         public bool canAttack(Card defender)
@@ -129,6 +131,11 @@ namespace stonerkart
             if (hs.Count == 0) return new List<ManaColour>(new[] {ManaColour.Colourless});
 
             return hs.ToList();
+        }
+
+        public bool hasAbility(KeywordAbility kwa)
+        {
+            return keywordAbilities.Contains(kwa);
         }
 
         public bool isCastAbility(Ability a)
@@ -190,7 +197,16 @@ namespace stonerkart
             StringBuilder sb = new StringBuilder();
             foreach (Ability a in abilities)
             {
-                sb.Append(a.description);
+                string s = a.description;
+                if (s.Length > 0)
+                {
+                    sb.Append(a.description);
+                    sb.Append("\r\n");
+                }
+            }
+            foreach (var a in keywordAbilities)
+            {
+                sb.Append(a);
                 sb.Append("\r\n");
             }
             return sb.ToString();
@@ -263,7 +279,7 @@ namespace stonerkart
 
                 moveTo(e.tile);
                 moveTo(e.card.controller.field);
-                exhaust();
+                if (!hasAbility(KeywordAbility.Fervor)) exhaust();
             }));
 
             r.add(new TypedGameEventHandler<FatigueEvent>(e =>
@@ -370,5 +386,11 @@ namespace stonerkart
         Warrior,
         Wizard,
         Cleric
+    }
+
+    enum KeywordAbility
+    {
+        Fervor,
+
     }
 }
