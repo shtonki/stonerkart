@@ -162,7 +162,7 @@ namespace stonerkart
                     baseToughness = 4;
                     baseMovement = 2;
 
-                    lifeCost = 1;
+                    lifeCost = 0;
                     greyCost = 0;
 
                     addTriggeredAbility(
@@ -174,17 +174,6 @@ namespace stonerkart
                             moveEvent.card.controller == controller &&
                             moveEvent.to.location.pile == PileLocation.Field &&
                             location.pile == PileLocation.Field),
-                            0,
-                            PileLocation.Field,
-                            TriggeredAbility.Timing.Post
-                        );
-
-                        addTriggeredAbility(
-                        "Big Dick",
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
-                        new ZepperDoer(-1),
-                        new Foo(),
-                        LL.never,
                             0,
                             PileLocation.Field,
                             TriggeredAbility.Timing.Post

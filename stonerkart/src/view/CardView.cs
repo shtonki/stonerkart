@@ -120,6 +120,12 @@ namespace stonerkart
             });
         }
 
+        private void colorGlow(Color c)
+        {
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+        }
+        
+
         public void notify(object o, CardChangedMessage t)
         {
             sickmemes();

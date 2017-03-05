@@ -500,6 +500,7 @@ namespace stonerkart
             }
         }
 
+        
 
         private void pendAbilities(IEnumerable<TriggeredAbility> tas)
         {
@@ -548,47 +549,54 @@ namespace stonerkart
             }
         }
 
-        private struct ptas
-        {
-            public TriggeredAbility ability { get; }
-            public int originalIndex { get; }
-            public Card dummyCard { get; }
-
-            public ptas(TriggeredAbility ability, int originalIndex, Card dummyCard)
-            {
-                this.ability = ability;
-                this.originalIndex = originalIndex;
-                this.dummyCard = dummyCard;
-            }
-        }
-
         private void handlePendingTrigs(Player p, IEnumerable<TriggeredAbility> abilityList)
         {
             if (p == hero)
             {
-                TriggeredAbility[] pending = abilityList.ToArray();
+                TriggeredAbility[] orig = abilityList.ToArray();
                 Pile pl = new Pile();
 
-                for (int i = 0; i < pending.Length; i++)
+                for (int i = 0; i < orig.Length; i++)
                 {
-                    Card dummy = createDummy(pending[i], pl);
+                    Card dummy = createDummy(orig[i], pl);
                 }
 
                 ManualResetEventSlim re = new ManualResetEventSlim();
                 Clickable clkd = null;
-                Controller.showPile(pl, false, c =>
+                DraggablePanel dp = Controller.showPile(pl, false, c =>
                 {
                     clkd = c;
                     re.Set();
                 });
 
-                foreach (TriggeredAbility str in pending)
-                {
-                    Card c = createDummy(str, str.card.owner.displaced);
-                    StackWrapper v = tryCastDx(p, str, c);
-                    if (v == null) throw new Exception();
+                List<ptas> triggd = new List<ptas>();
 
-                    playerCasts(p, v);
+                while (triggd.Count < orig.Length)
+                {
+                    re.Wait();
+                    re.Reset();
+                    Clickable cp = clkd;
+                    if (!(cp is CardView)) continue;
+
+                    Card c = (Card)cp.getStuff();
+
+                    //ptas v = triggd.FirstOrDefault(s => s.dummyCard == c);
+
+                    int i = Array.IndexOf(orig, c.dummiedAbility);
+                    TriggeredAbility tab = orig[i];
+
+                    StackWrapper v = tryCastDx(p, tab, c);
+
+
+                    ptas ptas = new ptas(tab,i,c, v);
+                    triggd.Add(ptas);
+                }
+
+                dp.close();
+
+                foreach (ptas pt in triggd)
+                {
+                    playerCasts(p, pt.wrapper);
                 }
             }
             else
@@ -596,6 +604,23 @@ namespace stonerkart
                 //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             }
         }
+        #region hack
+        private class ptas
+        {
+            public TriggeredAbility ability { get; }
+            public int originalIndex { get; }
+            public Card dummyCard { get; }
+            public StackWrapper wrapper { get; }
+
+            public ptas(TriggeredAbility ability, int originalIndex, Card dummyCard, StackWrapper wrapper)
+            {
+                this.ability = ability;
+                this.originalIndex = originalIndex;
+                this.dummyCard = dummyCard;
+                this.wrapper = wrapper;
+            }
+        }
+        #endregion 
 
         private void trashcanDeadCreatures()
         { 
