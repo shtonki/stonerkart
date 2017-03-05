@@ -27,7 +27,7 @@ namespace stonerkart
         public StepHandler stepHandler;
 
         private GameEventHandlerBuckets baseHandler = new GameEventHandlerBuckets();
-        private Stack<StackWrapper> wrapperStack = new Stack<StackWrapper>();
+        private Stack<StackWrapper> wrapperStack { get; } = new Stack<StackWrapper>();
 
         private IEnumerable<Card> triggerableCards => cards.Where(card => card.location.pile != PileLocation.Deck && !card.isDummy);
         private IEnumerable<Card> fieldCards => cards.Where(card => card.location.pile == PileLocation.Field);
@@ -148,7 +148,7 @@ namespace stonerkart
 
             baseHandler.add(new TypedGameEventHandler<CastEvent>(e =>
             {
-                Card c = e.wrapper.card;
+                Card c = e.wrapper.castingCard;
                 if (!e.wrapper.isCastAbility) c = createDummy(c, c.owner.displaced);
 
                 wrapperStack.Push(e.wrapper);
@@ -527,8 +527,10 @@ namespace stonerkart
             do
             {
                 handlePendingTrigs();
-                trashcanDeadCreatures(); //todo suspect
             } while (pendingTriggeredAbilities.Count > 0);
+
+            trashcanDeadCreatures(); //todo suspect
+
             Controller.redraw();
         }
 
@@ -552,8 +554,8 @@ namespace stonerkart
                     
                     handlePendingTrigs(p, abilityList);
                 }
+                pendingTriggeredAbilities.Clear();
             }
-            pendingTriggeredAbilities.Clear();
         }
 
         private void handlePendingTrigs(Player p, IEnumerable<PendingAbilityStruct> abilityList)
@@ -612,7 +614,7 @@ namespace stonerkart
                         }
 
                         StackWrapper wrapper = wrapperStack.Pop();
-                        if (wrapper.card != stack.peekTop() && wrapper.card != stack.peekTop().dummyFor) throw new Exception();
+                        if (wrapper.castingCard != stack.peekTop() && wrapper.castingCard != stack.peekTop().dummyFor) throw new Exception();
                         resolve(wrapper);
                         c = 0;
 
@@ -679,7 +681,7 @@ namespace stonerkart
         private void playerCasts(Player p, StackWrapper w)
         {
             GameTransaction gt = new GameTransaction();
-            gt.addEvents(w.ability.cost.resolve(makeHackStruct(w.card), w.costMatricies));
+            gt.addEvents(w.ability.cost.resolve(makeHackStruct(w.castingCard), w.costMatricies));
             handleTransaction(gt);
             gt = new GameTransaction();
             gt.addEvent(new CastEvent(w));
@@ -787,7 +789,7 @@ namespace stonerkart
         private void resolve(StackWrapper wrapper)
         {
             Card stackpopped = stack.peekTop();
-            Card card = wrapper.card;
+            Card card = wrapper.castingCard;
             TargetMatrix[] ts = wrapper.targetMatrices;
             Foo foo = wrapper.ability.effects;
 
@@ -939,7 +941,7 @@ namespace stonerkart
 
         public void setTargetHighlight(Card c)
         {
-            StackWrapper w = wrapperStack.First(sw => sw.card == c);
+            StackWrapper w = wrapperStack.First(sw => sw.castingCard == c);
 
             if (w == null) return;
 
@@ -980,16 +982,18 @@ namespace stonerkart
 
     class StackWrapper
     {
-        public readonly Card card;
-        public readonly Ability ability;
-        public readonly TargetMatrix[] targetMatrices;
-        public readonly TargetMatrix[] costMatricies;
+        public Card stackCard { get; }
+        public Ability ability { get; }
+        public TargetMatrix[] targetMatrices { get; }
+        public TargetMatrix[] costMatricies { get; }
 
-        public bool isCastAbility => card.isCastAbility(ability);
+        public Card castingCard => stackCard.isDummy ? stackCard.dummyFor : stackCard;
+        public bool isCastAbility => castingCard.isCastAbility(ability);
 
-        public StackWrapper(Card card, Ability ability, TargetMatrix[] targetMatrices, TargetMatrix[] costMatricies)
+
+        public StackWrapper(Card stackCard, Ability ability, TargetMatrix[] targetMatrices, TargetMatrix[] costMatricies)
         {
-            this.card = card;
+            this.stackCard = stackCard;
             this.ability = ability;
             this.targetMatrices = targetMatrices;
             this.costMatricies = costMatricies;

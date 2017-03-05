@@ -208,11 +208,11 @@ namespace stonerkart
             {
                 StringBuilder sb = new StringBuilder();
 
-                int cardOrd = g.ord(wrapper.card);
+                int cardOrd = g.ord(wrapper.castingCard);
                 sb.Append(cardOrd);
                 sb.Append(';');
 
-                int abilityOrd = wrapper.card.abilityOrd(wrapper.ability);
+                int abilityOrd = wrapper.castingCard.abilityOrd(wrapper.ability);
                 sb.Append(abilityOrd);
                 sb.Append(';');
 

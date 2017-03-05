@@ -420,7 +420,20 @@ namespace stonerkart
 
                 case CardTemplate.missingno:
                 {
+                    cardType = CardType.Creature;
 
+                    basePower = baseToughness = baseMovement = 1;
+
+                        addTriggeredAbility(
+                            "",
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                            new ZepperDoer(1),
+                            new Foo(),
+                            LL.thisEnters(this, PileLocation.Field),
+                            3,
+                            PileLocation.Field,
+                            TriggeredAbility.Timing.Post
+                            );
                 } break;
 
                 default:
@@ -492,17 +505,17 @@ namespace stonerkart
             eventHandler = generatedlft();
         }
 
-        private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo foo, GameEventFilter filter, int castRange, PileLocation activeIn, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
+        private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
         {
             Effect e = new Effect(trs, doer);
-            TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, foo, filter, timing, description);
+            TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, cost, filter, timing, description);
             abilities.Add(ta);
         }
 
-        private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo foo, int castRange, PileLocation activeIn, CastSpeed castSpeed)
+        private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed)
         {
             Effect e = new Effect(trs, doer);
-            ActivatedAbility ta = new ActivatedAbility(this, activeIn, castRange, foo, castSpeed, description, e);
+            ActivatedAbility ta = new ActivatedAbility(this, activeIn, castRange, cost, castSpeed, description, e);
             abilities.Add(ta);
         }
 
