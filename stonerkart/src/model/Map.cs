@@ -89,7 +89,7 @@ namespace stonerkart
         public Path path(Tile startTile, Tile endTile)
         {
             List<Path> v = dijkstra(startTile);
-            return v.First(t => t.to == endTile);
+            return v.First(t => t.last == endTile);
         }
 
         public List<Path> dijkstra(Tile startTile)

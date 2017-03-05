@@ -501,8 +501,6 @@ namespace stonerkart
             }
         }
 
-        
-
         private void pendAbilities(IEnumerable<TriggeredAbility> tas)
         {
             if (tas.Count() == 0) return;

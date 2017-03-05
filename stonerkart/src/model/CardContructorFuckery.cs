@@ -43,6 +43,7 @@ namespace stonerkart
                 case CardTemplate.Illegal_sGoblin_sLaboratory:
                 {
                     cardType = CardType.Relic;
+                    rarity = Rarity.Uncommon;
 
                     chaosCost = 2;
                     greyCost = 1;
@@ -303,6 +304,7 @@ namespace stonerkart
                 case CardTemplate.Goblin_sGrenade:
                 {
                     cardType = CardType.Instant;
+                    rarity = Rarity.Common;
 
                     chaosCost = 2;
                     greyCost = 1;
@@ -318,6 +320,7 @@ namespace stonerkart
                 case CardTemplate.Teleport:
                 {
                     cardType = CardType.Sorcery;
+                    rarity = Rarity.Common;
 
                     orderCost = 2;
                     castRange = 6;
@@ -331,6 +334,7 @@ namespace stonerkart
                 case CardTemplate.One_sWith_sNature:
                 {
                     cardType = CardType.Sorcery;
+                    rarity = Rarity.Rare;
 
                     natureCost = 1;
 
@@ -344,6 +348,7 @@ namespace stonerkart
                 case CardTemplate.Graverobber_sSyrdin:
                 {
                     cardType = CardType.Creature;
+                    rarity = Rarity.Legendary;
 
                     baseMovement = 2;
                     basePower = 3;
@@ -371,6 +376,7 @@ namespace stonerkart
                 case CardTemplate.Alter_sFate:
                 { 
                     cardType = CardType.Instant;
+                    rarity = Rarity.Common;
 
                     orderCost = 1;
 
@@ -383,10 +389,11 @@ namespace stonerkart
                         "Search your deck for a card. Shuffle your deck then put the selected card on top.";
                 } break;
                 #endregion
-
+                #region Fresh Fox
                 case CardTemplate.Fresh_sFox:
                 {
                     cardType = CardType.Creature;
+                    rarity = Rarity.Uncommon;
 
                     baseToughness = 2;
                     basePower = 2;
@@ -396,10 +403,12 @@ namespace stonerkart
 
                     keywordAbilities.Add(KeywordAbility.Fervor);
                 } break;
-
+                #endregion
+                #region Damage Ward
                 case CardTemplate.Damage_sWard:
                 {
                     cardType = CardType.Instant;
+                    rarity = Rarity.Uncommon;
 
                     lifeCost = 1;
                     castRange = 4;
@@ -409,11 +418,12 @@ namespace stonerkart
                     castDescription = "Target creature gains 3 toughness.";
 
                 } break;
-
-
+                #endregion
+                #region Survival Instincts
                 case CardTemplate.Survival_sInstincts:
                 {
                     cardType = CardType.Instant;
+                    rarity = Rarity.Common;
 
                     castRange = 3;
                     natureCost = 2;
@@ -424,16 +434,18 @@ namespace stonerkart
                     castDescription =
                         "Target creature is healed for 2 and gains 2 power until the end of this turn.";
                 } break;
-
+                #endregion
+                #region Baby Dragon
                 case CardTemplate.Baby_sDragon:
                 {
                     cardType = CardType.Creature;
+                    rarity = Rarity.Common;
 
                     basePower = 2;
                     baseToughness = 1;
                     baseMovement = 2;
 
-                    chaosCost = 1;
+                    chaosCost = 2;
                     addTriggeredAbility(
                         "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
@@ -446,6 +458,7 @@ namespace stonerkart
                         TriggeredAbility.Timing.Post
                         );
                 } break;
+                #endregion
 
                 case CardTemplate.missingno:
                 {
