@@ -218,7 +218,9 @@ namespace stonerkart
             return hackedaf[(int)c];
         }
 
-        
+        public static char exhaust => '\u24BA';
+
+
         public static IEnumerable<int> range(int min, int max)
         {
             int[] r = new int[max - min];

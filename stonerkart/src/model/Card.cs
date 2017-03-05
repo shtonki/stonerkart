@@ -91,6 +91,8 @@ namespace stonerkart
             return true;
         }
 
+        public bool canExhaust => fatigue == 0;
+
         public void moveTo(Pile p)
         {
             pile?.remove(this);

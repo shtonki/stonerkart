@@ -32,6 +32,11 @@ namespace stonerkart
             return effects.resolve(hs, tms);
         }
 
+        public bool possible(HackStruct hs)
+        {
+            return cost.possibleAsCost(hs);
+        }
+
         public Card createDummy()
         {
             return card.createDummy(this);

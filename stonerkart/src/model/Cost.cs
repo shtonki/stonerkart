@@ -22,17 +22,15 @@ namespace stonerkart
 
         public IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] ts)
         {
+            ts = fillResolve(hs, ts);
+
             List<GameEvent> rt = new List<GameEvent>();
 
             for (int i = 0; i < ts.Length; i++)
             {
                 Effect effect = effects[i];
-                TargetMatrix matrix = effect.ts.fillResolve(ts[i], hs);
-                hs.previousTargets = matrix;
-
-                rt.AddRange(effect.doer.act(hs, matrix.generateRows()));
+                rt.AddRange(effect.doer.act(hs, ts[i].generateRows()));
             }
-            hs.previousTargets = null;
 
             return rt;
         }
@@ -45,28 +43,29 @@ namespace stonerkart
             {
                 rt[i] = effects[i].fillCast(hs);
                 if (rt[i] == null) return null;
+
             }
 
             return rt;
         }
 
-        public TargetMatrix[] fillResolve(TargetMatrix[] tms, HackStruct hs)
+        public TargetMatrix[] fillResolve(HackStruct hs, TargetMatrix[] ts)
         {
             TargetMatrix[] rt = new TargetMatrix[effects.Length];
 
             for (int i = 0; i < effects.Length; i++)
             {
-                rt[i] = effects[i].fillResolve(tms[i], hs);
+                rt[i] = effects[i].fillResolve(ts[i], hs);
                 if (rt[i] == null) return null;
             }
+            hs.previousTargets = null;
 
             return rt;
         }
 
-        public bool possible(HackStruct hs)
+        public bool possibleAsCost(HackStruct hs)
         {
-            return effects.All(e => e.possible(hs));
+            return effects.All(e => e.possibleAsCost(hs));
         }
     }
-
 }

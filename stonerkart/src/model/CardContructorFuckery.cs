@@ -453,15 +453,15 @@ namespace stonerkart
                     basePower = 3;
                     baseMovement = 2;
 
-                        addActivatedAbility(
-                            "xdf",
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
-                            new ZepperDoer(1),
-                            new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer())),
-                            3,
-                            PileLocation.Field, 
-                            CastSpeed.Instant
-                            );
+                    addActivatedAbility(
+                        String.Format("{0}: Deal 1 damage to target creature.", G.exhaust),
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
+                        new ZepperDoer(1),
+                        new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer())),
+                        3,
+                        PileLocation.Field, 
+                        CastSpeed.Instant
+                        );
                 } break;
 
                 default:

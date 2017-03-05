@@ -30,6 +30,25 @@ namespace stonerkart
             bonus = new List<ManaColour>();
         }
 
+        public bool covers(IEnumerable<ManaOrb> os)
+        {
+            ManaSet ms = current.clone();
+            foreach (var o in bonus)
+            {
+                ms[o]++;
+            }
+
+            int c = 0;
+            foreach (var o in os)
+            {
+                var clr = o.colour;
+                if (clr == ManaColour.Colourless) c++;
+                else if (--ms[clr] < 0) return false;
+            }
+
+            return ms.count >= c;
+        }
+
         public void gainMana(ManaColour c)
         {
             max[c]++;
@@ -103,6 +122,8 @@ namespace stonerkart
     {
         public const int size = 7;
         private int[] manas;
+
+        public int count => manas.Sum();
 
         public List<ManaColour> colours => coloursEx();
         public IEnumerable<ManaOrb> orbs => colours.Select(c => new ManaOrb(c));
