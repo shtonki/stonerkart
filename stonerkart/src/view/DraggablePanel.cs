@@ -9,6 +9,23 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
+    public class DraggablePanelConfig
+    {
+        public bool closeable { get; set; }
+        public bool moveable { get; set; }
+        public bool resizeable { get; set; }
+
+        public Rectangle hackrect { get; set; }
+
+        public DraggablePanelConfig()
+        {
+            closeable = true;
+            moveable = true;
+            resizeable = true;
+            hackrect = new Rectangle(25, 25, 50, 50);
+        }
+    }
+
     public class DraggablePanel : Panel
     {
         public bool closed { get; private set; }

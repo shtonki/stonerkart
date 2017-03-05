@@ -84,6 +84,11 @@ namespace stonerkart
                     swapColour = Color.DarkGoldenrod;
                 } break;
 
+                case Rarity.None:
+                {
+                    swapColour = Color.LimeGreen;
+                } break;
+
                 default: throw new NotImplementedException();
             }
 
@@ -104,6 +109,15 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Baby_sDragon:
+                {
+                    return Resources.artDragonHatchling;
+                }
+
+                case CardTemplate.Fresh_sFox:
+                {
+                    return Resources.artFreshFox;
+                }
 
                 case CardTemplate.Damage_sWard:
                 {

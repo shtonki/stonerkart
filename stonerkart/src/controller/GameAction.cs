@@ -34,9 +34,9 @@ namespace stonerkart
 
     class CastSelection : GameAction
     {
-        public StackWrapper? wrapper;
+        public StackWrapper wrapper;
 
-        public CastSelection(StackWrapper? wrapper)
+        public CastSelection(StackWrapper wrapper)
         {
             this.wrapper = wrapper;
         }
@@ -200,7 +200,7 @@ namespace stonerkart
 
         public string toString(Game g)
         {
-            if (!wrapper.HasValue)
+            if (wrapper == null)
             {
                 return "";
             }
@@ -208,20 +208,18 @@ namespace stonerkart
             {
                 StringBuilder sb = new StringBuilder();
 
-                StackWrapper wp = wrapper.Value;
-
-                int cardOrd = g.ord(wp.card);
+                int cardOrd = g.ord(wrapper.castingCard);
                 sb.Append(cardOrd);
                 sb.Append(';');
 
-                int abilityOrd = wp.card.abilityOrd(wp.ability);
+                int abilityOrd = wrapper.castingCard.abilityOrd(wrapper.ability);
                 sb.Append(abilityOrd);
                 sb.Append(';');
 
-                matriciesToString(sb, wp.matricies, g);
+                matriciesToString(sb, wrapper.targetMatrices, g);
                 sb.Append(';');
 
-                matriciesToString(sb, wp.costMatricies, g);
+                matriciesToString(sb, wrapper.costMatricies, g);
 
                 return sb.ToString();
             }

@@ -44,8 +44,8 @@ namespace stonerkart
                 {
                     cardType = CardType.Relic;
 
-                    chaosCost = 1;
-                    greyCost = 0;
+                    chaosCost = 2;
+                    greyCost = 1;
 
                     addTriggeredAbility(
                         "At the end of your turn deal 1 damage to every enemy player.",
@@ -54,7 +54,8 @@ namespace stonerkart
                         new Foo(),
                         new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.End && e.activePlayer == controller),
                         0,
-                        PileLocation.Field
+                        PileLocation.Field,
+                        false
                         );
                 } break;
                 #endregion
@@ -94,6 +95,7 @@ namespace stonerkart
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
                         0, 
                         PileLocation.Field,
+                        false,
                         TriggeredAbility.Timing.Post
                         );
 
@@ -119,7 +121,8 @@ namespace stonerkart
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard && location.pile == PileLocation.Field),
                         0,
-                        PileLocation.Field
+                        PileLocation.Field,
+                        false
                         );
                 } break;
                 #endregion
@@ -166,16 +169,18 @@ namespace stonerkart
                     greyCost = 2;
 
                     addTriggeredAbility(
-                        "Whenever a creature enters the battlefield under your control, gain 1 life.",
+                        "Whenever a creature enters the battlefield under your control, you may restore 1 toughness to your hero.",
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
                         new ZepperDoer(-1),
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
-                           moveEvent.card.controller == this.controller &&
-                           moveEvent.to.location.pile == PileLocation.Field &&
-                           this.location.pile == PileLocation.Field),
-                        0,
-                        PileLocation.Field
+                            moveEvent.card.controller == controller &&
+                            moveEvent.to.location.pile == PileLocation.Field &&
+                            location.pile == PileLocation.Field),
+                            0,
+                            PileLocation.Field,
+                            true,
+                            TriggeredAbility.Timing.Post
                         );
                     } break;
                 #endregion
@@ -356,6 +361,7 @@ namespace stonerkart
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Field),
                         0,
                         PileLocation.Field,
+                        true,
                         TriggeredAbility.Timing.Post
                         );
 
@@ -378,12 +384,23 @@ namespace stonerkart
                 } break;
                 #endregion
 
+                case CardTemplate.Fresh_sFox:
+                {
+                    cardType = CardType.Creature;
+
+                    baseToughness = 2;
+                    basePower = 3;
+                    baseMovement = 3;
+
+                    natureCost = 2;
+                } break;
+
                 case CardTemplate.Damage_sWard:
                 {
                     cardType = CardType.Instant;
 
                     lifeCost = 1;
-                    castRange = 5;
+                    castRange = 4;
                     castEffect = new Effect(
                         new TargetRuleSet(new PryCardRule()),
                         new ModifyDoer(ModifiableStats.Toughness, 3, LL.add, LL.never));
@@ -406,9 +423,45 @@ namespace stonerkart
                         "Target creature is healed for 2 and gains 2 power until the end of this turn.";
                 } break;
 
+                case CardTemplate.Baby_sDragon:
+                {
+                    cardType = CardType.Creature;
+
+                    basePower = 2;
+                    baseToughness = 1;
+                    baseMovement = 2;
+
+                    chaosCost = 1;
+                    addTriggeredAbility(
+                        "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                        new ZepperDoer(2),
+                        new Foo(),
+                        LL.thisEnters(this, PileLocation.Field),
+                        3,
+                        PileLocation.Field,
+                        true,
+                        TriggeredAbility.Timing.Post
+                        );
+                } break;
+
                 case CardTemplate.missingno:
                 {
-                    
+                    cardType = CardType.Creature;
+
+                    baseToughness = 2;
+                    basePower = 3;
+                    baseMovement = 2;
+
+                    addActivatedAbility(
+                        String.Format("{0}: Deal 1 damage to target creature.", G.exhaust),
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
+                        new ZepperDoer(1),
+                        new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer())),
+                        3,
+                        PileLocation.Field, 
+                        CastSpeed.Instant
+                        );
                 } break;
 
                 default:
@@ -469,7 +522,7 @@ namespace stonerkart
 
             additionalCastCosts.Add(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new ManaCostRule(castManaCost)), new PayManaDoer()));
 
-            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Foo(additionalCastCosts.ToArray()), castSpeed, castDescription, es.ToArray());
+            castAbility = new ActivatedAbility(this, PileLocation.Hand, castRange, new Foo(additionalCastCosts.ToArray()), castSpeed, castDescription, es.ToArray());
             abilities.Add(castAbility);
 
             this.owner = owner;
@@ -480,17 +533,17 @@ namespace stonerkart
             eventHandler = generatedlft();
         }
 
-        private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo foo, GameEventFilter filter, int castRange, PileLocation activeIn, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
+        private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, bool optional, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
         {
             Effect e = new Effect(trs, doer);
-            TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, foo, filter, timing, description);
+            TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, cost, filter, optional, timing, description);
             abilities.Add(ta);
         }
 
-        private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo foo, int castRange, PileLocation activeIn, CastSpeed castSpeed)
+        private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed)
         {
             Effect e = new Effect(trs, doer);
-            ActivatedAbility ta = new ActivatedAbility(activeIn, castRange, foo, castSpeed, description, e);
+            ActivatedAbility ta = new ActivatedAbility(this, activeIn, castRange, cost, castSpeed, description, e);
             abilities.Add(ta);
         }
 

@@ -21,7 +21,7 @@ namespace stonerkart
         public CardTemplate template { get; }
         public bool isDummy { get; private set; }
         public CardType cardType { get; }
-        public Rarity rarity { get; }
+        public Rarity rarity { get; set; }
         public CardSet set { get; }
         public Race? race { get; }
         public Subtype? subtype { get; }
@@ -40,7 +40,8 @@ namespace stonerkart
 
         public string typeText => typeTextEx();
 
-        public Card dummyFor;
+        public Card dummyFor => dummiedAbility.card;
+        public Ability dummiedAbility { get; private set; }
 
         public IEnumerable<ActivatedAbility> activatedAbilities
             => abilities.Where(a => a is ActivatedAbility).Cast<ActivatedAbility>();
@@ -89,6 +90,8 @@ namespace stonerkart
         {
             return true;
         }
+
+        public bool canExhaust => fatigue == 0;
 
         public void moveTo(Pile p)
         {
@@ -193,11 +196,12 @@ namespace stonerkart
             return sb.ToString();
         }
 
-        public Card clone()
+        public Card createDummy(Ability a)
         {
             Card r = new Card(template, owner);
-            r.dummyFor = this;
             r.isDummy = true;
+            r.dummiedAbility = a;
+            r.rarity = Rarity.None;
             return r;
         }
 
@@ -234,11 +238,8 @@ namespace stonerkart
             shitterhack =
                 new TypedGameEventHandler<StartOfStepEvent>(
                     new TypedGameEventFilter<StartOfStepEvent>(
-                        a =>
-                        {
-                            int v = 2;
-                            return a.step == Steps.Replenish && a.activePlayer == controller;
-                        }), e => fatigue = 0);
+                        a => a.step == Steps.Replenish && a.activePlayer == controller
+                        ), e => fatigue = 0);
 
 
             r.add(new TypedGameEventHandler<ApplyModifierEvent>(e =>
@@ -265,12 +266,16 @@ namespace stonerkart
                 exhaust();
             }));
 
+            r.add(new TypedGameEventHandler<FatigueEvent>(e =>
+            {
+                exhaust(e.amount);
+            }));
+
             r.add(new TypedGameEventHandler<MoveEvent>(e =>
             {
                 Path path = e.path;
                 Tile destination = path.to;
                 moveTo(destination);
-                exhaust(path.attacking ? movement : path.length);
             }));
 
             r.add(new TypedGameEventHandler<DamageEvent>(e =>
@@ -299,6 +304,8 @@ namespace stonerkart
     enum CardTemplate
     {
         missingno,
+        Baby_sDragon,
+        Fresh_sFox,
         Survival_sInstincts,
         Damage_sWard,
         One_sWith_sNature,
@@ -332,6 +339,7 @@ namespace stonerkart
 
     internal enum Rarity
     {
+        None,
         Common,
         Uncommon,
         Rare,

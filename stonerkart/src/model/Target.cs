@@ -68,6 +68,16 @@ namespace stonerkart
             return new TargetMatrix(r);
         }
 
+        public TargetMatrix possible(HackStruct hs)
+        {
+            TargetColumn[] cs = new TargetColumn[rules.Length];
+            for (int i = 0; i < cs.Length; i++)
+            {
+                cs[i] = rules[i].possible(hs);
+            }
+
+            return new TargetMatrix(cs);
+        }
     }
 
     class TargetMatrix
@@ -125,7 +135,8 @@ namespace stonerkart
 
         public abstract TargetColumn? fillCastTargets(HackStruct f);
         public abstract TargetColumn fillResolveTargets(HackStruct re, TargetColumn c);
-        //public abstract bool possible(HackStruct hs);
+
+        public abstract TargetColumn possible(HackStruct hs);
     }
     
     class SelectCardRule : TargetRule
@@ -152,6 +163,21 @@ namespace stonerkart
             Card crd = hs.selectCardSynchronized(p.pileFrom(l));
             return new TargetColumn(crd);
         }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            TargetColumn innerPossible = pg.possible(hs);
+            List<Targetable> psbl = new List<Targetable>();
+
+            foreach (var v in innerPossible.targets)
+            {
+                if (!(v is Player)) throw new Exception();
+                Player p = (Player)v;
+                psbl.AddRange(p.pileFrom(l));
+            }
+
+            return new TargetColumn(psbl);
+        }
     }
 
     class CopyPreviousRule<T> : ResolveRule
@@ -166,6 +192,11 @@ namespace stonerkart
         public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             return re.previousTargets.columns[column];
+        }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return hs.previousColumn;
         }
     }
 
@@ -196,7 +227,10 @@ namespace stonerkart
             return new TargetColumn(v);
         }
 
-        
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return ruler.possible(hs);
+        }
     }
 
     class ManaCostRule : TargetRule
@@ -215,7 +249,7 @@ namespace stonerkart
 
         public ManaCostRule(int[] cs) : this(new ManaSet(cs))
         {
-            
+
         }
 
         public override TargetColumn? fillCastTargets(HackStruct hs)
@@ -282,6 +316,11 @@ namespace stonerkart
         {
             return c;
         }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return new TargetColumn(ms.orbs);
+        }
     }
 
     class PryTileRule : TargetRule
@@ -311,6 +350,11 @@ namespace stonerkart
         public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
         {
             return c;
+        }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return new TargetColumn(hs.tilesInRange.Where(filter));
         }
     }
 
@@ -353,6 +397,11 @@ namespace stonerkart
         {
             return c;
         }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return new TargetColumn(hs.tilesInRange.Where(t => t.card != null && filter(t.card)));
+        }
     }
 
     class CardResolveRule : ResolveRule
@@ -387,6 +436,11 @@ namespace stonerkart
             throw new Exception();
         }
 
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return fillResolveTargets(hs, new TargetColumn(new Targetable[0]));
+        }
+
         public enum Rule
         {
             ResolveControllerCard,
@@ -418,6 +472,10 @@ namespace stonerkart
             throw new Exception();
         }
 
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return fillResolveTargets(hs, new TargetColumn(new Targetable[0]));
+        }
 
         public enum Rule
         {
@@ -456,7 +514,7 @@ namespace stonerkart
     struct TargetColumn
     {
         public Targetable[] targets;
-        
+
         public TargetColumn(params Targetable[] targets)
         {
             this.targets = targets;

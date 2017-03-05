@@ -99,6 +99,7 @@ namespace stonerkart
                     this[Rarity.Uncommon]   = Int32.MaxValue;
                     this[Rarity.Rare]       = Int32.MaxValue;
                     this[Rarity.Legendary]  = Int32.MaxValue;
+                    this[Rarity.None]  = Int32.MaxValue;
                 } break;
 
                 case Format.Standard:

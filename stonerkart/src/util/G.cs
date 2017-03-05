@@ -218,7 +218,9 @@ namespace stonerkart
             return hackedaf[(int)c];
         }
 
-        
+        public static char exhaust => '\u24BA';
+
+
         public static IEnumerable<int> range(int min, int max)
         {
             int[] r = new int[max - min];
@@ -254,12 +256,20 @@ namespace stonerkart
         public static Func<int, int, int> add { get; } = (a, b) => a + b;
 
 
+        public static GameEventFilter never { get; } = new StaticGameEventFilter(() => false);
+        public static GameEventFilter endOfTurn { get; } = new TypedGameEventFilter<EndOfStepEvent>((e) => e.step == Steps.End);
+
+        public static GameEventFilter thisEnters(Card c, PileLocation pl)
+        {
+            return new TypedGameEventFilter<MoveToPileEvent>(
+                e => e.card == c && e.to.location.pile == pl);
+        }
         public static GameEventFilter startOfOwnersTurn(Card c)
         {
             return new TypedGameEventFilter<StartOfStepEvent>(
                 e => e.activePlayer == c.controller && e.step == Steps.Replenish);
         }
-        public static GameEventFilter never { get; } = new StaticGameEventFilter(() => false);
-        public static GameEventFilter endOfTurn { get; } = new TypedGameEventFilter<EndOfStepEvent>((e) => e.step == Steps.End);
+
+
     }
 }

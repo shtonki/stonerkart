@@ -173,11 +173,18 @@ namespace stonerkart
                 friendsList = showControl(friendsListPanel);
             }
         }
-        
 
-        public static DraggablePanel showControl(Control c, bool resizeable = true, bool closeable = true)
+        public static DraggablePanel showControl(Control c, bool resizable = true, bool closeable = true)
         {
-            return gameFrame.showControl(c, resizeable, closeable);
+            DraggablePanelConfig cfg = new DraggablePanelConfig();
+            cfg.resizeable = resizable;
+            cfg.closeable = closeable;
+            return showControl(c, cfg);
+        }
+
+        public static DraggablePanel showControl(Control c, DraggablePanelConfig cfg)
+        {
+            return gameFrame.showControl(c, cfg);
         }
 
         private static Dictionary<Pile, DraggablePanel> cachex = new Dictionary<Pile, DraggablePanel>();

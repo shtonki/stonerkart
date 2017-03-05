@@ -13,11 +13,15 @@ namespace stonerkart
         private AutoFontTextBox nameBox;
         private AutoFontTextBox toughnessBox;
         private AutoFontTextBox powerBox;
-        private PictureBox frameImage;
         private AutoFontTextBox cardTypeText;
         private AutoFontTextBox castRangeSlashMovementBox;
         private AutoFontTextBox autoFontTextBox1;
         private SetArtPanel setArtPanel1;
+        private Panel topBorderPanel;
+        private Panel botBorderPanel;
+        private Panel lftBorderPanel;
+        private PictureBox frameImage;
+        private Panel rgtBorderPanel;
         private ManaCostPanel manaCostPanel1;
 
 
@@ -39,7 +43,7 @@ namespace stonerkart
 
             card = c;
             sickmemes();
-
+            glowColour();
         }
 
         public void setCard(CardTemplate ct)
@@ -60,7 +64,6 @@ namespace stonerkart
         {
             this.memeout(() =>
             {
-                
                 if (card.colours.Count == 1)
                 {
                     frameImage.Image = ImageLoader.frameImage(card.colours[0]);
@@ -72,21 +75,28 @@ namespace stonerkart
                 art.Image = ImageLoader.artImage(card.template);
 
                 nameBox.Text = card.name;
-                cardTypeText.Text = card.typeText;
-
-                breadText.Text = card.breadText;
-                manaCostPanel1.setCost(card.castManaCost);
                 setArtPanel1.setThings(card.set, card.rarity);
 
-                if (card.race.HasValue)
+                if (card.isDummy)
                 {
-                    cardTypeText.Text = card.typeText + " -- " + card.race.Value + " " + (card.subtype?.ToString() ?? "");
+                    breadText.Text = card.dummiedAbility.description;
+                }
+                else
+                {
+                    breadText.Text = card.breadText;
+                    manaCostPanel1.setCost(card.castManaCost);
+                    cardTypeText.Text = card.typeText;
+                    if (card.race.HasValue)
+                    {
+                        cardTypeText.Text = card.typeText + " -- " + card.race.Value + " " + (card.subtype?.ToString() ?? "");
+                    }
                 }
 
                 if (card.isDummy)
                 {
                     powerBox.Text = toughnessBox.Text =
                         castRangeSlashMovementBox.Text = autoFontTextBox1.Text = "";
+                    breadText.Text = card.dummiedAbility.description;
                 }
                 else if (card.hasPT)
                 {
@@ -114,6 +124,34 @@ namespace stonerkart
             });
         }
 
+        public void glowColour(Color? c = null)
+        {
+            Panel[] ps = new[]
+            {
+                topBorderPanel,
+                botBorderPanel,
+                lftBorderPanel,
+                rgtBorderPanel,
+            };
+
+            foreach (Panel p in ps)
+            {
+                p.memeout(() =>
+                {
+                    if (c.HasValue)
+                    {
+                        p.Visible = true;
+                        p.BackColor = c.Value;
+                    }
+                    else
+                    {
+                        p.Visible = false;
+                    }
+                });
+            }
+        }
+
+
         public void notify(object o, CardChangedMessage t)
         {
             sickmemes();
@@ -131,12 +169,16 @@ namespace stonerkart
             this.nameBox = new stonerkart.AutoFontTextBox();
             this.toughnessBox = new stonerkart.AutoFontTextBox();
             this.powerBox = new stonerkart.AutoFontTextBox();
-            this.frameImage = new System.Windows.Forms.PictureBox();
             this.cardTypeText = new stonerkart.AutoFontTextBox();
             this.castRangeSlashMovementBox = new stonerkart.AutoFontTextBox();
             this.manaCostPanel1 = new stonerkart.ManaCostPanel();
             this.autoFontTextBox1 = new stonerkart.AutoFontTextBox();
             this.setArtPanel1 = new stonerkart.SetArtPanel();
+            this.topBorderPanel = new System.Windows.Forms.Panel();
+            this.botBorderPanel = new System.Windows.Forms.Panel();
+            this.lftBorderPanel = new System.Windows.Forms.Panel();
+            this.frameImage = new System.Windows.Forms.PictureBox();
+            this.rgtBorderPanel = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.art)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.frameImage)).BeginInit();
             this.SuspendLayout();
@@ -201,18 +243,6 @@ namespace stonerkart
             this.powerBox.Size = new System.Drawing.Size(49, 57);
             this.powerBox.TabIndex = 4;
             // 
-            // frameImage
-            // 
-            this.frameImage.Enabled = false;
-            this.frameImage.Image = global::stonerkart.Properties.Resources.lifeFrame;
-            this.frameImage.InitialImage = null;
-            this.frameImage.Location = new System.Drawing.Point(0, 0);
-            this.frameImage.Name = "frameImage";
-            this.frameImage.Size = new System.Drawing.Size(478, 618);
-            this.frameImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.frameImage.TabIndex = 5;
-            this.frameImage.TabStop = false;
-            // 
             // cardTypeText
             // 
             this.cardTypeText.BackColor = System.Drawing.Color.Transparent;
@@ -266,8 +296,52 @@ namespace stonerkart
             this.setArtPanel1.Size = new System.Drawing.Size(25, 25);
             this.setArtPanel1.TabIndex = 8;
             // 
+            // topBorderPanel
+            // 
+            this.topBorderPanel.Location = new System.Drawing.Point(0, 0);
+            this.topBorderPanel.Name = "topBorderPanel";
+            this.topBorderPanel.Size = new System.Drawing.Size(478, 8);
+            this.topBorderPanel.TabIndex = 9;
+            // 
+            // botBorderPanel
+            // 
+            this.botBorderPanel.Location = new System.Drawing.Point(0, 611);
+            this.botBorderPanel.Name = "botBorderPanel";
+            this.botBorderPanel.Size = new System.Drawing.Size(478, 8);
+            this.botBorderPanel.TabIndex = 10;
+            // 
+            // lftBorderPanel
+            // 
+            this.lftBorderPanel.Location = new System.Drawing.Point(0, 0);
+            this.lftBorderPanel.Name = "lftBorderPanel";
+            this.lftBorderPanel.Size = new System.Drawing.Size(8, 618);
+            this.lftBorderPanel.TabIndex = 10;
+            // 
+            // frameImage
+            // 
+            this.frameImage.Enabled = false;
+            this.frameImage.Image = global::stonerkart.Properties.Resources.lifeFrame;
+            this.frameImage.InitialImage = null;
+            this.frameImage.Location = new System.Drawing.Point(0, 0);
+            this.frameImage.Name = "frameImage";
+            this.frameImage.Size = new System.Drawing.Size(478, 618);
+            this.frameImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.frameImage.TabIndex = 5;
+            this.frameImage.TabStop = false;
+            // 
+            // rgtBorderPanel
+            // 
+            this.rgtBorderPanel.Location = new System.Drawing.Point(471, 0);
+            this.rgtBorderPanel.Name = "rgtBorderPanel";
+            this.rgtBorderPanel.Size = new System.Drawing.Size(8, 618);
+            this.rgtBorderPanel.TabIndex = 11;
+            // 
             // CardView
             // 
+            this.Controls.Add(this.rgtBorderPanel);
+            this.Controls.Add(this.lftBorderPanel);
+            this.Controls.Add(this.botBorderPanel);
+            this.Controls.Add(this.topBorderPanel);
             this.Controls.Add(this.setArtPanel1);
             this.Controls.Add(this.autoFontTextBox1);
             this.Controls.Add(this.manaCostPanel1);
