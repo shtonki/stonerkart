@@ -166,7 +166,7 @@ namespace stonerkart
                     greyCost = 0;
 
                     addTriggeredAbility(
-                        "Whenever a creature enters the battlefield under your control, gain 1 life.",
+                        "Whenever a creature enters the battlefield under your control, you may restore 1 toughness to your hero.",
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
                         new ZepperDoer(-1),
                         new Foo(),
@@ -174,6 +174,17 @@ namespace stonerkart
                             moveEvent.card.controller == controller &&
                             moveEvent.to.location.pile == PileLocation.Field &&
                             location.pile == PileLocation.Field),
+                            0,
+                            PileLocation.Field,
+                            TriggeredAbility.Timing.Post
+                        );
+
+                        addTriggeredAbility(
+                        "Big Dick",
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
+                        new ZepperDoer(-1),
+                        new Foo(),
+                        LL.never,
                             0,
                             PileLocation.Field,
                             TriggeredAbility.Timing.Post

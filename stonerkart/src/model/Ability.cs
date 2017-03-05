@@ -27,7 +27,10 @@ namespace stonerkart
             this.card = card;
         }
 
-
+        public Card createDummy()
+        {
+            return card.createDummy(this);
+        }
     }
 
     class ActivatedAbility : Ability

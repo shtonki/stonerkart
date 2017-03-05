@@ -21,7 +21,7 @@ namespace stonerkart
         public CardTemplate template { get; }
         public bool isDummy { get; private set; }
         public CardType cardType { get; }
-        public Rarity rarity { get; }
+        public Rarity rarity { get; set; }
         public CardSet set { get; }
         public Race? race { get; }
         public Subtype? subtype { get; }
@@ -40,7 +40,8 @@ namespace stonerkart
 
         public string typeText => typeTextEx();
 
-        public Card dummyFor;
+        public Card dummyFor => dummiedAbility.card;
+        public Ability dummiedAbility { get; private set; }
 
         public IEnumerable<ActivatedAbility> activatedAbilities
             => abilities.Where(a => a is ActivatedAbility).Cast<ActivatedAbility>();
@@ -193,11 +194,12 @@ namespace stonerkart
             return sb.ToString();
         }
 
-        public Card clone()
+        public Card createDummy(Ability a)
         {
             Card r = new Card(template, owner);
-            r.dummyFor = this;
             r.isDummy = true;
+            r.dummiedAbility = a;
+            r.rarity = Rarity.None;
             return r;
         }
 
@@ -330,6 +332,7 @@ namespace stonerkart
 
     internal enum Rarity
     {
+        None,
         Common,
         Uncommon,
         Rare,

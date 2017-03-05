@@ -78,9 +78,10 @@ namespace stonerkart
             return r;
         }
 
-        private Card createDummy(Card from, Pile pile)
+        private Card createDummy(Ability a, Pile pile)
         {
-            Card r = from.clone();
+            Card r = a.createDummy();
+
             r.moveTo(pile);
             cards.Add(r);
             return r;
@@ -547,15 +548,43 @@ namespace stonerkart
             }
         }
 
+        private struct ptas
+        {
+            public TriggeredAbility ability { get; }
+            public int originalIndex { get; }
+            public Card dummyCard { get; }
+
+            public ptas(TriggeredAbility ability, int originalIndex, Card dummyCard)
+            {
+                this.ability = ability;
+                this.originalIndex = originalIndex;
+                this.dummyCard = dummyCard;
+            }
+        }
+
         private void handlePendingTrigs(Player p, IEnumerable<TriggeredAbility> abilityList)
         {
             if (p == hero)
             {
-                List<TriggeredAbility> pending = abilityList.ToList();
+                TriggeredAbility[] pending = abilityList.ToArray();
+                Pile pl = new Pile();
+
+                for (int i = 0; i < pending.Length; i++)
+                {
+                    Card dummy = createDummy(pending[i], pl);
+                }
+
+                ManualResetEventSlim re = new ManualResetEventSlim();
+                Clickable clkd = null;
+                Controller.showPile(pl, false, c =>
+                {
+                    clkd = c;
+                    re.Set();
+                });
 
                 foreach (TriggeredAbility str in pending)
                 {
-                    Card c = createDummy(str.card, str.card.owner.displaced);
+                    Card c = createDummy(str, str.card.owner.displaced);
                     StackWrapper v = tryCastDx(p, str, c);
                     if (v == null) throw new Exception();
 

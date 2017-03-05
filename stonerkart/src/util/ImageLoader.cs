@@ -84,6 +84,11 @@ namespace stonerkart
                     swapColour = Color.DarkGoldenrod;
                 } break;
 
+                case Rarity.None:
+                {
+                    swapColour = Color.LimeGreen;
+                } break;
+
                 default: throw new NotImplementedException();
             }
 

@@ -60,7 +60,6 @@ namespace stonerkart
         {
             this.memeout(() =>
             {
-                
                 if (card.colours.Count == 1)
                 {
                     frameImage.Image = ImageLoader.frameImage(card.colours[0]);
@@ -72,21 +71,28 @@ namespace stonerkart
                 art.Image = ImageLoader.artImage(card.template);
 
                 nameBox.Text = card.name;
-                cardTypeText.Text = card.typeText;
-
-                breadText.Text = card.breadText;
-                manaCostPanel1.setCost(card.castManaCost);
                 setArtPanel1.setThings(card.set, card.rarity);
 
-                if (card.race.HasValue)
+                if (card.isDummy)
                 {
-                    cardTypeText.Text = card.typeText + " -- " + card.race.Value + " " + (card.subtype?.ToString() ?? "");
+                    breadText.Text = card.dummiedAbility.description;
+                }
+                else
+                {
+                    breadText.Text = card.breadText;
+                    manaCostPanel1.setCost(card.castManaCost);
+                    cardTypeText.Text = card.typeText;
+                    if (card.race.HasValue)
+                    {
+                        cardTypeText.Text = card.typeText + " -- " + card.race.Value + " " + (card.subtype?.ToString() ?? "");
+                    }
                 }
 
                 if (card.isDummy)
                 {
                     powerBox.Text = toughnessBox.Text =
                         castRangeSlashMovementBox.Text = autoFontTextBox1.Text = "";
+                    breadText.Text = card.dummiedAbility.description;
                 }
                 else if (card.hasPT)
                 {
