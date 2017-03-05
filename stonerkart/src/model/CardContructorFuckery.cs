@@ -348,6 +348,7 @@ namespace stonerkart
                 case CardTemplate.Graverobber_sSyrdin:
                 {
                     cardType = CardType.Creature;
+                    rarity = Rarity.Legendary;
 
                     baseMovement = 2;
                     basePower = 3;
@@ -438,6 +439,7 @@ namespace stonerkart
                 case CardTemplate.Baby_sDragon:
                 {
                     cardType = CardType.Creature;
+                    rarity = Rarity.Common;
 
                     basePower = 2;
                     baseToughness = 1;
