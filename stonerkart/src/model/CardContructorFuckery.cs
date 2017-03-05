@@ -54,7 +54,8 @@ namespace stonerkart
                         new Foo(),
                         new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.End && e.activePlayer == controller),
                         0,
-                        PileLocation.Field
+                        PileLocation.Field,
+                        false
                         );
                 } break;
                 #endregion
@@ -94,6 +95,7 @@ namespace stonerkart
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
                         0, 
                         PileLocation.Field,
+                        false,
                         TriggeredAbility.Timing.Post
                         );
 
@@ -119,7 +121,8 @@ namespace stonerkart
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard && location.pile == PileLocation.Field),
                         0,
-                        PileLocation.Field
+                        PileLocation.Field,
+                        false
                         );
                 } break;
                 #endregion
@@ -176,6 +179,7 @@ namespace stonerkart
                             location.pile == PileLocation.Field),
                             0,
                             PileLocation.Field,
+                            true,
                             TriggeredAbility.Timing.Post
                         );
                     } break;
@@ -357,6 +361,7 @@ namespace stonerkart
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Field),
                         0,
                         PileLocation.Field,
+                        true,
                         TriggeredAbility.Timing.Post
                         );
 
@@ -426,7 +431,7 @@ namespace stonerkart
                     baseToughness = 1;
                     baseMovement = 2;
 
-                    chaosCost = 2;
+                    chaosCost = 1;
                     addTriggeredAbility(
                         "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
@@ -435,6 +440,7 @@ namespace stonerkart
                         LL.thisEnters(this, PileLocation.Field),
                         3,
                         PileLocation.Field,
+                        true,
                         TriggeredAbility.Timing.Post
                         );
                 } break;
@@ -513,10 +519,10 @@ namespace stonerkart
             eventHandler = generatedlft();
         }
 
-        private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
+        private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, bool optional, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
         {
             Effect e = new Effect(trs, doer);
-            TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, cost, filter, timing, description);
+            TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, cost, filter, optional, timing, description);
             abilities.Add(ta);
         }
 

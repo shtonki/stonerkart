@@ -19,7 +19,7 @@ namespace stonerkart
 
         public Pile stack { get; } = new Pile(new Location(null, PileLocation.Stack));
 
-        private List<TriggeredAbility> pendingTriggeredAbilities = new List<TriggeredAbility>();
+        private List<TriggeredAbility> pendingTriggeredAbilities { get; }= new List<TriggeredAbility>();
 
         private int activePlayerIndex { get; set; }
         public Player activePlayer => players[activePlayerIndex];
@@ -538,29 +538,39 @@ namespace stonerkart
                     abilityArrays[ix].Add(pending);
                 }
 
+                List<StackWrapper> wrappers = new List<StackWrapper>();
+
                 for (int i = 0; i < abilityArrays.Length; i++)
                 {
                     Player p = playerFromOrd(i);
                     List<TriggeredAbility> abilityList = abilityArrays[i];
                     
-                    handlePendingTrigs(p, abilityList);
+                    wrappers.AddRange(handlePendingTrigs(p, abilityList));
                 }
+
                 pendingTriggeredAbilities.Clear();
+
+                foreach (var w in wrappers)
+                {
+                    cast(w);
+                }
             }
         }
 
-        private void handlePendingTrigs(Player p, IEnumerable<TriggeredAbility> abilityList)
+        private List<StackWrapper> handlePendingTrigs(Player p, IEnumerable<TriggeredAbility> abilities)
         {
+            List<StackWrapper> r = new List<StackWrapper>();
+            TriggeredAbility[] orig = abilities.ToArray();
+
+            Pile pl = new Pile();
+
+            for (int i = 0; i < orig.Length; i++)
+            {
+                createDummy(orig[i], pl);
+            }
+
             if (p == hero)
             {
-                TriggeredAbility[] orig = abilityList.ToArray();
-                Pile pl = new Pile();
-
-                for (int i = 0; i < orig.Length; i++)
-                {
-                    Card dummy = createDummy(orig[i], pl);
-                }
-
                 ManualResetEventSlim re = new ManualResetEventSlim();
                 Clickable clkd = null;
                 DraggablePanel dp = Controller.showPile(pl, false, c =>
@@ -595,7 +605,7 @@ namespace stonerkart
                     StackWrapper v = tryCastDx(p, tab, c);
                     if (v == null) continue;
 
-                    ptas ptas = new ptas(tab,i,c, v);
+                    ptas ptas = new ptas(tab,i,c,v);
                     triggd.Add(ptas);
                     cv.glowColour(Color.Green);
                 }
@@ -604,13 +614,22 @@ namespace stonerkart
 
                 foreach (ptas pt in triggd)
                 {
-                    playerCasts(p, pt.wrapper);
+                    connection.sendAction(new CastSelection(pt.wrapper));
+                    r.Add(pt.wrapper);
                 }
             }
             else
             {
-                //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+                Controller.setPrompt("Opponent is handling triggered abilities.");
+                for (int i = 0; i < orig.Count(); i++)
+                {
+                    StackWrapper w = connection.receiveAction<CastSelection>().wrapper;
+                    Card dummy = pl.First(c => c.dummiedAbility == w.ability);
+                    
+                    r.Add(new StackWrapper(dummy, w.ability, w.targetMatrices, w.costMatricies));
+                }
             }
+            return r;
         }
         #region hack
         private class ptas
@@ -662,7 +681,7 @@ namespace stonerkart
 
                 if (w != null)
                 {
-                    playerCasts(fuckboy, w);
+                    cast(w);
                     c = 0;
                 }
                 else //pass
@@ -735,12 +754,7 @@ namespace stonerkart
             return (Tile)v;
         }
 
-        /// <summary>
-        /// Wrapper function which one calls when one wants a Player to put a card on the stack using the information in a  StackWrapper's.
-        /// </summary>
-        /// <param text="p">The Player who is to cast the spell/ability.</param>
-        /// <param text="w">The StackWrapper containing the relevant information.</param>
-        private void playerCasts(Player p, StackWrapper w)
+        private void cast(StackWrapper w)
         {
             GameTransaction gt = new GameTransaction();
             gt.addEvents(w.ability.cost.resolve(makeHackStruct(w.castingCard), w.costMatricies));
@@ -862,13 +876,13 @@ namespace stonerkart
             Card stackpopped = stack.peekTop();
             Card card = wrapper.castingCard;
             TargetMatrix[] ts = wrapper.targetMatrices;
-            Foo foo = wrapper.ability.effects;
+            Ability ability = wrapper.ability;
 
             if (stackpopped.isDummy && stackpopped.dummyFor != card) throw new Exception();
 
             List<GameEvent> events = new List<GameEvent>();
 
-            events.AddRange(foo.resolve(makeHackStruct(card), ts));
+            events.AddRange(ability.resolve(makeHackStruct(card), ts));
 
             GameTransaction gt = new GameTransaction(events);
 
@@ -1125,6 +1139,18 @@ namespace stonerkart
             this.previousTargets = previousTargets;
         }
 
+        public T waitForStuff<T>(Func<T, bool> f) where T : Stuff
+        {
+            while (true)
+            {
+                Stuff s = getStuff();
+                if (s is T)
+                {
+                    T t = (T)s;
+                    if (f(t)) return t;
+                }
+            }
+        }
 
         public Card selectCardSynchronized(IEnumerable<Card> cs)
         {

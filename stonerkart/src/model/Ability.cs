@@ -27,6 +27,11 @@ namespace stonerkart
             this.card = card;
         }
 
+        public virtual IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] tms)
+        {
+            return effects.resolve(hs, tms);
+        }
+
         public Card createDummy()
         {
             return card.createDummy(this);
@@ -50,13 +55,39 @@ namespace stonerkart
         public enum Timing { Pre, Post };
 
         public Timing timing;
+        public bool isOptional;
+
         private GameEventFilter filter;
 
-        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Foo cost, GameEventFilter trigger, Timing timing, string description) : base(card, activeIn, new Foo(effects), castRange, cost, description)
+        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Foo cost, GameEventFilter trigger, bool isOptional, Timing timing, string description) : base(card, activeIn, new Foo(effects), castRange, cost, description)
         {
             this.card = card;
             filter = trigger;
             this.timing = timing;
+            this.isOptional = isOptional;
+        }
+
+        public override IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] tms)
+        {
+            if (isOptional)
+            {
+                ButtonOption opt;
+                if (hs.heroIsResolver)
+                {
+                    Controller.setPrompt("Do you want to use this ability?", ButtonOption.Yes, ButtonOption.No);
+                    ShibbuttonStuff ss = hs.waitForStuff<ShibbuttonStuff>(b => true);
+                    opt = ss.option;
+                    hs.sendChoices(new[] {(int)opt});
+                }
+                else
+                {
+                    Controller.setPrompt("Opponent is deciding whether to use the optional ability.");
+                    opt = (ButtonOption)hs.receiveChoices()[0];
+                }
+
+                if (opt == ButtonOption.No) return new GameEvent[] {};
+            }
+            return base.resolve(hs, tms);
         }
 
         public bool triggeredBy(GameEvent e)
