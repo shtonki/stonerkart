@@ -162,8 +162,8 @@ namespace stonerkart
                     baseToughness = 4;
                     baseMovement = 2;
 
-                    lifeCost = 0;
-                    greyCost = 0;
+                    lifeCost = 2;
+                    greyCost = 2;
 
                     addTriggeredAbility(
                         "Whenever a creature enters the battlefield under your control, you may restore 1 toughness to your hero.",
@@ -418,23 +418,31 @@ namespace stonerkart
                         "Target creature is healed for 2 and gains 2 power until the end of this turn.";
                 } break;
 
-                case CardTemplate.missingno:
+                case CardTemplate.Baby_sDragon:
                 {
                     cardType = CardType.Creature;
 
-                    basePower = baseToughness = baseMovement = 1;
+                    basePower = 2;
+                    baseToughness = 1;
+                    baseMovement = 2;
 
-                        addTriggeredAbility(
-                            "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
-                            new ZepperDoer(1),
-                            new Foo(),
-                            LL.thisEnters(this, PileLocation.Field),
-                            3,
-                            PileLocation.Field,
-                            TriggeredAbility.Timing.Post
-                            );
-                    } break;
+                    chaosCost = 2;
+                    addTriggeredAbility(
+                        "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                        new ZepperDoer(2),
+                        new Foo(),
+                        LL.thisEnters(this, PileLocation.Field),
+                        3,
+                        PileLocation.Field,
+                        TriggeredAbility.Timing.Post
+                        );
+                } break;
+
+                case CardTemplate.missingno:
+                {
+                    
+                } break;
 
                 default:
                 {

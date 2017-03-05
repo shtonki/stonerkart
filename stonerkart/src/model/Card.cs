@@ -298,6 +298,7 @@ namespace stonerkart
     enum CardTemplate
     {
         missingno,
+        Baby_sDragon,
         Fresh_sFox,
         Survival_sInstincts,
         Damage_sWard,

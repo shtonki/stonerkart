@@ -239,10 +239,5 @@ namespace stonerkart
                 a();
             }
         }
-
-        public static void memehard(this Control uc, Action a)
-        {
-            
-        }
     }
 }

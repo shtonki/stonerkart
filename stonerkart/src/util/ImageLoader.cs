@@ -109,6 +109,10 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Baby_sDragon:
+                {
+                    return Resources.artDragonHatchling;
+                }
 
                 case CardTemplate.Fresh_sFox:
                 {

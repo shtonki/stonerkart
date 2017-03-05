@@ -573,23 +573,31 @@ namespace stonerkart
 
                 while (triggd.Count < orig.Length)
                 {
+                    Controller.setPrompt("Select which ability to place on the stack next.");
                     re.Wait();
                     re.Reset();
                     Clickable cp = clkd;
                     if (!(cp is CardView)) continue;
 
-                    Card c = (Card)cp.getStuff();
+                    CardView cv = (CardView)cp;
+                    Card c = (Card)cv.getStuff();
 
-                    //ptas v = triggd.FirstOrDefault(s => s.dummyCard == c);
+                    ptas prevadd = triggd.FirstOrDefault(s => s.dummyCard == c);
+                    if (prevadd != null)
+                    {
+                        triggd.Remove(prevadd);
+                        cv.glowColour();
+                        continue;
+                    }
 
                     int i = Array.IndexOf(orig, c.dummiedAbility);
                     TriggeredAbility tab = orig[i];
-
                     StackWrapper v = tryCastDx(p, tab, c);
-
+                    if (v == null) continue;
 
                     ptas ptas = new ptas(tab,i,c, v);
                     triggd.Add(ptas);
+                    cv.glowColour(Color.Green);
                 }
 
                 dp.close();
