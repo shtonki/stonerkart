@@ -450,12 +450,14 @@ namespace stonerkart
                     cardType = CardType.Creature;
 
                     baseToughness = 2;
+                    basePower = 3;
+                    baseMovement = 2;
 
                         addActivatedAbility(
                             "xdf",
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
                             new ZepperDoer(1),
-                            new Foo(),
+                            new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer())),
                             3,
                             PileLocation.Field, 
                             CastSpeed.Instant

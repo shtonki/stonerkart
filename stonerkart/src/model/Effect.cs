@@ -68,6 +68,22 @@ namespace stonerkart
         protected abstract GameEvent[] simpleAct(HackStruct dkt, TargetRow row);
     }
 
+    class FatigueDoer : SimpleDoer
+    {
+        private int? fatigueBy;
+
+        public FatigueDoer(int? fatigueBy = null) : base(typeof(Card))
+        {
+            this.fatigueBy = fatigueBy;
+        }
+
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        {
+            Card c = (Card)row[0];
+            return new GameEvent[] {new FatigueEvent(c, fatigueBy.HasValue ? fatigueBy.Value : c.movement)};
+        }
+    }
+
     class ModifyDoer : SimpleDoer
     {
         public ModifiableStats modifiableStats;
@@ -134,24 +150,7 @@ namespace stonerkart
             return new GameEvent[] {new DrawEvent(player, cards)};
         }
     }
-
-    class SwapWithCard : SimpleDoer
-    {
-        public SwapWithCard() : base(typeof(Card), typeof(Card))
-        {
-
-        }
-
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
-        {
-            Card moved1 = (Card)row[0];
-            Tile move1To = ((Card)row[1]).tile;
-            Card moved2 = (Card)row[1];
-            Tile move2To = ((Card)row[0]).tile;
-            return new GameEvent[] { new PlaceOnTileEvent(moved1, new Tile(null, 0, 0)), new PlaceOnTileEvent(moved2, move2To), new PlaceOnTileEvent(moved1, move1To)};
-        }
-    }
-
+    
     class MoveToTileDoer : SimpleDoer
     {
         public MoveToTileDoer() : base(typeof(Card), typeof(Tile))

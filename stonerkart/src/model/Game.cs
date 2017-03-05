@@ -450,6 +450,7 @@ namespace stonerkart
                 }
                 
                 gt.addEvent(new MoveEvent(mover, path));
+                gt.addEvent(new FatigueEvent(mover, path.attacking ? mover.movement : path.length));
             }
 
             handleTransaction(gt);

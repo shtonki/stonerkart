@@ -264,12 +264,16 @@ namespace stonerkart
                 exhaust();
             }));
 
+            r.add(new TypedGameEventHandler<FatigueEvent>(e =>
+            {
+                exhaust(e.amount);
+            }));
+
             r.add(new TypedGameEventHandler<MoveEvent>(e =>
             {
                 Path path = e.path;
                 Tile destination = path.to;
                 moveTo(destination);
-                exhaust(path.attacking ? movement : path.length);
             }));
 
             r.add(new TypedGameEventHandler<DamageEvent>(e =>
