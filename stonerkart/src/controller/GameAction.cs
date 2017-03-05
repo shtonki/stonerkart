@@ -265,7 +265,7 @@ namespace stonerkart
             foreach (var v in moves)
             {
                 Card c = v.Item1;
-                Tile t = v.Item2.to;
+                Tile t = v.Item2.last;
                 sb.Append(g.ord(c));
                 sb.Append(',');
                 sb.Append(g.ord(t));
