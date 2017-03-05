@@ -557,12 +557,14 @@ namespace stonerkart
                 {
                     StackWrapper v = tryCastDx(p, str);
                     if (v == null) throw new Exception();
+
                     v = new StackWrapper(
                         createDummy(v.castingCard, v.castingCard.owner.displaced),
                         v.ability,
                         v.targetMatrices,
                         v.costMatricies
                         );
+
                     playerCasts(p, v);
                 }
             }
@@ -934,7 +936,7 @@ namespace stonerkart
 
         public void setTargetHighlight(Card c)
         {
-            StackWrapper w = wrapperStack.First(sw => sw.castingCard == c);
+            StackWrapper w = wrapperStack.FirstOrDefault(sw => sw.stackCard == c);
 
             if (w == null) return;
 
