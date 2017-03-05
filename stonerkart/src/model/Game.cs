@@ -549,18 +549,21 @@ namespace stonerkart
                 {
                     Player p = playerFromOrd(i);
                     List<PendingAbilityStruct> abilityList = abilityArrays[i];
-
-                    if (abilityList.Count > 1) throw new NotImplementedException();
-
-                    foreach (PendingAbilityStruct str in abilityList)
-                    {
-                        var v = cast(p, false, str.card, str.ability);
-                        if (!v.HasValue) throw new Exception();
-                        playerCasts(p, v.Value);
-                    }
+                    
+                    handlePendingTrigs(p, abilityList);
                 }
             }
             pendingTriggeredAbilities.Clear();
+        }
+
+        private void handlePendingTrigs(Player p, IEnumerable<PendingAbilityStruct> abilityList)
+        {
+            foreach (PendingAbilityStruct str in abilityList)
+            {
+                StackWrapper v = tryCast(p, str.ability);
+                if (v == null) throw new Exception();
+                playerCasts(p, v);
+            }
         }
 
         private void trashcanDeadCreatures()
@@ -591,11 +594,11 @@ namespace stonerkart
             {
                 enforceRules();
                 Player fuckboy = players[(activePlayerIndex + c)%players.Count];
-                StackWrapper? w = priority(fuckboy);
+                StackWrapper w = tryCast(fuckboy);
 
-                if (w.HasValue)
+                if (w != null)
                 {
-                    playerCasts(fuckboy, w.Value);
+                    playerCasts(fuckboy, w);
                     c = 0;
                 }
                 else //pass
@@ -620,7 +623,7 @@ namespace stonerkart
         }
 
         /// <summary>
-        /// 
+        /// Returns null if the user Passed his turn.
         /// </summary>
         /// <param text="f"></param>
         /// <param text="prompt"></param>
@@ -683,54 +686,19 @@ namespace stonerkart
             handleTransaction(gt);
         }
 
-        private StackWrapper? priority(Player p)
-        {
-            return cast(p, true);
-        }
-
-        private StackWrapper? cast(Player p, bool cancellable, Card card = null, Ability ability = null, TargetMatrix[] targets = null, TargetMatrix[] costs = null)
-        {
-            //fucked variables which control when and how one cancels the cast
-            int lv = 0;
-            int bt = 0;
-
-            if (card != null) { lv = bt = 1; }
-            if (ability != null) { lv = bt = 2; }
-
-            StackWrapper? r = null;
+        private StackWrapper tryCast(Player p, TriggeredAbility pendingAbility = null)
+        { 
+            StackWrapper r;
             if (p == hero)
             {
-                if (!(cancellable && !stack.Any() &&
-                      !Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
+                if ((stack.Any() ||
+                     Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
                 {
-                    Tile from = card == null ? p.heroCard.tile : card.tile;
-                    while (lv >= bt && r == null)
-                    {
-                        object stuff = null;
-                        if (lv == 0)
-                        {
-                            stuff = card = getCard(c => c.controller == p, "Cast a card");
-                            if (cancellable && stuff == null) break;
-                        }
-                        else if (lv == 1)
-                        {
-                            stuff = ability = chooseAbility(card);
-                        }
-                        else if (lv == 2)
-                        {
-                            stuff = targets = getCastTargets(ability, from);
-                        }
-                        else if (lv == 3)
-                        {
-                            HackStruct s = makeHackStruct(waitForAnything);
-                            stuff = costs = ability.cost.fillCast(s);
-                        }
-                        else if (lv == 4)
-                        {
-                            stuff = r = new StackWrapper(card, ability, targets, costs);
-                        }
-                        lv = stuff == null ? bt : lv + 1;
-                    }
+                    r = tryCastDx(hero, pendingAbility);
+                }
+                else
+                {
+                    r = null;
                 }
                 connection.sendAction(new CastSelection(r));
             }
@@ -739,8 +707,47 @@ namespace stonerkart
                 Controller.setPrompt("Opponents turn to act.");
                 r = connection.receiveAction<CastSelection>().wrapper;
             }
-
             return r;
+        }
+
+        private StackWrapper tryCastDx(Player p, TriggeredAbility pendingAbility)
+        {
+            do
+            {
+                Card card;
+                Ability ability;
+                TargetMatrix[] costmxs;
+                TargetMatrix[] targetmxs;
+
+                if (pendingAbility == null)
+                {
+                    if (!(stack.Any() ||
+                         Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
+                    {
+                        return null;    //auto pass
+                    }
+
+                    //todo merge getCard and chooseAbility into one call
+                    card = getCard(c => c.controller == p, "Cast a card");
+                    if (card == null) return null;
+
+                    ability = chooseAbility(card);
+                    if (ability == null) continue;
+                }
+                else
+                {
+                    card = pendingAbility.card;
+                    ability = pendingAbility;
+                }
+
+                targetmxs = getCastTargets(ability);
+                if (targetmxs == null) continue;
+
+                costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything));
+                if (costmxs == null) continue;
+
+                return new StackWrapper(card, ability, targetmxs, costmxs);
+            } while (true);
         }
 
         private ActivatedAbility chooseAbility(Card c)
@@ -762,9 +769,10 @@ namespace stonerkart
             return r;
         }
 
-        private TargetMatrix[] getCastTargets(Ability a, Tile castFrom)
+        private TargetMatrix[] getCastTargets(Ability a)
         {
-            List<Tile> v = castFrom.withinDistance(a.castRange);
+            Card caster = a.isCastAbility ? a.card.controller.heroCard : a.card;
+            List<Tile> v = caster.tile.withinDistance(a.castRange);
 
             Controller.highlight(v, Color.Green);
             Controller.setPrompt("target nigra", ButtonOption.Cancel);
@@ -780,7 +788,7 @@ namespace stonerkart
         {
             Card stackpopped = stack.peekTop();
             Card card = wrapper.card;
-            TargetMatrix[] ts = wrapper.matricies;
+            TargetMatrix[] ts = wrapper.targetMatrices;
             Foo foo = wrapper.ability.effects;
 
             if (stackpopped.isDummy && stackpopped.dummyFor != card) throw new Exception();
@@ -931,22 +939,12 @@ namespace stonerkart
 
         public void setTargetHighlight(Card c)
         {
-            StackWrapper? w = null;
-
-            foreach (var v in wrapperStack)
-            {
-                if (v.card == c)
-                {
-                    w = v;
-                    break;
-                }
-            }
+            StackWrapper w = wrapperStack.First(sw => sw.card == c);
 
             if (w == null) return;
-            StackWrapper wr = w.Value;
 
             List<Tile> tiles = new List<Tile>();
-            foreach (TargetMatrix tm in wr.matricies)
+            foreach (TargetMatrix tm in w.targetMatrices)
             {
                 foreach (TargetColumn cl in tm.columns)
                 {
@@ -980,20 +978,20 @@ namespace stonerkart
     }
 
 
-    struct StackWrapper
+    class StackWrapper
     {
         public readonly Card card;
         public readonly Ability ability;
-        public readonly TargetMatrix[] matricies;
+        public readonly TargetMatrix[] targetMatrices;
         public readonly TargetMatrix[] costMatricies;
 
         public bool isCastAbility => card.isCastAbility(ability);
 
-        public StackWrapper(Card card, Ability ability, TargetMatrix[] matricies, TargetMatrix[] costMatricies)
+        public StackWrapper(Card card, Ability ability, TargetMatrix[] targetMatrices, TargetMatrix[] costMatricies)
         {
             this.card = card;
             this.ability = ability;
-            this.matricies = matricies;
+            this.targetMatrices = targetMatrices;
             this.costMatricies = costMatricies;
         }
     }

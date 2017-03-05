@@ -8,19 +8,23 @@ namespace stonerkart
 {
     abstract class Ability
     {
+        public Card card;
         public PileLocation activeIn;
         public Foo effects;
         public Foo cost;
         public int castRange;
         public string description;
 
-        public Ability(PileLocation activeIn, Foo effects, int castRange, Foo cost, string description)
+        public bool isCastAbility => card.castAbility == this;
+
+        public Ability(Card card, PileLocation activeIn, Foo effects, int castRange, Foo cost, string description)
         {
             this.activeIn = activeIn;
             this.effects = effects;
             this.castRange = castRange;
             this.cost = cost;
             this.description = description;
+            this.card = card;
         }
 
 
@@ -32,8 +36,7 @@ namespace stonerkart
 
         private CastSpeed castSpeed;
 
-
-        public ActivatedAbility(PileLocation activeIn, int castRange, Foo cost, CastSpeed castSpeed, string description, params Effect[] effects) : base(activeIn, new Foo(effects), castRange, cost, description)
+        public ActivatedAbility(Card card, PileLocation activeIn, int castRange, Foo cost, CastSpeed castSpeed, string description, params Effect[] effects) : base(card, activeIn, new Foo(effects), castRange, cost, description)
         {
             this.castSpeed = castSpeed;
         }
@@ -45,9 +48,8 @@ namespace stonerkart
 
         public Timing timing;
         private GameEventFilter filter;
-        private Card card;
 
-        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Foo cost, GameEventFilter trigger, Timing timing, string description) : base(activeIn, new Foo(effects), castRange, cost, description)
+        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Foo cost, GameEventFilter trigger, Timing timing, string description) : base(card, activeIn, new Foo(effects), castRange, cost, description)
         {
             this.card = card;
             filter = trigger;

@@ -234,11 +234,8 @@ namespace stonerkart
             shitterhack =
                 new TypedGameEventHandler<StartOfStepEvent>(
                     new TypedGameEventFilter<StartOfStepEvent>(
-                        a =>
-                        {
-                            int v = 2;
-                            return a.step == Steps.Replenish && a.activePlayer == controller;
-                        }), e => fatigue = 0);
+                        a => a.step == Steps.Replenish && a.activePlayer == controller
+                        ), e => fatigue = 0);
 
 
             r.add(new TypedGameEventHandler<ApplyModifierEvent>(e =>

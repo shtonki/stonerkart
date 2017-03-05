@@ -162,8 +162,8 @@ namespace stonerkart
                     baseToughness = 4;
                     baseMovement = 2;
 
-                    lifeCost = 2;
-                    greyCost = 2;
+                    lifeCost = 1;
+                    greyCost = 0;
 
                     addTriggeredAbility(
                         "Whenever a creature enters the battlefield under your control, gain 1 life.",
@@ -171,11 +171,12 @@ namespace stonerkart
                         new ZepperDoer(-1),
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
-                           moveEvent.card.controller == this.controller &&
-                           moveEvent.to.location.pile == PileLocation.Field &&
-                           this.location.pile == PileLocation.Field),
-                        0,
-                        PileLocation.Field
+                            moveEvent.card.controller == controller &&
+                            moveEvent.to.location.pile == PileLocation.Field &&
+                            location.pile == PileLocation.Field),
+                            0,
+                            PileLocation.Field,
+                            TriggeredAbility.Timing.Post
                         );
                     } break;
                 #endregion
@@ -419,7 +420,7 @@ namespace stonerkart
 
                 case CardTemplate.missingno:
                 {
-                    
+
                 } break;
 
                 default:
@@ -480,7 +481,7 @@ namespace stonerkart
 
             additionalCastCosts.Add(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new ManaCostRule(castManaCost)), new PayManaDoer()));
 
-            castAbility = new ActivatedAbility(PileLocation.Hand, castRange, new Foo(additionalCastCosts.ToArray()), castSpeed, castDescription, es.ToArray());
+            castAbility = new ActivatedAbility(this, PileLocation.Hand, castRange, new Foo(additionalCastCosts.ToArray()), castSpeed, castDescription, es.ToArray());
             abilities.Add(castAbility);
 
             this.owner = owner;
@@ -501,7 +502,7 @@ namespace stonerkart
         private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo foo, int castRange, PileLocation activeIn, CastSpeed castSpeed)
         {
             Effect e = new Effect(trs, doer);
-            ActivatedAbility ta = new ActivatedAbility(activeIn, castRange, foo, castSpeed, description, e);
+            ActivatedAbility ta = new ActivatedAbility(this, activeIn, castRange, foo, castSpeed, description, e);
             abilities.Add(ta);
         }
 
