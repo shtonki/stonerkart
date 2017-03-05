@@ -46,13 +46,26 @@ namespace stonerkart
 
         }
 
-        public DraggablePanel showControl(Control content, bool resizeable, bool closeable)
+        public DraggablePanel showControl(Control content, DraggablePanelConfig dfg = null)
         {
-            DraggablePanel r = new DraggablePanel(content, resizeable, closeable);
+            dfg = dfg ?? new DraggablePanelConfig();
+
+            DraggablePanel r = new DraggablePanel(content, dfg.resizeable, dfg.closeable);
             this.memeout(() =>
             {
                 Controls.Add(r);
                 r.BringToFront();
+
+                int w = ClientSize.Width;
+                int h = ClientSize.Height;
+
+                r.Bounds = new Rectangle(
+                    (int)((dfg.hackrect.X / 100f) * w),
+                    (int)((dfg.hackrect.Y / 100f) * h),
+                    (int)((dfg.hackrect.Width / 100f) * w),
+                    (int)((dfg.hackrect.Height / 100f) * h)
+                    );
+
             });
             return r;
         }
@@ -119,7 +132,7 @@ namespace stonerkart
             {
                 v.close();
             };
-            v = showControl(c, false, false);
+            v = showControl(c);
         }
 
         private DraggablePanel optionPanel;
@@ -128,7 +141,7 @@ namespace stonerkart
             if (optionPanel == null)
             {
                 Panel p = menuFromItems(activeScreenS.getMenuPanel());
-                optionPanel = showControl(p, false, true);
+                optionPanel = showControl(p);
             }
             else
             {
