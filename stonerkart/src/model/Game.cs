@@ -19,7 +19,7 @@ namespace stonerkart
 
         public Pile stack { get; } = new Pile(new Location(null, PileLocation.Stack));
 
-        private List<PendingAbilityStruct> pendingTriggeredAbilities = new List<PendingAbilityStruct>();
+        private List<TriggeredAbility> pendingTriggeredAbilities = new List<TriggeredAbility>();
 
         private int activePlayerIndex { get; set; }
         public Player activePlayer => players[activePlayerIndex];
@@ -148,11 +148,8 @@ namespace stonerkart
 
             baseHandler.add(new TypedGameEventHandler<CastEvent>(e =>
             {
-                Card c = e.wrapper.castingCard;
-                if (!e.wrapper.isCastAbility) c = createDummy(c, c.owner.displaced);
-
                 wrapperStack.Push(e.wrapper);
-                c.moveTo(stack);
+                e.wrapper.stackCard.moveTo(stack);
 
                 Controller.redraw();
             }));
@@ -479,14 +476,7 @@ namespace stonerkart
             {
                 foreach (Card card in triggerableCards)
                 {
-                    var card1 = card;
-                    if (true && card.template == CardTemplate.Illegal_sGoblin_sLaboratory && e is EndOfStepEvent &&
-                        ((EndOfStepEvent)e).step == Steps.End)
-                    {
-                        TriggeredAbility v = card.triggeredAbilities.ToArray()[0];
-                        v.triggeredBy(e);
-                    }
-                    pendAbilities(card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Pre).Select(a => new PendingAbilityStruct(a, card1)));
+                    pendAbilities(card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Pre));
                 }
             }
 
@@ -504,14 +494,13 @@ namespace stonerkart
             {
                 foreach (Card card in triggerableCards)
                 {
-                    var abilities = card.abilitiesTriggeredBy(e);
-                    var card1 = card;
-                    pendAbilities(abilities.Where(a => a.timing == TriggeredAbility.Timing.Post).Select(a => new PendingAbilityStruct(a, card1)));
+                    pendAbilities(card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Post));
                 }
             }
         }
 
-        private void pendAbilities(IEnumerable<PendingAbilityStruct> tas)
+
+        private void pendAbilities(IEnumerable<TriggeredAbility> tas)
         {
             if (tas.Count() == 0) return;
             pendingTriggeredAbilities.AddRange(tas);
@@ -538,10 +527,10 @@ namespace stonerkart
         {
             if (pendingTriggeredAbilities.Count > 0)
             {
-                List<PendingAbilityStruct>[] abilityArrays =
-                    players.Select(p => new List<PendingAbilityStruct>()).ToArray();
+                List<TriggeredAbility>[] abilityArrays =
+                    players.Select(p => new List<TriggeredAbility>()).ToArray();
 
-                foreach (PendingAbilityStruct pending in pendingTriggeredAbilities)
+                foreach (TriggeredAbility pending in pendingTriggeredAbilities)
                 {
                     int ix = ord(pending.card.controller);
                     abilityArrays[ix].Add(pending);
@@ -550,7 +539,7 @@ namespace stonerkart
                 for (int i = 0; i < abilityArrays.Length; i++)
                 {
                     Player p = playerFromOrd(i);
-                    List<PendingAbilityStruct> abilityList = abilityArrays[i];
+                    List<TriggeredAbility> abilityList = abilityArrays[i];
                     
                     handlePendingTrigs(p, abilityList);
                 }
@@ -558,13 +547,28 @@ namespace stonerkart
             }
         }
 
-        private void handlePendingTrigs(Player p, IEnumerable<PendingAbilityStruct> abilityList)
+        private void handlePendingTrigs(Player p, IEnumerable<TriggeredAbility> abilityList)
         {
-            foreach (PendingAbilityStruct str in abilityList)
+            if (p == hero)
             {
-                StackWrapper v = tryCast(p, str.ability);
-                if (v == null) throw new Exception();
-                playerCasts(p, v);
+                List<TriggeredAbility> pending = abilityList.ToList();
+
+                foreach (TriggeredAbility str in pending)
+                {
+                    StackWrapper v = tryCastDx(p, str);
+                    if (v == null) throw new Exception();
+                    v = new StackWrapper(
+                        createDummy(v.castingCard, v.castingCard.owner.displaced),
+                        v.ability,
+                        v.targetMatrices,
+                        v.costMatricies
+                        );
+                    playerCasts(p, v);
+                }
+            }
+            else
+            {
+                //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             }
         }
 
@@ -623,39 +627,7 @@ namespace stonerkart
                 }
             }
         }
-
-        /// <summary>
-        /// Returns null if the user Passed his turn.
-        /// </summary>
-        /// <param text="f"></param>
-        /// <param text="prompt"></param>
-        /// <returns></returns>
-        private Card getCard(Func<Card, bool> f, string prompt)
-        {
-            Controller.setPrompt(prompt, ButtonOption.Cancel);
-            while (true)
-            {
-                var v = waitForAnything();
-                Card c = null;
-                if (v is ShibbuttonStuff)
-                {
-                    return null;
-                }
-                else if (v is Card)
-                {
-                    c = (Card)v;
-                }
-                else if (v is Tile)
-                {
-                    Tile t = (Tile)v;
-                    if (t.card != null) c = t.card;
-                }
-
-                if (c != null && f(c)) return c;
-
-            }
-        }
-
+        
         /// <summary>
         /// Returns null when the OK button is pressed else it returns a tile when it is clicked
         /// </summary>
@@ -688,7 +660,7 @@ namespace stonerkart
             handleTransaction(gt);
         }
 
-        private StackWrapper tryCast(Player p, TriggeredAbility pendingAbility = null)
+        private StackWrapper tryCast(Player p)
         { 
             StackWrapper r;
             if (p == hero)
@@ -696,7 +668,7 @@ namespace stonerkart
                 if ((stack.Any() ||
                      Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
                 {
-                    r = tryCastDx(hero, pendingAbility);
+                    r = tryCastDx(hero);
                 }
                 else
                 {
@@ -712,7 +684,8 @@ namespace stonerkart
             return r;
         }
 
-        private StackWrapper tryCastDx(Player p, TriggeredAbility pendingAbility)
+
+        private StackWrapper tryCastDx(Player p, TriggeredAbility pendingAbility = null)
         {
             do
             {
@@ -730,11 +703,9 @@ namespace stonerkart
                     }
 
                     //todo merge getCard and chooseAbility into one call
-                    card = getCard(c => c.controller == p, "Cast a card");
-                    if (card == null) return null;
 
-                    ability = chooseAbility(card);
-                    if (ability == null) continue;
+                    ability = chooseAbility(p);
+                    if (ability == null) return null;
                 }
                 else
                 {
@@ -748,12 +719,34 @@ namespace stonerkart
                 costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything));
                 if (costmxs == null) continue;
 
-                return new StackWrapper(card, ability, targetmxs, costmxs);
+                return new StackWrapper(ability.card, ability, targetmxs, costmxs);
             } while (true);
         }
 
-        private ActivatedAbility chooseAbility(Card c)
+        private ActivatedAbility chooseAbility(Player chooser)
         {
+            Card c;
+            Controller.setPrompt("Choose a card to cast.", ButtonOption.Cancel);
+            do
+            {
+                var v = waitForAnything();
+                c = null;
+                if (v is ShibbuttonStuff)
+                {
+                    return null;
+                }
+                else if (v is Card)
+                {
+                    c = (Card)v;
+                }
+                else if (v is Tile)
+                {
+                    Tile t = (Tile)v;
+                    if (t.card != null) c = t.card;
+                }
+
+            } while (c == null || c.controller != chooser);
+
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere;
 
@@ -1114,18 +1107,6 @@ namespace stonerkart
         public void addEvents(IEnumerable<GameEvent> es)
         {
             events.AddRange(es);
-        }
-    }
-
-    internal struct PendingAbilityStruct
-    {
-        public TriggeredAbility ability { get; }
-        public Card card { get; }
-
-        public PendingAbilityStruct(TriggeredAbility ability, Card card)
-        {
-            this.ability = ability;
-            this.card = card;
         }
     }
 
