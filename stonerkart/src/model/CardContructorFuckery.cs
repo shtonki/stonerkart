@@ -447,7 +447,19 @@ namespace stonerkart
 
                 case CardTemplate.missingno:
                 {
-                    
+                    cardType = CardType.Creature;
+
+                    baseToughness = 2;
+
+                        addActivatedAbility(
+                            "xdf",
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
+                            new ZepperDoer(1),
+                            new Foo(),
+                            3,
+                            PileLocation.Field, 
+                            CastSpeed.Instant
+                            );
                 } break;
 
                 default:

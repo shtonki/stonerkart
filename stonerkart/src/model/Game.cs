@@ -785,6 +785,11 @@ namespace stonerkart
                 Controller.setPrompt("Opponents turn to act.");
                 r = connection.receiveAction<CastSelection>().wrapper;
             }
+
+            if (r != null && !r.ability.isCastAbility)
+            {
+                r = new StackWrapper(r.ability.createDummy(), r.ability, r.targetMatrices, r.costMatricies);
+            }
             return r;
         }
 
