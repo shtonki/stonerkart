@@ -32,8 +32,8 @@ namespace stonerkart
             List<Effect> additionalCastEffects = new List<Effect>();
             string castDescription = "";
             CastSpeed castSpeed;
-
             List<Effect> additionalCastCosts = new List<Effect>();
+            keywordAbilities = new List<KeywordAbility>();
 
             #region oophell
 
@@ -389,10 +389,12 @@ namespace stonerkart
                     cardType = CardType.Creature;
 
                     baseToughness = 2;
-                    basePower = 3;
+                    basePower = 2;
                     baseMovement = 3;
 
                     natureCost = 2;
+
+                    keywordAbilities.Add(KeywordAbility.Fervor);
                 } break;
 
                 case CardTemplate.Damage_sWard:
@@ -454,7 +456,7 @@ namespace stonerkart
                     baseMovement = 2;
 
                     addActivatedAbility(
-                        String.Format("{0}: Deal 1 damage to target creature.", G.exhaust),
+                        String.Format("{0}: Deal 1 damage to target creature within 3 tiles.", G.exhaust),
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
                         new ZepperDoer(1),
                         new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer())),
