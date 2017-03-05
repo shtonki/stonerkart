@@ -425,7 +425,7 @@ namespace stonerkart
                     basePower = baseToughness = baseMovement = 1;
 
                         addTriggeredAbility(
-                            "",
+                            "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
                             new ZepperDoer(1),
                             new Foo(),
@@ -434,7 +434,7 @@ namespace stonerkart
                             PileLocation.Field,
                             TriggeredAbility.Timing.Post
                             );
-                } break;
+                    } break;
 
                 default:
                 {

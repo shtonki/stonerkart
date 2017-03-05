@@ -555,15 +555,9 @@ namespace stonerkart
 
                 foreach (TriggeredAbility str in pending)
                 {
-                    StackWrapper v = tryCastDx(p, str);
+                    Card c = createDummy(str.card, str.card.owner.displaced);
+                    StackWrapper v = tryCastDx(p, str, c);
                     if (v == null) throw new Exception();
-
-                    v = new StackWrapper(
-                        createDummy(v.castingCard, v.castingCard.owner.displaced),
-                        v.ability,
-                        v.targetMatrices,
-                        v.costMatricies
-                        );
 
                     playerCasts(p, v);
                 }
@@ -629,7 +623,39 @@ namespace stonerkart
                 }
             }
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param text="f"></param>
+        /// <param text="prompt"></param>
+        /// <returns></returns>
+        private Card getCard(Func<Card, bool> f, string prompt)
+        {
+            Controller.setPrompt(prompt, ButtonOption.Cancel);
+            while (true)
+            {
+                var v = waitForAnything();
+                Card c = null;
+                if (v is ShibbuttonStuff)
+                {
+                    return null;
+                }
+                else if (v is Card)
+                {
+                    c = (Card)v;
+                }
+                else if (v is Tile)
+                {
+                    Tile t = (Tile)v;
+                    if (t.card != null) c = t.card;
+                }
+
+                if (c != null && f(c)) return c;
+
+            }
+        }
+
         /// <summary>
         /// Returns null when the OK button is pressed else it returns a tile when it is clicked
         /// </summary>
@@ -687,7 +713,7 @@ namespace stonerkart
         }
 
 
-        private StackWrapper tryCastDx(Player p, TriggeredAbility pendingAbility = null)
+        private StackWrapper tryCastDx(Player p)
         {
             do
             {
@@ -696,24 +722,17 @@ namespace stonerkart
                 TargetMatrix[] costmxs;
                 TargetMatrix[] targetmxs;
 
-                if (pendingAbility == null)
+                if (!(stack.Any() ||
+                        Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
                 {
-                    if (!(stack.Any() ||
-                         Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
-                    {
-                        return null;    //auto pass
-                    }
-
-                    //todo merge getCard and chooseAbility into one call
-
-                    ability = chooseAbility(p);
-                    if (ability == null) return null;
+                    return null;    //auto pass
                 }
-                else
-                {
-                    card = pendingAbility.card;
-                    ability = pendingAbility;
-                }
+
+                card = getCard(c => c.controller == p, "Cast a card");
+                if (card == null) return null;
+
+                ability = chooseAbility(card);
+                if (ability == null) continue;
 
                 targetmxs = getCastTargets(ability);
                 if (targetmxs == null) continue;
@@ -721,34 +740,29 @@ namespace stonerkart
                 costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything));
                 if (costmxs == null) continue;
 
-                return new StackWrapper(ability.card, ability, targetmxs, costmxs);
+                return new StackWrapper(card, ability, targetmxs, costmxs);
             } while (true);
         }
 
-        private ActivatedAbility chooseAbility(Player chooser)
+        private StackWrapper tryCastDx(Player p, TriggeredAbility ability, Card dummyCard)
         {
-            Card c;
-            Controller.setPrompt("Choose a card to cast.", ButtonOption.Cancel);
+            TargetMatrix[] costmxs;
+            TargetMatrix[] targetmxs;
+
             do
             {
-                var v = waitForAnything();
-                c = null;
-                if (v is ShibbuttonStuff)
-                {
-                    return null;
-                }
-                else if (v is Card)
-                {
-                    c = (Card)v;
-                }
-                else if (v is Tile)
-                {
-                    Tile t = (Tile)v;
-                    if (t.card != null) c = t.card;
-                }
+                targetmxs = getCastTargets(ability);
+                if (targetmxs == null) return null;
 
-            } while (c == null || c.controller != chooser);
+                costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything));
+                if (costmxs == null) continue;
 
+                return new StackWrapper(dummyCard, ability, targetmxs, costmxs);
+            } while (true);
+        }
+
+        private ActivatedAbility chooseAbility(Card c)
+        {
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere;
 
