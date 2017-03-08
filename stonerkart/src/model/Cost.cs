@@ -57,6 +57,7 @@ namespace stonerkart
             {
                 rt[i] = effects[i].fillResolve(ts[i], hs);
                 if (rt[i] == null) return null;
+                hs.previousTargets = rt[i];
             }
             hs.previousTargets = null;
 

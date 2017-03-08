@@ -31,7 +31,6 @@ namespace stonerkart
         public TargetMatrix fillResolve(TargetMatrix tm, HackStruct hs)
         {
             var r = ts.fillResolve(tm, hs);
-            hs.previousTargets = r;
             return r;
         }
 

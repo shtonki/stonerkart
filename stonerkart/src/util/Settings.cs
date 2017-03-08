@@ -167,9 +167,11 @@ namespace stonerkart
         {
             if (!File.Exists(saveFileName))
             {
-                FileStream fs = File.Create(saveFileName);
-                byte[] bs = Encoding.ASCII.GetBytes("# lines starting with a # are treated as commens.");
-                fs.Write(bs, 0, bs.Length);
+                using (FileStream fs = File.Create(saveFileName))
+                {
+                    byte[] bs = Encoding.ASCII.GetBytes("# lines starting with a # are treated as commens then promptly overwritten.");
+                    fs.Write(bs, 0, bs.Length);
+                }
             }
             string s = File.ReadAllText(saveFileName);
             string[] ss = s.Split('\n');

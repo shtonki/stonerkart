@@ -817,7 +817,7 @@ namespace stonerkart
                 targetmxs = getCastTargets(ability);
                 if (targetmxs == null) continue;
 
-                costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything));
+                costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything, p));
                 if (costmxs == null) continue;
 
                 return new StackWrapper(card, ability, targetmxs, costmxs);
@@ -834,7 +834,7 @@ namespace stonerkart
                 targetmxs = getCastTargets(ability);
                 if (targetmxs == null) return null;
 
-                costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything));
+                costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything, p));
                 if (costmxs == null) continue;
 
                 return new StackWrapper(dummyCard, ability, targetmxs, costmxs);
@@ -976,20 +976,20 @@ namespace stonerkart
 
         private HackStruct makeHackStruct()
         {
-            return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, waitForAnything, ord, ord,
+            return new HackStruct(selectCardFromCards, hero, null, sendChoices, receiveChoices, waitForAnything, ord, ord,
                 ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, null);
         }
 
-        private HackStruct makeHackStruct(Func<Stuff> f)
+        private HackStruct makeHackStruct(Func<Stuff> f, Player castingPlayer)
         {
-            return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, f, ord, ord, ord,
+            return new HackStruct(selectCardFromCards, hero, castingPlayer, sendChoices, receiveChoices, f, ord, ord, ord,
                 cardFromOrd, playerFromOrd, tileFromOrd, cards, null);
         }
 
-        private HackStruct makeHackStruct(Card c)
+        private HackStruct makeHackStruct(Card resolvingCard)
         {
-            return new HackStruct(selectCardFromCards, hero, activePlayer, sendChoices, receiveChoices, waitForAnything, ord, ord,
-                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, c);
+            return new HackStruct(selectCardFromCards, hero, null, sendChoices, receiveChoices, waitForAnything, ord, ord,
+                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, resolvingCard);
         }
         
 
@@ -1097,8 +1097,8 @@ namespace stonerkart
     {
         //game stuff
         public Player hero { get; }
-        public Player activePlayer { get; }
-        public bool heroIsActive => hero == activePlayer;
+        public Player castingPlayer { get; }
+        public bool heroIsCasting => hero == castingPlayer;
 
 
         public Func<Card, int> ordC { get; }
@@ -1129,11 +1129,11 @@ namespace stonerkart
 
         private Func<IEnumerable<Card>, bool, int, Card> selectCardEx;
         
-        public HackStruct(Func<IEnumerable<Card>, bool, int, Card> selectCardEx, Player hero, Player activePlayer, Action<int[]> sendChoices, Func<int[]> receiveChoices, Func<Stuff> getStuff, Func<Card, int> ordC, Func<Player, int> ordP, Func<Tile, int> ordT, Func<int, Card> cord, Func<int, Player> pord, Func<int, Tile> tord, IEnumerable<Card> cards, Card resolveCard) : this()
+        public HackStruct(Func<IEnumerable<Card>, bool, int, Card> selectCardEx, Player hero, Player castingPlayer, Action<int[]> sendChoices, Func<int[]> receiveChoices, Func<Stuff> getStuff, Func<Card, int> ordC, Func<Player, int> ordP, Func<Tile, int> ordT, Func<int, Card> cord, Func<int, Player> pord, Func<int, Tile> tord, IEnumerable<Card> cards, Card resolveCard) : this()
         {
             this.selectCardEx = selectCardEx;
             this.hero = hero;
-            this.activePlayer = activePlayer;
+            this.castingPlayer = castingPlayer;
             this.sendChoices = sendChoices;
             this.receiveChoices = receiveChoices;
             this.getStuff = getStuff;
