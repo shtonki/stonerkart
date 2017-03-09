@@ -75,7 +75,14 @@ namespace stonerkart
             setupHandlers();
         }
 
-        public Card createCard(CardTemplate ct, Pile pile, Player owner = null)
+        public Card createToken(CardTemplate ct, Player owner)
+        {
+            Card r = createCard(ct, owner.field, owner);
+            if (!r.isToken) throw new Exception();
+            return r;
+        }
+
+        private Card createCard(CardTemplate ct, Pile pile, Player owner)
         {
             Card r = new Card(ct, owner);
             allCards.Add(r);
@@ -1084,6 +1091,7 @@ namespace stonerkart
         public Player hero { get; }
         public Player castingPlayer { get; }
         public bool heroIsCasting => hero == castingPlayer;
+        public Func<CardTemplate, Player, Card> createToken;
 
         public Tile castFrom => resolveAbility.card.isDummy ? resolveAbility.card.dummyFor.tile : hero.heroCard.tile;
         public int castRange => resolveAbility.castRange;
@@ -1120,6 +1128,7 @@ namespace stonerkart
 
         private Func<IEnumerable<Card>, bool, int, Card> selectCardEx;
 
+
         public HackStruct(Game g) : this()
         {
             ordP = g.ord;
@@ -1137,6 +1146,7 @@ namespace stonerkart
             _setPrompt = g.gameController.setPrompt;
             clearHighlights = () => g.gameController.clearHighlights(true);
             highlight = g.gameController.highlight;
+            createToken = g.createToken;
         }
 
         public HackStruct(Game g, Player p) : this(g)

@@ -20,6 +20,7 @@ namespace stonerkart
         public Player controller { get; }
         public CardTemplate template { get; }
         public bool isDummy { get; private set; }
+        public bool isToken { get; private set; }
         public CardType cardType { get; }
         public Rarity rarity { get; set; }
         public CardSet set { get; }
@@ -319,7 +320,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
-        missingno,
+        missingo,
+        Huntress_sOf_sNibememe,
         Baby_sDragon,
         Fresh_sFox,
         Survival_sInstincts,
@@ -342,7 +344,9 @@ namespace stonerkart
         Rockhand_sOgre,
         Bear_sCavalary,
         Illegal_sGoblin_sLaboratory,
-        Teleport
+        Teleport,
+        Squire,
+        Call_sTo_sArms,
     }
 
     internal enum CardType
