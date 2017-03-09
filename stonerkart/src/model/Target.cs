@@ -323,53 +323,10 @@ namespace stonerkart
         }
     }
 
-    class PryTileRule : TargetRule
+    abstract class PryRule : TargetRule
     {
-        private Func<Tile, bool> filter;
-
-        public PryTileRule(Func<Tile, bool> filter) : base(typeof(Tile))
+        public PryRule(Type targetType) : base(targetType)
         {
-            this.filter = filter;
-        }
-
-        public override TargetColumn? fillCastTargets(HackStruct hs)
-        {
-            while (true)
-            {
-                Stuff v = hs.getStuff();
-
-                var b = v as ShibbuttonStuff;
-                if (b?.option == ButtonOption.Cancel) return null;
-
-                if (!(v is Tile)) continue;
-                Tile t = (Tile)v;
-                if (hs.tilesInRange.Contains(t) && filter(t)) return new TargetColumn(t);
-            }
-        }
-
-        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
-        {
-            return c;
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return new TargetColumn(hs.tilesInRange.Where(filter));
-        }
-    }
-
-    class PryCardRule : TargetRule
-    {
-        private Func<Card, bool> filter;
-
-        public PryCardRule() : this(c => true)
-        {
-            
-        }
-
-        public PryCardRule(Func<Card, bool> filter) : base(typeof(Card))
-        {
-            this.filter = filter;
         }
 
         public override TargetColumn? fillCastTargets(HackStruct box)
@@ -387,9 +344,13 @@ namespace stonerkart
                 if (!(v is Tile)) continue;
 
                 Tile t = (Tile)v;
-                if (t.card == null || !box.tilesInRange.Contains(t)) continue;
 
-                if (filter(t.card)) return new TargetColumn(t.card);
+                Targetable target = pry(t);
+
+                if (target != null && box.tilesInRange.Contains(t))
+                {
+                    return new TargetColumn(target);
+                }
             }
         }
 
@@ -400,7 +361,45 @@ namespace stonerkart
 
         public override TargetColumn possible(HackStruct hs)
         {
-            return new TargetColumn(hs.tilesInRange.Where(t => t.card != null && filter(t.card)));
+            return new TargetColumn(hs.tilesInRange.Where(t => pry(t) != null));
+        }
+
+        protected abstract Targetable pry(Tile t);
+    }
+
+    class PryTileRule : PryRule
+    {
+        private Func<Tile, bool> fltr;
+
+        public PryTileRule(Func<Tile, bool> filter) : base(typeof(Tile))
+        {
+            this.fltr = filter;
+        }
+
+        protected override Targetable pry(Tile t)
+        {
+            return fltr(t) ? t : null;
+        }
+    }
+
+    class PryCardRule : PryRule
+    {
+        private Func<Card, bool> fltr;
+
+        public PryCardRule() : this(c => true)
+        {
+            
+        }
+
+        public PryCardRule(Func<Card, bool> filter) : base(typeof(Card))
+        {
+            this.fltr = filter;
+        }
+
+        protected override Targetable pry(Tile t)
+        {
+            Card card = t.card;
+            return card != null && fltr(card) ? card : null;
         }
     }
 
