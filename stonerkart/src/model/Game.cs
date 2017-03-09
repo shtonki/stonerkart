@@ -320,11 +320,6 @@ namespace stonerkart
 
         private void untapStep()
         {
-            foreach (Player p in players)
-            {
-                p.setActive(p == activePlayer);
-            }
-
             activePlayer.resetMana();
 
             ManaOrbSelection selection;
@@ -375,7 +370,9 @@ namespace stonerkart
         {
             List<Tuple<Card, Path>> paths;
 
-            if (activePlayer == hero)
+            bool b = activePlayer == hero;
+            Controller.setHeroActive(b);
+            if (b)
             {
                 paths = new List<Tuple<Card, Path>>();
 
@@ -710,9 +707,9 @@ namespace stonerkart
         /// <param text="f"></param>
         /// <param text="prompt"></param>
         /// <returns></returns>
-        private Card getCard(Func<Card, bool> f, string prompt)
+        private Card chooseCastCard(Player p)
         {
-            Controller.setPrompt(prompt, ButtonOption.Cancel);
+            Controller.setPrompt("Cast a card.", ButtonOption.Pass);
             while (true)
             {
                 var v = waitForAnything();
@@ -731,7 +728,7 @@ namespace stonerkart
                     if (t.card != null) c = t.card;
                 }
 
-                if (c != null && f(c)) return c;
+                if (c != null && c.controller == p) return c;
 
             }
         }
@@ -766,7 +763,10 @@ namespace stonerkart
         private StackWrapper tryCast(Player p)
         { 
             StackWrapper r;
-            if (p == hero)
+
+            bool b = p == hero;
+            Controller.setHeroActive(b);
+            if (b)
             {
                 if ((stack.Any() ||
                      Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
@@ -808,13 +808,13 @@ namespace stonerkart
                     return null;    //auto pass
                 }
 
-                card = getCard(c => c.controller == p, "Cast a card");
+                card = chooseCastCard(p);
                 if (card == null) return null;
 
                 ability = chooseAbility(card);
                 if (ability == null) continue;
 
-                targetmxs = getCastTargets(ability);
+                targetmxs = chooseTargets(ability);
                 if (targetmxs == null) continue;
 
                 costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything, p));
@@ -831,7 +831,7 @@ namespace stonerkart
 
             do
             {
-                targetmxs = getCastTargets(ability);
+                targetmxs = chooseTargets(ability);
                 if (targetmxs == null) return null;
 
                 costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything, p));
@@ -860,7 +860,7 @@ namespace stonerkart
             return r;
         }
 
-        private TargetMatrix[] getCastTargets(Ability a)
+        private TargetMatrix[] chooseTargets(Ability a)
         {
             Card caster = a.isCastAbility ? a.card.controller.heroCard : a.card;
             List<Tile> v = caster.tile.withinDistance(a.castRange);
@@ -870,7 +870,7 @@ namespace stonerkart
             if (!a.possible(box)) return null;
 
             Controller.highlight(v, Color.Green);
-            Controller.setPrompt("target nigra", ButtonOption.Cancel);
+            Controller.setPrompt("Choose targets.", ButtonOption.Cancel);
 
             TargetMatrix[] ms = a.effects.fillCast(box);
 

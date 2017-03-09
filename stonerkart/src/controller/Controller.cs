@@ -220,6 +220,11 @@ namespace stonerkart
             return Controller.showControl(p, true, closeable);
         }
 
+        public static void setHeroActive(bool b)
+        {
+            gameFrame.gamePanel.setHeroActive(b);
+        }
+
         public static void addArrow(List<Tile> l)
         {
             hexPanel.ts.Add(l);

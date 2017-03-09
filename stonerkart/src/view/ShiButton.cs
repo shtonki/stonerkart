@@ -38,6 +38,7 @@ namespace stonerkart
         No,
         OK,
         Cancel,
+        Pass,
     }
 
     class ShibbuttonStuff : Stuff

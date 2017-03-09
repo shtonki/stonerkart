@@ -73,7 +73,17 @@ namespace stonerkart
         public GamePanel() : this(null)
         {
         }
-        
+
+        public void setHeroActive(bool b)
+        {
+            Color a = Color.ForestGreen, ia = Color.DarkRed;
+            this.memeout(() =>
+            {
+                heroPanel.BackColor    =  b ? a : ia;
+                villainPanel.BackColor = !b ? a : ia;
+            });
+        }
+
         private void setHightlight(Stuff stuff)
         {
             if (stuff == null) return;
@@ -150,7 +160,7 @@ namespace stonerkart
             this.promtText.Enabled = false;
             this.promtText.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.promtText.justifyText = stonerkart.Justify.Left;
-            this.promtText.Location = new System.Drawing.Point(3, 6);
+            this.promtText.Location = new System.Drawing.Point(4, 366);
             this.promtText.Name = "promtText";
             this.promtText.Opacity = 100;
             this.promtText.Size = new System.Drawing.Size(211, 84);
@@ -159,7 +169,7 @@ namespace stonerkart
             // 
             // shibbutton2
             // 
-            this.shibbutton2.Location = new System.Drawing.Point(3, 96);
+            this.shibbutton2.Location = new System.Drawing.Point(4, 456);
             this.shibbutton2.Name = "shibbutton2";
             this.shibbutton2.Size = new System.Drawing.Size(105, 34);
             this.shibbutton2.TabIndex = 5;
@@ -168,7 +178,7 @@ namespace stonerkart
             // 
             // shibbutton3
             // 
-            this.shibbutton3.Location = new System.Drawing.Point(109, 96);
+            this.shibbutton3.Location = new System.Drawing.Point(110, 456);
             this.shibbutton3.Name = "shibbutton3";
             this.shibbutton3.Size = new System.Drawing.Size(105, 34);
             this.shibbutton3.TabIndex = 6;
@@ -177,7 +187,7 @@ namespace stonerkart
             // 
             // shibbutton4
             // 
-            this.shibbutton4.Location = new System.Drawing.Point(3, 136);
+            this.shibbutton4.Location = new System.Drawing.Point(4, 496);
             this.shibbutton4.Name = "shibbutton4";
             this.shibbutton4.Size = new System.Drawing.Size(105, 34);
             this.shibbutton4.TabIndex = 8;
@@ -186,7 +196,7 @@ namespace stonerkart
             // 
             // shibbutton5
             // 
-            this.shibbutton5.Location = new System.Drawing.Point(109, 136);
+            this.shibbutton5.Location = new System.Drawing.Point(110, 496);
             this.shibbutton5.Name = "shibbutton5";
             this.shibbutton5.Size = new System.Drawing.Size(102, 34);
             this.shibbutton5.TabIndex = 7;
@@ -197,7 +207,7 @@ namespace stonerkart
             // 
             this.stackPanel.BackColor = System.Drawing.Color.Navy;
             this.stackPanel.comp = null;
-            this.stackPanel.Location = new System.Drawing.Point(7, 314);
+            this.stackPanel.Location = new System.Drawing.Point(4, 141);
             this.stackPanel.Name = "stackPanel";
             this.stackPanel.Size = new System.Drawing.Size(135, 213);
             this.stackPanel.TabIndex = 10;
@@ -214,14 +224,14 @@ namespace stonerkart
             // villainPanel
             // 
             this.villainPanel.BackColor = System.Drawing.Color.DarkViolet;
-            this.villainPanel.Location = new System.Drawing.Point(7, 176);
+            this.villainPanel.Location = new System.Drawing.Point(4, 3);
             this.villainPanel.Name = "villainPanel";
             this.villainPanel.Size = new System.Drawing.Size(204, 132);
             this.villainPanel.TabIndex = 12;
             // 
             // stepPanel1
             // 
-            this.stepPanel1.Location = new System.Drawing.Point(161, 314);
+            this.stepPanel1.Location = new System.Drawing.Point(158, 141);
             this.stepPanel1.Name = "stepPanel1";
             this.stepPanel1.Size = new System.Drawing.Size(53, 213);
             this.stepPanel1.TabIndex = 13;
@@ -257,12 +267,12 @@ namespace stonerkart
             // GamePanel
             // 
             this.BackColor = System.Drawing.Color.Fuchsia;
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.highlightCard);
+            this.Controls.Add(this.stackPanel);
             this.Controls.Add(this.stepPanel1);
             this.Controls.Add(this.villainPanel);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.highlightCard);
             this.Controls.Add(this.heroPanel);
-            this.Controls.Add(this.stackPanel);
             this.Controls.Add(this.shibbutton4);
             this.Controls.Add(this.shibbutton5);
             this.Controls.Add(this.shibbutton3);

@@ -67,11 +67,6 @@ namespace stonerkart
         public void notify(object o, PlayerChangedArgs t)
         {
             hackp = (Player)o;
-            if (t.active.HasValue)
-            {
-                Color c = t.active.Value ? StepPanel.on : StepPanel.off;
-                BackColor = c;
-            }
             if (t.pileChanged.HasValue)
             {
                 foreach (hackery h in hack)
@@ -167,13 +162,7 @@ namespace stonerkart
     class PlayerChangedArgs
     {
         public readonly Player player;
-        public readonly bool? active;
         public readonly PileLocation? pileChanged;
-
-        public PlayerChangedArgs(bool active)
-        {
-            this.active = active;
-        }
 
         public PlayerChangedArgs(Player player)
         {
