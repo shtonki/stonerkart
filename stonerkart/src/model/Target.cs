@@ -197,8 +197,16 @@ namespace stonerkart
     {
         private TargetRule pg;
         private PileLocation l;
+        private Func<Card, bool> filter;
 
-        public SelectCardRule(PileLocation location, TargetRule playerGenerator) : base(typeof(Card))
+        public SelectCardRule(PileLocation l, TargetRule pg, Func<Card, bool> filter) : base(typeof(Card))
+        {
+            this.pg = pg;
+            this.l = l;
+            this.filter = filter;
+        }
+
+        public SelectCardRule(PileLocation location, TargetRule playerGenerator) : this(location, playerGenerator, c => true)
         {
             pg = playerGenerator;
             l = location;
@@ -216,8 +224,11 @@ namespace stonerkart
             TargetColumn r = t.Value;
             if (r.targets.Length != 1) throw new Exception();
             Player p = (Player)r.targets[0];
-            Card crd = hs.selectCardSynchronized(p.pileFrom(l));
-            return new TargetColumn(crd);
+            while (true)
+            {
+                Card crd = hs.selectCardSynchronized(p.pileFrom(l));
+                if (filter(crd)) return new TargetColumn(crd);
+            }
         }
 
         public override TargetColumn possible(HackStruct hs)
@@ -488,6 +499,23 @@ namespace stonerkart
         {
             Card card = t.card;
             return card != null && fltr(card) ? card : null;
+        }
+    }
+
+    class PryPlayerRule : PryRule
+    {
+        private Func<Player, bool> fltr;
+        
+
+        public PryPlayerRule(Func<Player, bool> filter, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Card), flip, count, allowDuplicates)
+        {
+            this.fltr = filter;
+        }
+
+        protected override Targetable pry(Tile t)
+        {
+            Card card = t.card;
+            return card != null && card.isHeroic && fltr(card.owner) ? card.owner : null;
         }
     }
 

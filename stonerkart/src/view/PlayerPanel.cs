@@ -155,7 +155,7 @@ namespace stonerkart
         private void koen(PileLocation pl)
         {
             if (hackp == null) return;
-            //Controller.toggleShowPile(hackp, pl);
+            hackp.game.gameController.toggleShowPile(hackp, pl);  //v nice
         }
     }
 

@@ -29,6 +29,7 @@ namespace stonerkart
                 greyCost = 0;
 
             int castRange = -1;
+
             Effect castEffect = null;
             List<Effect> additionalCastEffects = new List<Effect>();
             string castDescription = "";
@@ -505,7 +506,11 @@ namespace stonerkart
                 #endregion
                 case CardTemplate.missingo:
                 {
-                    
+                    cardType = CardType.Sorcery;
+
+                    castEffect = new Effect(new SelectCardRule(PileLocation.Hand, new PryPlayerRule(p => true), c => c.cardType == CardType.Creature),
+                        new ToOwnersDoer(PileLocation.Graveyard));
+                    castRange = 100;
                 } break;
 
                 #region tokens
@@ -527,7 +532,6 @@ namespace stonerkart
                     throw new Exception("missing cardtemplate in switch");
                 }
             }
-
 
             #endregion
 
