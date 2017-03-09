@@ -27,13 +27,12 @@ namespace stonerkart
 
             if (Network.connectToServer())
             {
-                
+                ScreenController.transitionToLoginScreen();
             }
             else
             {
-                //
+                ScreenController.transitionToMainMenu();
             }
-            ScreenController.transitionToMainMenu();
         }
 
         public static void quit()

@@ -23,6 +23,11 @@ namespace stonerkart
             UIController.gameFrame.transitionTo(new MapEditor());
         }
 
+        public static void transitionToLoginScreen()
+        {
+            UIController.gameFrame.transitionTo(new LoginScreen());
+        }
+
         public static void transitionToMainMenu()
         {
             UIController.gameFrame.transitionTo(new MainMenuPanel());
