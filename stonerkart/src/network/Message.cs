@@ -215,6 +215,15 @@ namespace stonerkart
         public readonly int randomSeed;
         public readonly string[] playerNames;
         public readonly int heroIndex;
+        public bool local;
+
+        public NewGameStruct(int randomSeed, string[] playerNames, int heroIndex, bool local)
+        {
+            this.randomSeed = randomSeed;
+            this.playerNames = playerNames;
+            this.heroIndex = heroIndex;
+            this.local = local;
+        }
 
         public NewGameStruct(int randomSeed, string[] playerNames, int heroIndex)
         {

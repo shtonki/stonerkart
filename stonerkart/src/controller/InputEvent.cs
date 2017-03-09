@@ -19,6 +19,15 @@ namespace stonerkart
         }
     }
 
+    interface Clickable
+    {
+        /// <summary>
+        /// When this Clickable is clicked in the interface it yields a Stuff.
+        /// </summary>
+        /// <returns>The Stuff generated from the state/configuration of the Clickable</returns>
+        Stuff getStuff();
+    }
+
     public interface Stuff
     {
         

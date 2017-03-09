@@ -79,14 +79,14 @@ namespace stonerkart
                 ButtonOption opt;
                 if (hs.heroIsResolver)
                 {
-                    Controller.setPrompt("Do you want to use this ability?", ButtonOption.Yes, ButtonOption.No);
+                    hs.setPrompt("Do you want to use this ability?", ButtonOption.Yes, ButtonOption.No);
                     ShibbuttonStuff ss = hs.waitForStuff<ShibbuttonStuff>(b => true);
                     opt = ss.option;
                     hs.sendChoices(new[] {(int)opt});
                 }
                 else
                 {
-                    Controller.setPrompt("Opponent is deciding whether to use the optional ability.");
+                    hs.setPrompt("Opponent is deciding whether to use the optional ability.");
                     opt = (ButtonOption)hs.receiveChoices()[0];
                 }
 

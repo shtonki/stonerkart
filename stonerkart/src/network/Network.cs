@@ -60,7 +60,7 @@ namespace stonerkart
                 case Message.MessageType.NEWGAME:
                 {
                     NewGameBody b = new NewGameBody(m.body);
-                    Controller.newGame(b.newGameStruct, false);
+                    ScreenController.transitionToGamePanel(b.newGameStruct, false);
                 } break;
 
                 case Message.MessageType.GAMEMESSAGE:
@@ -125,7 +125,7 @@ namespace stonerkart
             if (rb.code == ResponseBody.ResponseCode.OKWITHFRIENDS)
             {
                 FriendListBody fb = new FriendListBody(rb.text);
-                Controller.setFriendList(fb.friends);
+                UIController.setFriendList(fb.friends);
                 return true;
             }
             else

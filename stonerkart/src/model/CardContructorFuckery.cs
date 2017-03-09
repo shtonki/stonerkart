@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define testX
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -35,8 +36,8 @@ namespace stonerkart
             List<Effect> additionalCastCosts = new List<Effect>();
             keywordAbilities = new List<KeywordAbility>();
 
-            #region oophell
 
+            #region oophell
             switch (ct)
             {
                 #region Illegal Goblin Laboratory
@@ -489,6 +490,7 @@ namespace stonerkart
             #endregion
 
             int[] x = new int[ManaSet.size];
+#if !test
             x[(int)ManaColour.Chaos] = chaosCost;
             x[(int)ManaColour.Colourless] = greyCost;
             x[(int)ManaColour.Death] = deathCost;
@@ -496,6 +498,10 @@ namespace stonerkart
             x[(int)ManaColour.Might] = mightCost;
             x[(int)ManaColour.Nature] = natureCost;
             x[(int)ManaColour.Order] = orderCost;
+#else
+            baseMovement = 10;
+            castRange = 10;
+#endif
             castManaCost = new ManaSet(x);
 
             Power = new Modifiable(basePower);

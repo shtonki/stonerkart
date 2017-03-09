@@ -254,7 +254,7 @@ namespace stonerkart
 
         public override TargetColumn? fillCastTargets(HackStruct hs)
         {
-            Player p = hs.activePlayer;
+            Player p = hs.castingPlayer;
             ManaSet cost = ms.clone();
             for (int i = 0; i < ManaSet.size; i++)
             {
@@ -273,7 +273,7 @@ namespace stonerkart
             {
                 if (diff < 0) // we have more total mana than the cost
                 {
-                    Controller.setPrompt("Cast using what mana", ButtonOption.Cancel);
+                    hs.setPrompt("Cast using what mana", ButtonOption.Cancel);
                     ManaSet colours = cost.clone();
                     colours[ManaColour.Colourless] = 0;
                     p.stuntLoss(colours);
@@ -306,7 +306,7 @@ namespace stonerkart
                 }
                 else
                 {
-                    cost = hs.activePlayer.manaPool.current;
+                    cost = hs.castingPlayer.manaPool.current;
                 }
             }
             return new TargetColumn(cost.orbs);

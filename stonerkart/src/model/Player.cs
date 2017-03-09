@@ -133,10 +133,6 @@ namespace stonerkart
         }
 
         #endregion
-        public void setActive(bool b)
-        {
-            notify(new PlayerChangedArgs(b));
-        }
 
         public void notify(object o, PileChangedMessage t)
         {

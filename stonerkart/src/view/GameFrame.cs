@@ -15,25 +15,17 @@ namespace stonerkart
     /// </summary>
     class GameFrame : Form
     {
-        public Screen mainMenuPanel { get; private set; }
-        public Screen loginPanel { get; private set; }
-        public GamePanel gamePanel;
+
         private StickyPanel mainPanel;
         public MenuBar menuBar1;
 
-        public Screen mapEditorScreen { get; private set; }
-        public Screen deckEditorScreen { get; private set; }
         public Control activeScreen { get; private set; }
         public Screen activeScreenS => (Screen)activeScreen;
 
         public GameFrame()
         {
             InitializeComponent();
-
-            mainMenuPanel = new MainMenuPanel();
-            mapEditorScreen = new MapEditor();
-            deckEditorScreen = new DeckEditorPanel();
-            loginPanel = new LoginScreen();
+            
             Closed += (_, __) => Controller.quit();
             Resize += (_, __) =>
             {
@@ -68,39 +60,6 @@ namespace stonerkart
 
             });
             return r;
-        }
-
-        public void setPrompt(string message, ButtonOption[] buttons)
-        {
-            this.memeout(() =>
-            {
-                gamePanel.promtText.Text = message;
-                Shibbutton[] bs = new[] {
-                    gamePanel.shibbutton2,
-                    gamePanel.shibbutton3,
-                    gamePanel.shibbutton4,
-                    gamePanel.shibbutton5,
-                };
-                for (int i = 0; i < bs.Length; i++)
-                {
-                    if (buttons.Length > i && buttons[i] != ButtonOption.NOTHING)
-                    {
-                        bs[i].Visible = true;
-                        bs[i].setOption(buttons[i]);
-                    }
-                    else
-                    {
-                        bs[i].Visible = false;
-                    }
-                }
-                gamePanel.Invalidate();
-            });
-        }
-
-        public void toGame(Game g)
-        {
-            gamePanel = new GamePanel(g);
-            transitionTo(gamePanel);
         }
 
         public void transitionTo(Screen s)
@@ -153,15 +112,15 @@ namespace stonerkart
         private Panel menuFromItems(IEnumerable<MenuItem> mis)
         {
             MenuItem mi = new MenuItem("Report Bug", showBugReportScreen);
-            MenuItem[] dflts = new[] { mi };
+            MenuItem[] dflts = { mi };
 
             Panel p = new Panel();
             MenuItem[] items = mis.Concat(dflts).ToArray();
 
             p.Size = new Size(220, 20 + 50 * items.Count());
-            int i = 0;
-            foreach (var m in items)
+            for(int i = 0; i < items.Length; i++)
             {
+                var m = items[i];
                 Button b = new Button();
                 b.Text = m.title;
                 b.Size = new Size(200, 50);
