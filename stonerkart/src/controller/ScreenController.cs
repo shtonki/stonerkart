@@ -20,17 +20,17 @@ namespace stonerkart
 
         public static void transitionToMapEditor()
         {
-            UIController.gameFrame.transitionTo(UIController.gameFrame.mapEditorScreen);
+            UIController.gameFrame.transitionTo(new MapEditor());
         }
 
         public static void transitionToMainMenu()
         {
-            UIController.gameFrame.transitionTo(UIController.gameFrame.mainMenuPanel);
+            UIController.gameFrame.transitionTo(new MainMenuPanel());
         }
 
         public static void transitionToDeckEditor()
         {
-            UIController.gameFrame.transitionTo(UIController.gameFrame.deckEditorScreen);
+            UIController.gameFrame.transitionTo(new DeckEditorPanel());
         }
 
         public static void transtitionToPostGameScreen(Game g)

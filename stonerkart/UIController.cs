@@ -81,7 +81,6 @@ namespace stonerkart
             }
         }
 
-
         public static void toggleOptionPanel()
         {
             gameFrame.toggleOptionPanel();

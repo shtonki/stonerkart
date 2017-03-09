@@ -15,24 +15,17 @@ namespace stonerkart
     /// </summary>
     class GameFrame : Form
     {
-        public Screen mainMenuPanel { get; private set; }
-        public Screen loginPanel { get; private set; }
+
         private StickyPanel mainPanel;
         public MenuBar menuBar1;
 
-        public Screen mapEditorScreen { get; private set; }
-        public Screen deckEditorScreen { get; private set; }
         public Control activeScreen { get; private set; }
         public Screen activeScreenS => (Screen)activeScreen;
 
         public GameFrame()
         {
             InitializeComponent();
-
-            mainMenuPanel = new MainMenuPanel();
-            mapEditorScreen = new MapEditor();
-            deckEditorScreen = new DeckEditorPanel();
-            loginPanel = new LoginScreen();
+            
             Closed += (_, __) => Controller.quit();
             Resize += (_, __) =>
             {

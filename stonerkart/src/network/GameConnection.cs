@@ -93,7 +93,7 @@ namespace stonerkart
     {
         public void sendAction(GameAction g)
         {
-            Console.WriteLine(g.GetType());
+            //Console.WriteLine(g.GetType());
         }
 
         public T receiveAction<T>() where T : GameAction
