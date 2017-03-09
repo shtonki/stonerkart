@@ -123,7 +123,7 @@ namespace stonerkart
         {
             if (Network.login(usernameBox.Text, passwordBox.Text))
             {
-                Controller.transitionToMainMenu();
+                ScreenController.transitionToMainMenu();
             }
             else
             {
@@ -138,7 +138,7 @@ namespace stonerkart
 
         private void button3_Click(object sender, EventArgs e)
         {
-            Controller.transitionToMainMenu();
+            ScreenController.transitionToMainMenu();
         }
     }
 }

@@ -77,13 +77,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="src\controller\Clickable.cs" />
     <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />
-    <Compile Include="src\controller\GameAction.cs" />
-    <Compile Include="src\controller\GameEvent.cs" />
-    <Compile Include="src\controller\GameEventFilter.cs" />
-    <Compile Include="src\controller\GameEventHandler.cs" />
+    <Compile Include="src\controller\DeckController.cs" />
+    <Compile Include="src\controller\GameController.cs" />
+    <Compile Include="src\controller\ScreenController.cs" />
+    <Compile Include="src\model\GameAction.cs" />
+    <Compile Include="src\model\GameEvent.cs" />
+    <Compile Include="src\model\GameEventFilter.cs" />
+    <Compile Include="src\model\GameEventHandler.cs" />
     <Compile Include="src\controller\InputEvent.cs" />
     <Compile Include="src\model\Ability.cs" />
     <Compile Include="src\model\Card.cs" />
@@ -177,6 +179,7 @@
     <Compile Include="src\view\TransparentPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UIController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

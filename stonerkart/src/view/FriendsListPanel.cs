@@ -29,7 +29,7 @@ namespace stonerkart
             {
                 if (args.KeyChar == (char)13)
                 {
-                    Controller.addFriend(addInput.Text);
+                    UIController.addFriend(addInput.Text);
                     addInput.Text = "";
                 }
             };

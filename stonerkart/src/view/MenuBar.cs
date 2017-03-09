@@ -15,7 +15,7 @@ namespace stonerkart
         public MenuBar()
         {
             InitializeComponent();
-            optionsButton.Click += (__, _) => Controller.toggleOptionPanel();
+            optionsButton.Click += (__, _) => UIController.toggleOptionPanel();
         }
 
         public void enableFriendsButton()
@@ -62,7 +62,7 @@ namespace stonerkart
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Controller.toggleFriendsList();
+            UIController.toggleFriendsList();
         }
     }
 }

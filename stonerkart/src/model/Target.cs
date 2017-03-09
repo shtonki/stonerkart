@@ -273,7 +273,7 @@ namespace stonerkart
             {
                 if (diff < 0) // we have more total mana than the cost
                 {
-                    Controller.setPrompt("Cast using what mana", ButtonOption.Cancel);
+                    hs.setPrompt("Cast using what mana", ButtonOption.Cancel);
                     ManaSet colours = cost.clone();
                     colours[ManaColour.Colourless] = 0;
                     p.stuntLoss(colours);

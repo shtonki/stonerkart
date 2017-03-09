@@ -208,7 +208,7 @@ namespace stonerkart
         private void loadDeck(string deckName)
         {
             deck.clear();
-            Deck v = Controller.loadDeck(deckName);
+            Deck v = DeckController.loadDeck(deckName);
             deck.addRange(v.templates.Select(t => new Card(t)));
             heroic = v.hero;
         }
@@ -533,12 +533,12 @@ namespace stonerkart
         private void button1_Click(object sender, EventArgs e)
         {
             Deck d = new Deck(heroic, deck.Select(c => c.template).ToArray());
-            Controller.saveDeck(d, deckName.Text);
+            DeckController.saveDeck(d, deckName.Text);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Controller.chooseDeck(loadDeck);
+            DeckController.chooseDeck(loadDeck);
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -573,7 +573,7 @@ namespace stonerkart
 
         private void button5_Click(object sender, EventArgs e)
         {
-            Controller.transitionToMainMenu();
+            ScreenController.transitionToMainMenu();
         }
 
         private void button6_Click(object sender, EventArgs e)

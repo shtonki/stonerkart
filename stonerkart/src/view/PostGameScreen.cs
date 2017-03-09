@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace stonerkart.src.view
+namespace stonerkart
 {
     class PostGameScreen : StickyPanel, Screen
     {
@@ -48,7 +48,7 @@ namespace stonerkart.src.view
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Controller.transitionToMainMenu();
+            ScreenController.transitionToMainMenu();
         }
     }
 }

@@ -17,7 +17,6 @@ namespace stonerkart
     {
         public Screen mainMenuPanel { get; private set; }
         public Screen loginPanel { get; private set; }
-        public GamePanel gamePanel;
         private StickyPanel mainPanel;
         public MenuBar menuBar1;
 
@@ -68,39 +67,6 @@ namespace stonerkart
 
             });
             return r;
-        }
-
-        public void setPrompt(string message, ButtonOption[] buttons)
-        {
-            this.memeout(() =>
-            {
-                gamePanel.promtText.Text = message;
-                Shibbutton[] bs = new[] {
-                    gamePanel.shibbutton2,
-                    gamePanel.shibbutton3,
-                    gamePanel.shibbutton4,
-                    gamePanel.shibbutton5,
-                };
-                for (int i = 0; i < bs.Length; i++)
-                {
-                    if (buttons.Length > i && buttons[i] != ButtonOption.NOTHING)
-                    {
-                        bs[i].Visible = true;
-                        bs[i].setOption(buttons[i]);
-                    }
-                    else
-                    {
-                        bs[i].Visible = false;
-                    }
-                }
-                gamePanel.Invalidate();
-            });
-        }
-
-        public void toGame(Game g)
-        {
-            gamePanel = new GamePanel(g);
-            transitionTo(gamePanel);
         }
 
         public void transitionTo(Screen s)

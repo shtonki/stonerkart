@@ -49,7 +49,7 @@ namespace stonerkart
 
             if (newLine) sb.Append(Environment.NewLine);
 
-            Controller.print(sb.ToString());
+            throw new NotImplementedException();
         }
     }
 }

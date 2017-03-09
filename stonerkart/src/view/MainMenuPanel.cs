@@ -63,13 +63,13 @@ namespace stonerkart
         {
             Random r = new Random();
             NewGameStruct s = new NewGameStruct(r.Next(), new []{"Hero", "Villain"}, 0);
-            Controller.transitionToGamePanel(s, true);
+            ScreenController.transitionToGamePanel(s, true);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             //Controller.transitionToMapEditor();
-            Controller.transitionToDeckEditor();
+            ScreenController.transitionToDeckEditor();
         }
     }
 }

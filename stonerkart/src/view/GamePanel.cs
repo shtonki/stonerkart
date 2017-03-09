@@ -66,8 +66,6 @@ namespace stonerkart
             
 
             g.stepHandler.addObserver(stepPanel1);
-
-            
         }
 
         public GamePanel() : this(null)
@@ -114,7 +112,7 @@ namespace stonerkart
         public IEnumerable<MenuItem> getMenuPanel()
         {
             MenuItem surrender = new MenuItem("French out",
-                () => Controller.transtitionToPostGameScreen(null)
+                () => ScreenController.transtitionToPostGameScreen(null)
                 );
             return new [] {surrender};
 
