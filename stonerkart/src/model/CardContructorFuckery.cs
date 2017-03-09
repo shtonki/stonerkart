@@ -460,13 +460,16 @@ namespace stonerkart
                         );
                 } break;
                 #endregion
-
-                case CardTemplate.missingno:
+                #region Huntress of Nibememe
+                case CardTemplate.Huntress_sOf_sNibememe:
                 {
                     cardType = CardType.Creature;
 
-                    baseToughness = 2;
-                    basePower = 3;
+                    natureCost = 1;
+                    greyCost = 2;
+
+                    baseToughness = 3;
+                    basePower = 1;
                     baseMovement = 2;
 
                     addActivatedAbility(
@@ -479,6 +482,45 @@ namespace stonerkart
                         CastSpeed.Instant
                         );
                 } break;
+                #endregion
+                #region Call to arms
+                case CardTemplate.Call_sTo_sArms:
+                {
+                    cardType = CardType.Sorcery;
+                    rarity = Rarity.Common;
+
+                    lifeCost = 1;
+                    castRange = 2;
+
+                    castDescription = "Summon two 1/1 Squire tokens.";
+                    castEffect = new Effect(new TargetRuleSet(
+                        new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                            CardTemplate.Squire, CardTemplate.Squire),
+                        new PryTileRule(t => t.card == null && !t.isEdgy, true, 2, false)),
+                        new MoveToTileDoer(),
+                        true
+                        );
+
+                } break;
+                #endregion
+                case CardTemplate.missingo:
+                {
+                    
+                } break;
+
+                #region tokens
+                #region Squre
+                case CardTemplate.Squire:
+                {
+                    forceColour = ManaColour.Life;
+                    basePower = 1;
+                    baseToughness = 1;
+                    race = Race.Human;
+                    subtype = Subtype.Warrior;
+                    isToken = true;
+                } break;
+                #endregion
+                #endregion
 
                 default:
                 {
@@ -530,7 +572,7 @@ namespace stonerkart
                 castRange = 2;
                 castEffect = new Effect(new TargetRuleSet(
                     new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                    new PryTileRule(t => t.card == null, true)),
+                    new PryTileRule(t => t.card == null && !t.isEdgy, true)),
                     new MoveToTileDoer());
             }
             else throw new Exception();

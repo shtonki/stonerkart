@@ -109,6 +109,21 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Call_sTo_sArms:
+                {
+                    return Resources.artCallToArmsAlternate;
+                }
+
+                case CardTemplate.Huntress_sOf_sNibememe:
+                {
+                    return Resources.artHuntress;
+                }
+
+                case CardTemplate.Squire:
+                {
+                    return Resources.artSquire;
+                }
+
                 case CardTemplate.Baby_sDragon:
                 {
                     return Resources.artDragonHatchling;

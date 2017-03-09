@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace stonerkart
 {
@@ -91,8 +92,9 @@ namespace stonerkart
             this.columns = columns.ToArray();
         }
 
-        public TargetRow[] generateRows()
+        public TargetRow[] generateRows(bool straightRows)
         {
+            if (straightRows) return straightRowsEx();
             int l = columns.Aggregate(1, (current, c) => current*c.targets.Length);
             if (l == 0) return new TargetRow[] {};
 
@@ -124,6 +126,18 @@ namespace stonerkart
                 if (cs[0] == ms[0]) return r;
             }
         }
+
+        public TargetRow[] straightRowsEx()
+        {
+            if (columns.Select(c => c.targets.Length).Any(l => l != columns[0].targets.Length)) throw new Exception();
+            int length = columns[0].targets.Length;
+            TargetRow[] rows = new TargetRow[length];
+            for (int i = 0; i < length; i++)
+            {
+                rows[i] = new TargetRow(columns.Select(c => c.targets[i]).ToArray());
+            }
+            return rows;
+        }
     }
 
     abstract class TargetRule
@@ -140,7 +154,45 @@ namespace stonerkart
 
         public abstract TargetColumn possible(HackStruct hs);
     }
-    
+
+    class CreateTokenRule : TargetRule
+    {
+        private TargetRule summonFor;
+        private CardTemplate[] tokens;
+
+        public CreateTokenRule(TargetRule summonFor, params CardTemplate[] tokens) : base(typeof(Card))
+        {
+            this.summonFor = summonFor;
+            this.tokens = tokens;
+        }
+
+        public override TargetColumn? fillCastTargets(HackStruct f)
+        {
+            return summonFor.fillCastTargets(f);
+        }
+
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        {
+            TargetColumn? players = summonFor.fillResolveTargets(hs, c);
+            if (!players.HasValue) return null;
+            Player[] ps = players.Value.targets.Cast<Player>().ToArray();
+            List<Card> ts = new List<Card>(ps.Length);
+            foreach (Player p in ps)
+            {
+                foreach (var t in tokens)
+                {
+                    ts.Add(hs.createToken(t, p));
+                }
+            }
+            return new TargetColumn(ts);
+        }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return TargetColumn.empty;
+        }
+    }
+
     class SelectCardRule : TargetRule
     {
         private TargetRule pg;
@@ -330,10 +382,14 @@ namespace stonerkart
     abstract class PryRule : TargetRule
     {
         private bool pryAtResolveTime;
+        private int count;
+        private bool allowDuplicates;
 
-        public PryRule(Type targetType, bool pryAtResolveTime) : base(targetType)
+        public PryRule(Type targetType, bool pryAtResolveTime, int count, bool allowDuplicates) : base(targetType)
         {
             this.pryAtResolveTime = pryAtResolveTime;
+            this.count = count;
+            this.allowDuplicates = allowDuplicates;
         }
 
         public override TargetColumn? fillCastTargets(HackStruct hs)
@@ -348,12 +404,11 @@ namespace stonerkart
 
         private TargetColumn? loopEx(HackStruct hs)
         {
-            TargetColumn? r;
+            List<Targetable> ts = new List<Targetable>();
             hs.highlight(hs.tilesInRange.Where(t => pry(t) != null), Color.OrangeRed);
             hs.setPrompt("Click on a tile", ButtonOption.Cancel);
-            while (true)
+            while (ts.Count < count)
             {
-
                 Stuff v = hs.getStuff();
 
                 if (v is ShibbuttonStuff)
@@ -361,7 +416,7 @@ namespace stonerkart
                     var b = (ShibbuttonStuff)v;
                     if (b.option == ButtonOption.Cancel)
                     {
-                        r = null;
+                        ts.Clear();
                         break;
                     }
                 }
@@ -371,15 +426,25 @@ namespace stonerkart
                 Tile t = (Tile)v;
 
                 Targetable target = pry(t);
-
+                
                 if (target != null && hs.tilesInRange.Contains(t))
                 {
-                    r = new TargetColumn(target);
-                    break;
+                    if (allowDuplicates || !ts.Contains(target))
+                    {
+                        ts.Add(target);
+                        hs.highlight(new Tile[] { t }, Color.ForestGreen);
+                    }
+                    else
+                    {
+                        hs.highlight(new Tile[] { t }, Color.OrangeRed);
+                        ts.Remove(target);
+                    }
+                    
                 }
             }
             hs.clearHighlights();
-            return r;
+            if (ts.Count < count) return null;
+            return new TargetColumn(ts);
         }
 
         public override TargetColumn possible(HackStruct hs)
@@ -394,7 +459,7 @@ namespace stonerkart
     {
         private Func<Tile, bool> fltr;
 
-        public PryTileRule(Func<Tile, bool> filter, bool flip = false) : base(typeof(Tile), flip)
+        public PryTileRule(Func<Tile, bool> filter, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Tile), flip, count, allowDuplicates)
         {
             this.fltr = filter;
         }
@@ -414,7 +479,7 @@ namespace stonerkart
             
         }
 
-        public PryCardRule(Func<Card, bool> filter, bool flip = false) : base(typeof(Card), flip)
+        public PryCardRule(Func<Card, bool> filter, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Card), flip, count, allowDuplicates)
         {
             this.fltr = filter;
         }
@@ -536,6 +601,8 @@ namespace stonerkart
     struct TargetColumn
     {
         public Targetable[] targets;
+
+        public static TargetColumn empty => new TargetColumn();
 
         public TargetColumn(params Targetable[] targets)
         {

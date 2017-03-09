@@ -29,7 +29,7 @@ namespace stonerkart
             for (int i = 0; i < ts.Length; i++)
             {
                 Effect effect = effects[i];
-                rt.AddRange(effect.doer.act(hs, ts[i].generateRows()));
+                rt.AddRange(effect.doer.act(hs, ts[i].generateRows(effect.straightRows)));
             }
 
             return rt;

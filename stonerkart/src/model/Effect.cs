@@ -11,12 +11,14 @@ namespace stonerkart
         public TargetRuleSet ts;
         public Doer doer;
 
+        public bool straightRows { get; }
 
-        public Effect(TargetRuleSet ts, Doer d)
+        public Effect(TargetRuleSet ts, Doer d, bool straightRows = false)
         {
             if (!ts.matchesTypeSignatureOf(d)) throw new Exception();
             this.ts = ts;
             doer = d;
+            this.straightRows = straightRows;
         }
 
         public Effect(TargetRule r, Doer d) : this(new TargetRuleSet(r), d)
@@ -37,7 +39,7 @@ namespace stonerkart
         public bool possibleAsCost(HackStruct hs)
         {
             var tm = ts.possible(hs);
-            var rs = tm.generateRows();
+            var rs = tm.generateRows(straightRows);
             var ps = doer.filterCostRows(rs);
             return ps != null;
         }
