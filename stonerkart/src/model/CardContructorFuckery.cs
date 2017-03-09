@@ -496,7 +496,7 @@ namespace stonerkart
                     castEffect = new Effect(new TargetRuleSet(
                         new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                             CardTemplate.Squire, CardTemplate.Squire),
-                        new PryTileRule(t => t.card == null, true, 2, false)),
+                        new PryTileRule(t => t.card == null && !t.isEdgy, true, 2, false)),
                         new MoveToTileDoer(),
                         true
                         );
@@ -572,7 +572,7 @@ namespace stonerkart
                 castRange = 2;
                 castEffect = new Effect(new TargetRuleSet(
                     new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                    new PryTileRule(t => t.card == null, true)),
+                    new PryTileRule(t => t.card == null && !t.isEdgy, true)),
                     new MoveToTileDoer());
             }
             else throw new Exception();

@@ -15,6 +15,7 @@ namespace stonerkart
         public int c => abcCoord.c;
         public int ord => map.ord(this);
         public Tile[] neighbours => atDistance(1).ToArray();
+        public bool isEdgy => neighbours.Length != 6;
 
         public Card card { get; private set; }
 
