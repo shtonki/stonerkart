@@ -60,7 +60,7 @@ namespace stonerkart
                 case Message.MessageType.NEWGAME:
                 {
                     NewGameBody b = new NewGameBody(m.body);
-                    Controller.newGame(b.newGameStruct, false);
+                    Controller.transitionToGamePanel(b.newGameStruct, false);
                 } break;
 
                 case Message.MessageType.GAMEMESSAGE:

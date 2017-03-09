@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using stonerkart.src.view;
 
 namespace stonerkart
 {
@@ -115,7 +116,7 @@ namespace stonerkart
             Network.challenge(username);
         }
 
-        public static void newGame(NewGameStruct ngs, bool local)
+        public static void transitionToGamePanel(NewGameStruct ngs, bool local)
         {
             inGame = true;
             Game g = new Game(ngs, local);
@@ -136,6 +137,12 @@ namespace stonerkart
         public static void transitionToDeckEditor()
         {
             gameFrame.transitionTo(gameFrame.deckEditorScreen);
+        }
+
+        public static void transtitionToPostGameScreen(Game g)
+        {
+            inGame = false;
+            gameFrame.transitionTo(new PostGameScreen());
         }
 
         public static void setFriendList(List<string> fs)

@@ -113,7 +113,10 @@ namespace stonerkart
 
         public IEnumerable<MenuItem> getMenuPanel()
         {
-            return new List<MenuItem>();
+            MenuItem surrender = new MenuItem("French out",
+                () => Controller.transtitionToPostGameScreen(null)
+                );
+            return new [] {surrender};
 
         }
 

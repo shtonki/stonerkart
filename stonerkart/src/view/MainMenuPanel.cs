@@ -63,7 +63,7 @@ namespace stonerkart
         {
             Random r = new Random();
             NewGameStruct s = new NewGameStruct(r.Next(), new []{"Hero", "Villain"}, 0);
-            Controller.newGame(s, true);
+            Controller.transitionToGamePanel(s, true);
         }
 
         private void button2_Click(object sender, EventArgs e)

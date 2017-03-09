@@ -153,15 +153,15 @@ namespace stonerkart
         private Panel menuFromItems(IEnumerable<MenuItem> mis)
         {
             MenuItem mi = new MenuItem("Report Bug", showBugReportScreen);
-            MenuItem[] dflts = new[] { mi };
+            MenuItem[] dflts = { mi };
 
             Panel p = new Panel();
             MenuItem[] items = mis.Concat(dflts).ToArray();
 
             p.Size = new Size(220, 20 + 50 * items.Count());
-            int i = 0;
-            foreach (var m in items)
+            for(int i = 0; i < items.Length; i++)
             {
+                var m = items[i];
                 Button b = new Button();
                 b.Text = m.title;
                 b.Size = new Size(200, 50);

@@ -284,11 +284,6 @@ namespace stonerkart
                     untapStep();
                 } break;
 
-                case Steps.Draw:
-                {
-                    drawStep();
-                } break;
-
                 case Steps.Main1:
                 {
                     mainStep();
@@ -345,10 +340,7 @@ namespace stonerkart
             activePlayer.gainMana(selection.orb);
 
             priority();
-        }
 
-        private void drawStep()
-        {
             if (!skipFirstDraw)
             {
                 handleTransaction(new DrawEvent(activePlayer, 1));
@@ -357,8 +349,6 @@ namespace stonerkart
             {
                 skipFirstDraw = false;
             }
-
-            priority();
         }
 
         private void mainStep()
@@ -1225,7 +1215,6 @@ namespace stonerkart
     enum Steps
     {
         Replenish,
-        Draw,
         Main1,
         Move,
         Main2,
