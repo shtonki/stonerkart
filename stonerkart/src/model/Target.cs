@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace stonerkart
             for (int i = 0; i < rules.Length; i++)
             {
                 TargetColumn? v = rules[i].fillCastTargets(str);
-                if (v == null) return null;
+                if (!v.HasValue) return null;
                 r[i] = v.Value;
             }
 
@@ -61,7 +62,8 @@ namespace stonerkart
             for (int i = 0; i < rules.Length; i++)
             {
                 var column = rules[i].fillResolveTargets(hs, r[i]);
-                r[i] = column;
+                if (!column.HasValue) throw new Exception();
+                r[i] = column.Value;
             }
 
 
@@ -134,7 +136,7 @@ namespace stonerkart
         }
 
         public abstract TargetColumn? fillCastTargets(HackStruct f);
-        public abstract TargetColumn fillResolveTargets(HackStruct re, TargetColumn c);
+        public abstract TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c);
 
         public abstract TargetColumn possible(HackStruct hs);
     }
@@ -155,9 +157,11 @@ namespace stonerkart
             return pg.fillCastTargets(f);
         }
 
-        public override TargetColumn fillResolveTargets(HackStruct hs, TargetColumn c)
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
         {
-            TargetColumn r = pg.fillResolveTargets(hs, c);
+            TargetColumn? t = pg.fillResolveTargets(hs, c);
+            if (!t.HasValue) return null;
+            TargetColumn r = t.Value;
             if (r.targets.Length != 1) throw new Exception();
             Player p = (Player)r.targets[0];
             Card crd = hs.selectCardSynchronized(p.pileFrom(l));
@@ -189,9 +193,9 @@ namespace stonerkart
             this.column = column;
         }
 
-        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
         {
-            return re.previousTargets.columns[column];
+            return hs.previousTargets.columns[column];
         }
 
         public override TargetColumn possible(HackStruct hs)
@@ -219,7 +223,7 @@ namespace stonerkart
             return ruler.fillCastTargets(f);
         }
 
-        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
         {
             if (c.targets.Length != 1) throw new Exception();
             Tile centre = (Tile)c.targets[0];
@@ -312,7 +316,7 @@ namespace stonerkart
             return new TargetColumn(cost.orbs);
         }
 
-        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
         {
             return c;
         }
@@ -323,84 +327,102 @@ namespace stonerkart
         }
     }
 
-    class PryTileRule : TargetRule
+    abstract class PryRule : TargetRule
     {
-        private Func<Tile, bool> filter;
+        private bool pryAtResolveTime;
 
-        public PryTileRule(Func<Tile, bool> filter) : base(typeof(Tile))
+        public PryRule(Type targetType, bool pryAtResolveTime) : base(targetType)
         {
-            this.filter = filter;
+            this.pryAtResolveTime = pryAtResolveTime;
         }
 
         public override TargetColumn? fillCastTargets(HackStruct hs)
         {
+            return pryAtResolveTime ? new TargetColumn() : loopEx(hs);
+        }
+
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        {
+            return !pryAtResolveTime ? c : loopEx(hs);
+        }
+
+        private TargetColumn? loopEx(HackStruct hs)
+        {
+            TargetColumn? r;
+            hs.highlight(hs.tilesInRange.Where(t => pry(t) != null), Color.OrangeRed);
+            hs.setPrompt("Click on a tile", ButtonOption.Cancel);
             while (true)
             {
+
                 Stuff v = hs.getStuff();
-
-                var b = v as ShibbuttonStuff;
-                if (b?.option == ButtonOption.Cancel) return null;
-
-                if (!(v is Tile)) continue;
-                Tile t = (Tile)v;
-                if (hs.tilesInRange.Contains(t) && filter(t)) return new TargetColumn(t);
-            }
-        }
-
-        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
-        {
-            return c;
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return new TargetColumn(hs.tilesInRange.Where(filter));
-        }
-    }
-
-    class PryCardRule : TargetRule
-    {
-        private Func<Card, bool> filter;
-
-        public PryCardRule() : this(c => true)
-        {
-            
-        }
-
-        public PryCardRule(Func<Card, bool> filter) : base(typeof(Card))
-        {
-            this.filter = filter;
-        }
-
-        public override TargetColumn? fillCastTargets(HackStruct box)
-        {
-            while (true)
-            {
-                Stuff v = box.getStuff();
 
                 if (v is ShibbuttonStuff)
                 {
                     var b = (ShibbuttonStuff)v;
-                    if (b.option == ButtonOption.Cancel) return null;
+                    if (b.option == ButtonOption.Cancel)
+                    {
+                        r = null;
+                        break;
+                    }
                 }
 
                 if (!(v is Tile)) continue;
 
                 Tile t = (Tile)v;
-                if (t.card == null || !box.tilesInRange.Contains(t)) continue;
 
-                if (filter(t.card)) return new TargetColumn(t.card);
+                Targetable target = pry(t);
+
+                if (target != null && hs.tilesInRange.Contains(t))
+                {
+                    r = new TargetColumn(target);
+                    break;
+                }
             }
-        }
-
-        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
-        {
-            return c;
+            hs.clearHighlights();
+            return r;
         }
 
         public override TargetColumn possible(HackStruct hs)
         {
-            return new TargetColumn(hs.tilesInRange.Where(t => t.card != null && filter(t.card)));
+            return new TargetColumn(hs.tilesInRange.Where(t => pry(t) != null));
+        }
+
+        protected abstract Targetable pry(Tile t);
+    }
+
+    class PryTileRule : PryRule
+    {
+        private Func<Tile, bool> fltr;
+
+        public PryTileRule(Func<Tile, bool> filter, bool flip = false) : base(typeof(Tile), flip)
+        {
+            this.fltr = filter;
+        }
+
+        protected override Targetable pry(Tile t)
+        {
+            return fltr(t) ? t : null;
+        }
+    }
+
+    class PryCardRule : PryRule
+    {
+        private Func<Card, bool> fltr;
+
+        public PryCardRule(bool flip = false) : this(c => true, flip)
+        {
+            
+        }
+
+        public PryCardRule(Func<Card, bool> filter, bool flip = false) : base(typeof(Card), flip)
+        {
+            this.fltr = filter;
+        }
+
+        protected override Targetable pry(Tile t)
+        {
+            Card card = t.card;
+            return card != null && fltr(card) ? card : null;
         }
     }
 
@@ -413,24 +435,24 @@ namespace stonerkart
             this.rule = rule;
         }
 
-        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
         {
             if (c.targets.Length != 0) throw new Exception();
             switch (rule)
             {
                 case Rule.ResolveCard:
                 {
-                    return new TargetColumn(re.resolveCard);
+                    return new TargetColumn(hs.resolveCard);
                 }
 
                 case Rule.ResolveControllerCard:
                 {
-                    return new TargetColumn(re.resolveCard.controller.heroCard);
+                    return new TargetColumn(hs.resolveCard.controller.heroCard);
                 }
 
                 case Rule.VillainHeroes:
                 {
-                    return new TargetColumn(re.cards.Where(crd => crd.isHeroic && crd.controller != re.resolveCard.controller));
+                    return new TargetColumn(hs.cards.Where(crd => crd.isHeroic && crd.controller != hs.resolveCard.controller));
                 }
             }
             throw new Exception();
@@ -438,7 +460,7 @@ namespace stonerkart
 
         public override TargetColumn possible(HackStruct hs)
         {
-            return fillResolveTargets(hs, new TargetColumn(new Targetable[0]));
+            return fillResolveTargets(hs, new TargetColumn(new Targetable[0])).Value;
         }
 
         public enum Rule
@@ -459,14 +481,14 @@ namespace stonerkart
             this.rule = rule;
         }
 
-        public override TargetColumn fillResolveTargets(HackStruct re, TargetColumn c)
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
         {
             if (c.targets.Length != 0) throw new Exception();
             switch (rule)
             {
                 case Rule.ResolveController:
                 {
-                    return new TargetColumn(re.resolveCard.controller);
+                    return new TargetColumn(hs.resolveCard.controller);
                 }
             }
             throw new Exception();
@@ -474,7 +496,7 @@ namespace stonerkart
 
         public override TargetColumn possible(HackStruct hs)
         {
-            return fillResolveTargets(hs, new TargetColumn(new Targetable[0]));
+            return fillResolveTargets(hs, new TargetColumn(new Targetable[0])).Value;
         }
 
         public enum Rule

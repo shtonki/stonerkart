@@ -391,6 +391,5 @@ namespace stonerkart
     enum KeywordAbility
     {
         Fervor,
-
     }
 }
