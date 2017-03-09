@@ -15,7 +15,9 @@ namespace stonerkart
         public Player villain { get; }
 
         private List<Player> players;
-        private List<Card> cards;
+        private List<Card> allCards;
+
+        public IEnumerable<Card> cards => allCards;
 
         public Pile stack { get; } = new Pile(new Location(null, PileLocation.Stack));
 
@@ -28,11 +30,12 @@ namespace stonerkart
 
         public GameController gameController;
 
+
         private GameEventHandlerBuckets baseHandler = new GameEventHandlerBuckets();
         private Stack<StackWrapper> wrapperStack { get; } = new Stack<StackWrapper>();
 
-        private IEnumerable<Card> triggerableCards => cards.Where(card => card.location.pile != PileLocation.Deck && !card.isDummy);
-        private IEnumerable<Card> fieldCards => cards.Where(card => card.location.pile == PileLocation.Field);
+        private IEnumerable<Card> triggerableCards => allCards.Where(card => card.location.pile != PileLocation.Deck && !card.isDummy);
+        private IEnumerable<Card> fieldCards => allCards.Where(card => card.location.pile == PileLocation.Field);
 
         private Random random;
         private GameConnection connection;
@@ -51,7 +54,7 @@ namespace stonerkart
 
             random = new Random(ngs.randomSeed);
             map = new Map(16, 9, false, false);
-            cards = new List<Card>();
+            allCards = new List<Card>();
             players = new List<Player>();
 
             for (int i = 0; i < ngs.playerNames.Length; i++)
@@ -75,7 +78,7 @@ namespace stonerkart
         public Card createCard(CardTemplate ct, Pile pile, Player owner = null)
         {
             Card r = new Card(ct, owner);
-            cards.Add(r);
+            allCards.Add(r);
             r.moveTo(pile);
             return r;
         }
@@ -85,18 +88,18 @@ namespace stonerkart
             Card r = a.createDummy();
 
             r.moveTo(pile);
-            cards.Add(r);
+            allCards.Add(r);
             return r;
         }
 
         public int ord(Card c)
         {
-            return cards.IndexOf(c);
+            return allCards.IndexOf(c);
         }
 
         public Card cardFromOrd(int i)
         {
-            return cards[i];
+            return allCards[i];
         }
 
         public int ord(Player p)
@@ -475,7 +478,7 @@ namespace stonerkart
             {
                 baseHandler.handle(e);
 
-                foreach (Card card in cards)
+                foreach (Card card in allCards)
                 {
                     card.handleEvent(e);
                 }
@@ -498,7 +501,7 @@ namespace stonerkart
 
         private void enforceRules()
         {
-            foreach (Card c in cards)
+            foreach (Card c in allCards)
             {
                 c.updateState();
             }
@@ -745,7 +748,7 @@ namespace stonerkart
         private void cast(StackWrapper w)
         {
             GameTransaction gt = new GameTransaction();
-            gt.addEvents(w.ability.cost.resolve(makeHackStruct(w.castingCard), w.costMatricies));
+            gt.addEvents(w.ability.cost.resolve(makeHackStruct(w.ability), w.costMatricies));
             handleTransaction(gt);
             gt = new GameTransaction();
             gt.addEvent(new CastEvent(w));
@@ -809,7 +812,7 @@ namespace stonerkart
                 targetmxs = chooseTargets(ability);
                 if (targetmxs == null) continue;
 
-                costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything, p));
+                costmxs = ability.cost.fillCast(makeHackStruct(p));
                 if (costmxs == null) continue;
 
                 return new StackWrapper(card, ability, targetmxs, costmxs);
@@ -826,7 +829,7 @@ namespace stonerkart
                 targetmxs = chooseTargets(ability);
                 if (targetmxs == null) return null;
 
-                costmxs = ability.cost.fillCast(makeHackStruct(waitForAnything, p));
+                costmxs = ability.cost.fillCast(makeHackStruct(p));
                 if (costmxs == null) continue;
 
                 return new StackWrapper(dummyCard, ability, targetmxs, costmxs);
@@ -857,12 +860,9 @@ namespace stonerkart
             Card caster = a.isCastAbility ? a.card.controller.heroCard : a.card;
             List<Tile> v = caster.tile.withinDistance(a.castRange);
 
-            HackStruct box = makeHackStruct(a.card);
-            box.tilesInRange = v;
-            if (!a.possible(box)) return null;
+            HackStruct box = makeHackStruct(a);
 
-            gameController.highlight(v, Color.Green);
-            gameController.setPrompt("Choose targets.", ButtonOption.Cancel);
+            if (!a.possible(box)) return null;
 
             TargetMatrix[] ms = a.effects.fillCast(box);
 
@@ -881,7 +881,7 @@ namespace stonerkart
 
             List<GameEvent> events = new List<GameEvent>();
 
-            events.AddRange(ability.resolve(makeHackStruct(card), ts));
+            events.AddRange(ability.resolve(makeHackStruct(ability), ts));
 
             GameTransaction gt = new GameTransaction(events);
 
@@ -940,7 +940,7 @@ namespace stonerkart
             return waitFor(f);
         }
 
-        private Stuff waitForAnything()
+        public Stuff waitForAnything()
         {
             InputEventFilter f = new InputEventFilter((x, y) => true);
             return waitFor(f);
@@ -966,22 +966,14 @@ namespace stonerkart
             return s.option;
         }
 
-        private HackStruct makeHackStruct()
+        private HackStruct makeHackStruct(Player castingPlayer)
         {
-            return new HackStruct(selectCardFromCards, hero, null, sendChoices, receiveChoices, waitForAnything, ord, ord,
-                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, null);
+            return new HackStruct(this, castingPlayer);
         }
 
-        private HackStruct makeHackStruct(Func<Stuff> f, Player castingPlayer)
+        private HackStruct makeHackStruct(Ability resolvingAbility)
         {
-            return new HackStruct(selectCardFromCards, hero, castingPlayer, sendChoices, receiveChoices, f, ord, ord, ord,
-                cardFromOrd, playerFromOrd, tileFromOrd, cards, null);
-        }
-
-        private HackStruct makeHackStruct(Card resolvingCard)
-        {
-            return new HackStruct(selectCardFromCards, hero, null, sendChoices, receiveChoices, waitForAnything, ord, ord,
-                ord, cardFromOrd, playerFromOrd, tileFromOrd, cards, resolvingCard);
+            return new HackStruct(this, resolvingAbility);
         }
         
 
@@ -990,7 +982,7 @@ namespace stonerkart
             return gameController.showCards(cards, closeable, clicked);
         }
 
-        private Card selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount)
+        public Card selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount)
         {
             if (cardCount != 1) throw new NotImplementedException();
             gameController.setPrompt("Select card", cancelable ? new ButtonOption[]{ButtonOption.Cancel, } : new ButtonOption[]{ButtonOption.NOTHING});
@@ -1008,12 +1000,12 @@ namespace stonerkart
             throw new Exception();
         }
 
-        private void sendChoices(int[] cs)
+        public void sendChoices(int[] cs)
         {
             connection.sendAction(new ChoiceSelection(cs));
         }
 
-        private int[] receiveChoices()
+        public int[] receiveChoices()
         {
             return connection.receiveAction<ChoiceSelection>().choices;
         }
@@ -1034,6 +1026,7 @@ namespace stonerkart
             {
                 foreach (TargetColumn cl in tm.columns)
                 {
+                    if (cl.targets == null) continue;
                     tiles.AddRange(tilesFromTargetables(cl.targets));
                 }
             }
@@ -1083,8 +1076,8 @@ namespace stonerkart
             this.costMatricies = costMatricies;
         }
     }
-
-
+    
+    
     struct HackStruct
     {
         //game stuff
@@ -1092,6 +1085,8 @@ namespace stonerkart
         public Player castingPlayer { get; }
         public bool heroIsCasting => hero == castingPlayer;
 
+        public Tile castFrom => resolveAbility.card.isDummy ? resolveAbility.card.dummyFor.tile : hero.heroCard.tile;
+        public int castRange => resolveAbility.castRange;
 
         public Func<Card, int> ordC { get; }
         public Func<Player, int> ordP { get; }
@@ -1103,12 +1098,14 @@ namespace stonerkart
         //resolve shit
         public Player resolveController => resolveCard.controller;
         public bool heroIsResolver => hero == resolveController;
-        public Card resolveCard { get; }
+        public Card resolveCard => resolveAbility.card;
+        public Ability resolveAbility { get; }
         public IEnumerable<Card> cards { get; }
 
         public TargetMatrix previousTargets { get; set; }
         public TargetColumn previousColumn { get; set; }
-        public IEnumerable<Tile> tilesInRange { get; set; }
+        public IEnumerable<Tile> tilesInRange => castFrom.withinDistance(castRange);
+        
 
         //network stuff
         public Action<int[]> sendChoices { get; }
@@ -1118,25 +1115,38 @@ namespace stonerkart
         public Func<Stuff> getStuff { get; }
         private Action<string, ButtonOption[]> _setPrompt { get; }
 
+        public Action clearHighlights { get; }
+        public Action<IEnumerable<Tile>, Color> highlight { get; }
 
         private Func<IEnumerable<Card>, bool, int, Card> selectCardEx;
-        
-        public HackStruct(Func<IEnumerable<Card>, bool, int, Card> selectCardEx, Player hero, Player castingPlayer, Action<int[]> sendChoices, Func<int[]> receiveChoices, Func<Stuff> getStuff, Func<Card, int> ordC, Func<Player, int> ordP, Func<Tile, int> ordT, Func<int, Card> cord, Func<int, Player> pord, Func<int, Tile> tord, IEnumerable<Card> cards, Card resolveCard) : this()
+
+        public HackStruct(Game g) : this()
         {
-            this.selectCardEx = selectCardEx;
-            this.hero = hero;
-            this.castingPlayer = castingPlayer;
-            this.sendChoices = sendChoices;
-            this.receiveChoices = receiveChoices;
-            this.getStuff = getStuff;
-            this.ordC = ordC;
-            this.ordP = ordP;
-            this.ordT = ordT;
-            Cord = cord;
-            Pord = pord;
-            Tord = tord;
-            this.cards = cards;
-            this.resolveCard = resolveCard;
+            ordP = g.ord;
+            ordC = g.ord;
+            ordT = g.ord;
+            Cord = g.cardFromOrd;
+            Pord = g.playerFromOrd;
+            Tord = g.tileFromOrd;
+            cards = g.cards;
+            sendChoices = g.sendChoices;
+            receiveChoices = g.receiveChoices;
+            selectCardEx = g.selectCardFromCards;
+            getStuff = g.waitForAnything;
+            hero = g.hero;
+            _setPrompt = g.gameController.setPrompt;
+            clearHighlights = () => g.gameController.clearHighlights(true);
+            highlight = g.gameController.highlight;
+        }
+
+        public HackStruct(Game g, Player p) : this(g)
+        {
+            castingPlayer = p;
+        }
+
+        public HackStruct(Game g, Ability a) : this(g)
+        {
+            resolveAbility = a;
         }
 
         public void setPrompt(string s)
@@ -1182,7 +1192,7 @@ namespace stonerkart
             return c;
         }
     }
-
+    
     class StepHandler : Observable<Steps>
     {
         public Steps step { get; private set; }

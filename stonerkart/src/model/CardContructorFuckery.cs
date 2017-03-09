@@ -530,7 +530,7 @@ namespace stonerkart
                 castRange = 2;
                 castEffect = new Effect(new TargetRuleSet(
                     new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                    new PryTileRule(t => t.card == null)),
+                    new PryTileRule(t => t.card == null, true)),
                     new MoveToTileDoer());
             }
             else throw new Exception();
