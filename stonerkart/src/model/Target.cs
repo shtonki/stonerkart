@@ -332,18 +332,18 @@ namespace stonerkart
             this.filter = filter;
         }
 
-        public override TargetColumn? fillCastTargets(HackStruct box)
+        public override TargetColumn? fillCastTargets(HackStruct hs)
         {
             while (true)
             {
-                Stuff v = box.getStuff();
+                Stuff v = hs.getStuff();
 
                 var b = v as ShibbuttonStuff;
                 if (b?.option == ButtonOption.Cancel) return null;
 
                 if (!(v is Tile)) continue;
                 Tile t = (Tile)v;
-                if (filter(t)) return new TargetColumn(t);
+                if (hs.tilesInRange.Contains(t) && filter(t)) return new TargetColumn(t);
             }
         }
 
@@ -387,7 +387,7 @@ namespace stonerkart
                 if (!(v is Tile)) continue;
 
                 Tile t = (Tile)v;
-                if (t.card == null) continue;
+                if (t.card == null || !box.tilesInRange.Contains(t)) continue;
 
                 if (filter(t.card)) return new TargetColumn(t.card);
             }
