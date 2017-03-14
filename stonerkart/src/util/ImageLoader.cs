@@ -109,6 +109,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Wilt:
+                {
+                    return Resources.artWilt;
+                }
+
                 case CardTemplate.Call_sTo_sArms:
                 {
                     return Resources.artCallToArmsAlternate;
