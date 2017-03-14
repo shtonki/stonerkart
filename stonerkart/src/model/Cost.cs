@@ -20,9 +20,10 @@ namespace stonerkart
             this.effects = effects;
         }
 
-        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] ts)
+        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] tsx)
         {
-            ts = fillResolve(hs, ts);
+            var ts = fillResolve(hs, tsx);
+            if (ts == null) return new GameEvent[0];
 
             List<GameEvent> rt = new List<GameEvent>();
 
