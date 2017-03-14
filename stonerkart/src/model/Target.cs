@@ -390,14 +390,15 @@ namespace stonerkart
         }
     }
 
-    abstract class PryRule : TargetRule
+    internal abstract class PryRule : TargetRule
     {
         private bool pryAtResolveTime;
         private int count;
         private bool allowDuplicates;
         private TargetRule playerGenerator;
 
-        public PryRule(Type targetType, TargetRule playerGenerator, bool pryAtResolveTime, int count, bool allowDuplicates) : base(targetType)
+        public PryRule(Type targetType, TargetRule playerGenerator, bool pryAtResolveTime, int count,
+            bool allowDuplicates) : base(targetType)
         {
             this.pryAtResolveTime = pryAtResolveTime;
             this.count = count;
@@ -405,25 +406,46 @@ namespace stonerkart
             this.playerGenerator = playerGenerator;
         }
 
-        private TargetColumn? playerCache;
         public override TargetColumn? fillCastTargets(HackStruct hs)
         {
-            playerCache = playerGenerator.fillCastTargets(hs);
-            return pryAtResolveTime ? new TargetColumn(new Targetable[0]) : loopEx(hs);
+            return pryAtResolveTime ? playerGenerator.fillCastTargets(hs) : selectTiles(hs);
         }
 
         public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
         {
-            playerCache = playerGenerator.fillResolveTargets(hs, playerCache.Value);
-            return !pryAtResolveTime ? c : loopEx(hs);
+            var v = playerGenerator.fillResolveTargets(hs, c);
+            if (!v.HasValue) throw new Exception();
+            return !pryAtResolveTime ? c : selectTiles(hs, v.Value);
         }
 
-        private TargetColumn? loopEx(HackStruct hs)
+        private TargetColumn? selectTiles(HackStruct hs, TargetColumn tc)
         {
-            var pc = playerCache.Value.targets;
+            var pc = tc.targets;
             if (pc.Length != 1 || !(pc[0] is Player)) throw new Exception();
             Player p = (Player)pc[0];
 
+            //List<Targetable> ts = new List<Targetable>();
+
+            if (p == hs.hero)
+            {
+                var v = selectTiles(hs);
+                if (!v.HasValue) throw new Exception();
+                var ts = v.Value.targets;
+                hs.sendChoices(ts.Select(t => TtoI(hs, t)).ToArray());
+                return v.Value;
+            }
+            else
+            {
+                return new TargetColumn(hs.receiveChoices().Select(i => ItoT(hs, i)));
+            }
+        }
+
+        protected abstract int TtoI(HackStruct hs, Targetable t);
+        protected abstract Targetable ItoT(HackStruct hs, int i);
+
+
+        private TargetColumn? selectTiles(HackStruct hs)
+        {
             List<Targetable> ts = new List<Targetable>();
             hs.highlight(hs.tilesInRange.Where(t => pry(t) != null), Color.OrangeRed);
             hs.setPrompt("Click on a tile", pryAtResolveTime ? ButtonOption.NOTHING : ButtonOption.Cancel);
@@ -446,20 +468,20 @@ namespace stonerkart
                 Tile t = (Tile)v;
 
                 Targetable target = pry(t);
-                
+
                 if (target != null && hs.tilesInRange.Contains(t))
                 {
                     if (allowDuplicates || !ts.Contains(target))
                     {
                         ts.Add(target);
-                        hs.highlight(new Tile[] { t }, Color.ForestGreen);
+                        hs.highlight(new Tile[] {t}, Color.ForestGreen);
                     }
                     else
                     {
-                        hs.highlight(new Tile[] { t }, Color.OrangeRed);
+                        hs.highlight(new Tile[] {t}, Color.OrangeRed);
                         ts.Remove(target);
                     }
-                    
+
                 }
             }
             hs.clearHighlights();
@@ -488,6 +510,16 @@ namespace stonerkart
         {
             return fltr(t) ? t : null;
         }
+
+        protected override int TtoI(HackStruct hs, Targetable t)
+        {
+            return hs.ordT((Tile)t);
+        }
+
+        protected override Targetable ItoT(HackStruct hs, int i)
+        {
+            return hs.Tord(i);
+        }
     }
 
     class PryCardRule : PryRule
@@ -509,6 +541,16 @@ namespace stonerkart
             Card card = t.card;
             return card != null && fltr(card) ? card : null;
         }
+
+        protected override int TtoI(HackStruct hs, Targetable t)
+        {
+            return hs.ordC((Card)t);
+        }
+
+        protected override Targetable ItoT(HackStruct hs, int i)
+        {
+            return hs.Cord(i);
+        }
     }
 
     class PryPlayerRule : PryRule
@@ -525,6 +567,16 @@ namespace stonerkart
         {
             Card card = t.card;
             return card != null && card.isHeroic && fltr(card.owner) ? card.owner : null;
+        }
+
+        protected override int TtoI(HackStruct hs, Targetable t)
+        {
+            return hs.ordP((Player)t);
+        }
+
+        protected override Targetable ItoT(HackStruct hs, int i)
+        {
+            return hs.Pord(i);
         }
     }
 
