@@ -504,22 +504,38 @@ namespace stonerkart
 
                 } break;
                 #endregion
-                case CardTemplate.missingo:
+                #region Wilt
+                case CardTemplate.Wilt:
                 {
                     cardType = CardType.Sorcery;
 
-                    castEffect = new Effect(new SelectCardRule(PileLocation.Hand, new PryPlayerRule(p => true, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), c => c.cardType == CardType.Creature),
-                        new ToOwnersDoer(PileLocation.Graveyard));
+                    deathCost = 2;
+
+                    castDescription = "Look at target players hand and select a creature. Selected card is discarded.";
+                    castEffect =
+                        new Effect(
+                            new SelectCardRule(PileLocation.Hand,
+                                new PryPlayerRule(p => true,
+                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                                c => c.cardType == CardType.Creature),
+                            new ToOwnersDoer(PileLocation.Graveyard));
                     castRange = 100;
                 } break;
+                #endregion
 
-                #region tokens
-                #region Squre
+                case CardTemplate.missingo:
+                {
+
+                } break;
+
+                    #region tokens
+                #region Squire
                 case CardTemplate.Squire:
                 {
                     forceColour = ManaColour.Life;
                     basePower = 1;
                     baseToughness = 1;
+                    baseMovement = 2;
                     race = Race.Human;
                     subtype = Subtype.Warrior;
                     isToken = true;

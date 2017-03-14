@@ -413,9 +413,16 @@ namespace stonerkart
 
         public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
         {
-            var v = playerGenerator.fillResolveTargets(hs, c);
-            if (!v.HasValue) throw new Exception();
-            return !pryAtResolveTime ? c : selectTiles(hs, v.Value);
+            if (pryAtResolveTime)
+            {
+                var v = playerGenerator.fillResolveTargets(hs, c);
+                if (!v.HasValue) throw new Exception();
+                return selectTiles(hs, v.Value);
+            }
+            else
+            {
+                return c;
+            }
         }
 
         private TargetColumn? selectTiles(HackStruct hs, TargetColumn tc)
@@ -436,6 +443,7 @@ namespace stonerkart
             }
             else
             {
+                hs.setPrompt("Opponent is making selections.");
                 return new TargetColumn(hs.receiveChoices().Select(i => ItoT(hs, i)));
             }
         }
