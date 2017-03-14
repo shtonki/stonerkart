@@ -151,7 +151,7 @@ namespace stonerkart
                     castRange = 3;
                     chaosCost = 1;
 
-                    castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule(c => true)), 
+                    castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule(c => true, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), 
                         new ZepperDoer(2));
                     castDescription = "Deal 2 damage to target creature.";
                 } break;
@@ -249,7 +249,7 @@ namespace stonerkart
                     orderCost = 1;
                     greyCost = 1;
 
-                    castEffect = new Effect(new TargetRuleSet(new PryCardRule(c => !c.isHeroic)), 
+                    castEffect = new Effect(new TargetRuleSet(new PryCardRule(c => !c.isHeroic, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), 
                         new ToOwnersDoer(PileLocation.Hand));
                     castDescription = "Return target non-heroic creature to its owner's hand.";
                 } break;
@@ -328,7 +328,7 @@ namespace stonerkart
                     castRange = 6;
                     castEffect = new Effect(
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
-                                new PryTileRule(f => f.passable)), new MoveToTileDoer());
+                                new PryTileRule(f => f.passable, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer());
                     castDescription = "Move your hero to target tile.";
                 } break;
                 #endregion
@@ -497,7 +497,7 @@ namespace stonerkart
                     castEffect = new Effect(new TargetRuleSet(
                         new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                             CardTemplate.Squire, CardTemplate.Squire),
-                        new PryTileRule(t => t.card == null && !t.isEdgy, true, 2, false)),
+                        new PryTileRule(t => t.card == null && !t.isEdgy, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, 2, false)),
                         new MoveToTileDoer(),
                         true
                         );
@@ -508,7 +508,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Sorcery;
 
-                    castEffect = new Effect(new SelectCardRule(PileLocation.Hand, new PryPlayerRule(p => true), c => c.cardType == CardType.Creature),
+                    castEffect = new Effect(new SelectCardRule(PileLocation.Hand, new PryPlayerRule(p => true, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), c => c.cardType == CardType.Creature),
                         new ToOwnersDoer(PileLocation.Graveyard));
                     castRange = 100;
                 } break;
@@ -576,7 +576,7 @@ namespace stonerkart
                 castRange = 2;
                 castEffect = new Effect(new TargetRuleSet(
                     new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                    new PryTileRule(t => t.card == null && !t.isEdgy, true)),
+                    new PryTileRule(t => t.card == null && !t.isEdgy, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
                     new MoveToTileDoer());
             }
             else throw new Exception();

@@ -17,7 +17,7 @@ namespace stonerkart
         private List<Player> players;
         private List<Card> allCards;
 
-        public IEnumerable<Card> cards => allCards;
+        public IEnumerable<Card> ca => allCards;
 
         public Pile stack { get; } = new Pile(new Location(null, PileLocation.Stack));
 
@@ -989,22 +989,46 @@ namespace stonerkart
             return gameController.showCards(cards, closeable, clicked);
         }
 
-        public Card selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount)
+        public IEnumerable<Card> selectCardFromCards(IEnumerable<Card> cards, bool cancelable = true, int cardCount = 1, Func<Card, bool> filter = null)
         {
-            if (cardCount != 1) throw new NotImplementedException();
+            List<Card> rt = new List<Card>(cardCount);
+            filter = filter == null ? (c) => true : filter;
+            var ca = cards.ToArray();
+
+            if (ca.Count(filter) == 0)
+            {
+                var vv = showCards(ca, false);
+                var rr = waitForButton("No valid selections.", ButtonOption.Cancel);
+                vv.close();
+                return new Card[0];
+            }
+
             gameController.setPrompt("Select card", cancelable ? new ButtonOption[]{ButtonOption.Cancel, } : new ButtonOption[]{ButtonOption.NOTHING});
-            var v = showCards(cards, false);
-            Stuff r = waitForButtonOr<Card>(c => cards.Contains((c)));
+            var v = showCards(ca, false);
+
+            while (rt.Count < cardCount)
+            {
+                Stuff r = waitForButtonOr<Card>(c => ca.Contains(c) && filter(c));
+                if (r is Card)
+                {
+                    Card card = (Card)r;
+                    if (rt.Contains(card))
+                    {
+                        rt.Remove(card);
+                    }
+                    else
+                    {
+                        rt.Add(card);
+                    }
+                }
+                if (r is ShibbuttonStuff)
+                {
+                    rt.Clear();
+                    break;
+                }
+            }
             v.close();
-            if (r is Card)
-            {
-                return (Card)r;
-            }
-            if (r is ShibbuttonStuff)
-            {
-                return null;
-            }
-            throw new Exception();
+            return rt;
         }
 
         public void sendChoices(int[] cs)
@@ -1126,7 +1150,7 @@ namespace stonerkart
         public Action clearHighlights { get; }
         public Action<IEnumerable<Tile>, Color> highlight { get; }
 
-        private Func<IEnumerable<Card>, bool, int, Card> selectCardEx;
+        private Func<IEnumerable<Card>, bool, int, Func<Card, bool>, IEnumerable<Card>> selectCardEx;
 
 
         public HackStruct(Game g) : this()
@@ -1137,7 +1161,7 @@ namespace stonerkart
             Cord = g.cardFromOrd;
             Pord = g.playerFromOrd;
             Tord = g.tileFromOrd;
-            cards = g.cards;
+            cards = g.ca;
             sendChoices = g.sendChoices;
             receiveChoices = g.receiveChoices;
             selectCardEx = g.selectCardFromCards;
@@ -1182,22 +1206,28 @@ namespace stonerkart
             }
         }
 
-        public Card selectCardSynchronized(IEnumerable<Card> cs)
+        public Card selectCardSynchronized(IEnumerable<Card> cs, Func<Card, bool> filter)
         {
-            Card c;
+            var v = selectCardsSynchronized(cs, 1, filter).ToArray();
+            if (v.Length == 0) return null;
+            return v[0];
+        }
+
+        public IEnumerable<Card> selectCardsSynchronized(IEnumerable<Card> cs, int cardCount, Func<Card, bool> filter)
+        {
+            IEnumerable<Card> c;
             if (heroIsResolver)
             {
                 setPrompt("Choose a card.");
-                c = selectCardEx(cs, false, 1);
-                int s = ordC(c);
-                sendChoices(new int[] {s});
+                c = selectCardEx(cs, false, cardCount, filter);
+                int[] ss = c.Select(ordC).ToArray();
+                sendChoices(ss);
             }
             else
             {
                 setPrompt("Opponent is choosing a card.");
                 int[] v = receiveChoices();
-                Debug.Assert(v.Length == 1);
-                c = Cord(v[0]);
+                c = v.Select(Cord);
             }
             return c;
         }

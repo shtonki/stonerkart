@@ -56,17 +56,16 @@ namespace stonerkart
             return new TargetMatrix(r);
         }
 
-        public virtual TargetMatrix fillResolve(TargetMatrix tm, HackStruct hs)
+        public TargetMatrix fillResolve(TargetMatrix tm, HackStruct hs)
         {
             TargetColumn[] r = tm.columns;
 
             for (int i = 0; i < rules.Length; i++)
             {
                 var column = rules[i].fillResolveTargets(hs, r[i]);
-                if (!column.HasValue) throw new Exception();
+                if (!column.HasValue) return null;
                 r[i] = column.Value;
             }
-
 
             return new TargetMatrix(r);
         }
@@ -226,8 +225,9 @@ namespace stonerkart
             Player p = (Player)r.targets[0];
             while (true)
             {
-                Card crd = hs.selectCardSynchronized(p.pileFrom(l));
-                if (filter(crd)) return new TargetColumn(crd);
+                Card crd = hs.selectCardSynchronized(p.pileFrom(l), filter);
+                if (crd == null) return null;
+                return new TargetColumn(crd);
             }
         }
 
@@ -276,7 +276,7 @@ namespace stonerkart
 
         public AoeRule(Func<Tile, bool> filter, int radius, Func<Card, bool> cardFilter) : base(typeof(Card))
         {
-            ruler = new PryTileRule(filter);
+            ruler = new PryTileRule(filter, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController));
             this.radius = radius;
             this.cardFilter = cardFilter;
         }
@@ -395,29 +395,38 @@ namespace stonerkart
         private bool pryAtResolveTime;
         private int count;
         private bool allowDuplicates;
+        private TargetRule playerGenerator;
 
-        public PryRule(Type targetType, bool pryAtResolveTime, int count, bool allowDuplicates) : base(targetType)
+        public PryRule(Type targetType, TargetRule playerGenerator, bool pryAtResolveTime, int count, bool allowDuplicates) : base(targetType)
         {
             this.pryAtResolveTime = pryAtResolveTime;
             this.count = count;
             this.allowDuplicates = allowDuplicates;
+            this.playerGenerator = playerGenerator;
         }
 
+        private TargetColumn? playerCache;
         public override TargetColumn? fillCastTargets(HackStruct hs)
         {
-            return pryAtResolveTime ? new TargetColumn() : loopEx(hs);
+            playerCache = playerGenerator.fillCastTargets(hs);
+            return pryAtResolveTime ? new TargetColumn(new Targetable[0]) : loopEx(hs);
         }
 
         public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
         {
+            playerCache = playerGenerator.fillResolveTargets(hs, playerCache.Value);
             return !pryAtResolveTime ? c : loopEx(hs);
         }
 
         private TargetColumn? loopEx(HackStruct hs)
         {
+            var pc = playerCache.Value.targets;
+            if (pc.Length != 1 || !(pc[0] is Player)) throw new Exception();
+            Player p = (Player)pc[0];
+
             List<Targetable> ts = new List<Targetable>();
             hs.highlight(hs.tilesInRange.Where(t => pry(t) != null), Color.OrangeRed);
-            hs.setPrompt("Click on a tile", ButtonOption.Cancel);
+            hs.setPrompt("Click on a tile", pryAtResolveTime ? ButtonOption.NOTHING : ButtonOption.Cancel);
             while (ts.Count < count)
             {
                 Stuff v = hs.getStuff();
@@ -470,7 +479,7 @@ namespace stonerkart
     {
         private Func<Tile, bool> fltr;
 
-        public PryTileRule(Func<Tile, bool> filter, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Tile), flip, count, allowDuplicates)
+        public PryTileRule(Func<Tile, bool> filter, TargetRule playerGenerator, bool pryAtResolveTime = false, int count = 1, bool allowDuplicates = true) : base(typeof(Tile), playerGenerator, pryAtResolveTime, count, allowDuplicates)
         {
             this.fltr = filter;
         }
@@ -485,12 +494,12 @@ namespace stonerkart
     {
         private Func<Card, bool> fltr;
 
-        public PryCardRule(bool flip = false) : this(c => true, flip)
+        public PryCardRule(bool flip = false) : this(c => true, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), flip)
         {
             
         }
 
-        public PryCardRule(Func<Card, bool> filter, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Card), flip, count, allowDuplicates)
+        public PryCardRule(Func<Card, bool> filter, TargetRule playerGenerator, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Card), playerGenerator, flip, count, allowDuplicates)
         {
             this.fltr = filter;
         }
@@ -507,7 +516,7 @@ namespace stonerkart
         private Func<Player, bool> fltr;
         
 
-        public PryPlayerRule(Func<Player, bool> filter, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Card), flip, count, allowDuplicates)
+        public PryPlayerRule(Func<Player, bool> filter, TargetRule playerGenerator, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Card), playerGenerator, flip, count, allowDuplicates)
         {
             this.fltr = filter;
         }
