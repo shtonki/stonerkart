@@ -258,6 +258,7 @@ namespace stonerkart
 
         public static GameEventFilter never { get; } = new StaticGameEventFilter(() => false);
         public static GameEventFilter endOfTurn { get; } = new TypedGameEventFilter<EndOfStepEvent>((e) => e.step == Steps.End);
+        public static GameEventFilter clearAura { get; } = new TypedGameEventFilter<ClearAurasEvent>();
 
         public static GameEventFilter thisEnters(Card c, PileLocation pl)
         {

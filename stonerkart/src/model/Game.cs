@@ -512,6 +512,30 @@ namespace stonerkart
         {
             foreach (Card c in allCards)
             {
+                c.handleEvent(new ClearAurasEvent());
+            }
+            List<GameEvent> ae = new List<GameEvent>();
+            foreach (Card c in allCards)
+            {
+                foreach (Aura a in c.auras)
+                {
+                    foreach (Card affected in allCards.Where(a.filter))
+                    {
+                        ae.Add(new ModifyEvent(affected, a.stat, a.modifer));
+                    }
+                }
+            }
+
+            foreach (Card c in allCards)
+            {
+                foreach (GameEvent e in ae)
+                {
+                    c.handleEvent(e);
+                }
+            }
+
+            foreach (Card c in allCards)
+            {
                 c.updateState();
             }
 

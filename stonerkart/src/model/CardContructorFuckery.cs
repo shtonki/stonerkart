@@ -545,9 +545,24 @@ namespace stonerkart
                             );
                 } break;
 
-                case CardTemplate.missingo:
+                case CardTemplate.Kraken:
                 {
-                    
+                    cardType = CardType.Creature;
+
+                    baseMovement = 2;
+                    basePower = 1;
+                    baseToughness = 5;
+
+                    orderCost = 2;
+                    greyCost = 2;
+
+                    auras.Add(new Aura(
+                        "This creature gets +1/+0 for each card in its controllers hand.",
+                        () => controller.hand.Count,
+                        LL.add,
+                        ModifiableStats.Power, 
+                        c => c == this
+                        ));
                 } break;
 
                     #region tokens
