@@ -430,4 +430,10 @@
   <data name="artWilt" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artWilt.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="artLordIla" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artLordIla.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artKraken" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artKraken.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

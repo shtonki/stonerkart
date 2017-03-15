@@ -218,7 +218,7 @@ namespace stonerkart
             return hackedaf[(int)c];
         }
 
-        public static char exhaust => '\u24BA';
+        public static char exhaustGhyph => '\u24BA';
 
 
         public static IEnumerable<int> range(int min, int max)
@@ -258,6 +258,7 @@ namespace stonerkart
 
         public static GameEventFilter never { get; } = new StaticGameEventFilter(() => false);
         public static GameEventFilter endOfTurn { get; } = new TypedGameEventFilter<EndOfStepEvent>((e) => e.step == Steps.End);
+        public static GameEventFilter clearAura { get; } = new TypedGameEventFilter<ClearAurasEvent>();
 
         public static GameEventFilter thisEnters(Card c, PileLocation pl)
         {

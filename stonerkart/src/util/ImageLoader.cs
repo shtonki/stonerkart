@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using stonerkart.Properties;
 
@@ -109,6 +110,16 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Kraken:
+                {
+                    return Resources.artKraken;
+                }
+
+                case CardTemplate.Lord_sIla:
+                {
+                    return Resources.artLordIla;
+                }
+
                 case CardTemplate.Wilt:
                 {
                     return Resources.artWilt;

@@ -543,6 +543,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artKraken {
+            get {
+                object obj = ResourceManager.GetObject("artKraken", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artLoneRanger {
             get {
                 object obj = ResourceManager.GetObject("artLoneRanger", resourceCulture);
@@ -556,6 +566,16 @@ namespace stonerkart.Properties {
         public static System.Drawing.Bitmap artLoneWolf {
             get {
                 object obj = ResourceManager.GetObject("artLoneWolf", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artLordIla {
+            get {
+                object obj = ResourceManager.GetObject("artLordIla", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

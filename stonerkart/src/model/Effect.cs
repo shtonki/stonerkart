@@ -123,7 +123,7 @@ namespace stonerkart
         protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Card card = (Card)row[0];
-            return new GameEvent[] {new ApplyModifierEvent(card, modifiableStats, modifier)};
+            return new GameEvent[] {new ModifyEvent(card, modifiableStats, modifier)};
         }
     }
 
@@ -222,11 +222,11 @@ namespace stonerkart
         }
     }
 
-    class ToOwnersDoer : SimpleDoer
+    class MoveToPileDoer : SimpleDoer
     {
         public PileLocation pileLocation;
 
-        public ToOwnersDoer(PileLocation pileLocation) : base(typeof(Card))
+        public MoveToPileDoer(PileLocation pileLocation) : base(typeof(Card))
         {
             this.pileLocation = pileLocation;
         }

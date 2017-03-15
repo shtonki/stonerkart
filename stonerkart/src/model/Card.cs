@@ -55,6 +55,8 @@ namespace stonerkart
 
         public List<ManaColour> colours => coloursEx();
 
+        public List<Aura> auras { get; } = new List<Aura>();
+
         public bool isHeroic { get; }
 
         public bool hasPT => cardType == CardType.Creature;
@@ -196,6 +198,7 @@ namespace stonerkart
         private string breadTextEx()
         {
             StringBuilder sb = new StringBuilder();
+
             foreach (Ability a in abilities)
             {
                 string s = a.description;
@@ -205,11 +208,19 @@ namespace stonerkart
                     sb.Append("\r\n");
                 }
             }
+
             foreach (var a in keywordAbilities)
             {
                 sb.Append(a);
                 sb.Append("\r\n");
             }
+
+            foreach (var a in auras)
+            {
+                sb.Append(a.description);
+                sb.Append("\r\n");
+            }
+
             return sb.ToString();
         }
 
@@ -259,7 +270,7 @@ namespace stonerkart
                         ), e => fatigue = 0);
 
 
-            r.add(new TypedGameEventHandler<ApplyModifierEvent>(e =>
+            r.add(new TypedGameEventHandler<ModifyEvent>(e =>
             {
                 Modifiable m;
                 switch (e.stat)
@@ -313,6 +324,29 @@ namespace stonerkart
             
             return r;
         }
+
+        
+    }
+
+    class Aura
+    {
+        public string description { get; }
+        public ModifiableStats stat { get; }
+        public Func<Card, bool> filter { get; }
+
+        private Func<int> val;
+        private Func<int, int, int> fn;
+
+        public ModifierStruct modifer => new ModifierStruct(val(), fn, LL.clearAura);
+
+        public Aura(string description, Func<int> val, Func<int, int, int> fn, ModifiableStats stat, Func<Card, bool> filter)
+        {
+            this.val = val;
+            this.fn = fn;
+            this.description = description;
+            this.stat = stat;
+            this.filter = filter;
+        }
     }
 
     enum ModifiableStats { Power, Toughness, Movement };
@@ -320,7 +354,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
-        missingo,
+        Kraken,
+        Lord_sIla,
         Wilt,
         Huntress_sOf_sNibememe,
         Baby_sDragon,

@@ -32,6 +32,11 @@ namespace stonerkart
         }
     }
 
+    struct ClearAurasEvent : GameEvent
+    {
+        
+    }
+
     struct GainBonusManaEvent : GameEvent
     {
         public Player player { get; }
@@ -54,13 +59,13 @@ namespace stonerkart
         }
     }
 
-    struct ApplyModifierEvent : GameEvent, CardedEvent
+    struct ModifyEvent : GameEvent, CardedEvent
     {
         public Card card { get; }
         public ModifiableStats stat { get; }
         public ModifierStruct modifier { get; }
 
-        public ApplyModifierEvent(Card card, ModifiableStats stat, ModifierStruct modifier)
+        public ModifyEvent(Card card, ModifiableStats stat, ModifierStruct modifier)
         {
             this.card = card;
             this.stat = stat;

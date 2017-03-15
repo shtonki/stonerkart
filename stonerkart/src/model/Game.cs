@@ -13,6 +13,7 @@ namespace stonerkart
         public Map map { get; }
         public Player hero { get; }
         public Player villain { get; }
+        public IEnumerable<Player> allPlayers => players;
 
         private List<Player> players;
         private List<Card> allCards;
@@ -53,7 +54,7 @@ namespace stonerkart
             }
 
             random = new Random(ngs.randomSeed);
-            map = new Map(16, 9, false, false);
+            map = new Map(11, 7, false, false);
             allCards = new List<Card>();
             players = new List<Player>();
 
@@ -198,8 +199,8 @@ namespace stonerkart
 
             Tile[] ts = new[]
             {
-                map.tileAt(4, 3),
-                map.tileAt(map.width - 6, map.height - 4),
+                map.tileAt(2, 2),
+                map.tileAt(map.width - 3, map.height - 3),
             };
             int ix = 0;
             gameController.redraw();
@@ -329,28 +330,29 @@ namespace stonerkart
         {
             activePlayer.resetMana();
 
-            ManaOrbSelection selection;
-
-            if (activePlayer == hero)
+            if (activePlayer.manaPool.max.orbs.Count() < 12)
             {
-                activePlayer.stuntMana();
+                ManaOrbSelection selection;
+                if (activePlayer == hero)
+                {
+                    activePlayer.stuntMana();
 
-                gameController.setPrompt("Gain mana nerd");
-                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.currentMana(o.colour) != 6);
+                    gameController.setPrompt("Gain mana nerd");
+                    ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.currentMana(o.colour) != 6);
 
-                activePlayer.unstuntMana();
+                    activePlayer.unstuntMana();
 
-                selection = new ManaOrbSelection(v.colour);
-                connection.sendAction(selection);
+                    selection = new ManaOrbSelection(v.colour);
+                    connection.sendAction(selection);
+                }
+                else
+                {
+                    gameController.setPrompt("Opponent is gaining mana");
+                    selection = connection.receiveAction<ManaOrbSelection>();
+                }
+
+                activePlayer.gainMana(selection.orb);
             }
-            else
-            {
-                gameController.setPrompt("Opponent is gaining mama");
-                selection = connection.receiveAction<ManaOrbSelection>();
-            }
-
-            activePlayer.gainMana(selection.orb);
-
             priority();
 
             if (!skipFirstDraw)
@@ -508,6 +510,30 @@ namespace stonerkart
 
         private void enforceRules()
         {
+            foreach (Card c in allCards)
+            {
+                c.handleEvent(new ClearAurasEvent());
+            }
+            List<GameEvent> ae = new List<GameEvent>();
+            foreach (Card c in allCards)
+            {
+                foreach (Aura a in c.auras)
+                {
+                    foreach (Card affected in allCards.Where(a.filter))
+                    {
+                        ae.Add(new ModifyEvent(affected, a.stat, a.modifer));
+                    }
+                }
+            }
+
+            foreach (Card c in allCards)
+            {
+                foreach (GameEvent e in ae)
+                {
+                    c.handleEvent(e);
+                }
+            }
+
             foreach (Card c in allCards)
             {
                 c.updateState();
@@ -1112,6 +1138,7 @@ namespace stonerkart
     struct HackStruct
     {
         //game stuff
+        public IEnumerable<Player> players { get; }
         public Player hero { get; }
         public Player castingPlayer { get; }
         public bool heroIsCasting => hero == castingPlayer;
@@ -1171,6 +1198,7 @@ namespace stonerkart
             clearHighlights = () => g.gameController.clearHighlights(true);
             highlight = g.gameController.highlight;
             createToken = g.createToken;
+            players = g.allPlayers;
         }
 
         public HackStruct(Game g, Player p) : this(g)
@@ -1206,17 +1234,17 @@ namespace stonerkart
             }
         }
 
-        public Card selectCardSynchronized(IEnumerable<Card> cs, Func<Card, bool> filter)
+        public Card selectCardSynchronized(IEnumerable<Card> cs, Player chooser, Func<Card, bool> filter)
         {
-            var v = selectCardsSynchronized(cs, 1, filter).ToArray();
+            var v = selectCardsSynchronized(cs, chooser, 1, filter).ToArray();
             if (v.Length == 0) return null;
             return v[0];
         }
 
-        public IEnumerable<Card> selectCardsSynchronized(IEnumerable<Card> cs, int cardCount, Func<Card, bool> filter)
+        public IEnumerable<Card> selectCardsSynchronized(IEnumerable<Card> cs, Player chooser, int cardCount, Func<Card, bool> filter)
         {
             IEnumerable<Card> c;
-            if (heroIsResolver)
+            if (hero == chooser)
             {
                 setPrompt("Choose a card.");
                 c = selectCardEx(cs, false, cardCount, filter);
