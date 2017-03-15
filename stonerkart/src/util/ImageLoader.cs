@@ -110,12 +110,17 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Ilas_sGravekeeper:
+                {
+                    return Resources.artIlasGravekeeper;
+                }
+
                 case CardTemplate.Kraken:
                 {
                     return Resources.artKraken;
                 }
 
-                case CardTemplate.Lord_sIla:
+                case CardTemplate.Prince_sIla:
                 {
                     return Resources.artLordIla;
                 }

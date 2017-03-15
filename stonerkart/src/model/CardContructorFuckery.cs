@@ -204,6 +204,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
+                    race = Race.Zombie;
 
                     basePower = 2;
                     baseToughness = 2;
@@ -523,7 +524,7 @@ namespace stonerkart
                 } break;
                 #endregion
 
-                case CardTemplate.Lord_sIla:
+                case CardTemplate.Prince_sIla:
                 {
                         cardType = CardType.Creature;
                         rarity = Rarity.Legendary;
@@ -565,7 +566,28 @@ namespace stonerkart
                         ));
                 } break;
 
-                    #region tokens
+                case CardTemplate.Ilas_sGravekeeper:
+                    {
+                        cardType = CardType.Creature;
+
+                        baseMovement = 2;
+                        basePower = 0;
+                        baseToughness = 4;
+
+                        deathCost = 2;
+
+                        auras.Add(new Aura(
+                            "This creature gets +1/+0 for each Zombie card in its controllers graveyard.",
+                            () => controller.graveyard.Count(c => c.race == Race.Zombie),
+                            LL.add,
+                            ModifiableStats.Power,
+                            c => c == this
+                            ));
+                    }
+                    break;
+
+
+                #region tokens
                 #region Squire
                 case CardTemplate.Squire:
                 {

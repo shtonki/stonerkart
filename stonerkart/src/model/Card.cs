@@ -355,8 +355,9 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Ilas_sGravekeeper,
         Kraken,
-        Lord_sIla,
+        Prince_sIla,
         Wilt,
         Huntress_sOf_sNibememe,
         Baby_sDragon,
@@ -419,6 +420,7 @@ namespace stonerkart
         Human,
         Undead,
         Lizard,
+        Zombie,
         Goblin
     }
 
