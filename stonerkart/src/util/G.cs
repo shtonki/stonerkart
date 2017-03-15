@@ -255,6 +255,17 @@ namespace stonerkart
     {
         public static Func<int, int, int> add { get; } = (a, b) => a + b;
 
+        public static Foo exhaustThis { get; } =
+            new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
+                new FatigueDoer(true)));
+
+        public static Effect manaCost(ManaSet castManaCost)
+        {
+            return new Effect(
+                new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                    new ManaCostRule(castManaCost)), new PayManaDoer());
+        }
+
 
         public static GameEventFilter never { get; } = new StaticGameEventFilter(() => false);
         public static GameEventFilter endOfTurn { get; } = new TypedGameEventFilter<EndOfStepEvent>((e) => e.step == Steps.End);

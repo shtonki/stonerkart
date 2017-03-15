@@ -110,12 +110,37 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Counterspell:
+                {
+                    return Resources.artCounterspell;
+                }
+
+                case CardTemplate.Invigorate:
+                {
+                    return Resources.artInvigorate;
+                }
+
+                case CardTemplate.Ilatian_sHaunter:
+                {
+                    return Resources.artIlatianHaunter;
+                }
+
+                case CardTemplate.Frenzied_sPirhana:
+                {
+                    return Resources.artFrenziedPiranha;
+                }
+
+                case CardTemplate.Ilas_sGravekeeper:
+                {
+                    return Resources.artIlasGravekeeper;
+                }
+
                 case CardTemplate.Kraken:
                 {
                     return Resources.artKraken;
                 }
 
-                case CardTemplate.Lord_sIla:
+                case CardTemplate.Prince_sIla:
                 {
                     return Resources.artLordIla;
                 }
@@ -190,9 +215,9 @@ namespace stonerkart
                     return Resources.artUnstableMemeExperiment;
                 }
 
-                case CardTemplate.Bear_sCavalary:
+                case CardTemplate.Primordial_sChimera:
                 {
-                    return Resources.artBearCavalary;
+                    return Resources.artChimera;
                 }
 
                 case CardTemplate.Cleansing_sFire:
@@ -200,7 +225,7 @@ namespace stonerkart
                     return Resources.artCleansingFire;
                 }
 
-                case CardTemplate.Rockhand_sOgre:
+                case CardTemplate.Rockhand_sEchion:
                 {
                     return Resources.artRockhandOgre;
                 }
@@ -220,9 +245,9 @@ namespace stonerkart
                     return Resources.artSolemnAberration;
                 }
 
-                case CardTemplate.Nature_sHeroman:
+                case CardTemplate.Chieftain_sZ_aloot_aboks:
                 {
-                    return Resources.artLoneRanger;
+                    return Resources.artChieftainZlootbox;
                 }
 
                 case CardTemplate.Yung_sLich:
