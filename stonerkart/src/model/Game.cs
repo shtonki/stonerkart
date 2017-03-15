@@ -53,7 +53,7 @@ namespace stonerkart
             }
 
             random = new Random(ngs.randomSeed);
-            map = new Map(16, 9, false, false);
+            map = new Map(11, 7, false, false);
             allCards = new List<Card>();
             players = new List<Player>();
 
@@ -198,8 +198,8 @@ namespace stonerkart
 
             Tile[] ts = new[]
             {
-                map.tileAt(4, 3),
-                map.tileAt(map.width - 6, map.height - 4),
+                map.tileAt(2, 2),
+                map.tileAt(map.width - 3, map.height - 3),
             };
             int ix = 0;
             gameController.redraw();
@@ -329,28 +329,29 @@ namespace stonerkart
         {
             activePlayer.resetMana();
 
-            ManaOrbSelection selection;
-
-            if (activePlayer == hero)
+            if (activePlayer.manaPool.max.orbs.Count() < 12)
             {
-                activePlayer.stuntMana();
+                ManaOrbSelection selection;
+                if (activePlayer == hero)
+                {
+                    activePlayer.stuntMana();
 
-                gameController.setPrompt("Gain mana nerd");
-                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.currentMana(o.colour) != 6);
+                    gameController.setPrompt("Gain mana nerd");
+                    ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.currentMana(o.colour) != 6);
 
-                activePlayer.unstuntMana();
+                    activePlayer.unstuntMana();
 
-                selection = new ManaOrbSelection(v.colour);
-                connection.sendAction(selection);
+                    selection = new ManaOrbSelection(v.colour);
+                    connection.sendAction(selection);
+                }
+                else
+                {
+                    gameController.setPrompt("Opponent is gaining mana");
+                    selection = connection.receiveAction<ManaOrbSelection>();
+                }
+
+                activePlayer.gainMana(selection.orb);
             }
-            else
-            {
-                gameController.setPrompt("Opponent is gaining mama");
-                selection = connection.receiveAction<ManaOrbSelection>();
-            }
-
-            activePlayer.gainMana(selection.orb);
-
             priority();
 
             if (!skipFirstDraw)
