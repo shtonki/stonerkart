@@ -142,7 +142,7 @@ namespace stonerkart
                 if (e.card.location.pile == PileLocation.Stack)
                 {
                     Stack<StackWrapper> t = new Stack<StackWrapper>();
-                    while (true)
+                    while (wrapperStack.Count > 0) //todo this is p ugly coachella
                     {
                         var v = wrapperStack.Pop();
                         if (v.stackCard == e.card) break;
@@ -736,7 +736,7 @@ namespace stonerkart
                             break;
                         }
 
-                        StackWrapper wrapper = wrapperStack.Peek();
+                        StackWrapper wrapper = wrapperStack.Pop();
                         if (wrapper.castingCard != stack.peekTop() && wrapper.castingCard != stack.peekTop().dummyFor) throw new Exception();
                         resolve(wrapper);
                         c = 0;
