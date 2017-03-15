@@ -175,8 +175,9 @@ namespace stonerkart
             shitterhack.handle(e);
 
             if (!(e is CardedEvent && ((CardedEvent)e).getCard() == this)) return;
-
             eventHandler.handle(e);
+            notify(this, 0);
+
         }
 
         public void updateState()

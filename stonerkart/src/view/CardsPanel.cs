@@ -113,7 +113,6 @@ namespace stonerkart
             this.memeout(() => Controls.Add(cv));
         }
 
-
         private void removeCardView(Card c)
         {
             CardView cv = null;

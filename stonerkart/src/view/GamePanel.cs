@@ -12,7 +12,7 @@ namespace stonerkart
 {
     class GamePanel : StickyPanel, Screen
     {
-        private CardsPanel cardsPanel1;
+        public CardsPanel handPanel;
         public AutoFontTextBox promtText;
         public Shibbutton shibbutton2;
         public Shibbutton shibbutton3;
@@ -36,9 +36,9 @@ namespace stonerkart
             hexPanel.tileEntered.Add(clickable => setHightlight(clickable?.getStuff()));
             
 
-            cardsPanel1.setPile(g.hero.hand);
-            cardsPanel1.clickedCallbacks.Add(g.clicked);
-            cardsPanel1.mouseEnteredCallbacks.Add(clickable => setHightlight(clickable.getStuff()));
+            handPanel.setPile(g.hero.hand);
+            handPanel.clickedCallbacks.Add(g.clicked);
+            handPanel.mouseEnteredCallbacks.Add(clickable => setHightlight(clickable.getStuff()));
 
             stackPanel.vertical = true;
             stackPanel.setPile(g.stack);
@@ -121,7 +121,7 @@ namespace stonerkart
         private void InitializeComponent()
         {
             this.hexPanel = new stonerkart.HexPanel();
-            this.cardsPanel1 = new stonerkart.CardsPanel();
+            this.handPanel = new stonerkart.CardsPanel();
             this.promtText = new stonerkart.AutoFontTextBox();
             this.shibbutton2 = new stonerkart.Shibbutton();
             this.shibbutton3 = new stonerkart.Shibbutton();
@@ -145,15 +145,15 @@ namespace stonerkart
             this.hexPanel.Size = new System.Drawing.Size(688, 507);
             this.hexPanel.TabIndex = 0;
             // 
-            // cardsPanel1
+            // handPanel
             // 
-            this.cardsPanel1.BackColor = System.Drawing.Color.Navy;
-            this.cardsPanel1.comp = null;
-            this.cardsPanel1.Location = new System.Drawing.Point(217, 516);
-            this.cardsPanel1.Name = "cardsPanel1";
-            this.cardsPanel1.Size = new System.Drawing.Size(866, 150);
-            this.cardsPanel1.TabIndex = 1;
-            this.cardsPanel1.vertical = false;
+            this.handPanel.BackColor = System.Drawing.Color.Navy;
+            this.handPanel.comp = null;
+            this.handPanel.Location = new System.Drawing.Point(217, 516);
+            this.handPanel.Name = "handPanel";
+            this.handPanel.Size = new System.Drawing.Size(866, 150);
+            this.handPanel.TabIndex = 1;
+            this.handPanel.vertical = false;
             // 
             // promtText
             // 
@@ -279,7 +279,7 @@ namespace stonerkart
             this.Controls.Add(this.shibbutton3);
             this.Controls.Add(this.shibbutton2);
             this.Controls.Add(this.promtText);
-            this.Controls.Add(this.cardsPanel1);
+            this.Controls.Add(this.handPanel);
             this.Controls.Add(this.hexPanel);
             this.Name = "GamePanel";
             this.Size = new System.Drawing.Size(1086, 669);
