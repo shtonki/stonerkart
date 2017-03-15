@@ -657,7 +657,7 @@ namespace stonerkart
                 case CardTemplate.Wilt:
                 {
                     cardType = CardType.Sorcery;
-                    rarity = Rarity.Uncommon;
+                    rarity = Rarity.None;
 
                     deathCost = 2;
 

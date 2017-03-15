@@ -328,6 +328,8 @@ namespace stonerkart
                     tile = null;
                 }
                 moveTo(e.to);
+                fatigue = 0;
+                damageTaken = 0;
             }));
             
             return r;
