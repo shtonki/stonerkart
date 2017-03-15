@@ -250,7 +250,7 @@ namespace stonerkart
                     greyCost = 1;
 
                     castEffect = new Effect(new TargetRuleSet(new PryCardRule(c => !c.isHeroic, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), 
-                        new ToOwnersDoer(PileLocation.Hand));
+                        new MoveToPileDoer(PileLocation.Hand));
                     castDescription = "Return target non-heroic creature to its owner's hand.";
                 } break;
                 #endregion
@@ -363,7 +363,7 @@ namespace stonerkart
                     addTriggeredAbility(
                         "Whenever this creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
                         new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
-                        new ToOwnersDoer(PileLocation.Hand), 
+                        new MoveToPileDoer(PileLocation.Hand), 
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Field),
                         0,
@@ -386,7 +386,7 @@ namespace stonerkart
                         new Effect(
                             new TargetRuleSet(new SelectCardRule(PileLocation.Deck,
                                 new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
-                            new ToOwnersDoer(PileLocation.Deck));
+                            new MoveToPileDoer(PileLocation.Deck));
                     castDescription =
                         "Search your deck for a card. Shuffle your deck then put the selected card on top.";
                 } break;
@@ -451,7 +451,7 @@ namespace stonerkart
                     addTriggeredAbility(
                         "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
-                        new ZepperDoer(2),
+                        new ZepperDoer(1),
                         new Foo(),
                         LL.thisEnters(this, PileLocation.Field),
                         3,
@@ -474,7 +474,7 @@ namespace stonerkart
                     baseMovement = 2;
 
                     addActivatedAbility(
-                        String.Format("{0}: Deal 1 damage to target creature within 3 tiles.", G.exhaust),
+                        String.Format("{0}: Deal 1 damage to target creature within 3 tiles.", G.exhaustGhyph),
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
                         new ZepperDoer(1),
                         new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer())),
@@ -518,14 +518,36 @@ namespace stonerkart
                                 new PryPlayerRule(p => true,
                                     new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                                 c => c.cardType == CardType.Creature),
-                            new ToOwnersDoer(PileLocation.Graveyard));
+                            new MoveToPileDoer(PileLocation.Graveyard));
                     castRange = 100;
                 } break;
                 #endregion
 
+                case CardTemplate.Lord_sIla:
+                {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Legendary;
+                        isHeroic = true;
+                        forceColour = ManaColour.Death;
+
+                        baseMovement = 2;
+                        basePower = 2;
+                        baseToughness = 20;
+
+                        addActivatedAbility(
+                            String.Format("{0}: Each player discards a card.", G.exhaustGhyph),
+                            new TargetRuleSet(new SelectCardRule(PileLocation.Hand, new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers))),
+                            new MoveToPileDoer(PileLocation.Graveyard),
+                            new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer())),
+                            0,
+                            PileLocation.Field, 
+                            CastSpeed.Slow 
+                            );
+                } break;
+
                 case CardTemplate.missingo:
                 {
-
+                    
                 } break;
 
                     #region tokens

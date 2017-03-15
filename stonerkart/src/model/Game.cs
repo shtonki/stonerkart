@@ -13,6 +13,7 @@ namespace stonerkart
         public Map map { get; }
         public Player hero { get; }
         public Player villain { get; }
+        public IEnumerable<Player> allPlayers => players;
 
         private List<Player> players;
         private List<Card> allCards;
@@ -1113,6 +1114,7 @@ namespace stonerkart
     struct HackStruct
     {
         //game stuff
+        public IEnumerable<Player> players { get; }
         public Player hero { get; }
         public Player castingPlayer { get; }
         public bool heroIsCasting => hero == castingPlayer;
@@ -1172,6 +1174,7 @@ namespace stonerkart
             clearHighlights = () => g.gameController.clearHighlights(true);
             highlight = g.gameController.highlight;
             createToken = g.createToken;
+            players = g.allPlayers;
         }
 
         public HackStruct(Game g, Player p) : this(g)
@@ -1207,17 +1210,17 @@ namespace stonerkart
             }
         }
 
-        public Card selectCardSynchronized(IEnumerable<Card> cs, Func<Card, bool> filter)
+        public Card selectCardSynchronized(IEnumerable<Card> cs, Player chooser, Func<Card, bool> filter)
         {
-            var v = selectCardsSynchronized(cs, 1, filter).ToArray();
+            var v = selectCardsSynchronized(cs, chooser, 1, filter).ToArray();
             if (v.Length == 0) return null;
             return v[0];
         }
 
-        public IEnumerable<Card> selectCardsSynchronized(IEnumerable<Card> cs, int cardCount, Func<Card, bool> filter)
+        public IEnumerable<Card> selectCardsSynchronized(IEnumerable<Card> cs, Player chooser, int cardCount, Func<Card, bool> filter)
         {
             IEnumerable<Card> c;
-            if (heroIsResolver)
+            if (hero == chooser)
             {
                 setPrompt("Choose a card.");
                 c = selectCardEx(cs, false, cardCount, filter);

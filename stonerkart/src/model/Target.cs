@@ -220,15 +220,18 @@ namespace stonerkart
         {
             TargetColumn? t = pg.fillResolveTargets(hs, c);
             if (!t.HasValue) return null;
+            List<Card> rt = new List<Card>();
             TargetColumn r = t.Value;
-            if (r.targets.Length != 1) throw new Exception();
-            Player p = (Player)r.targets[0];
-            while (true)
+            foreach (var tbl in r.targets)
             {
-                Card crd = hs.selectCardSynchronized(p.pileFrom(l), filter);
-                if (crd == null) return null;
-                return new TargetColumn(crd);
+                Player p = (Player)tbl;
+                Card crd;
+
+                crd = hs.selectCardSynchronized(p.pileFrom(l), p, filter);
+                if (crd == null) throw new Exception();
+                rt.Add(crd);
             }
+            return new TargetColumn(rt);
         }
 
         public override TargetColumn possible(HackStruct hs)
@@ -652,6 +655,11 @@ namespace stonerkart
                 {
                     return new TargetColumn(hs.resolveCard.controller);
                 }
+
+                case Rule.AllPlayers:
+                {
+                    return new TargetColumn(hs.players);
+                }
             }
             throw new Exception();
         }
@@ -664,7 +672,7 @@ namespace stonerkart
         public enum Rule
         {
             ResolveController,
-
+            AllPlayers,
         }
     }
 

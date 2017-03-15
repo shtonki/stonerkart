@@ -109,6 +109,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Lord_sIla:
+                {
+                    return Resources.artLordIla;
+                }
+
                 case CardTemplate.Wilt:
                 {
                     return Resources.artWilt;

@@ -321,6 +321,7 @@ namespace stonerkart
     enum CardTemplate
     {
         missingo,
+        Lord_sIla,
         Wilt,
         Huntress_sOf_sNibememe,
         Baby_sDragon,

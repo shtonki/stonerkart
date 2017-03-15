@@ -222,11 +222,11 @@ namespace stonerkart
         }
     }
 
-    class ToOwnersDoer : SimpleDoer
+    class MoveToPileDoer : SimpleDoer
     {
         public PileLocation pileLocation;
 
-        public ToOwnersDoer(PileLocation pileLocation) : base(typeof(Card))
+        public MoveToPileDoer(PileLocation pileLocation) : base(typeof(Card))
         {
             this.pileLocation = pileLocation;
         }
