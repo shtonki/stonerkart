@@ -393,7 +393,7 @@ namespace stonerkart
         }
     }
 
-    internal abstract class PryRule : TargetRule
+    abstract class PryRule : TargetRule
     {
         private bool pryAtResolveTime;
         private int count;
@@ -458,7 +458,7 @@ namespace stonerkart
         private TargetColumn? selectTiles(HackStruct hs)
         {
             List<Targetable> ts = new List<Targetable>();
-            hs.highlight(hs.tilesInRange.Where(t => pry(t) != null), Color.OrangeRed);
+            hs.highlight(hs.tilesInRange.Where(t => pryx(t, hs) != null), Color.OrangeRed);
             hs.setPrompt("Click on a tile", pryAtResolveTime ? ButtonOption.NOTHING : ButtonOption.Cancel);
             while (ts.Count < count)
             {
@@ -477,8 +477,8 @@ namespace stonerkart
                 if (!(v is Tile)) continue;
 
                 Tile t = (Tile)v;
-
-                Targetable target = pry(t);
+                Card c = t.card;
+                Targetable target = pryx(t, hs);
 
                 if (target != null && hs.tilesInRange.Contains(t))
                 {
@@ -503,6 +503,13 @@ namespace stonerkart
         public override TargetColumn possible(HackStruct hs)
         {
             return new TargetColumn(hs.tilesInRange.Where(t => pry(t) != null));
+        }
+
+        protected Targetable pryx(Tile t, HackStruct hs)
+        {
+            Card c = t.card;
+            if (c != null && !hs.resolveAbility.card.canTarget(c)) return null;
+            return pry(t);
         }
 
         protected abstract Targetable pry(Tile t);

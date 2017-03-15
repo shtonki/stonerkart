@@ -93,6 +93,7 @@ namespace stonerkart
 
         public bool canTarget(Card target)
         {
+            if (target.hasAbility(KeywordAbility.Elusion)) return false;
             return true;
         }
 
@@ -355,6 +356,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Frenzied_sPirhana,
         Ilas_sGravekeeper,
         Kraken,
         Prince_sIla,
@@ -375,7 +377,7 @@ namespace stonerkart
         Cantrip,
         Temple_sHealer,
         Yung_sLich,
-        Nature_sHeroman,
+        Chieftain_sZ_aloot_aboks,
         Risen_sAbberation,
         Shibby_sShtank,
         Unmake,
@@ -434,5 +436,6 @@ namespace stonerkart
     enum KeywordAbility
     {
         Fervor,
+        Elusion,
     }
 }

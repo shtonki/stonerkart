@@ -253,6 +253,7 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artChieftainZlootbox.png" />
     <None Include="Resources\artKraken.png" />
     <None Include="Resources\artLordIla.png" />
     <None Include="Resources\artWilt.png" />

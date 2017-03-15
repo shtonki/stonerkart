@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Frenzied_sPirhana:
+                {
+                    return Resources.artFrenziedPiranha;
+                }
+
                 case CardTemplate.Ilas_sGravekeeper:
                 {
                     return Resources.artIlasGravekeeper;
@@ -225,9 +230,9 @@ namespace stonerkart
                     return Resources.artSolemnAberration;
                 }
 
-                case CardTemplate.Nature_sHeroman:
+                case CardTemplate.Chieftain_sZ_aloot_aboks:
                 {
-                    return Resources.artLoneRanger;
+                    return Resources.artChieftainZlootbox;
                 }
 
                 case CardTemplate.Yung_sLich:

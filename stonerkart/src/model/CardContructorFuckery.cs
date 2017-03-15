@@ -188,7 +188,7 @@ namespace stonerkart
                     } break;
                 #endregion
                 #region Nature Heroman
-                case CardTemplate.Nature_sHeroman:
+                case CardTemplate.Chieftain_sZ_aloot_aboks:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Legendary;
@@ -197,6 +197,16 @@ namespace stonerkart
                     basePower = 1;
                     baseToughness = 20;
                     forceColour = ManaColour.Nature;
+
+                    addActivatedAbility(
+                        String.Format("{0}: Exhaust target creature.", G.exhaustGhyph),
+                        new TargetRuleSet(new PryCardRule()),
+                        new FatigueDoer(),
+                        LL.exhaustThis,
+                        3,
+                        PileLocation.Field,
+                        CastSpeed.Instant
+                        );
                 } break;
                 #endregion
                 #region Risen Abberation
@@ -523,7 +533,7 @@ namespace stonerkart
                     castRange = 100;
                 } break;
                 #endregion
-
+                #region Price Ila
                 case CardTemplate.Prince_sIla:
                 {
                         cardType = CardType.Creature;
@@ -545,7 +555,8 @@ namespace stonerkart
                             CastSpeed.Slow 
                             );
                 } break;
-
+                #endregion
+                #region Kraken
                 case CardTemplate.Kraken:
                 {
                     cardType = CardType.Creature;
@@ -565,27 +576,54 @@ namespace stonerkart
                         c => c == this
                         ));
                 } break;
-
+                #endregion
+                #region Ilas Gravekeeper
                 case CardTemplate.Ilas_sGravekeeper:
-                    {
-                        cardType = CardType.Creature;
+                {
+                    cardType = CardType.Creature;
 
-                        baseMovement = 2;
-                        basePower = 0;
-                        baseToughness = 4;
+                    baseMovement = 2;
+                    basePower = 0;
+                    baseToughness = 4;
 
-                        deathCost = 2;
+                    deathCost = 2;
 
-                        auras.Add(new Aura(
-                            "This creature gets +1/+0 for each Zombie card in its controllers graveyard.",
-                            () => controller.graveyard.Count(c => c.race == Race.Zombie),
-                            LL.add,
-                            ModifiableStats.Power,
-                            c => c == this
-                            ));
-                    }
-                    break;
+                    auras.Add(new Aura(
+                        "This creature gets +1/+0 for each Zombie in its controllers graveyard.",
+                        () => controller.graveyard.Count(c => c.race == Race.Zombie),
+                        LL.add,
+                        ModifiableStats.Power,
+                        c => c == this
+                        ));
+                } break;
+                #endregion
 
+                case CardTemplate.Frenzied_sPirhana:
+                {
+                    baseMovement = 2;
+                    baseToughness = 1;
+                    basePower = 1;
+
+                    natureCost = 1;
+
+                    keywordAbilities.Add(KeywordAbility.Elusion);
+
+                    auras.Add(new Aura(
+                        "",
+                        () => controller.graveyard.Count >= 7 ? 2 : 0,
+                        LL.add,
+                        ModifiableStats.Power,
+                        c => c == this
+                        ));
+
+                    auras.Add(new Aura(
+                        "This creature has gets +2/+2 as long as its controllers graveyard contains seven or more cards.",
+                        () => controller.graveyard.Count >= 7 ? 2 : 0,
+                        LL.add,
+                        ModifiableStats.Toughness,
+                        c => c == this
+                        ));
+                    } break;
 
                 #region tokens
                 #region Squire
