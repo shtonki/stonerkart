@@ -71,7 +71,7 @@ namespace stonerkart
         private Modifiable Movement;
 
         private int damageTaken;
-        private int fatigue;
+        public int fatigue { get; private set; }
 
         private ManaColour? forceColour;
         private Modifiable[] modifiables;
@@ -114,9 +114,14 @@ namespace stonerkart
             t.place(this);
         }
 
-        public void exhaust(int steps = -1)
+        public void exhaust()
         {
-            fatigue += steps < 0 ? Movement : steps;
+            exhaust(movement);
+        }
+
+        public void exhaust(int steps)
+        {
+            fatigue += steps;
         }
 
         public void damage(int d)
@@ -357,6 +362,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Counterspell,
+        Invigorate,
         Ilatian_sHaunter,
         Frenzied_sPirhana,
         Ilas_sGravekeeper,
@@ -383,8 +390,8 @@ namespace stonerkart
         Risen_sAbberation,
         Shibby_sShtank,
         Unmake,
-        Rockhand_sOgre,
-        Bear_sCavalary,
+        Rockhand_sEchion,
+        Primordial_sChimera,
         Illegal_sGoblin_sLaboratory,
         Teleport,
         Squire,
@@ -423,16 +430,19 @@ namespace stonerkart
     {
         Human,
         Undead,
-        Lizard,
         Zombie,
-        Goblin
+        Goblin,
+        Giant,
+        Beast,
+        Dragon,
     }
 
     internal enum Subtype
     {
         Warrior,
         Wizard,
-        Cleric
+        Cleric,
+        Rogue,
     }
 
     enum KeywordAbility

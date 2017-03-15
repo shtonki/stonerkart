@@ -110,6 +110,16 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Counterspell:
+                {
+                    return Resources.artCounterspell;
+                }
+
+                case CardTemplate.Invigorate:
+                {
+                    return Resources.artInvigorate;
+                }
+
                 case CardTemplate.Ilatian_sHaunter:
                 {
                     return Resources.artIlatianHaunter;
@@ -205,9 +215,9 @@ namespace stonerkart
                     return Resources.artUnstableMemeExperiment;
                 }
 
-                case CardTemplate.Bear_sCavalary:
+                case CardTemplate.Primordial_sChimera:
                 {
-                    return Resources.artBearCavalary;
+                    return Resources.artChimera;
                 }
 
                 case CardTemplate.Cleansing_sFire:
@@ -215,7 +225,7 @@ namespace stonerkart
                     return Resources.artCleansingFire;
                 }
 
-                case CardTemplate.Rockhand_sOgre:
+                case CardTemplate.Rockhand_sEchion:
                 {
                     return Resources.artRockhandOgre;
                 }

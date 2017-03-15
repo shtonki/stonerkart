@@ -94,7 +94,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Uncommon;
-                    race = Race.Lizard;
+                    race = Race.Beast;
 
                     baseMovement = 1;
                     basePower = 2;
@@ -234,6 +234,8 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Legendary;
+                    race = Race.Human;
+                    subtype = Subtype.Warrior;
                     isHeroic = true;
                     baseMovement = 3;
                     basePower = 1;
@@ -243,7 +245,7 @@ namespace stonerkart
                     addActivatedAbility(
                         String.Format("{0}: Exhaust target creature.", G.exhaustGhyph),
                         new TargetRuleSet(new PryCardRule()),
-                        new FatigueDoer(),
+                        new FatigueDoer(true),
                         LL.exhaustThis,
                         3,
                         PileLocation.Field,
@@ -327,10 +329,11 @@ namespace stonerkart
 
                     #region Rockhand Ogre
 
-                case CardTemplate.Rockhand_sOgre:
+                case CardTemplate.Rockhand_sEchion:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Uncommon;
+                    race = Race.Giant;
 
                     baseMovement = 2;
                     basePower = 2;
@@ -341,12 +344,13 @@ namespace stonerkart
 
                     #endregion
 
-                    #region Bear Cavalary
+                    #region Primeordial Chimera
 
-                case CardTemplate.Bear_sCavalary:
+                case CardTemplate.Primordial_sChimera:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
+                    race = Race.Beast;
 
                     baseMovement = 3;
                     basePower = 3;
@@ -452,6 +456,8 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Legendary;
+                    race = Race.Human;
+                    subtype = Subtype.Rogue;
 
                     baseMovement = 2;
                     basePower = 3;
@@ -507,6 +513,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Uncommon;
+                    race = Race.Beast;
 
                     baseToughness = 2;
                     basePower = 2;
@@ -567,6 +574,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
+                    race = Race.Dragon;
 
                     basePower = 2;
                     baseToughness = 1;
@@ -594,6 +602,8 @@ namespace stonerkart
                 case CardTemplate.Huntress_sOf_sNibememe:
                 {
                     cardType = CardType.Creature;
+                    race = Race.Human;
+                    subtype = Subtype.Warrior;
 
                     natureCost = 1;
                     greyCost = 2;
@@ -607,7 +617,7 @@ namespace stonerkart
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
                         new ZepperDoer(1),
                         new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                            new FatigueDoer())),
+                            new FatigueDoer(true))),
                         3,
                         PileLocation.Field,
                         CastSpeed.Instant
@@ -647,6 +657,7 @@ namespace stonerkart
                 case CardTemplate.Wilt:
                 {
                     cardType = CardType.Sorcery;
+                    rarity = Rarity.Uncommon;
 
                     deathCost = 2;
 
@@ -670,6 +681,8 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Legendary;
+                    race = Race.Undead;
+                    subtype = Subtype.Rogue;
                     isHeroic = true;
                     forceColour = ManaColour.Death;
 
@@ -683,7 +696,7 @@ namespace stonerkart
                             new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers))),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                            new FatigueDoer())),
+                            new FatigueDoer(true))),
                         0,
                         PileLocation.Field,
                         CastSpeed.Slow
@@ -698,6 +711,8 @@ namespace stonerkart
                 case CardTemplate.Kraken:
                 {
                     cardType = CardType.Creature;
+                    rarity = Rarity.Rare;
+                    race = Race.Beast;
 
                     baseMovement = 2;
                     basePower = 1;
@@ -723,6 +738,8 @@ namespace stonerkart
                 case CardTemplate.Ilas_sGravekeeper:
                 {
                     cardType = CardType.Creature;
+                    rarity = Rarity.Uncommon;
+                    race = Race.Undead;
 
                     baseMovement = 2;
                     basePower = 0;
@@ -746,6 +763,10 @@ namespace stonerkart
 
                 case CardTemplate.Frenzied_sPirhana:
                 {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Common;
+                    race = Race.Beast;
+
                     baseMovement = 2;
                     baseToughness = 1;
                     basePower = 1;
@@ -774,11 +795,14 @@ namespace stonerkart
 
                     #endregion
 
+                    #region Ilatian Haunter
 
                 case CardTemplate.Ilatian_sHaunter:
                 {
                     cardType = CardType.Creature;
                     race = Race.Zombie;
+                    rarity = Rarity.Common;
+
                     baseMovement = 1;
                     baseToughness = 1;
                     basePower = 1;
@@ -798,10 +822,44 @@ namespace stonerkart
                         CastSpeed.Slow,
                         true
                         );
+                }
+                    break;
+
+                    #endregion
+
+                    #region Invigorate
+
+                case CardTemplate.Invigorate:
+                {
+                    cardType = CardType.Instant;
+                    rarity = Rarity.Common;
+
+                    natureCost = 1;
+
+                    castDescription = "Return all movement to target creature.";
+                    castEffect = new Effect(new PryCardRule(), new FatigueDoer(false));
+                    castRange = 4;
+                }
+                    break;
+
+                #endregion
+
+                #region Counterspell
+                case CardTemplate.Counterspell:
+                {
+                    cardType = CardType.Instant;
+                    rarity = Rarity.Common;
+
+                    orderCost = 2;
+                    greyCost = 1;
+
+                    castDescription = "Counter target spell.";
+                    castEffect = new Effect(new ClickCardRule(c => c.location.pile == PileLocation.Stack && !c.isDummy),
+                        new MoveToPileDoer(PileLocation.Graveyard));
                 } break;
+                #endregion
 
-
-            #region tokens
+                #region tokens
                 #region Squire
                 case CardTemplate.Squire:
                 {

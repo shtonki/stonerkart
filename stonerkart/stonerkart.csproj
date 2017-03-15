@@ -94,6 +94,7 @@
     <Compile Include="src\model\Deck.cs" />
     <Compile Include="src\model\Effect.cs" />
     <Compile Include="src\model\Game.cs" />
+    <Compile Include="src\model\HackStruct.cs" />
     <Compile Include="src\model\Mana.cs" />
     <Compile Include="src\model\Map.cs" />
     <Compile Include="src\model\Modifiable.cs" />
@@ -253,6 +254,8 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artChimera.png" />
+    <None Include="Resources\artInvigorate.png" />
     <None Include="Resources\artIlatianHaunter.png" />
     <None Include="Resources\artChieftainZlootbox.png" />
     <None Include="Resources\artKraken.png" />

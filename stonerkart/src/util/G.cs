@@ -257,7 +257,7 @@ namespace stonerkart
 
         public static Foo exhaustThis { get; } =
             new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                new FatigueDoer()));
+                new FatigueDoer(true)));
 
         public static Effect manaCost(ManaSet castManaCost)
         {

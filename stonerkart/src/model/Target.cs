@@ -154,6 +154,44 @@ namespace stonerkart
         public abstract TargetColumn possible(HackStruct hs);
     }
 
+    class ClickCardRule : TargetRule
+    {
+        private Func<Card, bool> filter;
+
+        public ClickCardRule(Func<Card, bool> filter) : base(typeof(Card))
+        {
+            this.filter = filter;
+        }
+
+        public override TargetColumn? fillCastTargets(HackStruct f)
+        {
+            f.setPrompt("Select target.", ButtonOption.Cancel);
+            while (true)
+            {
+                var v = f.getStuff();
+                if (v is ShibbuttonStuff)
+                {
+                    return null;
+                }
+                if (v is Card)
+                {
+                    Card c = (Card)v;
+                    if (filter(c)) return new TargetColumn(c);
+                }
+            }
+        }
+
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        {
+            return c;
+        }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return new TargetColumn(hs.cards.Where(filter));
+        }
+    }
+
     class CreateTokenRule : TargetRule
     {
         private TargetRule summonFor;

@@ -89,9 +89,27 @@ namespace stonerkart
 
     class FatigueDoer : SimpleDoer
     {
-        private int? fatigueBy;
+        private int fatigueBy;
+        private bool exhaust;
+        private bool invigorate;
 
-        public FatigueDoer(int? fatigueBy = null) : base(typeof(Card))
+        /// <summary>
+        /// Exhausts if passed paramater is true, else invigorates.
+        /// </summary>
+        /// <param name="fatigue"></param>
+        public FatigueDoer(bool exhaust) : base(typeof(Card))
+        {
+            if (exhaust)
+            {
+                this.exhaust = true;
+            }
+            else
+            {
+                invigorate = true;
+            }
+        }
+
+        public FatigueDoer(int fatigueBy) : base(typeof(Card))
         {
             this.fatigueBy = fatigueBy;
         }
@@ -99,13 +117,26 @@ namespace stonerkart
         protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Card c = (Card)row[0];
-            return new GameEvent[] {new FatigueEvent(c, fatigueBy.HasValue ? fatigueBy.Value : c.movement)};
+            int v;
+            if (exhaust)
+            {
+                v = c.movement;
+            }
+            else if (invigorate)
+            {
+                v = -c.fatigue;
+            }
+            else
+            {
+                v = fatigueBy;
+            }
+            return new GameEvent[] {new FatigueEvent(c, v)};
         }
 
         protected override bool validCostRow(TargetRow tr)
         {
             Card c = (Card)tr[0];
-            return fatigueBy.HasValue ? c.movement >= fatigueBy.Value : c.canExhaust;
+            return exhaust ? c.canExhaust : c.movement >= fatigueBy;
         }
     }
 
