@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Ilatian_sHaunter:
+                {
+                    return Resources.artIlatianHaunter;
+                }
+
                 case CardTemplate.Frenzied_sPirhana:
                 {
                     return Resources.artFrenziedPiranha;

@@ -228,7 +228,7 @@ namespace stonerkart
                 Card crd;
 
                 crd = hs.selectCardSynchronized(p.pileFrom(l), p, filter);
-                if (crd == null) throw new Exception();
+                if (crd == null) continue; //todo allow canceling or something
                 rt.Add(crd);
             }
             return new TargetColumn(rt);

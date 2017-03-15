@@ -36,6 +36,7 @@ namespace stonerkart
         public Location location => locationEx();
 
         public ActivatedAbility castAbility { get; }
+        private List<ActivatedAbility> alternateCasts = new List<ActivatedAbility>();
         public int castRange => castAbility.castRange;
         public ManaSet castManaCost { get; }
 
@@ -144,7 +145,7 @@ namespace stonerkart
 
         public bool isCastAbility(Ability a)
         {
-            return castAbility == a;
+            return castAbility == a || alternateCasts.Contains(a);
         }
 
         public int abilityOrd(Ability a)
@@ -356,6 +357,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Ilatian_sHaunter,
         Frenzied_sPirhana,
         Ilas_sGravekeeper,
         Kraken,

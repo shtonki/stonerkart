@@ -39,9 +39,11 @@ namespace stonerkart
 
 
             #region oophell
+
             switch (ct)
             {
-                #region Illegal Goblin Laboratory
+                    #region Illegal Goblin Laboratory
+
                 case CardTemplate.Illegal_sGoblin_sLaboratory:
                 {
                     cardType = CardType.Relic;
@@ -52,17 +54,23 @@ namespace stonerkart
 
                     addTriggeredAbility(
                         "At the end of your turn deal 1 damage to every enemy player.",
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new CardResolveRule(CardResolveRule.Rule.VillainHeroes)),
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new CardResolveRule(CardResolveRule.Rule.VillainHeroes)),
                         new ZepperDoer(1),
                         new Foo(),
-                        new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.End && e.activePlayer == controller),
+                        new TypedGameEventFilter<StartOfStepEvent>(
+                            e => e.step == Steps.End && e.activePlayer == controller),
                         0,
                         PileLocation.Field,
                         false
                         );
-                } break;
-                #endregion
-                #region Belwas
+                }
+                    break;
+
+                    #endregion
+
+                    #region Belwas
+
                 case CardTemplate.Belwas:
                 {
                     cardType = CardType.Creature;
@@ -75,9 +83,13 @@ namespace stonerkart
                     baseMovement = 2;
                     basePower = 2;
                     baseToughness = 25;
-                } break;
-                #endregion
-                #region Kappa
+                }
+                    break;
+
+                    #endregion
+
+                    #region Kappa
+
                 case CardTemplate.Kappa:
                 {
                     cardType = CardType.Creature;
@@ -95,16 +107,21 @@ namespace stonerkart
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                         new DrawCardsDoer(2),
                         new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
-                        0, 
+                        new TypedGameEventFilter<MoveToPileEvent>(
+                            moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
+                        0,
                         PileLocation.Field,
                         false,
                         TriggeredAbility.Timing.Post
                         );
 
-                } break;
-                #endregion
-                #region Yung Lich
+                }
+                    break;
+
+                    #endregion
+
+                    #region Yung Lich
+
                 case CardTemplate.Yung_sLich:
                 {
                     cardType = CardType.Creature;
@@ -122,27 +139,39 @@ namespace stonerkart
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                         new DrawCardsDoer(1),
                         new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard && location.pile == PileLocation.Field),
+                        new TypedGameEventFilter<MoveToPileEvent>(
+                            moveEvent =>
+                                moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard &&
+                                location.pile == PileLocation.Field),
                         0,
                         PileLocation.Field,
                         false
                         );
-                } break;
-                #endregion
-                #region Cantrip
+                }
+                    break;
+
+                    #endregion
+
+                    #region Cantrip
+
                 case CardTemplate.Cantrip:
                 {
                     cardType = CardType.Instant;
                     rarity = Rarity.Common;
 
                     orderCost = 1;
-                    castEffect = new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                        new DrawCardsDoer(1));
+                    castEffect =
+                        new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                            new DrawCardsDoer(1));
                     castDescription = "Draw a card.";
 
-                } break;
-                #endregion
-                #region Zap
+                }
+                    break;
+
+                    #endregion
+
+                    #region Zap
+
                 case CardTemplate.Zap:
                 {
                     cardType = CardType.Instant;
@@ -151,12 +180,20 @@ namespace stonerkart
                     castRange = 3;
                     chaosCost = 1;
 
-                    castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule(c => true, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), 
-                        new ZepperDoer(2));
+                    castEffect =
+                        new Effect(
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                                new PryCardRule(c => true,
+                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                            new ZepperDoer(2));
                     castDescription = "Deal 2 damage to target creature.";
-                } break;
-                #endregion
-                #region Temple Healer
+                }
+                    break;
+
+                    #endregion
+
+                    #region Temple Healer
+
                 case CardTemplate.Temple_sHealer:
                 {
                     cardType = CardType.Creature;
@@ -173,21 +210,26 @@ namespace stonerkart
 
                     addTriggeredAbility(
                         "Whenever a creature enters the battlefield under your control, you may restore 1 toughness to your hero.",
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
                         new ZepperDoer(-1),
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
                             moveEvent.card.controller == controller &&
                             moveEvent.to.location.pile == PileLocation.Field &&
                             location.pile == PileLocation.Field),
-                            0,
-                            PileLocation.Field,
-                            true,
-                            TriggeredAbility.Timing.Post
+                        0,
+                        PileLocation.Field,
+                        true,
+                        TriggeredAbility.Timing.Post
                         );
-                    } break;
-                #endregion
-                #region Nature Heroman
+                }
+                    break;
+
+                    #endregion
+
+                    #region Nature Heroman
+
                 case CardTemplate.Chieftain_sZ_aloot_aboks:
                 {
                     cardType = CardType.Creature;
@@ -207,9 +249,13 @@ namespace stonerkart
                         PileLocation.Field,
                         CastSpeed.Instant
                         );
-                } break;
-                #endregion
-                #region Risen Abberation
+                }
+                    break;
+
+                    #endregion
+
+                    #region Risen Abberation
+
                 case CardTemplate.Risen_sAbberation:
                 {
                     cardType = CardType.Creature;
@@ -221,9 +267,13 @@ namespace stonerkart
                     baseMovement = 1;
 
                     deathCost = 1;
-                    } break;
-                #endregion
-                #region Shibby Shtank
+                }
+                    break;
+
+                    #endregion
+
+                    #region Shibby Shtank
+
                 case CardTemplate.Shibby_sShtank:
                 {
                     cardType = CardType.Creature;
@@ -237,20 +287,24 @@ namespace stonerkart
                     basePower = 1;
                     baseToughness = 20;
 
-                    
+
                     addActivatedAbility(
                         String.Format("{1}{0}{0}: Draw a card", G.coloured(ManaColour.Order), G.colourless(2)),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                         new DrawCardsDoer(1),
                         fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
                         0,
-                        PileLocation.Field, 
+                        PileLocation.Field,
                         CastSpeed.Instant
                         );
 
-                } break;
-                #endregion
-                #region Unmake
+                }
+                    break;
+
+                    #endregion
+
+                    #region Unmake
+
                 case CardTemplate.Unmake:
                 {
                     cardType = CardType.Instant;
@@ -260,12 +314,19 @@ namespace stonerkart
                     orderCost = 1;
                     greyCost = 1;
 
-                    castEffect = new Effect(new TargetRuleSet(new PryCardRule(c => !c.isHeroic, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), 
-                        new MoveToPileDoer(PileLocation.Hand));
+                    castEffect =
+                        new Effect(
+                            new TargetRuleSet(new PryCardRule(c => !c.isHeroic,
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                            new MoveToPileDoer(PileLocation.Hand));
                     castDescription = "Return target non-heroic creature to its owner's hand.";
-                } break;
-                #endregion
-                #region Rockhand Ogre
+                }
+                    break;
+
+                    #endregion
+
+                    #region Rockhand Ogre
+
                 case CardTemplate.Rockhand_sOgre:
                 {
                     cardType = CardType.Creature;
@@ -275,9 +336,13 @@ namespace stonerkart
                     basePower = 2;
                     baseToughness = 2;
                     mightCost = 1;
-                } break;
-                #endregion
-                #region Bear Cavalary
+                }
+                    break;
+
+                    #endregion
+
+                    #region Bear Cavalary
+
                 case CardTemplate.Bear_sCavalary:
                 {
                     cardType = CardType.Creature;
@@ -287,9 +352,13 @@ namespace stonerkart
                     basePower = 3;
                     baseToughness = 3;
                     mightCost = 2;
-                } break;
-                #endregion
-                #region Cleansing Fire
+                }
+                    break;
+
+                    #endregion
+
+                    #region Cleansing Fire
+
                 case CardTemplate.Cleansing_sFire:
                 {
                     cardType = CardType.Instant;
@@ -311,9 +380,13 @@ namespace stonerkart
                     castDescription = "Deal 3 damage to target creature. You gain 3 life.";
 
 
-                } break;
-                #endregion
-                #region Goblin Grenade
+                }
+                    break;
+
+                    #endregion
+
+                    #region Goblin Grenade
+
                 case CardTemplate.Goblin_sGrenade:
                 {
                     cardType = CardType.Instant;
@@ -323,13 +396,20 @@ namespace stonerkart
                     greyCost = 1;
 
                     castRange = 5;
-                    castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new AoeRule(t => true, 2, c => true)),
-                    new ZepperDoer(1));
+                    castEffect =
+                        new Effect(
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                                new AoeRule(t => true, 2, c => true)),
+                            new ZepperDoer(1));
                     castDescription = "Deal 1 damage to all creatures within 2 tiles of target tile.";
 
-                } break;
-                #endregion
-                #region Teleport
+                }
+                    break;
+
+                    #endregion
+
+                    #region Teleport
+
                 case CardTemplate.Teleport:
                 {
                     cardType = CardType.Sorcery;
@@ -338,12 +418,17 @@ namespace stonerkart
                     orderCost = 2;
                     castRange = 6;
                     castEffect = new Effect(
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
-                                new PryTileRule(f => f.passable, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer());
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
+                            new PryTileRule(f => f.passable,
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer());
                     castDescription = "Move your hero to target tile.";
-                } break;
-                #endregion
-                #region One With Nature
+                }
+                    break;
+
+                    #endregion
+
+                    #region One With Nature
+
                 case CardTemplate.One_sWith_sNature:
                 {
                     cardType = CardType.Sorcery;
@@ -351,13 +436,18 @@ namespace stonerkart
 
                     natureCost = 1;
 
-                    castEffect = new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)), 
-                        new GainBonusManaDoer(ManaColour.Nature, ManaColour.Nature, ManaColour.Nature));
+                    castEffect =
+                        new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                            new GainBonusManaDoer(ManaColour.Nature, ManaColour.Nature, ManaColour.Nature));
                     castDescription = String.Format("You gain {0}{0}{0} until the end of the step.",
                         G.coloured(ManaColour.Nature));
-                } break;
-                #endregion
-                #region Graverobber Syrdin
+                }
+                    break;
+
+                    #endregion
+
+                    #region Graverobber Syrdin
+
                 case CardTemplate.Graverobber_sSyrdin:
                 {
                     cardType = CardType.Creature;
@@ -373,21 +463,27 @@ namespace stonerkart
 
                     addTriggeredAbility(
                         "Whenever this creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
-                        new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
-                        new MoveToPileDoer(PileLocation.Hand), 
+                        new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard,
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                        new MoveToPileDoer(PileLocation.Hand),
                         new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Field),
+                        new TypedGameEventFilter<MoveToPileEvent>(
+                            moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Field),
                         0,
                         PileLocation.Field,
                         true,
                         TriggeredAbility.Timing.Post
                         );
 
-                    } break;
-                #endregion
-                #region Alter Fate
+                }
+                    break;
+
+                    #endregion
+
+                    #region Alter Fate
+
                 case CardTemplate.Alter_sFate:
-                { 
+                {
                     cardType = CardType.Instant;
                     rarity = Rarity.Common;
 
@@ -400,9 +496,13 @@ namespace stonerkart
                             new MoveToPileDoer(PileLocation.Deck));
                     castDescription =
                         "Search your deck for a card. Shuffle your deck then put the selected card on top.";
-                } break;
-                #endregion
-                #region Fresh Fox
+                }
+                    break;
+
+                    #endregion
+
+                    #region Fresh Fox
+
                 case CardTemplate.Fresh_sFox:
                 {
                     cardType = CardType.Creature;
@@ -415,9 +515,13 @@ namespace stonerkart
                     natureCost = 2;
 
                     keywordAbilities.Add(KeywordAbility.Fervor);
-                } break;
-                #endregion
-                #region Damage Ward
+                }
+                    break;
+
+                    #endregion
+
+                    #region Damage Ward
+
                 case CardTemplate.Damage_sWard:
                 {
                     cardType = CardType.Instant;
@@ -430,9 +534,13 @@ namespace stonerkart
                         new ModifyDoer(ModifiableStats.Toughness, 3, LL.add, LL.never));
                     castDescription = "Target creature gains 3 toughness.";
 
-                } break;
-                #endregion
-                #region Survival Instincts
+                }
+                    break;
+
+                    #endregion
+
+                    #region Survival Instincts
+
                 case CardTemplate.Survival_sInstincts:
                 {
                     cardType = CardType.Instant;
@@ -440,15 +548,21 @@ namespace stonerkart
 
                     castRange = 3;
                     natureCost = 2;
-                    castEffect = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
-                        new ZepperDoer(-2));
-                    additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1), 
+                    castEffect =
+                        new Effect(
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                            new ZepperDoer(-2));
+                    additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1),
                         new ModifyDoer(ModifiableStats.Power, 2, LL.add, LL.endOfTurn)));
                     castDescription =
                         "Target creature is healed for 2 and gains 2 power until the end of this turn.";
-                } break;
-                #endregion
-                #region Baby Dragon
+                }
+                    break;
+
+                    #endregion
+
+                    #region Baby Dragon
+
                 case CardTemplate.Baby_sDragon:
                 {
                     cardType = CardType.Creature;
@@ -470,9 +584,13 @@ namespace stonerkart
                         true,
                         TriggeredAbility.Timing.Post
                         );
-                } break;
-                #endregion
-                #region Huntress of Nibememe
+                }
+                    break;
+
+                    #endregion
+
+                    #region Huntress of Nibememe
+
                 case CardTemplate.Huntress_sOf_sNibememe:
                 {
                     cardType = CardType.Creature;
@@ -486,16 +604,21 @@ namespace stonerkart
 
                     addActivatedAbility(
                         String.Format("{0}: Deal 1 damage to target creature within 3 tiles.", G.exhaustGhyph),
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()), 
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
                         new ZepperDoer(1),
-                        new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer())),
+                        new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
+                            new FatigueDoer())),
                         3,
-                        PileLocation.Field, 
+                        PileLocation.Field,
                         CastSpeed.Instant
                         );
-                } break;
-                #endregion
-                #region Call to arms
+                }
+                    break;
+
+                    #endregion
+
+                    #region Call to arms
+
                 case CardTemplate.Call_sTo_sArms:
                 {
                     cardType = CardType.Sorcery;
@@ -508,14 +631,19 @@ namespace stonerkart
                     castEffect = new Effect(new TargetRuleSet(
                         new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                             CardTemplate.Squire, CardTemplate.Squire),
-                        new PryTileRule(t => t.card == null && !t.isEdgy, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, 2, false)),
+                        new PryTileRule(t => t.card == null && !t.isEdgy,
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, 2, false)),
                         new MoveToTileDoer(),
                         true
                         );
 
-                } break;
-                #endregion
-                #region Wilt
+                }
+                    break;
+
+                    #endregion
+
+                    #region Wilt
+
                 case CardTemplate.Wilt:
                 {
                     cardType = CardType.Sorcery;
@@ -531,32 +659,42 @@ namespace stonerkart
                                 c => c.cardType == CardType.Creature),
                             new MoveToPileDoer(PileLocation.Graveyard));
                     castRange = 100;
-                } break;
-                #endregion
-                #region Price Ila
+                }
+                    break;
+
+                    #endregion
+
+                    #region Price Ila
+
                 case CardTemplate.Prince_sIla:
                 {
-                        cardType = CardType.Creature;
-                        rarity = Rarity.Legendary;
-                        isHeroic = true;
-                        forceColour = ManaColour.Death;
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Legendary;
+                    isHeroic = true;
+                    forceColour = ManaColour.Death;
 
-                        baseMovement = 2;
-                        basePower = 2;
-                        baseToughness = 20;
+                    baseMovement = 2;
+                    basePower = 2;
+                    baseToughness = 20;
 
-                        addActivatedAbility(
-                            String.Format("{0}: Each player discards a card.", G.exhaustGhyph),
-                            new TargetRuleSet(new SelectCardRule(PileLocation.Hand, new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers))),
-                            new MoveToPileDoer(PileLocation.Graveyard),
-                            new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer())),
-                            0,
-                            PileLocation.Field, 
-                            CastSpeed.Slow 
-                            );
-                } break;
-                #endregion
-                #region Kraken
+                    addActivatedAbility(
+                        String.Format("{0}: Each player discards a card.", G.exhaustGhyph),
+                        new TargetRuleSet(new SelectCardRule(PileLocation.Hand,
+                            new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers))),
+                        new MoveToPileDoer(PileLocation.Graveyard),
+                        new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
+                            new FatigueDoer())),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Slow
+                        );
+                }
+                    break;
+
+                    #endregion
+
+                    #region Kraken
+
                 case CardTemplate.Kraken:
                 {
                     cardType = CardType.Creature;
@@ -572,12 +710,16 @@ namespace stonerkart
                         "This creature gets +1/+0 for each card in its controllers hand.",
                         () => controller.hand.Count,
                         LL.add,
-                        ModifiableStats.Power, 
+                        ModifiableStats.Power,
                         c => c == this
                         ));
-                } break;
-                #endregion
-                #region Ilas Gravekeeper
+                }
+                    break;
+
+                    #endregion
+
+                    #region Ilas Gravekeeper
+
                 case CardTemplate.Ilas_sGravekeeper:
                 {
                     cardType = CardType.Creature;
@@ -595,8 +737,12 @@ namespace stonerkart
                         ModifiableStats.Power,
                         c => c == this
                         ));
-                } break;
-                #endregion
+                }
+                    break;
+
+                    #endregion
+
+                    #region Frenzied Pirhana
 
                 case CardTemplate.Frenzied_sPirhana:
                 {
@@ -623,9 +769,39 @@ namespace stonerkart
                         ModifiableStats.Toughness,
                         c => c == this
                         ));
-                    } break;
+                }
+                    break;
 
-                #region tokens
+                    #endregion
+
+
+                case CardTemplate.Ilatian_sHaunter:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Zombie;
+                    baseMovement = 1;
+                    baseToughness = 1;
+                    basePower = 1;
+
+                    deathCost = 1;
+                    greyCost = 1;
+
+                    addActivatedAbility(
+                        "You may cast this card from the graveyard.",
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new PryTileRule(t => t.card == null && !t.isEdgy,
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
+                        new MoveToTileDoer(),
+                        new Foo(LL.manaCost(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
+                        2,
+                        PileLocation.Graveyard,
+                        CastSpeed.Slow,
+                        true
+                        );
+                } break;
+
+
+            #region tokens
                 #region Squire
                 case CardTemplate.Squire:
                 {
@@ -700,7 +876,7 @@ namespace stonerkart
             es.Add(castEffect);
             es.AddRange(additionalCastEffects);
 
-            additionalCastCosts.Add(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new ManaCostRule(castManaCost)), new PayManaDoer()));
+            additionalCastCosts.Add(LL.manaCost(castManaCost));
 
             castAbility = new ActivatedAbility(this, PileLocation.Hand, castRange, new Foo(additionalCastCosts.ToArray()), castSpeed, castDescription, es.ToArray());
             abilities.Add(castAbility);
@@ -720,11 +896,12 @@ namespace stonerkart
             abilities.Add(ta);
         }
 
-        private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed)
+        private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed, bool alternateCast = false)
         {
             Effect e = new Effect(trs, doer);
-            ActivatedAbility ta = new ActivatedAbility(this, activeIn, castRange, cost, castSpeed, description, e);
-            abilities.Add(ta);
+            ActivatedAbility aa = new ActivatedAbility(this, activeIn, castRange, cost, castSpeed, description, e);
+            abilities.Add(aa);
+            if (alternateCast) alternateCasts.Add(aa);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)] //yagni said no one ever

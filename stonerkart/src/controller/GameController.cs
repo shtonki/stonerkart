@@ -38,7 +38,7 @@ namespace stonerkart
                     return;
                 }
             }
-            DraggablePanel dp = showPile(pile, true, c => { });
+            DraggablePanel dp = showPile(pile, true, c => { game.clicked(c); });
             cachex[pile] = dp;
         }
 

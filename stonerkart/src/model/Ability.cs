@@ -15,7 +15,7 @@ namespace stonerkart
         public int castRange;
         public string description;
 
-        public bool isCastAbility => card.castAbility == this;
+        public bool isCastAbility => card.isCastAbility(this);
 
         public Ability(Card card, PileLocation activeIn, Foo effects, int castRange, Foo cost, string description)
         {
