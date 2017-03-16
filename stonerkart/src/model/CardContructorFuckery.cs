@@ -420,7 +420,7 @@ namespace stonerkart
                     rarity = Rarity.Common;
 
                     orderCost = 2;
-                    castRange = 6;
+                    castRange = 5;
                     castEffect = new Effect(
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
                             new PryTileRule(f => f.passable,
@@ -856,6 +856,19 @@ namespace stonerkart
                     castDescription = "Counter target spell.";
                     castEffect = new Effect(new ClickCardRule(c => c.location.pile == PileLocation.Stack && !c.isDummy),
                         new MoveToPileDoer(PileLocation.Graveyard));
+                } break;
+                #endregion
+
+                #region Gleeful Duty
+                case CardTemplate.Gleeful_sDuty:
+                {
+                    cardType = CardType.Instant;
+
+                    castEffect =
+                        new Effect(
+                            new PryCardRule(c => !c.isHeroic,
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                            new MoveToPileDoer(PileLocation.Graveyard));
                 } break;
                 #endregion
 
