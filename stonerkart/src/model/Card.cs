@@ -80,6 +80,11 @@ namespace stonerkart
 
         private GameEventHandlerBuckets eventHandler;
 
+        public bool isColour(ManaColour c)
+        {
+            return colours.Contains(c);
+        }
+
         public bool canAttack(Card defender)
         {
             if (defender.cardType != CardType.Creature) return false;
@@ -367,6 +372,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Gotterdammerung,
+        Overgrow,
         Gleeful_sDuty,
         Counterspell,
         Invigorate,

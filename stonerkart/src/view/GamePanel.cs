@@ -64,8 +64,9 @@ namespace stonerkart
 
             g.villain.addObserver(villainPanel);
             
-
             g.stepHandler.addObserver(stepPanel1);
+
+            highlightCard.showBase = true;
         }
 
         public GamePanel() : this(null)

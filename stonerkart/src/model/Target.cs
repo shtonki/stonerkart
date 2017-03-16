@@ -712,6 +712,26 @@ namespace stonerkart
         }
     }
 
+    class AllCardsRule : ResolveRule
+    {
+        private Func<Card, bool> filter;
+
+        public AllCardsRule(Func<Card, bool> filter) : base(typeof(Card))
+        {
+            this.filter = filter;
+        }
+
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        {
+            return new TargetColumn(hs.cards.Where(filter));
+        }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return new TargetColumn(hs.cards.Where(filter));
+        }
+    }
+
     class PlayerResolveRule : ResolveRule
     {
         private Rule rule;
