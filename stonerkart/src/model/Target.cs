@@ -232,10 +232,13 @@ namespace stonerkart
 
     class SelectCardRule : TargetRule
     {
+        public enum Mode { Resolver, Reflexive}
+
         private TargetRule pg;
         private PileLocation l;
         private Func<Card, bool> filter;
-
+        private Mode mode;
+        /*
         public SelectCardRule(PileLocation l, TargetRule pg, Func<Card, bool> filter) : base(typeof(Card))
         {
             this.pg = pg;
@@ -248,6 +251,17 @@ namespace stonerkart
             pg = playerGenerator;
             l = location;
         }
+        */
+
+        public SelectCardRule(PileLocation l, Func<Card, bool> filter = null, TargetRule pg = null, Mode mode = Mode.Reflexive) : base(typeof(Card))
+        {
+            this.pg = pg ?? new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController);
+            this.l = l;
+            this.filter = filter ?? (c => true);
+            this.mode = mode;
+        }
+
+
 
         public override TargetColumn? fillCastTargets(HackStruct f)
         {
@@ -265,7 +279,18 @@ namespace stonerkart
                 Player p = (Player)tbl;
                 Card crd;
 
-                crd = hs.selectCardSynchronized(p.pileFrom(l), p, filter);
+                Player seer;
+                if (mode == Mode.Reflexive)
+                {
+                    seer = p;
+                }
+                else if (mode == Mode.Resolver)
+                {
+                    seer = hs.resolveController;
+                }
+                else throw new Exception();
+
+                crd = hs.selectCardSynchronized(p.pileFrom(l), seer, filter);
                 if (crd == null) continue; //todo allow canceling or something
                 rt.Add(crd);
             }
@@ -612,7 +637,12 @@ namespace stonerkart
     class PryPlayerRule : PryRule
     {
         private Func<Player, bool> fltr;
-        
+
+
+        public PryPlayerRule() : this(p => true, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))
+        {
+            
+        }
 
         public PryPlayerRule(Func<Player, bool> filter, TargetRule playerGenerator, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Card), playerGenerator, flip, count, allowDuplicates)
         {

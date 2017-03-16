@@ -96,7 +96,7 @@ namespace stonerkart
                     rarity = Rarity.Uncommon;
                     race = Race.Beast;
 
-                    baseMovement = 1;
+                    baseMovement = 2;
                     basePower = 2;
                     baseToughness = 3;
                     orderCost = 3;
@@ -203,7 +203,7 @@ namespace stonerkart
 
                     basePower = 3;
                     baseToughness = 4;
-                    baseMovement = 2;
+                    baseMovement = 3;
 
                     lifeCost = 2;
                     greyCost = 2;
@@ -266,7 +266,7 @@ namespace stonerkart
 
                     basePower = 2;
                     baseToughness = 2;
-                    baseMovement = 1;
+                    baseMovement = 2;
 
                     deathCost = 1;
                 }
@@ -335,7 +335,7 @@ namespace stonerkart
                     rarity = Rarity.Uncommon;
                     race = Race.Giant;
 
-                    baseMovement = 2;
+                    baseMovement = 3;
                     basePower = 2;
                     baseToughness = 2;
                     mightCost = 1;
@@ -459,7 +459,7 @@ namespace stonerkart
                     race = Race.Human;
                     subtype = Subtype.Rogue;
 
-                    baseMovement = 2;
+                    baseMovement = 3;
                     basePower = 3;
                     baseToughness = 3;
 
@@ -469,8 +469,7 @@ namespace stonerkart
 
                     addTriggeredAbility(
                         "Whenever this creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
-                        new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard,
-                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                        new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard)),
                         new MoveToPileDoer(PileLocation.Hand),
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(
@@ -497,8 +496,7 @@ namespace stonerkart
 
                     castEffect =
                         new Effect(
-                            new TargetRuleSet(new SelectCardRule(PileLocation.Deck,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                            new TargetRuleSet(new SelectCardRule(PileLocation.Deck)),
                             new MoveToPileDoer(PileLocation.Deck));
                     castDescription =
                         "Search your deck for a card. Shuffle your deck then put the selected card on top.";
@@ -517,7 +515,7 @@ namespace stonerkart
 
                     baseToughness = 2;
                     basePower = 2;
-                    baseMovement = 3;
+                    baseMovement = 4;
 
                     natureCost = 2;
 
@@ -610,7 +608,7 @@ namespace stonerkart
 
                     baseToughness = 3;
                     basePower = 1;
-                    baseMovement = 2;
+                    baseMovement = 3;
 
                     addActivatedAbility(
                         String.Format("{0}: Deal 1 damage to target creature within 3 tiles.", G.exhaustGhyph),
@@ -665,9 +663,9 @@ namespace stonerkart
                     castEffect =
                         new Effect(
                             new SelectCardRule(PileLocation.Hand,
-                                new PryPlayerRule(p => true,
-                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                                c => c.cardType == CardType.Creature),
+                                c => c.cardType == CardType.Creature,
+                                new PryPlayerRule(),
+                                SelectCardRule.Mode.Resolver),
                             new MoveToPileDoer(PileLocation.Graveyard));
                     castRange = 100;
                 }
@@ -693,6 +691,7 @@ namespace stonerkart
                     addActivatedAbility(
                         String.Format("{0}: Each player discards a card.", G.exhaustGhyph),
                         new TargetRuleSet(new SelectCardRule(PileLocation.Hand,
+                            c => true,
                             new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers))),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
@@ -741,7 +740,7 @@ namespace stonerkart
                     rarity = Rarity.Uncommon;
                     race = Race.Undead;
 
-                    baseMovement = 2;
+                    baseMovement = 3;
                     basePower = 0;
                     baseToughness = 4;
 
@@ -767,7 +766,7 @@ namespace stonerkart
                     rarity = Rarity.Common;
                     race = Race.Beast;
 
-                    baseMovement = 2;
+                    baseMovement = 3;
                     baseToughness = 1;
                     basePower = 1;
 
@@ -803,7 +802,7 @@ namespace stonerkart
                     race = Race.Zombie;
                     rarity = Rarity.Common;
 
-                    baseMovement = 1;
+                    baseMovement = 2;
                     baseToughness = 1;
                     basePower = 1;
 
@@ -863,12 +862,17 @@ namespace stonerkart
                 case CardTemplate.Gleeful_sDuty:
                 {
                     cardType = CardType.Instant;
+                    rarity = Rarity.Uncommon;
 
+                    deathCost = 3;
+
+                    castDescription = "Destroy target non-heroic creature.";
                     castEffect =
                         new Effect(
                             new PryCardRule(c => !c.isHeroic,
                                 new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                             new MoveToPileDoer(PileLocation.Graveyard));
+                    castRange = 4;
                 } break;
                 #endregion
 

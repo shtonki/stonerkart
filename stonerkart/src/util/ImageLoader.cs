@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Gleeful_sDuty:
+                {
+                    return Resources.artGleefulDuty;
+                }
+
                 case CardTemplate.Counterspell:
                 {
                     return Resources.artCounterspell;

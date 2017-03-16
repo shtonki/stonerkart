@@ -560,9 +560,9 @@ namespace stonerkart
             do
             {
                 handlePendingTrigs();
+                trashcanDeadCreatures();
             } while (pendingTriggeredAbilities.Count > 0);
 
-            trashcanDeadCreatures(); //todo suspect
 
             gameController.redraw();
         }
@@ -908,9 +908,10 @@ namespace stonerkart
 
         private TargetMatrix[] chooseTargets(Ability a)
         {
+            /*
             Card caster = a.isCastAbility ? a.card.controller.heroCard : a.card;
             List<Tile> v = caster.tile.withinDistance(a.castRange);
-
+            */
             HackStruct box = makeHackStruct(a);
 
             if (!a.possible(box)) return null;
