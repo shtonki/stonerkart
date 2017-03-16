@@ -328,8 +328,11 @@ namespace stonerkart
                     tile = null;
                 }
                 moveTo(e.to);
-                fatigue = 0;
-                damageTaken = 0;
+                if (e.to.location.pile != PileLocation.Field)
+                {
+                    fatigue = 0;
+                    damageTaken = 0;
+                }
             }));
             
             return r;
@@ -364,6 +367,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Gleeful_sDuty,
         Counterspell,
         Invigorate,
         Ilatian_sHaunter,

@@ -292,9 +292,15 @@ namespace stonerkart
 
         public ChoiceSelection(Game g, string s)
         {
-            string[] ss = s.Split(',');
-
-            choices = ss.Select(Int32.Parse).ToArray();
+            if (s.Length == 0)
+            {
+                choices = new int[0];
+            }
+            else
+            {
+                string[] ss = s.Split(',');
+                choices = ss.Select(Int32.Parse).ToArray();
+            }
         }
 
         public string toString(Game g)
