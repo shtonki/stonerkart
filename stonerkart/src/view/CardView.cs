@@ -24,6 +24,7 @@ namespace stonerkart
         private Panel rgtBorderPanel;
         private ManaCostPanel manaCostPanel1;
 
+        public bool showBase { get; set; }
 
         public Card card { get; private set; }
         
@@ -62,6 +63,9 @@ namespace stonerkart
 
         private void sickmemes()
         {
+            Card c = card;
+            if (showBase) card = Card.fromTemplate(card.template);
+
             this.memeout(() =>
             {
                 if (card.colours.Count == 1)
@@ -122,6 +126,7 @@ namespace stonerkart
                 else throw new Exception();
                 Invalidate();
             });
+            card = c;
         }
 
         public void glowColour(Color? c = null)

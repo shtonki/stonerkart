@@ -497,7 +497,7 @@ namespace stonerkart
             {
                 foreach (Card card in triggerableCards)
                 {
-                    pendAbilities(card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Pre));
+                    pendAbilities(e, card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Pre));
                 }
             }
 
@@ -515,12 +515,12 @@ namespace stonerkart
             {
                 foreach (Card card in triggerableCards)
                 {
-                    pendAbilities(card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Post));
+                    pendAbilities(e, card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Post));
                 }
             }
         }
 
-        private void pendAbilities(IEnumerable<TriggeredAbility> tas)
+        private void pendAbilities(GameEvent trigger, IEnumerable<TriggeredAbility> tas)
         {
             if (tas.Count() == 0) return;
             pendingTriggeredAbilities.AddRange(tas);

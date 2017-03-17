@@ -83,6 +83,16 @@ namespace stonerkart
                     baseMovement = 2;
                     basePower = 2;
                     baseToughness = 25;
+
+                        addActivatedAbility(
+                            String.Format("{0}: Give all your other white creatures +1/+0 until end of turn.", G.exhaustGhyph),
+                            new TargetRuleSet(new AllCardsRule(c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
+                            new ModifyDoer(ModifiableStats.Power, 1, LL.add, LL.endOfTurn),
+                            LL.exhaustThis,
+                            0,
+                            PileLocation.Field,
+                            CastSpeed.Instant 
+                            );
                 }
                     break;
 
@@ -655,7 +665,7 @@ namespace stonerkart
                 case CardTemplate.Wilt:
                 {
                     cardType = CardType.Sorcery;
-                    rarity = Rarity.None;
+                    rarity = Rarity.Uncommon;
 
                     deathCost = 2;
 
@@ -714,11 +724,11 @@ namespace stonerkart
                     race = Race.Beast;
 
                     baseMovement = 2;
-                    basePower = 1;
+                    basePower = 0;
                     baseToughness = 5;
 
                     orderCost = 2;
-                    greyCost = 2;
+                    greyCost = 3;
 
                     auras.Add(new Aura(
                         "This creature gets +1/+0 for each card in its controllers hand.",
@@ -841,9 +851,10 @@ namespace stonerkart
                 }
                     break;
 
-                #endregion
+                    #endregion
 
-                #region Counterspell
+                    #region Counterspell
+
                 case CardTemplate.Counterspell:
                 {
                     cardType = CardType.Instant;
@@ -855,10 +866,13 @@ namespace stonerkart
                     castDescription = "Counter target spell.";
                     castEffect = new Effect(new ClickCardRule(c => c.location.pile == PileLocation.Stack && !c.isDummy),
                         new MoveToPileDoer(PileLocation.Graveyard));
-                } break;
-                #endregion
+                }
+                    break;
 
-                #region Gleeful Duty
+                    #endregion
+
+                    #region Gleeful Duty
+
                 case CardTemplate.Gleeful_sDuty:
                 {
                     cardType = CardType.Instant;
@@ -873,7 +887,49 @@ namespace stonerkart
                                 new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                             new MoveToPileDoer(PileLocation.Graveyard));
                     castRange = 4;
-                } break;
+                }
+                    break;
+
+                    #endregion
+
+                    #region Overgrow
+
+                case CardTemplate.Overgrow:
+                {
+                    cardType = CardType.Sorcery;
+                    rarity = Rarity.Common;
+
+                    natureCost = 2;
+
+                    castDescription = "Destroy target relic.";
+                    castEffect =
+                        new Effect(
+                            new PryCardRule(c => c.cardType == CardType.Relic,
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                            new MoveToPileDoer(PileLocation.Graveyard));
+                    castRange = 6;
+                }
+                    break;
+
+                #endregion
+
+                #region Gotterdammerun
+
+                case CardTemplate.Gotterdammerung:
+                {
+                    cardType = CardType.Sorcery;
+                    rarity = Rarity.Rare;
+
+                    lifeCost = 3;
+                    greyCost = 3;
+
+                    castDescription = "Destroy all non-heroic creatures";
+                    castEffect =
+                        new Effect(
+                            new AllCardsRule(c => !c.isHeroic), 
+                            new MoveToPileDoer(PileLocation.Graveyard));
+                    } break;
+
                 #endregion
 
                 #region tokens

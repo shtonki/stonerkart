@@ -110,6 +110,16 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Gotterdammerung:
+                {
+                    return Resources.artGottedammerung;
+                }
+
+                case CardTemplate.Overgrow:
+                {
+                    return Resources.artOvergrow;
+                }
+
                 case CardTemplate.Gleeful_sDuty:
                 {
                     return Resources.artGleefulDuty;
