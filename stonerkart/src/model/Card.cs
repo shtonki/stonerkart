@@ -311,7 +311,7 @@ namespace stonerkart
 
                 moveTo(e.tile);
                 moveTo(e.card.controller.field);
-                if (!hasAbility(KeywordAbility.Fervor)) exhaust();
+                if (!e.dontExhaust && !hasAbility(KeywordAbility.Fervor)) exhaust();
             }));
 
             r.add(new TypedGameEventHandler<FatigueEvent>(e =>

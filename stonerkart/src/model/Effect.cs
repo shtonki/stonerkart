@@ -219,16 +219,18 @@ namespace stonerkart
     
     class MoveToTileDoer : SimpleDoer
     {
-        public MoveToTileDoer() : base(typeof(Card), typeof(Tile))
-        {
+        private bool dontExhaust;
 
+        public MoveToTileDoer(bool dontExhaust = false) : base(typeof(Card), typeof(Tile))
+        {
+            this.dontExhaust = dontExhaust;
         }
 
         protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Card moved = (Card)row[0];
             Tile moveTo = (Tile)row[1];
-            return new GameEvent[] {new PlaceOnTileEvent(moved, moveTo)};
+            return new GameEvent[] {new PlaceOnTileEvent(moved, moveTo, dontExhaust)};
         }
     }
 

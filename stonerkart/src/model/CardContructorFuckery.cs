@@ -442,7 +442,7 @@ namespace stonerkart
                     castEffect = new Effect(
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
                             new PryTileRule(f => f.passable,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer());
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer(true));
                     castDescription = "Move your hero to target tile.";
                 }
                     break;
