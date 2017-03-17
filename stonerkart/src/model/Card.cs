@@ -380,6 +380,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Abolish,
         Chains_sof_sVirtue,
         Chains_sof_sSin,
         Rider_sof_sDeath,
