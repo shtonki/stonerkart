@@ -232,6 +232,9 @@ namespace stonerkart
             foreach (var a in keywordAbilities)
             {
                 sb.Append(a);
+                sb.Append(" -- (");
+                sb.Append(kaExplainer(a));
+                sb.Append(')');
                 sb.Append("\r\n");
             }
 
@@ -242,6 +245,29 @@ namespace stonerkart
             }
 
             return sb.ToString();
+        }
+
+        private static string kaExplainer(KeywordAbility ab)
+        {
+            switch (ab)
+            {
+                case KeywordAbility.Elusion:
+                {
+                    return "Cannot be targeted.";
+                }
+
+                case KeywordAbility.Fervor:
+                {
+                    return "Enters the battlefield with full movement.";
+                }
+
+                case KeywordAbility.Kingslayer:
+                {
+                    return "Deals double damage to heroic creatures";
+                }
+            }
+
+            return "";
         }
 
         public Card createDummy(Ability a)

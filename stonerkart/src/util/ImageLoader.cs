@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Abolish:
+                {
+                    return Resources.artAbolish;
+                }
+
                 case CardTemplate.Rider_sof_sWar:
                 {
                         return Resources.artWar;

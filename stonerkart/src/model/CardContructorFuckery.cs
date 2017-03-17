@@ -904,7 +904,7 @@ namespace stonerkart
 
                 case CardTemplate.Overgrow:
                 {
-                    cardType = CardType.Channel;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
 
                     natureCost = 2;
@@ -985,15 +985,15 @@ namespace stonerkart
                     greyCost = 3;
 
                     keywordAbilities.Add(KeywordAbility.Kingslayer);
-                    keywordAbilities.Add(KeywordAbility.Elusion);
+                    keywordAbilities.Add(KeywordAbility.Fervor);
                 } break;
 
                 #endregion
 
                 #region Rider of Famine
-                case CardTemplate.Rider_sof_sFamine:
-                {
-                    cardType = CardType.Creature;
+                case CardTemplate.Rider_sof_sPestilence:
+                    {
+                        cardType = CardType.Creature;
                     rarity = Rarity.Legendary;
 
                     basePower = 3;
@@ -1018,7 +1018,7 @@ namespace stonerkart
                 #endregion
 
                 #region Rider of Pestilence
-                case CardTemplate.Rider_sof_sPestilence:
+                case CardTemplate.Rider_sof_sFamine:
                     {
                         cardType = CardType.Creature;
                         rarity = Rarity.Legendary;
@@ -1104,8 +1104,20 @@ namespace stonerkart
 
                 case CardTemplate.Abolish:
                 {
-                    
-                } break;
+                    cardType = CardType.Channel;
+                    rarity = Rarity.Common;
+
+                    lifeCost = 2;
+                    greyCost = 1;
+
+                        castDescription = "Destroy target relic.";
+                        castEffect =
+                            new Effect(
+                                new PryCardRule(c => c.cardType == CardType.Relic,
+                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                                new MoveToPileDoer(PileLocation.Graveyard));
+                        castRange = 6;
+                    } break;
 
                 #region tokens
                 #region Squire
