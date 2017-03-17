@@ -29,7 +29,7 @@ namespace stonerkart
         public int convertedManaCost => castManaCost.colours.Count();
 
         public bool isExhausted => Movement == 0;
-        public bool canRetaliate => !isExhausted && !isHeroic;
+        public bool canRetaliate => !isHeroic;
 
         public string breadText => breadTextEx();
 
@@ -83,6 +83,13 @@ namespace stonerkart
         public bool isColour(ManaColour c)
         {
             return colours.Contains(c);
+        }
+
+        public int combatDamageTo(Card defender)
+        {
+            int d = power;
+            if (defender.isHeroic && hasAbility(KeywordAbility.Kingslayer)) d = d*2;
+            return d;
         }
 
         public bool canAttack(Card defender)
@@ -343,7 +350,8 @@ namespace stonerkart
             return r;
         }
 
-        
+        //can't see me
+        public TriggerGlueHack tghack { get; set; }
     }
 
     class Aura
@@ -372,6 +380,13 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Chains_sof_sVirtue,
+        Chains_sof_sSin,
+        Rider_sof_sDeath,
+        Rider_sof_sWar,
+        Rider_sof_sPestilence,
+        Rider_sof_sFamine,
+        Magma_sVents,
         Gotterdammerung,
         Overgrow,
         Gleeful_sDuty,
@@ -414,8 +429,8 @@ namespace stonerkart
     internal enum CardType
     {
         Creature,
-        Instant,
-        Sorcery,
+        Interrupt,
+        Channel,
         Relic
     }
 
@@ -462,5 +477,6 @@ namespace stonerkart
     {
         Fervor,
         Elusion,
+        Kingslayer,
     }
 }

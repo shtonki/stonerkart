@@ -22,7 +22,7 @@ namespace stonerkart
 
         public Pile stack { get; } = new Pile(new Location(null, PileLocation.Stack));
 
-        private List<TriggeredAbility> pendingTriggeredAbilities { get; }= new List<TriggeredAbility>();
+        private List<TriggerGlueHack> pendingTriggeredAbilities { get; }= new List<TriggerGlueHack>();
 
         private int activePlayerIndex { get; set; }
         public Player activePlayer => players[activePlayerIndex];
@@ -464,8 +464,8 @@ namespace stonerkart
 
                 if (path.attacking && mover.canAttack(defender))
                 {
-                    gt.addEvent(new DamageEvent(mover, defender, mover.power));
-                    if (defender.canRetaliate) gt.addEvent(new DamageEvent(defender, mover, defender.power));
+                    gt.addEvent(new DamageEvent(mover, defender, mover.combatDamageTo(defender)));
+                    if (defender.canRetaliate) gt.addEvent(new DamageEvent(defender, mover, defender.combatDamageTo(mover)));
                 }
                 
                 gt.addEvent(new MoveEvent(mover, path));
@@ -523,7 +523,7 @@ namespace stonerkart
         private void pendAbilities(GameEvent trigger, IEnumerable<TriggeredAbility> tas)
         {
             if (tas.Count() == 0) return;
-            pendingTriggeredAbilities.AddRange(tas);
+            pendingTriggeredAbilities.AddRange(tas.Select(ta => new TriggerGlueHack(ta, trigger)));
         }
 
         private void enforceRules()
@@ -571,12 +571,12 @@ namespace stonerkart
         {
             if (pendingTriggeredAbilities.Count > 0)
             {
-                List<TriggeredAbility>[] abilityArrays =
-                    players.Select(p => new List<TriggeredAbility>()).ToArray();
+                List<TriggerGlueHack>[] abilityArrays =
+                    players.Select(p => new List<TriggerGlueHack>()).ToArray();
 
-                foreach (TriggeredAbility pending in pendingTriggeredAbilities)
+                foreach (TriggerGlueHack pending in pendingTriggeredAbilities)
                 {
-                    int ix = ord(pending.card.controller);
+                    int ix = ord(pending.ta.card.controller);
                     abilityArrays[ix].Add(pending);
                 }
 
@@ -585,7 +585,7 @@ namespace stonerkart
                 for (int i = 0; i < abilityArrays.Length; i++)
                 {
                     Player p = playerFromOrd(i);
-                    List<TriggeredAbility> abilityList = abilityArrays[i];
+                    List<TriggerGlueHack> abilityList = abilityArrays[i];
                     
                     wrappers.AddRange(handlePendingTrigs(p, abilityList));
                 }
@@ -599,16 +599,17 @@ namespace stonerkart
             }
         }
 
-        private List<StackWrapper> handlePendingTrigs(Player p, IEnumerable<TriggeredAbility> abilities)
+        private List<StackWrapper> handlePendingTrigs(Player p, IEnumerable<TriggerGlueHack> abilities)
         {
             List<StackWrapper> r = new List<StackWrapper>();
-            TriggeredAbility[] orig = abilities.ToArray();
+            TriggerGlueHack[] orig = abilities.ToArray();
 
             Pile pl = new Pile();
 
             for (int i = 0; i < orig.Length; i++)
             {
-                createDummy(orig[i], pl);
+                Card c = createDummy(orig[i].ta, pl);
+                c.tghack = orig[i];
             }
 
             if (p == hero)
@@ -641,10 +642,9 @@ namespace stonerkart
                         cv.glowColour();
                         continue;
                     }
-
-                    int i = Array.IndexOf(orig, c.dummiedAbility);
-                    TriggeredAbility tab = orig[i];
-                    StackWrapper v = tryCastDx(p, tab, c);
+                    int i = Array.IndexOf(orig.Select(g => g.ta).ToArray(), c.dummiedAbility);
+                    TriggeredAbility tab = orig[i].ta;
+                    StackWrapper v = tryCastDx(p, tab, c, orig[i].ge);
                     if (v == null) continue;
 
                     ptas ptas = new ptas(tab,i,c,v);
@@ -860,7 +860,7 @@ namespace stonerkart
                 ability = chooseAbility(card);
                 if (ability == null) continue;
 
-                targetmxs = chooseTargets(ability);
+                targetmxs = ability.effects.fillCast(makeHackStruct(ability));
                 if (targetmxs == null) continue;
 
                 costmxs = ability.cost.fillCast(makeHackStruct(p));
@@ -870,14 +870,16 @@ namespace stonerkart
             } while (true);
         }
 
-        private StackWrapper tryCastDx(Player p, TriggeredAbility ability, Card dummyCard)
+        private StackWrapper tryCastDx(Player p, TriggeredAbility ability, Card dummyCard, GameEvent ge)
         {
             TargetMatrix[] costmxs;
             TargetMatrix[] targetmxs;
 
             do
             {
-                targetmxs = chooseTargets(ability);
+                var v = makeHackStruct(ability);
+                v.triggeringEvent = ge;
+                targetmxs = ability.effects.fillCast(v);
                 if (targetmxs == null) return null;
 
                 costmxs = ability.cost.fillCast(makeHackStruct(p));
@@ -1192,6 +1194,18 @@ namespace stonerkart
         public void addEvents(IEnumerable<GameEvent> es)
         {
             events.AddRange(es);
+        }
+    }
+
+    struct TriggerGlueHack
+    {
+        public TriggeredAbility ta;
+        public GameEvent ge;
+
+        public TriggerGlueHack(TriggeredAbility ta, GameEvent ge)
+        {
+            this.ta = ta;
+            this.ge = ge;
         }
     }
 

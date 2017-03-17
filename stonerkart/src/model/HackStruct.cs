@@ -30,6 +30,7 @@ namespace stonerkart
         public Card resolveCard => resolveAbility.card;
         public Ability resolveAbility { get; }
         public IEnumerable<Card> cards { get; }
+        public GameEvent triggeringEvent { get; set; }
 
         public TargetMatrix previousTargets { get; set; }
         public TargetColumn previousColumn { get; set; }

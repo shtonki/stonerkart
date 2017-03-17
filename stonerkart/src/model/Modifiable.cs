@@ -88,7 +88,10 @@ namespace stonerkart
         private int getValue()
         {
             if (dirty) recount();
-            return cachedValue;
+            int r = cachedValue;
+            r = Math.Max(r, minValue??r);
+            r = Math.Min(r, maxValue??r);
+            return r;
         }
 
 

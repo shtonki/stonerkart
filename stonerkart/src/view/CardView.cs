@@ -116,9 +116,9 @@ namespace stonerkart
                     toughnessBox.Text = "";
                     autoFontTextBox1.Text = "";
                 }
-                else if (card.cardType == CardType.Instant || card.cardType == CardType.Sorcery)
+                else if (card.cardType == CardType.Interrupt || card.cardType == CardType.Channel)
                 {
-                    castRangeSlashMovementBox.Text = ((card.cardType == CardType.Instant || card.cardType == CardType.Instant) && card.castRange > 0) ? card.castRange.ToString() : "";
+                    castRangeSlashMovementBox.Text = ((card.cardType == CardType.Interrupt || card.cardType == CardType.Interrupt) && card.castRange > 0) ? card.castRange.ToString() : "";
                     powerBox.Text = "";
                     toughnessBox.Text = "";
                     autoFontTextBox1.Text = "";

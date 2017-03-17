@@ -154,6 +154,33 @@ namespace stonerkart
         public abstract TargetColumn possible(HackStruct hs);
     }
 
+    class TriggeredTargetRule<G, T> : TargetRule where T : Targetable where G : GameEvent
+    {
+        private Func<G, T> func;
+
+        public TriggeredTargetRule(Func<G, T> func) : base(typeof(T))
+        {
+            this.func = func;
+        }
+
+        public override TargetColumn? fillCastTargets(HackStruct f)
+        {
+            G g = (G)f.triggeringEvent;
+            var t = (Targetable)func(g);
+            return new TargetColumn(new []{t});
+        }
+
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        {
+            return c;
+        }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return fillCastTargets(hs).Value;
+        }
+    }
+
     class ClickCardRule : TargetRule
     {
         private Func<Card, bool> filter;
@@ -615,6 +642,12 @@ namespace stonerkart
         public PryCardRule(Func<Card, bool> filter, TargetRule playerGenerator, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Card), playerGenerator, flip, count, allowDuplicates)
         {
             this.fltr = filter;
+        }
+
+        public PryCardRule(Func<Card, bool> filter)
+            : this(filter, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))
+        {
+            
         }
 
         protected override Targetable pry(Tile t)

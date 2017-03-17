@@ -110,6 +110,41 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Rider_sof_sWar:
+                {
+                        return Resources.artWar;
+                }
+
+                case CardTemplate.Rider_sof_sPestilence:
+                {
+                    return Resources.artPestilence;
+                }
+
+                case CardTemplate.Rider_sof_sFamine:
+                {
+                    return Resources.artFamine;
+                }
+
+                case CardTemplate.Rider_sof_sDeath:
+                {
+                    return Resources.artDeath;
+                }
+
+                case CardTemplate.Magma_sVents:
+                {
+                    return Resources.artMagmaVents;
+                }
+
+                case CardTemplate.Chains_sof_sVirtue:
+                {
+                    return Resources.artChainsofVirtue;
+                }
+
+                case CardTemplate.Chains_sof_sSin:
+                {
+                    return Resources.artChainsofSin;
+                }
+
                 case CardTemplate.Gotterdammerung:
                 {
                     return Resources.artGottedammerung;

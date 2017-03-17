@@ -254,6 +254,7 @@ namespace stonerkart
     static class LL
     {
         public static Func<int, int, int> add { get; } = (a, b) => a + b;
+        public static Func<int, int, int> set { get; } = (a, b) => b;
 
         public static Foo exhaustThis { get; } =
             new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
