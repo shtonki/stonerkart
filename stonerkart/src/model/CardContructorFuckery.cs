@@ -1,4 +1,4 @@
-﻿#define testX
+﻿#define testx
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -166,7 +166,7 @@ namespace stonerkart
 
                 case CardTemplate.Cantrip:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
 
                     orderCost = 1;
@@ -184,7 +184,7 @@ namespace stonerkart
 
                 case CardTemplate.Zap:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
 
                     castRange = 3;
@@ -319,7 +319,7 @@ namespace stonerkart
 
                 case CardTemplate.Unmake:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
 
                     castRange = 4;
@@ -375,7 +375,7 @@ namespace stonerkart
 
                 case CardTemplate.Cleansing_sFire:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Rare;
 
                     chaosCost = 1;
@@ -403,7 +403,7 @@ namespace stonerkart
 
                 case CardTemplate.Goblin_sGrenade:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
 
                     chaosCost = 2;
@@ -426,7 +426,7 @@ namespace stonerkart
 
                 case CardTemplate.Teleport:
                 {
-                    cardType = CardType.Sorcery;
+                    cardType = CardType.Channel;
                     rarity = Rarity.Common;
 
                     orderCost = 2;
@@ -445,7 +445,7 @@ namespace stonerkart
 
                 case CardTemplate.One_sWith_sNature:
                 {
-                    cardType = CardType.Sorcery;
+                    cardType = CardType.Channel;
                     rarity = Rarity.Rare;
 
                     natureCost = 1;
@@ -499,7 +499,7 @@ namespace stonerkart
 
                 case CardTemplate.Alter_sFate:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
 
                     orderCost = 1;
@@ -539,7 +539,7 @@ namespace stonerkart
 
                 case CardTemplate.Damage_sWard:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Uncommon;
 
                     lifeCost = 1;
@@ -558,7 +558,7 @@ namespace stonerkart
 
                 case CardTemplate.Survival_sInstincts:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
 
                     castRange = 3;
@@ -639,7 +639,7 @@ namespace stonerkart
 
                 case CardTemplate.Call_sTo_sArms:
                 {
-                    cardType = CardType.Sorcery;
+                    cardType = CardType.Channel;
                     rarity = Rarity.Common;
 
                     lifeCost = 1;
@@ -664,7 +664,7 @@ namespace stonerkart
 
                 case CardTemplate.Wilt:
                 {
-                    cardType = CardType.Sorcery;
+                    cardType = CardType.Channel;
                     rarity = Rarity.Uncommon;
 
                     deathCost = 2;
@@ -840,7 +840,7 @@ namespace stonerkart
 
                 case CardTemplate.Invigorate:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
 
                     natureCost = 1;
@@ -857,7 +857,7 @@ namespace stonerkart
 
                 case CardTemplate.Counterspell:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
 
                     orderCost = 2;
@@ -875,7 +875,7 @@ namespace stonerkart
 
                 case CardTemplate.Gleeful_sDuty:
                 {
-                    cardType = CardType.Instant;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Uncommon;
 
                     deathCost = 3;
@@ -896,7 +896,7 @@ namespace stonerkart
 
                 case CardTemplate.Overgrow:
                 {
-                    cardType = CardType.Sorcery;
+                    cardType = CardType.Channel;
                     rarity = Rarity.Common;
 
                     natureCost = 2;
@@ -917,7 +917,7 @@ namespace stonerkart
 
                 case CardTemplate.Gotterdammerung:
                 {
-                    cardType = CardType.Sorcery;
+                    cardType = CardType.Channel;
                     rarity = Rarity.Rare;
 
                     lifeCost = 3;
@@ -930,6 +930,168 @@ namespace stonerkart
                             new MoveToPileDoer(PileLocation.Graveyard));
                     } break;
 
+                #endregion
+
+                #region Rider of Death
+
+                case CardTemplate.Rider_sof_sDeath:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Legendary;
+
+                    basePower = 3;
+                    baseToughness = 7;
+                    baseMovement = 4;
+
+                    deathCost = 4;
+                    greyCost = 3;
+
+                    addTriggeredAbility(
+                        "Whenever Rider of Death enters the battlefield you may destroy target non-heroic creature.",
+                        new TargetRuleSet(new PryCardRule(c => !c.isHeroic)),
+                        new MoveToPileDoer(PileLocation.Graveyard),
+                        new Foo(),
+                        new TypedGameEventFilter<MoveToPileEvent>(
+                            e => e.card == this && e.to.location.pile == PileLocation.Field),
+                        100,
+                        PileLocation.Field,
+                        true,
+                        TriggeredAbility.Timing.Post
+                        );
+                } break;
+
+                #endregion
+
+                #region Rider of War
+
+                case CardTemplate.Rider_sof_sWar:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Legendary;
+
+                    basePower = 3;
+                    baseToughness = 7;
+                    baseMovement = 4;
+
+                    mightCost = 4;
+                    greyCost = 3;
+
+                    keywordAbilities.Add(KeywordAbility.Kingslayer);
+                    keywordAbilities.Add(KeywordAbility.Elusion);
+                } break;
+
+                #endregion
+
+                #region Rider of Famine
+                case CardTemplate.Rider_sof_sFamine:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Legendary;
+
+                    basePower = 3;
+                    baseToughness = 7;
+                    baseMovement = 4;
+
+                    chaosCost = 4;
+                    greyCost = 3;
+                        
+                    addTriggeredAbility(
+                        "Whenever Rider of Famine deals damage to a player that player discards a card.",
+                        new TargetRuleSet(new SelectCardRule(PileLocation.Hand, c => true,
+                            new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller))),
+                        new MoveToPileDoer(PileLocation.Graveyard),
+                        new Foo(),
+                        new TypedGameEventFilter<DamageEvent>(e => e.source == this && e.target.isHeroic),
+                        0,
+                        PileLocation.Field,
+                        false
+                        );
+                } break;
+                #endregion
+
+                #region Rider of Pestilence
+                case CardTemplate.Rider_sof_sPestilence:
+                    {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Legendary;
+
+                        basePower = 3;
+                        baseToughness = 7;
+                        baseMovement = 4;
+
+                        natureCost = 4;
+                        greyCost = 3;
+
+                        addTriggeredAbility(
+                            "Whenever Rider of Pestilence deals damage to a player that player sacrifices a non-heroic creature.",
+                            new TargetRuleSet(new SelectCardRule(PileLocation.Field,
+                                c => !c.isHeroic && c.cardType == CardType.Creature,
+                                new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller))),
+                            new MoveToPileDoer(PileLocation.Graveyard),
+                            new Foo(),
+                            new TypedGameEventFilter<DamageEvent>(e => e.source == this && e.target.isHeroic),
+                            0,
+                            PileLocation.Field,
+                            false
+                            );
+                    }
+                    break;
+                #endregion
+
+                #region Magma Vents
+                case CardTemplate.Magma_sVents:
+                {
+                    cardType = CardType.Relic;
+                    rarity = Rarity.Common;
+
+                    chaosCost = 1;
+                    orderCost = 1;
+                    greyCost = 2;
+
+                    addTriggeredAbility(
+                        "Whenever a player draws a card Magma Vents deals 1 damage to that player.",
+                        new TargetRuleSet(
+                            new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new TriggeredTargetRule<DrawEvent, Card>(g => g.player.heroCard)),
+                        new ZepperDoer(1),
+                        new Foo(),
+                        new TypedGameEventFilter<DrawEvent>(),
+                        0,
+                        PileLocation.Field,
+                        false 
+                        );
+                } break;
+                #endregion
+
+                #region Chains of Gold
+                    case CardTemplate.Chains_sof_sVirtue:
+                {
+                    cardType = CardType.Channel;
+                    rarity = Rarity.Common;
+
+                    lifeCost = 2;
+
+                    castDescription = "Set target creatures movement to 1.";
+                    castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Life)),
+                        new ModifyDoer(ModifiableStats.Movement, 1, LL.set, LL.never));
+                    castRange = 4;
+                } break;
+                #endregion
+
+                #region Chains of Iron
+                case CardTemplate.Chains_sof_sSin:
+                    {
+                        cardType = CardType.Channel;
+                        rarity = Rarity.Common;
+
+                        deathCost = 2;
+
+                        castDescription = "Reduce target creatures movement by 2.";
+                        castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Death)),
+                            new ModifyDoer(ModifiableStats.Movement, -2, LL.add, LL.never));
+                        castRange = 4;
+                    }
+                    break;
                 #endregion
 
                 #region tokens
@@ -970,9 +1132,9 @@ namespace stonerkart
 #endif
             castManaCost = new ManaSet(x);
 
-            Power = new Modifiable(basePower);
-            Toughness = new Modifiable(baseToughness);
-            Movement = new Modifiable(baseMovement);
+            Power = new Modifiable(basePower, 0);
+            Toughness = new Modifiable(baseToughness, 0);
+            Movement = new Modifiable(baseMovement, 0);
 
             modifiables = new Modifiable[]
             {
@@ -982,11 +1144,11 @@ namespace stonerkart
             };
 
 
-            if (cardType == CardType.Instant)
+            if (cardType == CardType.Interrupt)
             {
                 castSpeed = CastSpeed.Instant;
             }
-            else if (cardType == CardType.Sorcery)
+            else if (cardType == CardType.Channel)
             {
                 castSpeed = CastSpeed.Slow;
             }

@@ -22,7 +22,7 @@ namespace stonerkart
             {
                 Observer<T> w = null;
                 v.TryGetTarget(out w);
-                if (w != null && w == o) throw new Exception("kappapride");
+                if (w != null && w == o) return;
             }
             observers.Add(new WeakReference<Observer<T>>(o));
         }

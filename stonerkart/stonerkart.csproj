@@ -254,6 +254,13 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artPestilence.png" />
+    <None Include="Resources\artFamine.png" />
+    <None Include="Resources\artWar.png" />
+    <None Include="Resources\artDeath.png" />
+    <None Include="Resources\artMagmaVents.png" />
+    <None Include="Resources\artChainsofSin.png" />
+    <None Include="Resources\artChainsofVirtue.png" />
     <None Include="Resources\artGottedammerung.png" />
     <None Include="Resources\artGleefulDuty.png" />
     <None Include="Resources\artChimera.png" />

@@ -27,6 +27,7 @@ namespace stonerkart
             this.card = card;
         }
 
+
         public virtual IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] tms)
         {
             return effects.resolve(hs, tms);
