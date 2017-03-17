@@ -921,7 +921,7 @@ namespace stonerkart
                     rarity = Rarity.Rare;
 
                     lifeCost = 3;
-                    greyCost = 3;
+                    greyCost = 4;
 
                     castDescription = "Destroy all non-heroic creatures";
                     castEffect =
@@ -1071,7 +1071,7 @@ namespace stonerkart
 
                     lifeCost = 2;
 
-                    castDescription = "Set target creatures movement to 1.";
+                    castDescription = "Set target non-life creatures movement to 1.";
                     castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Life)),
                         new ModifyDoer(ModifiableStats.Movement, 1, LL.set, LL.never));
                     castRange = 4;
@@ -1086,7 +1086,7 @@ namespace stonerkart
 
                         deathCost = 2;
 
-                        castDescription = "Reduce target creatures movement by 2.";
+                        castDescription = "Reduce target non-death creatures movement by 2.";
                         castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Death)),
                             new ModifyDoer(ModifiableStats.Movement, -2, LL.add, LL.never));
                         castRange = 4;
