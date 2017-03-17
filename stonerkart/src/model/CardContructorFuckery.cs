@@ -173,7 +173,15 @@ namespace stonerkart
                     castEffect =
                         new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                             new DrawCardsDoer(1));
-                    castDescription = "Draw a card.";
+                    additionalCastEffects.Add(
+                        new Effect(
+                            new SelectCardRule(PileLocation.Hand, c => false,
+                                new PryPlayerRule(p => true,
+                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                                SelectCardRule.Mode.Resolver),
+                            new ModifyDoer(ModifiableStats.Movement, 0, LL.add, LL.clearAura)));
+                    castRange = 100;
+                    castDescription = "Look at target players hand. Draw a card.";
 
                 }
                     break;
@@ -1093,6 +1101,11 @@ namespace stonerkart
                     }
                     break;
                 #endregion
+
+                case CardTemplate.Abolish:
+                {
+                    
+                } break;
 
                 #region tokens
                 #region Squire
