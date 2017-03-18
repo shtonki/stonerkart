@@ -1102,6 +1102,8 @@ namespace stonerkart
                     break;
                 #endregion
 
+                #region Abolish
+
                 case CardTemplate.Abolish:
                 {
                     cardType = CardType.Channel;
@@ -1118,6 +1120,26 @@ namespace stonerkart
                                 new MoveToPileDoer(PileLocation.Graveyard));
                         castRange = 6;
                     } break;
+
+                #endregion
+
+                case CardTemplate.Deep_sFry:
+                {
+                    cardType = CardType.Interrupt;
+                    rarity = Rarity.Uncommon;
+
+                    chaosCost = 2;
+                    greyCost = 1;
+
+                    castDescription = "Deal 1 damage to and exhaust target creature.";
+                    castEffect =
+                        new Effect(
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                            new ZepperDoer(1));
+                    additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1), new FatigueDoer(true)));
+                    castRange = 5;
+
+                } break;
 
                 #region tokens
                 #region Squire

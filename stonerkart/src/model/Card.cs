@@ -406,6 +406,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Deep_sFry,
         Abolish,
         Chains_sof_sVirtue,
         Chains_sof_sSin,

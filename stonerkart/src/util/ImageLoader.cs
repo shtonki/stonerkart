@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Deep_sFry:
+                {
+                    return Resources.artSpark;
+                }
+
                 case CardTemplate.Abolish:
                 {
                     return Resources.artAbolish;
