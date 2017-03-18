@@ -58,6 +58,8 @@ namespace stonerkart
 
         public List<Tile> withinDistance(int distance, int mindistance = 0)
         {
+            if (distance == -1) return map.tyles.ToList();
+
             IEnumerable<Tile> r = new List<Tile>(3*(distance*(distance + 1)) + 1);
 
             for (int d = mindistance; d <= distance; d++)

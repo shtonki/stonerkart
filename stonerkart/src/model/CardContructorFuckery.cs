@@ -180,7 +180,6 @@ namespace stonerkart
                                     new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                                 SelectCardRule.Mode.Resolver),
                             new ModifyDoer(ModifiableStats.Movement, 0, LL.add, LL.clearAura)));
-                    castRange = 100;
                     castDescription = "Look at target players hand. Draw a card.";
 
                 }
@@ -685,7 +684,6 @@ namespace stonerkart
                                 new PryPlayerRule(),
                                 SelectCardRule.Mode.Resolver),
                             new MoveToPileDoer(PileLocation.Graveyard));
-                    castRange = 100;
                 }
                     break;
 
@@ -961,7 +959,7 @@ namespace stonerkart
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(
                             e => e.card == this && e.to.location.pile == PileLocation.Field),
-                        100,
+                        -1,
                         PileLocation.Field,
                         true,
                         TriggeredAbility.Timing.Post

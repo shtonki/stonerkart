@@ -16,6 +16,8 @@ namespace stonerkart
         public readonly int widthEx;
         public int size => tiles.Length;
 
+        public IEnumerable<Tile> tyles => tiles;
+
         private Tile[] tiles;
         private int gpr;
         private Tile[][] rows;
