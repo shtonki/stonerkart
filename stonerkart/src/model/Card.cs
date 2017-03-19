@@ -35,6 +35,8 @@ namespace stonerkart
 
         public Location location => locationEx();
 
+        public Path combatPath { get; set; }
+
         public ActivatedAbility castAbility { get; }
         private List<ActivatedAbility> alternateCasts = new List<ActivatedAbility>();
         public int castRange => castAbility.castRange;
@@ -91,6 +93,8 @@ namespace stonerkart
             if (defender.isHeroic && hasAbility(KeywordAbility.Kingslayer)) d = d*2;
             return d;
         }
+
+        public bool canMove => movement > 0;
 
         public bool canAttack(Card defender)
         {
@@ -348,7 +352,7 @@ namespace stonerkart
             r.add(new TypedGameEventHandler<MoveEvent>(e =>
             {
                 Path path = e.path;
-                Tile destination = path.to;
+                Tile destination = path.last;
                 moveTo(destination);
             }));
 

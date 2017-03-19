@@ -91,7 +91,7 @@ namespace stonerkart
         public Path path(Tile startTile, Tile endTile)
         {
             List<Path> v = dijkstra(startTile);
-            return v.First(t => t.last == endTile);
+            return v.First(t => t.to == endTile);
         }
 
         public List<Path> dijkstra(Tile startTile)
@@ -149,8 +149,7 @@ namespace stonerkart
         private int cost(Tile from, Tile to, Card card)
         {
             if (card == null) return 1;
-            if ((to.card != null && to.card.owner == card.owner) ||
-                from.card != null && from.card != card)
+            if (from.card?.controller != card.controller)
             {
                     return 10000;
             }
@@ -163,13 +162,13 @@ namespace stonerkart
         }
     }
 
-    struct Path
+    class Path
     {
         public int length { get; }
         public Tile from => tiles[0];
-        public Tile to => tiles[Math.Max(0, tiles.Count - (attacking ? 2 : 1))];
-        public Tile last => tiles[tiles.Count - 1];
-        public bool attacking => last.card != from.card && last.card != null;
+        public Tile last => tiles[Math.Max(0, tiles.Count - (attacking ? 2 : 1))];
+        public Tile to => tiles[tiles.Count - 1];
+        public bool attacking => to.card != from.card && to.card != null && to.card.controller != from.card.controller;
 
         private List<Tile> tiles;
 

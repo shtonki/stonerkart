@@ -532,9 +532,9 @@ namespace stonerkart
 
                     baseToughness = 2;
                     basePower = 2;
-                    baseMovement = 4;
+                    baseMovement = 1;
 
-                    natureCost = 2;
+                    //natureCost = 2;
 
                     keywordAbilities.Add(KeywordAbility.Fervor);
                 }
