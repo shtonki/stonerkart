@@ -180,7 +180,6 @@ namespace stonerkart
                                     new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                                 SelectCardRule.Mode.Resolver),
                             new ModifyDoer(ModifiableStats.Movement, 0, LL.add, LL.clearAura)));
-                    castRange = 100;
                     castDescription = "Look at target players hand. Draw a card.";
 
                 }
@@ -442,7 +441,7 @@ namespace stonerkart
                     castEffect = new Effect(
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
                             new PryTileRule(f => f.passable,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer());
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer(true));
                     castDescription = "Move your hero to target tile.";
                 }
                     break;
@@ -685,7 +684,6 @@ namespace stonerkart
                                 new PryPlayerRule(),
                                 SelectCardRule.Mode.Resolver),
                             new MoveToPileDoer(PileLocation.Graveyard));
-                    castRange = 100;
                 }
                     break;
 
@@ -904,7 +902,7 @@ namespace stonerkart
 
                 case CardTemplate.Overgrow:
                 {
-                    cardType = CardType.Channel;
+                    cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
 
                     natureCost = 2;
@@ -961,7 +959,7 @@ namespace stonerkart
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(
                             e => e.card == this && e.to.location.pile == PileLocation.Field),
-                        100,
+                        -1,
                         PileLocation.Field,
                         true,
                         TriggeredAbility.Timing.Post
@@ -985,15 +983,15 @@ namespace stonerkart
                     greyCost = 3;
 
                     keywordAbilities.Add(KeywordAbility.Kingslayer);
-                    keywordAbilities.Add(KeywordAbility.Elusion);
+                    keywordAbilities.Add(KeywordAbility.Fervor);
                 } break;
 
                 #endregion
 
                 #region Rider of Famine
-                case CardTemplate.Rider_sof_sFamine:
-                {
-                    cardType = CardType.Creature;
+                case CardTemplate.Rider_sof_sPestilence:
+                    {
+                        cardType = CardType.Creature;
                     rarity = Rarity.Legendary;
 
                     basePower = 3;
@@ -1018,7 +1016,7 @@ namespace stonerkart
                 #endregion
 
                 #region Rider of Pestilence
-                case CardTemplate.Rider_sof_sPestilence:
+                case CardTemplate.Rider_sof_sFamine:
                     {
                         cardType = CardType.Creature;
                         rarity = Rarity.Legendary;
@@ -1102,9 +1100,43 @@ namespace stonerkart
                     break;
                 #endregion
 
+                #region Abolish
+
                 case CardTemplate.Abolish:
                 {
-                    
+                    cardType = CardType.Channel;
+                    rarity = Rarity.Common;
+
+                    lifeCost = 2;
+                    greyCost = 1;
+
+                        castDescription = "Destroy target relic.";
+                        castEffect =
+                            new Effect(
+                                new PryCardRule(c => c.cardType == CardType.Relic,
+                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                                new MoveToPileDoer(PileLocation.Graveyard));
+                        castRange = 6;
+                    } break;
+
+                #endregion
+
+                case CardTemplate.Deep_sFry:
+                {
+                    cardType = CardType.Interrupt;
+                    rarity = Rarity.Uncommon;
+
+                    chaosCost = 2;
+                    greyCost = 1;
+
+                    castDescription = "Deal 1 damage to and exhaust target creature.";
+                    castEffect =
+                        new Effect(
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                            new ZepperDoer(1));
+                    additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1), new FatigueDoer(true)));
+                    castRange = 5;
+
                 } break;
 
                 #region tokens

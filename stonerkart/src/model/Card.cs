@@ -232,6 +232,9 @@ namespace stonerkart
             foreach (var a in keywordAbilities)
             {
                 sb.Append(a);
+                sb.Append(" -- (");
+                sb.Append(kaExplainer(a));
+                sb.Append(')');
                 sb.Append("\r\n");
             }
 
@@ -242,6 +245,29 @@ namespace stonerkart
             }
 
             return sb.ToString();
+        }
+
+        private static string kaExplainer(KeywordAbility ab)
+        {
+            switch (ab)
+            {
+                case KeywordAbility.Elusion:
+                {
+                    return "Cannot be targeted.";
+                }
+
+                case KeywordAbility.Fervor:
+                {
+                    return "Enters the battlefield with full movement.";
+                }
+
+                case KeywordAbility.Kingslayer:
+                {
+                    return "Deals double damage to heroic creatures";
+                }
+            }
+
+            return "";
         }
 
         public Card createDummy(Ability a)
@@ -311,7 +337,7 @@ namespace stonerkart
 
                 moveTo(e.tile);
                 moveTo(e.card.controller.field);
-                if (!hasAbility(KeywordAbility.Fervor)) exhaust();
+                if (!e.dontExhaust && !hasAbility(KeywordAbility.Fervor)) exhaust();
             }));
 
             r.add(new TypedGameEventHandler<FatigueEvent>(e =>
@@ -380,6 +406,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Deep_sFry,
         Abolish,
         Chains_sof_sVirtue,
         Chains_sof_sSin,

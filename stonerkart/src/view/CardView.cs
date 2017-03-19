@@ -118,7 +118,7 @@ namespace stonerkart
                 }
                 else if (card.cardType == CardType.Interrupt || card.cardType == CardType.Channel)
                 {
-                    castRangeSlashMovementBox.Text = ((card.cardType == CardType.Interrupt || card.cardType == CardType.Interrupt) && card.castRange > 0) ? card.castRange.ToString() : "";
+                    castRangeSlashMovementBox.Text = (card.castRange > 0) ? card.castRange.ToString() : "";
                     powerBox.Text = "";
                     toughnessBox.Text = "";
                     autoFontTextBox1.Text = "";

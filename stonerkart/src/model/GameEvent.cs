@@ -120,12 +120,16 @@ namespace stonerkart
     {
         public Card card { get; }
         public Tile tile { get; }
+        public bool dontExhaust { get; }
 
-        public PlaceOnTileEvent(Card card, Tile tile)
+        public PlaceOnTileEvent(Card card, Tile tile, bool dontExhaust)
         {
             this.card = card;
             this.tile = tile;
+            this.dontExhaust = dontExhaust;
         }
+
+
 
         public Card getCard()
         {
