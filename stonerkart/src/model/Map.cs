@@ -88,15 +88,15 @@ namespace stonerkart
             return tiles[p];
         }
 
-        public Path path(Tile startTile, Tile endTile)
+        public Path path(Card card, Tile endTile)
         {
-            List<Path> v = dijkstra(startTile);
-            return v.First(t => t.last == endTile);
+            var startTile = card.tile;
+            List<Path> v = pathCosts(card, startTile);
+            return v.First(t => t.to == endTile);
         }
 
-        public List<Path> dijkstra(Tile startTile)
+        public List<Path> pathCosts(Card traveller, Tile startTile)
         {
-            Card traveller = startTile.card;
             Dictionary<Tile,Tuple<int, Tile>> dict = new Dictionary<Tile, Tuple<int, Tile>>();
             List<Tile> Q = new List<Tile>();
 
@@ -149,10 +149,9 @@ namespace stonerkart
         private int cost(Tile from, Tile to, Card card)
         {
             if (card == null) return 1;
-            if ((to.card != null && to.card.owner == card.owner) ||
-                from.card != null && from.card != card)
+            if (from.card != null && from.card.controller != card.controller)
             {
-                    return 10000;
+                return 10000;
             }
             return 1;
         }
@@ -163,19 +162,26 @@ namespace stonerkart
         }
     }
 
-    struct Path
+    class Path
     {
-        public int length { get; }
+        public int length { get; private set; }
         public Tile from => tiles[0];
-        public Tile to => tiles[Math.Max(0, tiles.Count - (attacking ? 2 : 1))];
-        public Tile last => tiles[tiles.Count - 1];
-        public bool attacking => last.card != from.card && last.card != null;
+        public Tile last => tiles[Math.Max(0, tiles.Count - (attacking ? 2 : 1))];
+        public Tile to => tiles[tiles.Count - 1];
+        public bool attacking => to.card != null && to.card.controller != from.card?.controller;
+
+        public Color colorHack { get; set; } = Color.ForestGreen;
 
         private List<Tile> tiles;
+        public IEnumerable<Tile> tyles => tiles;
+
+        public Path(Tile toAndFrom) : this(new Tile[] { toAndFrom }.ToList(), 0)
+        {
+        }
 
         public Path(List<Tile> tiles, int length)
         {
-            if (length < 0) throw new Exception();
+            if (tiles.Count < 1 || length < 0) throw new Exception();
             this.tiles = tiles;
             this.length = length;
         }
@@ -183,6 +189,22 @@ namespace stonerkart
         public static implicit operator List<Tile>(Path p)
         {
             return p.tiles;
+        }
+
+        public void concat(Path p)
+        {
+            if (tiles.Count == 0)
+            {
+                tiles = p.tiles;
+                length = p.length;
+                return;
+            }
+
+            var cctiles = p.tiles;
+            if (tiles.Last() != cctiles.First()) throw new Exception();
+
+            tiles = tiles.Take(tiles.Count - 1).Concat(cctiles).ToList();
+            length += p.length;
         }
     }
 }

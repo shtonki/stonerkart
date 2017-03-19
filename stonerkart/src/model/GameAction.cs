@@ -246,12 +246,13 @@ namespace stonerkart
                 string[] foo = str.Split(',');
 
                 int cardOrd = Int32.Parse(foo[0]);
-                int tileOrd = Int32.Parse(foo[1]);
+                int length = Int32.Parse(foo[1]);
 
                 Card card = g.cardFromOrd(cardOrd);
-                Tile tile = g.tileFromOrd(tileOrd);
 
-                Path path = g.pathTo(card, tile);
+                var ts = foo.Reverse().Take(foo.Count() - 2).Reverse().Select(w => g.tileFromOrd(Int32.Parse(w)));
+
+                Path path = new Path(ts.ToList(), length);
 
                 moves.Add(new Tuple<Card, Path>(card, path));
             }
@@ -265,10 +266,16 @@ namespace stonerkart
             foreach (var v in moves)
             {
                 Card c = v.Item1;
-                Tile t = v.Item2.last;
+                Path p = v.Item2;
+                var ts = p.tyles;
                 sb.Append(g.ord(c));
                 sb.Append(',');
-                sb.Append(g.ord(t));
+                sb.Append(p.length);
+                foreach (var t in ts)
+                {
+                    sb.Append(',');
+                    sb.Append(g.ord(t));
+                }
                 sb.Append(';');
             }
             sb.Length--;

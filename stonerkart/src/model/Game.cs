@@ -16,9 +16,9 @@ namespace stonerkart
         public IEnumerable<Player> allPlayers => players;
 
         private List<Player> players;
-        private List<Card> allCards;
+        private List<Card> cards;
 
-        public IEnumerable<Card> ca => allCards;
+        public IEnumerable<Card> ca => cards;
 
         public Pile stack { get; } = new Pile(new Location(null, PileLocation.Stack));
 
@@ -35,8 +35,8 @@ namespace stonerkart
         private GameEventHandlerBuckets baseHandler = new GameEventHandlerBuckets();
         private Stack<StackWrapper> wrapperStack { get; } = new Stack<StackWrapper>();
 
-        private IEnumerable<Card> triggerableCards => allCards.Where(card => card.location.pile != PileLocation.Deck && !card.isDummy);
-        private IEnumerable<Card> fieldCards => allCards.Where(card => card.location.pile == PileLocation.Field);
+        private IEnumerable<Card> triggerableCards => cards.Where(card => card.location.pile != PileLocation.Deck && !card.isDummy);
+        private IEnumerable<Card> fieldCards => cards.Where(card => card.location.pile == PileLocation.Field);
 
         private Random random;
         private GameConnection connection;
@@ -55,7 +55,7 @@ namespace stonerkart
 
             random = new Random(ngs.randomSeed);
             map = new Map(11, 7, false, false);
-            allCards = new List<Card>();
+            cards = new List<Card>();
             players = new List<Player>();
 
             for (int i = 0; i < ngs.playerNames.Length; i++)
@@ -86,7 +86,7 @@ namespace stonerkart
         private Card createCard(CardTemplate ct, Pile pile, Player owner)
         {
             Card r = new Card(ct, owner);
-            allCards.Add(r);
+            cards.Add(r);
             r.moveTo(pile);
             return r;
         }
@@ -96,18 +96,18 @@ namespace stonerkart
             Card r = a.createDummy();
 
             r.moveTo(pile);
-            allCards.Add(r);
+            cards.Add(r);
             return r;
         }
 
         public int ord(Card c)
         {
-            return allCards.IndexOf(c);
+            return cards.IndexOf(c);
         }
 
         public Card cardFromOrd(int i)
         {
-            return allCards[i];
+            return cards[i];
         }
 
         public int ord(Player p)
@@ -132,7 +132,7 @@ namespace stonerkart
 
         public Path pathTo(Card c, Tile t)
         {
-            return map.path(c.tile, t);
+            return map.path(c, t);
         }
 
         private void setupHandlers()
@@ -388,56 +388,91 @@ namespace stonerkart
             priority();
         }
 
+        private static Color[] clrs = new[]
+        {
+            Color.ForestGreen, 
+            Color.Firebrick, 
+            Color.Fuchsia, 
+            Color.Ivory, 
+            Color.DimGray, 
+            Color.DarkCyan, 
+            Color.PaleVioletRed, 
+        };
+
         private void moveStep()
         {
             List<Tuple<Card, Path>> paths;
 
             bool b = activePlayer == hero;
             gameController.setHeroActive(b);
+            var movers = activePlayer.field.Where(c => c.canMove);
+
             if (b)
             {
-                paths = new List<Tuple<Card, Path>>();
+                var unpathed = movers.ToList();
+                var occupado = new List<Tile>();
 
                 while (true)
                 {
-                    var from = getTile(tile => tile.card != null && tile.card.movement > 0 && tile.card.owner == activePlayer ,  "Move your cards nigra");
+                    gameController.highlight(unpathed.Select(c => c.tile), Color.DodgerBlue);
+                    //gameController.highlight(pathed.Select(c => c.tile), Color.ForestGreen);
+
+                    var from = getTile(
+                        tile => tile.card != null && tile.card.canMove && tile.card.owner == activePlayer,
+                        "Move your cards nigra", unpathed.Count == 0 ? ButtonOption.Pass : ButtonOption.NOTHING);
                     if (from == null) break;
-
-                    Card card = from.card;
-                    var tpl = paths.Find(tuple => tuple.Item1 == card); //find out if card already has plans to move
-
-                    if (tpl != null)  //if it does cancel said plans
+                    Card mover = from.card;
+                    if (mover.combatPath != null)
                     {
-                        gameController.removeArrow(tpl.Item2);
-                        paths.Remove(tpl);
+                        gameController.removeArrow(mover.combatPath);
+                        occupado.Remove(mover.combatPath.last);
+                    }
+                    Path pth = new Path(from);
+                    pth.colorHack = clrs[ord(mover)%clrs.Length];
+                    gameController.addArrow(pth);
+
+                    while (true)
+                    {
+
+                        var options = map.pathCosts(mover, from).Where(path =>
+                            path.length <= mover.movement - pth.length //card can reach the tile
+                            &&
+                            (
+                                path.to.card == null || // tile is empty
+                                mover.canAttack(path.to.card) || //card can attack the card in the target tile
+                                (path.to.card.controller == mover.controller && !occupado.Contains(path.to))
+                                //we want to move to a tile occupied by a friendly creature that's moving somewhere else
+                                )
+                            &&
+                            !occupado.Any(p => p == path.last) //there isn't a card in the tile we want to move to
+                            ).ToList();
+                        if (options.Count == 1) break;
+                        var v = map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
+                        gameController.highlight(options.Select(p => p.to), Color.Green);
+                        var to = getTile(tile => options.Select(p => p.to).Contains(tile), "Move to where?");
+                        gameController.clearHighlights();
+                        if (to == null) continue;
+                        if (to == from) break;
+
+                        var cp = options.First(p => p.to == to);
+
+                        gameController.removeArrow(pth);
+                        pth.concat(cp);
+                        gameController.addArrow(pth);
+                        from = pth.to;
+
+                        if (pth.length == mover.movement) break;
                     }
 
-                    var options = map.dijkstra(from).Where(path =>
-                        path.length <= card.movement
-                        &&
-                        (
-                            path.last.card == null ||
-                            from.card.canAttack(path.last.card)
-                        )
-                        &&
-                        !paths.Any(p => p.Item2.to == path.to)
-                    ).ToList();
-
-                    //IEnumerable<>
-
-                    gameController.highlight(options.Select(n => new Tuple<Color, Tile>(Color.Green, n.last)));
-                    var to = getTile(tile => tile == from || options.Select(p => p.last).Contains(tile), "Move to where?");
-                    gameController.clearHighlights();
-                    if (to == null) break;
-
-                    if (to != from)
+                    if (mover.combatPath == null)
                     {
-                        var path = options.First(p => p.last == to);
-                        gameController.addArrow(path);
-                        paths.Add(new Tuple<Card, Path>(card, path));
+                        unpathed.Remove(mover);
                     }
+
+                    occupado.Add(pth.last);
+                    mover.combatPath = pth;
                 }
-
+                paths = movers.Select(c => new Tuple<Card, Path>(c, c.combatPath)).ToList();
                 connection.sendAction(new MoveSelection(paths));
             }
             else
@@ -447,6 +482,7 @@ namespace stonerkart
                 paths = v.moves;
                 foreach (var p in paths)
                 {
+                    p.Item2.colorHack = clrs[ord(p.Item1) % clrs.Length];
                     gameController.addArrow(p.Item2);
                 }
             }
@@ -455,12 +491,12 @@ namespace stonerkart
             priority();
 
             GameTransaction gt = new GameTransaction();
-
+            
             foreach (var v in paths)
             {
                 Card mover = v.Item1;
                 Path path = v.Item2;
-                Card defender = path.last.card;
+                Card defender = path.to.card;
 
                 if (path.attacking && mover.canAttack(defender))
                 {
@@ -471,10 +507,12 @@ namespace stonerkart
                 gt.addEvent(new MoveEvent(mover, path));
                 gt.addEvent(new FatigueEvent(mover, path.attacking ? mover.movement : path.length));
             }
-
+            foreach (var v in paths) v.Item1.tile.removeCard();
             handleTransaction(gt);
 
+            foreach (var c in cards) c.combatPath = null;
             gameController.clearArrows();
+            gameController.clearHighlights();
         }
 
         private void endStep()
@@ -505,7 +543,7 @@ namespace stonerkart
             {
                 baseHandler.handle(e);
 
-                foreach (Card card in allCards)
+                foreach (Card card in cards)
                 {
                     card.handleEvent(e);
                 }
@@ -528,23 +566,23 @@ namespace stonerkart
 
         private void enforceRules()
         {
-            foreach (Card c in allCards)
+            foreach (Card c in cards)
             {
                 c.handleEvent(new ClearAurasEvent());
             }
             List<GameEvent> ae = new List<GameEvent>();
-            foreach (Card c in allCards)
+            foreach (Card c in cards)
             {
                 foreach (Aura a in c.auras)
                 {
-                    foreach (Card affected in allCards.Where(a.filter))
+                    foreach (Card affected in cards.Where(a.filter))
                     {
                         ae.Add(new ModifyEvent(affected, a.stat, a.modifer));
                     }
                 }
             }
 
-            foreach (Card c in allCards)
+            foreach (Card c in cards)
             {
                 foreach (GameEvent e in ae)
                 {
@@ -552,7 +590,7 @@ namespace stonerkart
                 }
             }
 
-            foreach (Card c in allCards)
+            foreach (Card c in cards)
             {
                 c.updateState();
             }
@@ -785,9 +823,9 @@ namespace stonerkart
         /// <param name="f">Filters allowable tiles</param>
         /// <param name="prompt">The string to prompt to the user</param>
         /// <returns></returns>
-        private Tile getTile(Func<Tile, bool> f, string prompt)
+        private Tile getTile(Func<Tile, bool> f, string prompt, params ButtonOption[] buttons)
         {
-            gameController.setPrompt(prompt, ButtonOption.OK);
+            gameController.setPrompt(prompt, buttons);
             var v = waitForButtonOr<Tile>(f);
             if (v is ShibbuttonStuff)
             {

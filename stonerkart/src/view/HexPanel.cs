@@ -191,19 +191,27 @@ namespace stonerkart
                     }
                     g.DrawPolygon(pen, tv.poly);
                 }
-                foreach (var t in ts)
+                try
                 {
-                    for (int i = 0; i < t.Count - 1; i++)
+                    foreach (var p in paths)
                     {
-                        TileView from = viewOf(t[i]);
-                        TileView to = viewOf(t[i+1]);
-                        g.DrawLine(new Pen(Color.ForestGreen, 4), from.centre, to.centre);
+                        var t = p.tyles.ToList();
+                        for (int i = 0; i < t.Count - 1; i++)
+                        {
+                            TileView from = viewOf(t[i]);
+                            TileView to = viewOf(t[i + 1]);
+                            g.DrawLine(new Pen(p.colorHack, 4), from.centre, to.centre);
+                        }
                     }
+                }
+                catch (Exception exp)
+                {
+                    throw new Exception("borked it again coach");
                 }
             }
         }
 
-        public List<List<Tile>> ts { get; } = new List<List<Tile>>();
+        public List<Path> paths { get; } = new List<Path>();
 
         public TileView viewOf(Tile t)
         {

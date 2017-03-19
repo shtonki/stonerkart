@@ -62,19 +62,19 @@ namespace stonerkart
             gamePanel.setHeroActive(b);
         }
 
-        public void addArrow(List<Tile> l)
+        public void addArrow(Path l)
         {
-            hexPanel.ts.Add(l);
+            hexPanel.paths.Add(l);
         }
 
-        public void removeArrow(List<Tile> l)
+        public void removeArrow(Path l)
         {
-            hexPanel.ts.Remove(l);
+            hexPanel.paths.Remove(l);
         }
 
         public void clearArrows()
         {
-            hexPanel.ts.Clear();
+            hexPanel.paths.Clear();
             redraw();
         }
 
@@ -130,7 +130,7 @@ namespace stonerkart
             highlight(tiles.Select(t => new Tuple<Color, Tile>(color, t)));
         }
 
-        public void highlight(IEnumerable<Tuple<Color, Tile>> l, bool rd = true)
+        private  void highlight(IEnumerable<Tuple<Color, Tile>> l, bool rd = true)
         {
             foreach (var v in l)
             {
