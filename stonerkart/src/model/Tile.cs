@@ -47,6 +47,7 @@ namespace stonerkart
         {
             if (card == null) throw new Exception();
             var r = card;
+            card.tile = null;
             card = null;
             return r;
         }

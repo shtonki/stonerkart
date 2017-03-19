@@ -64,17 +64,17 @@ namespace stonerkart
 
         public void addArrow(Path l)
         {
-            hexPanel.ts.Add(l);
+            hexPanel.paths.Add(l);
         }
 
         public void removeArrow(Path l)
         {
-            hexPanel.ts.Remove(l);
+            hexPanel.paths.Remove(l);
         }
 
         public void clearArrows()
         {
-            hexPanel.ts.Clear();
+            hexPanel.paths.Clear();
             redraw();
         }
 

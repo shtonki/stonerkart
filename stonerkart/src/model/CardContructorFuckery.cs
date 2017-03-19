@@ -1,4 +1,4 @@
-﻿#define testx
+﻿#define test
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -532,9 +532,9 @@ namespace stonerkart
 
                     baseToughness = 2;
                     basePower = 2;
-                    baseMovement = 1;
+                    baseMovement = 4;
 
-                    //natureCost = 2;
+                    natureCost = 2;
 
                     keywordAbilities.Add(KeywordAbility.Fervor);
                 }
