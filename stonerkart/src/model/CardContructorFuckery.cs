@@ -703,7 +703,7 @@ namespace stonerkart
 
                     addActivatedAbility(
                         String.Format("{0}: Each player discards a card.", G.exhaustGhyph),
-                        new TargetRuleSet(new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), PileLocation.Hand, c => true)),
+                        new TargetRuleSet(new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), PileLocation.Hand, c => true, SelectCardRule.Mode.Reflexive)),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
                             new FatigueDoer(true))),
