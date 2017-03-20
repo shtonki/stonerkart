@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Suspicious_sVortex:
+                {
+                    return Resources.artSuspiciousVortex;
+                }
+
                 case CardTemplate.Ancient_sDruid:
                 {
                     return Resources.artAncientDruid;
