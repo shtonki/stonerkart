@@ -409,6 +409,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Ancient_sDruid,
         Reanimate_sDead,
         Deep_sFry,
         Abolish,
