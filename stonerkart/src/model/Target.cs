@@ -266,6 +266,7 @@ namespace stonerkart
         private Func<Card, bool> filter;
         private Mode mode;
         public bool cancelable { get; set; }
+        public bool sync { get; set; } = true;
         /*
         public SelectCardRule(PileLocation l, TargetRule pg, Func<Card, bool> filter) : base(typeof(Card))
         {
@@ -351,7 +352,7 @@ namespace stonerkart
                 }
                 else throw new Exception();
 
-                crd = hs.selectCardHalfSynchronized(p.pileFrom(l), seer, filter, cancelable);
+                crd = sync ? hs.selectCardHalfSynchronized(p.pileFrom(l), seer, filter, cancelable) : hs.selectCardUnsynchronized(p.pileFrom(l), seer, filter, cancelable);
                 if (crd == null) continue; //todo allow canceling or something
                 rt.Add(crd);
             }
@@ -382,6 +383,7 @@ namespace stonerkart
         {
             this.r = r;
             r.cancelable = true;
+            r.sync = false;
         }
 
         public override TargetColumn? fillCastTargets(HackStruct f)

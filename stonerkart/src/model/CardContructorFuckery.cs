@@ -1183,6 +1183,7 @@ namespace stonerkart
                 case CardTemplate.Suspicious_sVortex:
                 {
                     cardType = CardType.Interrupt;
+                    rarity = Rarity.Uncommon;
 
                     orderCost = 4;
                     
