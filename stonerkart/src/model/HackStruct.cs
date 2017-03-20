@@ -112,6 +112,13 @@ namespace stonerkart
             return v[0];
         }
 
+        public Card selectCardUnsynchronized(IEnumerable<Card> cs, Player chooser,Func<Card, bool> filter, bool cancelable)
+        {
+            var v =  selectCardEx(cs, cancelable, 1, filter);
+            if (v == null || v.Count() != 1) throw new Exception();
+            return v.ElementAt(0);
+        }
+
         public IEnumerable<Card> selectCardsSynchronized(IEnumerable<Card> cs, Player chooser, int cardCount, Func<Card, bool> filter, bool cancelable)
         {
             IEnumerable<Card> c;
