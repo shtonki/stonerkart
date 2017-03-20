@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Ancient_sDruid:
+                {
+                    return Resources.artAncientDruid;
+                }
+
                 case CardTemplate.Reanimate_sDead:
                 {
                     return Resources.artRaiseDead;

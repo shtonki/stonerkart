@@ -618,6 +618,7 @@ namespace stonerkart
                     cardType = CardType.Creature;
                     race = Race.Human;
                     subtype = Subtype.Warrior;
+                    rarity = Rarity.Common;
 
                     natureCost = 1;
                     greyCost = 2;
@@ -1155,6 +1156,29 @@ namespace stonerkart
                 } break;
                 #endregion
 
+                #region Ancient Druid
+                case CardTemplate.Ancient_sDruid:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Common;
+
+                    natureCost = 1;
+
+                    baseToughness = 1;
+                    baseMovement = 1;
+                    basePower = 1;
+
+                    addActivatedAbility(
+                        String.Format("{0}: Gain {1} until end of step.", G.exhaustGhyph, G.coloured(ManaColour.Nature)),
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new GainBonusManaDoer(ManaColour.Nature),
+                        LL.exhaustThis,
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Instant
+                        );
+                }break;
+                #endregion
 
                 #region tokens
                 #region Squire

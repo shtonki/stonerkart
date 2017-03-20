@@ -953,6 +953,7 @@ namespace stonerkart
             if (activatableAbilities.Length == 0) return null;
 
             r = activatableAbilities[0];
+            if (!r.possible(makeHackStruct(r))) return null;
 
             return r;
         }
