@@ -105,20 +105,19 @@ namespace stonerkart
             }
         }
 
-        public Card selectCardSynchronized(IEnumerable<Card> cs, Player chooser, Func<Card, bool> filter)
+        public Card selectCardHalfSynchronized(IEnumerable<Card> cs, Player chooser, Func<Card, bool> filter, bool cancelable)
         {
-            var v = selectCardsSynchronized(cs, chooser, 1, filter).ToArray();
+            var v = selectCardsSynchronized(cs, chooser, 1, filter, cancelable).ToArray();
             if (v.Length == 0) return null;
             return v[0];
         }
 
-        public IEnumerable<Card> selectCardsSynchronized(IEnumerable<Card> cs, Player chooser, int cardCount, Func<Card, bool> filter)
+        public IEnumerable<Card> selectCardsSynchronized(IEnumerable<Card> cs, Player chooser, int cardCount, Func<Card, bool> filter, bool cancelable)
         {
             IEnumerable<Card> c;
             if (hero == chooser)
             {
-                setPrompt("Choose a card.");
-                c = selectCardEx(cs, false, cardCount, filter);
+                c = selectCardEx(cs, cancelable, cardCount, filter);
                 int[] ss = c.Select(ordC).ToArray();
                 sendChoices(ss);
             }

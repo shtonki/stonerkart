@@ -265,6 +265,7 @@ namespace stonerkart
         private PileLocation l;
         private Func<Card, bool> filter;
         private Mode mode;
+        public bool cancelable { get; set; }
         /*
         public SelectCardRule(PileLocation l, TargetRule pg, Func<Card, bool> filter) : base(typeof(Card))
         {
@@ -279,7 +280,7 @@ namespace stonerkart
             l = location;
         }
         */
-
+        /*
         public SelectCardRule(PileLocation l, Func<Card, bool> filter = null, TargetRule pg = null, Mode mode = Mode.Reflexive) : base(typeof(Card))
         {
             this.pg = pg ?? new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController);
@@ -287,8 +288,41 @@ namespace stonerkart
             this.filter = filter ?? (c => true);
             this.mode = mode;
         }
+        */
+
+        public SelectCardRule(TargetRule pileOwnerRule, PileLocation pile, Func<Card, bool> filter, Mode mode) : this(pileOwnerRule, pile, filter, mode, false)
+        {
+            
+        }
+
+        public SelectCardRule(PileLocation pile)
+            : this(
+                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), pile, c => true, Mode.Resolver, false)
+        {
+            
+        }
+
+        public SelectCardRule(TargetRule pileOwnerRule, PileLocation pile, Func<Card, bool> filter)
+            : this(pileOwnerRule, pile, filter, Mode.Resolver)
+        {
+            
+        }
 
 
+        public SelectCardRule(PileLocation pile, Func<Card, bool> filter)
+            : this(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), pile, filter, Mode.Resolver)
+        {
+
+        }
+
+        public SelectCardRule(TargetRule pg, PileLocation l, Func<Card, bool> filter, Mode mode, bool cancelable) : base(typeof(Card))
+        {
+            this.pg = pg;
+            this.l = l;
+            this.filter = filter;
+            this.mode = mode;
+            this.cancelable = cancelable;
+        }
 
         public override TargetColumn? fillCastTargets(HackStruct f)
         {
@@ -317,7 +351,7 @@ namespace stonerkart
                 }
                 else throw new Exception();
 
-                crd = hs.selectCardSynchronized(p.pileFrom(l), seer, filter);
+                crd = hs.selectCardHalfSynchronized(p.pileFrom(l), seer, filter, cancelable);
                 if (crd == null) continue; //todo allow canceling or something
                 rt.Add(crd);
             }
@@ -337,6 +371,39 @@ namespace stonerkart
             }
 
             return new TargetColumn(psbl);
+        }
+    }
+
+    class CastSelectCardRule : TargetRule
+    {
+        private SelectCardRule r;
+
+        public CastSelectCardRule(SelectCardRule r) : base(typeof(Card))
+        {
+            this.r = r;
+            r.cancelable = true;
+        }
+
+        public override TargetColumn? fillCastTargets(HackStruct f)
+        {
+            var v = r.fillCastTargets(f);
+            if (!v.HasValue)
+            {
+                return null;
+            }
+            var rt =  r.fillResolveTargets(f, v.Value).Value;
+            if (rt.targets.Length == 0) return null;
+            return rt;
+        }
+
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        {
+            return c;
+        }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return r.possible(hs);
         }
     }
 

@@ -340,7 +340,6 @@ namespace stonerkart
                 if (e.tile.card != null) throw new Exception();
 
                 moveTo(e.tile);
-                moveTo(e.card.controller.field);
                 if (!e.dontExhaust && !hasAbility(KeywordAbility.Fervor)) exhaust();
             }));
 
@@ -410,6 +409,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Reanimate_sDead,
         Deep_sFry,
         Abolish,
         Chains_sof_sVirtue,

@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Reanimate_sDead:
+                {
+                    return Resources.artRaiseDead;
+                }
+
                 case CardTemplate.Deep_sFry:
                 {
                     return Resources.artSpark;

@@ -1,4 +1,4 @@
-﻿#define test
+﻿#define testx
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -175,10 +175,9 @@ namespace stonerkart
                             new DrawCardsDoer(1));
                     additionalCastEffects.Add(
                         new Effect(
-                            new SelectCardRule(PileLocation.Hand, c => false,
-                                new PryPlayerRule(p => true,
-                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                                SelectCardRule.Mode.Resolver),
+                            new SelectCardRule(new PryPlayerRule(p => true,
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                                PileLocation.Hand, c => false, SelectCardRule.Mode.Resolver),
                             new ModifyDoer(ModifiableStats.Movement, 0, LL.add, LL.clearAura)));
                     castDescription = "Look at target players hand. Draw a card.";
 
@@ -658,7 +657,7 @@ namespace stonerkart
                             CardTemplate.Squire, CardTemplate.Squire),
                         new PryTileRule(t => t.card == null && !t.isEdgy,
                             new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, 2, false)),
-                        new MoveToTileDoer(),
+                        new SummonToTileDoer(),
                         true
                         );
 
@@ -679,10 +678,8 @@ namespace stonerkart
                     castDescription = "Look at target players hand and select a creature. Selected card is discarded.";
                     castEffect =
                         new Effect(
-                            new SelectCardRule(PileLocation.Hand,
-                                c => c.cardType == CardType.Creature,
-                                new PryPlayerRule(),
-                                SelectCardRule.Mode.Resolver),
+                            new SelectCardRule(new PryPlayerRule(),
+                                PileLocation.Hand, c => c.cardType == CardType.Creature, SelectCardRule.Mode.Resolver),
                             new MoveToPileDoer(PileLocation.Graveyard));
                 }
                     break;
@@ -706,9 +703,7 @@ namespace stonerkart
 
                     addActivatedAbility(
                         String.Format("{0}: Each player discards a card.", G.exhaustGhyph),
-                        new TargetRuleSet(new SelectCardRule(PileLocation.Hand,
-                            c => true,
-                            new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers))),
+                        new TargetRuleSet(new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), PileLocation.Hand, c => true)),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
                             new FatigueDoer(true))),
@@ -830,7 +825,7 @@ namespace stonerkart
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                             new PryTileRule(t => t.card == null && !t.isEdgy,
                                 new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
-                        new MoveToTileDoer(),
+                        new SummonToTileDoer(),
                         new Foo(LL.manaCost(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
                         2,
                         PileLocation.Graveyard,
@@ -958,7 +953,10 @@ namespace stonerkart
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(
-                            e => e.card == this && e.to.location.pile == PileLocation.Field),
+                            e =>
+                            {
+                                return e.card == this && e.to.location.pile == PileLocation.Field;
+                            }),
                         -1,
                         PileLocation.Field,
                         true,
@@ -1003,8 +1001,7 @@ namespace stonerkart
                         
                     addTriggeredAbility(
                         "Whenever Rider of Famine deals damage to a player that player discards a card.",
-                        new TargetRuleSet(new SelectCardRule(PileLocation.Hand, c => true,
-                            new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller))),
+                        new TargetRuleSet(new SelectCardRule(new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller), PileLocation.Hand, c => true)),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(),
                         new TypedGameEventFilter<DamageEvent>(e => e.source == this && e.target.isHeroic),
@@ -1030,9 +1027,7 @@ namespace stonerkart
 
                         addTriggeredAbility(
                             "Whenever Rider of Pestilence deals damage to a player that player sacrifices a non-heroic creature.",
-                            new TargetRuleSet(new SelectCardRule(PileLocation.Field,
-                                c => !c.isHeroic && c.cardType == CardType.Creature,
-                                new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller))),
+                            new TargetRuleSet(new SelectCardRule(new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller), PileLocation.Field, c => !c.isHeroic && c.cardType == CardType.Creature)),
                             new MoveToPileDoer(PileLocation.Graveyard),
                             new Foo(),
                             new TypedGameEventFilter<DamageEvent>(e => e.source == this && e.target.isHeroic),
@@ -1121,6 +1116,8 @@ namespace stonerkart
 
                 #endregion
 
+                #region Deep Fry
+
                 case CardTemplate.Deep_sFry:
                 {
                     cardType = CardType.Interrupt;
@@ -1138,6 +1135,26 @@ namespace stonerkart
                     castRange = 5;
 
                 } break;
+                #endregion
+
+                #region Reanimate Dead
+                case CardTemplate.Reanimate_sDead:
+                {
+                    cardType = CardType.Channel;
+                    rarity = Rarity.Rare;
+
+                    deathCost = 3;
+                    greyCost = 2;
+
+                    castDescription = "Return a creature from your graveyard to the battlefield under your control.";
+                    castEffect = new Effect(new TargetRuleSet(
+                        new CastSelectCardRule(new SelectCardRule(PileLocation.Graveyard, c => c.cardType == CardType.Creature)),
+                        new PryTileRule(t => t.card == null && !t.isEdgy,
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
+                        new SummonToTileDoer());
+                } break;
+                #endregion
+
 
                 #region tokens
                 #region Squire
@@ -1204,7 +1221,7 @@ namespace stonerkart
                 castEffect = new Effect(new TargetRuleSet(
                     new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                     new PryTileRule(t => t.card == null && !t.isEdgy, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
-                    new MoveToTileDoer());
+                    new SummonToTileDoer());
             }
             else throw new Exception();
             

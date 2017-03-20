@@ -527,8 +527,19 @@ namespace stonerkart
             handleTransaction(new GameTransaction(e));
         }
 
+        LinkedList<GameEvent> gelog = new LinkedList<GameEvent>();
+
+        private void logTransaction(GameTransaction t)
+        {
+            foreach (var v in t.events)
+            {
+                gelog.AddLast(v);
+            }
+        }
+
         private void handleTransaction(GameTransaction t)
         {
+            logTransaction(t);
             var gameEvents = t.events;
 
             foreach (GameEvent e in gameEvents)
@@ -1074,10 +1085,9 @@ namespace stonerkart
             return gameController.showCards(cards, closeable, clicked);
         }
 
-        public IEnumerable<Card> selectCardFromCards(IEnumerable<Card> cards, bool cancelable = true, int cardCount = 1, Func<Card, bool> filter = null)
+        public IEnumerable<Card> selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount, Func<Card, bool> filter)
         {
             List<Card> rt = new List<Card>(cardCount);
-            filter = filter == null ? (c) => true : filter;
             var ca = cards.ToArray();
 
             if (ca.Count(filter) == 0)

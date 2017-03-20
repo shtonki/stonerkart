@@ -234,6 +234,21 @@ namespace stonerkart
         }
     }
 
+    class SummonToTileDoer : SimpleDoer
+    {
+
+        public SummonToTileDoer() : base(typeof(Card), typeof(Tile))
+        {
+        }
+
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        {
+            Card moved = (Card)row[0];
+            Tile moveTo = (Tile)row[1];
+            return new GameEvent[] { new MoveToPileEvent(moved, moved.controller.field), new PlaceOnTileEvent(moved, moveTo, false)  };
+        }
+    }
+
     class ZepperDoer : SimpleDoer
     {
         public int damage;
