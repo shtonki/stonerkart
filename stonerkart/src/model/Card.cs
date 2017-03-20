@@ -368,12 +368,17 @@ namespace stonerkart
                     tile.removeCard();
                     tile = null;
                 }
-                moveTo(e.to);
                 if (e.to.location.pile != PileLocation.Field)
                 {
+                    if (isToken)
+                    {
+                        pile.remove(this);
+                        return;
+                    }
                     fatigue = 0;
                     damageTaken = 0;
                 }
+                moveTo(e.to);
             }));
             
             return r;
@@ -409,6 +414,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Suspicious_sVortex,
         Ancient_sDruid,
         Reanimate_sDead,
         Deep_sFry,

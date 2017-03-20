@@ -1180,6 +1180,17 @@ namespace stonerkart
                 }break;
                 #endregion
 
+                case CardTemplate.Suspicious_sVortex:
+                {
+                    cardType = CardType.Interrupt;
+
+                    orderCost = 4;
+                    
+                    castRange = 5;
+                    castDescription = "Place target non-heroic permanent on top of its owners deck.";
+                    castEffect = new Effect(new PryCardRule(c => !c.isHeroic), new MoveToPileDoer(PileLocation.Deck));
+                } break;
+
                 #region tokens
                 #region Squire
                 case CardTemplate.Squire:

@@ -996,7 +996,7 @@ namespace stonerkart
             }
             else if (stackpopped.cardType == CardType.Creature || stackpopped.cardType == CardType.Relic)
             {
-                gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.controller.field, false));
+                //gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.controller.field, false));
             }
             else
             {
