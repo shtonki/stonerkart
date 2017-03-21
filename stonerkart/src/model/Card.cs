@@ -269,6 +269,11 @@ namespace stonerkart
                 {
                     return "Deals double damage to heroic creatures";
                 }
+
+                case KeywordAbility.Ambush:
+                {
+                    return "When attacking this creature deals damage prior to the defender and is not retaliated against if it kills the defender.";
+                }
             }
 
             return "";
@@ -414,6 +419,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Marilith,
         Seething_sRage,
         Ilas_sBargain,
         Rapture,

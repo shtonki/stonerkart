@@ -1242,6 +1242,20 @@ namespace stonerkart
                     additionalCastCosts.Add(sacLambda);
                 } break;
 
+                case CardTemplate.Marilith:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Rare;
+
+                    baseMovement = 4;
+                    baseToughness = 3;
+                    basePower = 3;
+
+                    mightCost = 3;
+
+                    keywordAbilities.Add(KeywordAbility.Ambush);
+                } break;
+                    
                 #region tokens
                 #region Squire
                 case CardTemplate.Squire:

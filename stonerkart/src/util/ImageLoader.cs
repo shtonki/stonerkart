@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Marilith:
+                {
+                    return Resources.artMarilith;
+                }
+
                 case CardTemplate.Seething_sRage:
                 {
                     return Resources.artEnragedDragon;

@@ -490,7 +490,27 @@ namespace stonerkart
             //todo raise MoveDeclared events lmfao
             priority();
 
+            #region ambush shenans
             GameTransaction gt = new GameTransaction();
+            var pathsx = paths.Where(p => p.Item1.hasAbility(KeywordAbility.Ambush) && p.Item2.attacking);
+            foreach (var v in pathsx)
+            {
+                Card mover = v.Item1;
+                Path path = v.Item2;
+                Card defender = path.to.card;
+
+                if (mover.canAttack(defender))
+                {
+                    gt.addEvent(new DamageEvent(mover, defender, mover.combatDamageTo(defender)));
+                }
+
+                gt.addEvent(new MoveEvent(mover, path));
+                gt.addEvent(new FatigueEvent(mover, path.attacking ? mover.movement : path.length));
+            }
+            handleTransaction(gt);
+            #endregion
+
+            gt = new GameTransaction();
             
             foreach (var v in paths)
             {
@@ -500,8 +520,17 @@ namespace stonerkart
 
                 if (path.attacking && mover.canAttack(defender))
                 {
-                    gt.addEvent(new DamageEvent(mover, defender, mover.combatDamageTo(defender)));
-                    if (defender.canRetaliate) gt.addEvent(new DamageEvent(defender, mover, defender.combatDamageTo(mover)));
+                    if (pathsx.Contains(v))
+                    {
+                        if (defender.canRetaliate && defender.toughness > 0)
+                            gt.addEvent(new DamageEvent(defender, mover, defender.combatDamageTo(mover)));
+                    }
+                    else
+                    {
+                        gt.addEvent(new DamageEvent(mover, defender, mover.combatDamageTo(defender)));
+                        if (defender.canRetaliate)
+                            gt.addEvent(new DamageEvent(defender, mover, defender.combatDamageTo(mover)));
+                    }
                 }
                 
                 gt.addEvent(new MoveEvent(mover, path));
