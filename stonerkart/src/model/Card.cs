@@ -28,7 +28,7 @@ namespace stonerkart
         public Subtype? subtype { get; }
         public int convertedManaCost => castManaCost.colours.Count();
 
-        public bool isExhausted => Movement == 0;
+        public bool isExhausted => movement == 0;
         public bool canRetaliate => !isHeroic;
 
         public string breadText => breadTextEx();
@@ -414,6 +414,9 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Seething_sRage,
+        Ilas_sBargain,
+        Rapture,
         Suspicious_sVortex,
         Ancient_sDruid,
         Reanimate_sDead,
@@ -517,5 +520,6 @@ namespace stonerkart
         Fervor,
         Elusion,
         Kingslayer,
+        Ambush,
     }
 }

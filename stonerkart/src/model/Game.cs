@@ -912,7 +912,7 @@ namespace stonerkart
                 targetmxs = ability.effects.fillCast(makeHackStruct(ability));
                 if (targetmxs == null) continue;
 
-                costmxs = ability.cost.fillCast(makeHackStruct(p));
+                costmxs = ability.cost.fillCast(makeHackStruct(p, ability));
                 if (costmxs == null) continue;
 
                 return new StackWrapper(card, ability, targetmxs, costmxs);
@@ -931,7 +931,7 @@ namespace stonerkart
                 targetmxs = ability.effects.fillCast(v);
                 if (targetmxs == null) return null;
 
-                costmxs = ability.cost.fillCast(makeHackStruct(p));
+                costmxs = ability.cost.fillCast(makeHackStruct(p, ability));
                 if (costmxs == null) continue;
 
                 return new StackWrapper(dummyCard, ability, targetmxs, costmxs);
@@ -1079,7 +1079,11 @@ namespace stonerkart
         {
             return new HackStruct(this, resolvingAbility);
         }
-        
+
+        private HackStruct makeHackStruct(Player castingPlayer, Ability resolvingAbility)
+        {
+            return new HackStruct(this, resolvingAbility, castingPlayer);
+        }
 
         private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)
         {
