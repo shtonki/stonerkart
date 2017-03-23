@@ -110,6 +110,26 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Marilith:
+                {
+                    return Resources.artMarilith;
+                }
+
+                case CardTemplate.Seething_sRage:
+                {
+                    return Resources.artEnragedDragon;
+                }
+
+                case CardTemplate.Rapture:
+                {
+                    return Resources.artRapture;
+                }
+
+                case CardTemplate.Ilas_sBargain:
+                {
+                    return Resources.artAberrantSacrifice;
+                }
+
                 case CardTemplate.Suspicious_sVortex:
                 {
                     return Resources.artSuspiciousVortex;

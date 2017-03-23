@@ -82,6 +82,12 @@ namespace stonerkart
             resolveAbility = a;
         }
 
+        public HackStruct(Game g, Ability a, Player p) : this(g)
+        {
+            resolveAbility = a;
+            castingPlayer = p;
+        }
+
         public void setPrompt(string s)
         {
             _setPrompt(s, new ButtonOption[] {});

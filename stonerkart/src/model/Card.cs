@@ -28,7 +28,7 @@ namespace stonerkart
         public Subtype? subtype { get; }
         public int convertedManaCost => castManaCost.colours.Count();
 
-        public bool isExhausted => Movement == 0;
+        public bool isExhausted => movement == 0;
         public bool canRetaliate => !isHeroic;
 
         public string breadText => breadTextEx();
@@ -269,6 +269,11 @@ namespace stonerkart
                 {
                     return "Deals double damage to heroic creatures";
                 }
+
+                case KeywordAbility.Ambush:
+                {
+                    return "When attacking this creature deals damage prior to the defender and is not retaliated against if it kills the defender.";
+                }
             }
 
             return "";
@@ -414,6 +419,10 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Marilith,
+        Seething_sRage,
+        Ilas_sBargain,
+        Rapture,
         Suspicious_sVortex,
         Ancient_sDruid,
         Reanimate_sDead,
@@ -517,5 +526,6 @@ namespace stonerkart
         Fervor,
         Elusion,
         Kingslayer,
+        Ambush,
     }
 }

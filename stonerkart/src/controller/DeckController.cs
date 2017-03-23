@@ -21,12 +21,13 @@ namespace stonerkart
             }
         }
 
-        public static string[] getDeckNames()
+        public static IEnumerable<Deck> getDecks()
         {
-            return Directory.EnumerateFiles(Settings.decksPath)
+            var localdecks = Directory.EnumerateFiles(Settings.decksPath)
                 .Where(s => s.EndsWith(".jas"))
-                .Select(s => s.Substring(s.LastIndexOf('/') + 1, s.Length - 6))
-                .ToArray();
+                .Select(s => s.Substring(s.LastIndexOf('/') + 1, s.Length - 6)).Select(loadDeck);
+            return localdecks.Concat(Deck.basicDecks);
+
         }
 
         public static Deck loadDeck(string name)
@@ -34,14 +35,16 @@ namespace stonerkart
             using (StreamReader r = new StreamReader(File.Open(Settings.decksPath + name + ".jas", FileMode.Open)))
             {
                 string s = r.ReadToEnd();
-                return new Deck(s);
+                Deck d =  new Deck(s);
+                d.name = name;
+                return d;
             }
         }
 
         public static Deck chooseDeck()
         {
             ManualResetEventSlim re = new ManualResetEventSlim(false);
-            string s = null;
+            Deck s = null;
             Thread t = new Thread(() => chooseDeck(v =>
             {
                 s = v;
@@ -50,24 +53,24 @@ namespace stonerkart
             t.Start();
             re.Wait();
 
-            return loadDeck(s);
+            return s;
         }
 
-        public static void chooseDeck(Action<string> cb)
+        public static void chooseDeck(Action<Deck> cb)
         {
             Panel p = new Panel();
             p.BackColor = Color.Tomato;
-            string[] decknames = getDeckNames();
-            p.Size = new Size(100, 20 * decknames.Length);
+            Deck[] decks = getDecks().ToArray();
+            p.Size = new Size(100, 20 * decks.Length);
             DraggablePanel dp = null;
-            for (int i = 0; i < decknames.Length; i++)
+            for (int i = 0; i < decks.Length; i++)
             {
-                string s = decknames[i];
+                Deck d = decks[i];
                 Button b = new Button();
-                b.Text = s;
+                b.Text = d.name;
                 b.Click += (_, __) =>
                 {
-                    cb(s);
+                    cb(d);
                     dp.close();
                 };
                 p.Controls.Add(b);
@@ -77,5 +80,6 @@ namespace stonerkart
 
             dp = UIController.showControl(p, true, false);
         }
+
     }
 }

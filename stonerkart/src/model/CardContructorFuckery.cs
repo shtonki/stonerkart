@@ -88,7 +88,7 @@ namespace stonerkart
                             String.Format("{0}: Give all your other white creatures +1/+0 until end of turn.", G.exhaustGhyph),
                             new TargetRuleSet(new AllCardsRule(c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
                             new ModifyDoer(ModifiableStats.Power, 1, LL.add, LL.endOfTurn),
-                            LL.exhaustThis,
+                            new Foo(LL.exhaustThis),
                             0,
                             PileLocation.Field,
                             CastSpeed.Instant 
@@ -262,7 +262,7 @@ namespace stonerkart
                         String.Format("{0}: Exhaust target creature.", G.exhaustGhyph),
                         new TargetRuleSet(new PryCardRule()),
                         new FatigueDoer(true),
-                        LL.exhaustThis,
+                        new Foo(LL.exhaustThis),
                         3,
                         PileLocation.Field,
                         CastSpeed.Instant
@@ -577,8 +577,7 @@ namespace stonerkart
                         new ModifyDoer(ModifiableStats.Power, 2, LL.add, LL.endOfTurn)));
                     castDescription =
                         "Target creature is healed for 2 and gains 2 power until the end of this turn.";
-                }
-                    break;
+                } break;
 
                     #endregion
 
@@ -1172,13 +1171,15 @@ namespace stonerkart
                         String.Format("{0}: Gain {1} until end of step.", G.exhaustGhyph, G.coloured(ManaColour.Nature)),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                         new GainBonusManaDoer(ManaColour.Nature),
-                        LL.exhaustThis,
+                        new Foo(LL.exhaustThis),
                         0,
                         PileLocation.Field,
                         CastSpeed.Instant
                         );
                 }break;
                 #endregion
+
+                #region Suspicious Vortex
 
                 case CardTemplate.Suspicious_sVortex:
                 {
@@ -1192,6 +1193,69 @@ namespace stonerkart
                     castEffect = new Effect(new PryCardRule(c => !c.isHeroic), new MoveToPileDoer(PileLocation.Deck));
                 } break;
 
+                #endregion
+
+                case CardTemplate.Rapture:
+                {
+                    cardType = CardType.Interrupt;
+                    rarity = Rarity.Uncommon;
+
+                    lifeCost = 2;
+
+                    castDescription = "Displace target exhausted non-heroic creature.";
+                    castEffect =
+                        new Effect(
+                            new PryCardRule(c => !c.isHeroic && c.isExhausted,
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                            new MoveToPileDoer(PileLocation.Displaced));
+                    castRange = 4;
+                } break;
+
+                case CardTemplate.Seething_sRage:
+                {
+                    cardType = CardType.Interrupt;
+                    rarity = Rarity.Uncommon;
+
+                    chaosCost = 2;
+
+                    castDescription = "Return all movement to target creature and give it +2/+0 until end of turn.";
+                    castEffect =
+                        new Effect(
+                            new TargetRuleSet(new PryCardRule(LL.isCreature)),
+                            new FatigueDoer(false));
+                    additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(0),
+                        new ModifyDoer(ModifiableStats.Power, 2, LL.add, LL.endOfTurn)));
+                    castRange = 3;
+                } break;
+
+                case CardTemplate.Ilas_sBargain:
+                {
+                    cardType = CardType.Channel;
+                    rarity = Rarity.Rare;
+
+                    deathCost = 2;
+
+                    castDescription =
+                        "As an additional cost to casting this card sacrifice a non-heroic creature. Draw two cards.";
+                    castEffect = new Effect(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                        new DrawCardsDoer(2));
+                    additionalCastCosts.Add(sacLambda);
+                } break;
+
+                case CardTemplate.Marilith:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Rare;
+
+                    baseMovement = 4;
+                    baseToughness = 3;
+                    basePower = 3;
+
+                    mightCost = 3;
+
+                    keywordAbilities.Add(KeywordAbility.Ambush);
+                } break;
+                    
                 #region tokens
                 #region Squire
                 case CardTemplate.Squire:
@@ -1301,6 +1365,13 @@ namespace stonerkart
             return new Foo(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                 new ManaCostRule(cs)), new PayManaDoer()));
         }
+
+        public Effect sacLambda
+            =>
+                new Effect(
+                    new PryCardRule(
+                        c => !c.isHeroic && c.controller == this.controller && c.cardType == CardType.Creature),
+                    new MoveToPileDoer(PileLocation.Graveyard));
 
     }
 }

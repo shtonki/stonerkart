@@ -16,11 +16,19 @@ namespace stonerkart
     {
         public CardTemplate hero;
         public CardTemplate[] templates;
+        public string name { get; set; }
 
         public Deck(CardTemplate hero, CardTemplate[] templates)
         {
             this.hero = hero;
             this.templates = templates;
+        }
+
+        public Deck(CardTemplate hero, CardTemplate[] templates, string name)
+        {
+            this.hero = hero;
+            this.templates = templates;
+            this.name = name;
         }
 
         public Deck(string saveText)
@@ -64,6 +72,172 @@ namespace stonerkart
 
             return sb.ToString();
         }
+
+        #region basicDNZombies
+
+
+        private static CardTemplate[] basicDNZombiesTs = new[]
+        {
+            CardTemplate.Risen_sAbberation,
+            CardTemplate.Risen_sAbberation,
+            CardTemplate.Risen_sAbberation,
+            CardTemplate.Risen_sAbberation,
+            CardTemplate.Chains_sof_sSin,
+            CardTemplate.Chains_sof_sSin,
+            CardTemplate.Ilas_sBargain,
+            CardTemplate.Ilas_sBargain,
+            CardTemplate.Ilas_sGravekeeper,
+            CardTemplate.Ilas_sGravekeeper,
+            CardTemplate.Ilas_sGravekeeper,
+            CardTemplate.Ilatian_sHaunter,
+            CardTemplate.Ilatian_sHaunter,
+            CardTemplate.Ilatian_sHaunter,
+            CardTemplate.Wilt,
+            CardTemplate.Wilt,
+            CardTemplate.Gleeful_sDuty,
+            CardTemplate.Gleeful_sDuty,
+            CardTemplate.Gleeful_sDuty,
+            CardTemplate.Rider_sof_sDeath,
+            CardTemplate.Ilatian_sHaunter,
+            CardTemplate.Frenzied_sPirhana,
+            CardTemplate.Frenzied_sPirhana,
+            CardTemplate.Frenzied_sPirhana,
+            CardTemplate.Frenzied_sPirhana,
+            CardTemplate.Invigorate,
+            CardTemplate.Invigorate,
+            CardTemplate.Rider_sof_sFamine,
+            CardTemplate.Survival_sInstincts,
+            CardTemplate.Survival_sInstincts,
+        };
+        #endregion
+
+        #region basicMLNZoo
+        public static CardTemplate[] basicMLNZooTs = new[]{CardTemplate.Rockhand_sEchion,
+CardTemplate.Rockhand_sEchion,
+CardTemplate.Rockhand_sEchion,
+CardTemplate.Primordial_sChimera,
+CardTemplate.Primordial_sChimera,
+CardTemplate.Primordial_sChimera,
+CardTemplate.Primordial_sChimera,
+CardTemplate.Marilith,
+CardTemplate.Marilith,
+CardTemplate.Rider_sof_sWar,
+CardTemplate.Call_sTo_sArms,
+CardTemplate.Call_sTo_sArms,
+CardTemplate.Call_sTo_sArms,
+CardTemplate.Call_sTo_sArms,
+CardTemplate.Damage_sWard,
+CardTemplate.Damage_sWard,
+CardTemplate.Damage_sWard,
+CardTemplate.Chains_sof_sVirtue,
+CardTemplate.Chains_sof_sVirtue,
+CardTemplate.Rapture,
+CardTemplate.Rapture,
+CardTemplate.Temple_sHealer,
+CardTemplate.Temple_sHealer,
+CardTemplate.Frenzied_sPirhana,
+CardTemplate.Frenzied_sPirhana,
+CardTemplate.Frenzied_sPirhana,
+CardTemplate.Frenzied_sPirhana,
+CardTemplate.Invigorate,
+CardTemplate.Invigorate,
+CardTemplate.One_sWith_sNature,
+CardTemplate.One_sWith_sNature,
+CardTemplate.Fresh_sFox,
+CardTemplate.Fresh_sFox,
+CardTemplate.Fresh_sFox,
+CardTemplate.Overgrow,
+CardTemplate.Survival_sInstincts,
+CardTemplate.Survival_sInstincts,
+};
+        #endregion
+
+        #region basicOLDRiders
+
+        public static CardTemplate[] basicOLDRidersTs = new[]
+        {
+            CardTemplate.Chains_sof_sSin,
+            CardTemplate.Ilas_sBargain,
+            CardTemplate.Ilas_sBargain,
+            CardTemplate.Wilt,
+            CardTemplate.Wilt,
+            CardTemplate.Gleeful_sDuty,
+            CardTemplate.Gleeful_sDuty,
+            CardTemplate.Reanimate_sDead,
+            CardTemplate.Reanimate_sDead,
+            CardTemplate.Rider_sof_sDeath,
+            CardTemplate.Rider_sof_sWar,
+            CardTemplate.Alter_sFate,
+            CardTemplate.Alter_sFate,
+            CardTemplate.Cantrip,
+            CardTemplate.Cantrip,
+            CardTemplate.Counterspell,
+            CardTemplate.Counterspell,
+            CardTemplate.Unmake,
+            CardTemplate.Unmake,
+            CardTemplate.Counterspell,
+            CardTemplate.Suspicious_sVortex,
+            CardTemplate.Kappa,
+            CardTemplate.Chains_sof_sVirtue,
+            CardTemplate.Rapture,
+            CardTemplate.Abolish,
+            CardTemplate.Gotterdammerung,
+            CardTemplate.Yung_sLich,
+            CardTemplate.Yung_sLich,
+            CardTemplate.Graverobber_sSyrdin,
+            CardTemplate.Rider_sof_sFamine,
+            CardTemplate.Rider_sof_sPestilence,
+        };
+        #endregion
+
+        #region basicJasinHomebrew
+
+        public static CardTemplate[] basicJasinHomebrewTs = new[]
+        {
+            CardTemplate.Magma_sVents,
+            CardTemplate.Magma_sVents,
+            CardTemplate.Magma_sVents,
+            CardTemplate.Magma_sVents,
+            CardTemplate.Cleansing_sFire,
+            CardTemplate.Cleansing_sFire,
+            CardTemplate.Zap,
+            CardTemplate.Zap,
+            CardTemplate.Zap,
+            CardTemplate.Zap,
+            CardTemplate.Goblin_sGrenade,
+            CardTemplate.Goblin_sGrenade,
+            CardTemplate.Goblin_sGrenade,
+            CardTemplate.Illegal_sGoblin_sLaboratory,
+            CardTemplate.Illegal_sGoblin_sLaboratory,
+            CardTemplate.Illegal_sGoblin_sLaboratory,
+            CardTemplate.Alter_sFate,
+            CardTemplate.Alter_sFate,
+            CardTemplate.Alter_sFate,
+            CardTemplate.Alter_sFate,
+            CardTemplate.Cantrip,
+            CardTemplate.Cantrip,
+            CardTemplate.Cantrip,
+            CardTemplate.Cantrip,
+            CardTemplate.Unmake,
+            CardTemplate.Unmake,
+            CardTemplate.Unmake,
+            CardTemplate.Unmake,
+            CardTemplate.Counterspell,
+            CardTemplate.Counterspell,
+            CardTemplate.Counterspell,
+            CardTemplate.Counterspell,
+            CardTemplate.Kappa,
+            CardTemplate.Kappa,
+        };
+        #endregion
+
+        public static Deck[] basicDecks = new[]
+        {
+            new Deck(CardTemplate.Prince_sIla, basicDNZombiesTs, "Basic DN Zombies"),
+            new Deck(CardTemplate.Chieftain_sZ_aloot_aboks, basicMLNZooTs, "Basic MLN Zoo"),
+            new Deck(CardTemplate.Shibby_sShtank, basicOLDRidersTs, "Basic OLD Riders"),
+            new Deck(CardTemplate.Chieftain_sZ_aloot_aboks, basicJasinHomebrewTs, "Basic Jasin Homebrew"),
+        };
     }
 
 
