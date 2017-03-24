@@ -377,7 +377,7 @@ namespace stonerkart
                 {
                     if (isToken)
                     {
-                        pile.remove(this);
+                        //pile.remove(this);
                         return;
                     }
                     fatigue = 0;
