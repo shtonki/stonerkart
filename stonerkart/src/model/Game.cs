@@ -348,6 +348,15 @@ namespace stonerkart
         {
             activePlayer.resetMana();
 
+            if (!skipFirstDraw)
+            {
+                handleTransaction(new DrawEvent(activePlayer, 1));
+            }
+            else
+            {
+                skipFirstDraw = false;
+            }
+
             if (activePlayer.manaPool.max.orbs.Count() < 12)
             {
                 ManaOrbSelection selection;
@@ -371,16 +380,8 @@ namespace stonerkart
 
                 activePlayer.gainMana(selection.orb);
             }
-            priority();
 
-            if (!skipFirstDraw)
-            {
-                handleTransaction(new DrawEvent(activePlayer, 1));
-            }
-            else
-            {
-                skipFirstDraw = false;
-            }
+            priority();
         }
 
         private void mainStep()
