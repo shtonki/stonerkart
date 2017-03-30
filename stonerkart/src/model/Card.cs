@@ -290,7 +290,7 @@ namespace stonerkart
 
         private Location locationEx()
         {
-            if (pile == null) throw new Exception();
+            if (pile == null) return new Location(owner, PileLocation.Nowhere);
             return pile.location;
         }
 
@@ -377,7 +377,8 @@ namespace stonerkart
                 {
                     if (isToken)
                     {
-                        //pile.remove(this);
+                        pile.remove(this);
+                        pile = null;
                         return;
                     }
                     fatigue = 0;
