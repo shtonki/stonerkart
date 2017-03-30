@@ -787,14 +787,14 @@ namespace stonerkart
 
                     auras.Add(new Aura(
                         "",
-                        () => controller.graveyard.Count >= 7 ? 2 : 0,
+                        () => controller.graveyard.Count >= 5 ? 2 : 0,
                         LL.add,
                         ModifiableStats.Power,
                         c => c == this
                         ));
 
                     auras.Add(new Aura(
-                        "This creature has gets +2/+2 as long as its controllers graveyard contains seven or more cards.",
+                        "This creature has gets +2/+2 as long as its controllers graveyard contains five or more cards.",
                         () => controller.graveyard.Count >= 7 ? 2 : 0,
                         LL.add,
                         ModifiableStats.Toughness,
