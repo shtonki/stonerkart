@@ -108,12 +108,13 @@ namespace stonerkart
 
     enum PileLocation
     {
+        Nowhere,
         Hand,
         Field,
         Stack,
         Deck,
         Graveyard,
-        Displaced
+        Displaced,
     }
 
     struct Location
