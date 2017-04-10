@@ -110,6 +110,31 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Feral_sImp:
+                {
+                    return Resources.artFeralImp;
+                }
+
+                case CardTemplate.Shotty_sContruct:
+                {
+                    return Resources.artShottyContruct;
+                }
+
+                case CardTemplate.Sanguine_sArtisan:
+                {
+                    return Resources.artSanguineArtisan;
+                }
+
+                case CardTemplate.Houndmaster:
+                {
+                    return Resources.artHoundmaster;
+                }
+
+                case CardTemplate.Wolf:
+                {
+                    return Resources.artWolf1;
+                }
+
                 case CardTemplate.Marilith:
                 {
                     return Resources.artMarilith;

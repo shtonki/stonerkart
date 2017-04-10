@@ -85,10 +85,10 @@ namespace stonerkart
                     baseToughness = 25;
 
                         addActivatedAbility(
-                            String.Format("{0}: Give all your other white creatures +1/+0 until end of turn.", G.exhaustGhyph),
+                            String.Format("{2}{1}{1}, {0}: Your other white creatures get +1/+0 until end of turn.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Life), G.colourlessGlyph(1)),
                             new TargetRuleSet(new AllCardsRule(c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
-                            new ModifyDoer(ModifiableStats.Power, 1, LL.add, LL.endOfTurn),
-                            new Foo(LL.exhaustThis),
+                            new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.endOfTurn),
+                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
                             0,
                             PileLocation.Field,
                             CastSpeed.Instant 
@@ -179,7 +179,7 @@ namespace stonerkart
                             new SelectCardRule(new PryPlayerRule(p => true,
                                 new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                                 PileLocation.Hand, c => false, SelectCardRule.Mode.Resolver),
-                            new ModifyDoer(ModifiableStats.Movement, 0, LL.add, LL.clearAura)));
+                            new ModifyDoer(ModifiableStats.Movement, LL.add(0), LL.clearAura))); //ugliest hack i've seen in a while
                     castDescription = "Look at target players hand. Draw a card.";
 
                 }
@@ -245,7 +245,7 @@ namespace stonerkart
 
                     #endregion
 
-                    #region Nature Heroman
+                    #region Chieftain Slootboks
 
                 case CardTemplate.Chieftain_sZ_aloot_aboks:
                 {
@@ -254,16 +254,17 @@ namespace stonerkart
                     race = Race.Human;
                     subtype = Subtype.Warrior;
                     isHeroic = true;
+
                     baseMovement = 3;
                     basePower = 1;
                     baseToughness = 20;
                     forceColour = ManaColour.Nature;
 
                     addActivatedAbility(
-                        String.Format("{0}: Exhaust target creature.", G.exhaustGhyph),
-                        new TargetRuleSet(new PryCardRule()),
+                        String.Format("{1}, {0}: Exhaust another target creature within 3 tiles.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Nature)),
+                        new TargetRuleSet(new PryCardRule(c => c != this)),
                         new FatigueDoer(true),
-                        new Foo(LL.exhaustThis),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Nature)),
                         3,
                         PileLocation.Field,
                         CastSpeed.Instant
@@ -308,7 +309,7 @@ namespace stonerkart
 
 
                     addActivatedAbility(
-                        String.Format("{1}{0}{0}: Draw a card", G.coloured(ManaColour.Order), G.colourless(2)),
+                        String.Format("{1}{0}{0}, {2}: Draw a card", G.colouredGlyph(ManaColour.Order), G.colourlessGlyph(2), G.exhaustGhyph),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                         new DrawCardsDoer(1),
                         fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
@@ -463,7 +464,7 @@ namespace stonerkart
                         new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                             new GainBonusManaDoer(ManaColour.Nature, ManaColour.Nature, ManaColour.Nature));
                     castDescription = String.Format("You gain {0}{0}{0} until the end of the step.",
-                        G.coloured(ManaColour.Nature));
+                        G.colouredGlyph(ManaColour.Nature));
                 }
                     break;
 
@@ -555,7 +556,7 @@ namespace stonerkart
                     castRange = 4;
                     castEffect = new Effect(
                         new TargetRuleSet(new PryCardRule()),
-                        new ModifyDoer(ModifiableStats.Toughness, 3, LL.add, LL.never));
+                        new ModifyDoer(ModifiableStats.Toughness, LL.add(3), LL.never));
                     castDescription = "Target creature gains 3 toughness.";
 
                 }
@@ -579,7 +580,7 @@ namespace stonerkart
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
                             new ZepperDoer(-2));
                     additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1),
-                        new ModifyDoer(ModifiableStats.Power, 2, LL.add, LL.endOfTurn)));
+                        new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.endOfTurn)));
                     castDescription =
                         "Target creature is healed for 2 and gains 2 power until the end of this turn.";
                 } break;
@@ -598,7 +599,10 @@ namespace stonerkart
                     baseToughness = 1;
                     baseMovement = 2;
 
-                    chaosCost = 2;
+                    chaosCost = 1;
+                    greyCost = 1;
+
+
                     addTriggeredAbility(
                         "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
@@ -657,14 +661,7 @@ namespace stonerkart
                     castRange = 2;
 
                     castDescription = "Summon two 1/1 Squire tokens.";
-                    castEffect = new Effect(new TargetRuleSet(
-                        new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                            CardTemplate.Squire, CardTemplate.Squire),
-                        new PryTileRule(t => t.card == null && !t.isEdgy,
-                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, 2, false)),
-                        new SummonToTileDoer(),
-                        true
-                        );
+                    castEffect = Effect.summonTokensEffect(CardTemplate.Squire, CardTemplate.Squire);
 
                 }
                     break;
@@ -707,7 +704,7 @@ namespace stonerkart
                     baseToughness = 20;
 
                     addActivatedAbility(
-                        String.Format("{0}: Each player discards a card.", G.exhaustGhyph),
+                        String.Format("{1}{1}, {0}: Each player discards a card.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Death)),
                         new TargetRuleSet(new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), PileLocation.Hand, c => true, SelectCardRule.Mode.Reflexive)),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
@@ -738,11 +735,9 @@ namespace stonerkart
 
                     auras.Add(new Aura(
                         "This creature gets +1/+0 for each card in its controllers hand.",
-                        () => controller.hand.Count,
-                        LL.add,
-                        ModifiableStats.Power,
-                        c => c == this
-                        ));
+                        v => v + controller.hand.Count,
+                        ModifiableStats.Power, 
+                        c => c == this));
                 }
                     break;
 
@@ -764,8 +759,7 @@ namespace stonerkart
 
                     auras.Add(new Aura(
                         "This creature gets +1/+0 for each Zombie in its controllers graveyard.",
-                        () => controller.graveyard.Count(c => c.race == Race.Zombie),
-                        LL.add,
+                        v => v + controller.graveyard.Count(c => c.race == Race.Zombie),
                         ModifiableStats.Power,
                         c => c == this
                         ));
@@ -792,16 +786,14 @@ namespace stonerkart
 
                     auras.Add(new Aura(
                         "",
-                        () => controller.graveyard.Count >= 5 ? 2 : 0,
-                        LL.add,
+                        v => v + controller.graveyard.Count >= 5 ? 2 : 0,
                         ModifiableStats.Power,
                         c => c == this
                         ));
 
                     auras.Add(new Aura(
                         "This creature has gets +2/+2 as long as its controllers graveyard contains five or more cards.",
-                        () => controller.graveyard.Count >= 7 ? 2 : 0,
-                        LL.add,
+                        v => v + controller.graveyard.Count >= 7 ? 2 : 0,
                         ModifiableStats.Toughness,
                         c => c == this
                         ));
@@ -1080,7 +1072,7 @@ namespace stonerkart
 
                     castDescription = "Set target non-life creatures movement to 1.";
                     castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Life)),
-                        new ModifyDoer(ModifiableStats.Movement, 1, LL.set, LL.never));
+                        new ModifyDoer(ModifiableStats.Movement, LL.set(1), LL.never));
                     castRange = 4;
                 } break;
                 #endregion
@@ -1096,7 +1088,7 @@ namespace stonerkart
 
                         castDescription = "Reduce target non-death creatures movement by 2.";
                         castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Death)),
-                            new ModifyDoer(ModifiableStats.Movement, -2, LL.add, LL.never));
+                            new ModifyDoer(ModifiableStats.Movement, LL.add(-2), LL.never));
                         castRange = 4;
                     }
                     break;
@@ -1175,7 +1167,7 @@ namespace stonerkart
                     basePower = 1;
 
                     addActivatedAbility(
-                        String.Format("{0}: Gain {1} until end of step.", G.exhaustGhyph, G.coloured(ManaColour.Nature)),
+                        String.Format("{0}: Gain {1} until end of step.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Nature)),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                         new GainBonusManaDoer(ManaColour.Nature),
                         new Foo(LL.exhaustThis),
@@ -1235,7 +1227,7 @@ namespace stonerkart
                             new TargetRuleSet(new PryCardRule(LL.isCreature)),
                             new FatigueDoer(false));
                     additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(0),
-                        new ModifyDoer(ModifiableStats.Power, 2, LL.add, LL.endOfTurn)));
+                        new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.endOfTurn)));
                     castRange = 3;
                 } break;
                 #endregion
@@ -1277,35 +1269,96 @@ namespace stonerkart
                 case CardTemplate.Sanguine_sArtisan:
                     {
                         cardType = CardType.Creature;
-                        race = Race.Human;
-                        subtype = Subtype.Cleric;
+                        race = Race.Vampire;
+                        rarity = Rarity.Common;
 
-                        basePower = 3;
-                        baseToughness = 4;
-                        baseMovement = 3;
+                        basePower = 0;
+                        baseToughness = 2;
+                        baseMovement = 2;
 
-                        lifeCost = 2;
-                        greyCost = 2;
+                        deathCost = 1;
+                        greyCost = 1;
+
 
                         addTriggeredAbility(
-                            "Whenever a creature enters the battlefield under your control, you may restore 1 toughness to your hero.",
+                            "Whenever a creature enters the graveyard from the battlefield under your control, Sanguine Artisan deals 1 damage to target heroic creature.",
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                                new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
-                            new ZepperDoer(-1),
+                                new PryCardRule(c => c.isHeroic)),
+                            new ZepperDoer(1),
                             new Foo(),
                             new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
                                 moveEvent.card.controller == controller &&
-                                moveEvent.to.location.pile == PileLocation.Field &&
-                                location.pile == PileLocation.Field),
-                            0,
+                                moveEvent.to.location.pile == PileLocation.Graveyard &&
+                                moveEvent.card.location.pile == PileLocation.Field),
+                            -1,
                             PileLocation.Field,
-                            true,
-                            TriggeredAbility.Timing.Post
+                            false
                             );
                     } break;
                 #endregion
 
+                #region Houndmaster
+                case CardTemplate.Houndmaster:
+                {
+                    race = Race.Human;
+                    rarity = Rarity.Common;
+
+                    natureCost = 2;
+                    greyCost = 2;
+
+                    basePower = 3;
+                    baseToughness = 5;
+                    baseMovement = 3;
+
+                    addTriggeredAbility(
+                        "Whenever Houndmaster deals damage you may summon a 2/2 Wolf token.",
+                        Effect.summonTokensEffect(CardTemplate.Wolf),
+                        new Foo(),
+                        new TypedGameEventFilter<DamageEvent>(damageEvent => damageEvent.source == this),
+                        2,
+                        PileLocation.Field,
+                        true,
+                        TriggeredAbility.Timing.Post
+                        );
+                } break;
+                #endregion
+
+                #region Shotty Contruct
+                    
+                case CardTemplate.Shotty_sContruct:
+                {
+                    race = Race.Mecha;
+                    subtype = Subtype.Warrior;
+                    rarity = Rarity.Common;
+
+                    greyCost = 0;
+
+                    basePower = 1;
+                    baseToughness = 1;
+                    baseMovement = 2;
+                } break;
+
+                #endregion
+
+                #region Feral Imp
+                    case CardTemplate.Feral_sImp:
+                {
+                    race = Race.Demon;
+                    rarity = Rarity.Common;
+
+                    mightCost = 1;
+                    greyCost = 1;
+
+                    basePower = 2;
+                    baseToughness = 1;
+                    baseMovement = 3;
+
+                        keywordAbilities.Add(KeywordAbility.Fervor);
+                } break;
+                #endregion
+
                 #region tokens
+
                 #region Squire
                 case CardTemplate.Squire:
                 {
@@ -1318,6 +1371,19 @@ namespace stonerkart
                     isToken = true;
                 } break;
                 #endregion
+
+                #region Wolf
+                case CardTemplate.Wolf:
+                    {
+                        forceColour = ManaColour.Nature;
+                        basePower = 2;
+                        baseToughness = 2;
+                        baseMovement = 3;
+                        race = Race.Beast;
+                        isToken = true;
+                    } break;
+                #endregion
+
                 #endregion
 
                 default:
@@ -1396,6 +1462,11 @@ namespace stonerkart
         private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, bool optional, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
         {
             Effect e = new Effect(trs, doer);
+            addTriggeredAbility(description, e, cost, filter, castRange, activeIn, optional);
+        }
+
+        private void addTriggeredAbility(string description, Effect e, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, bool optional, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
+        {
             TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, cost, filter, optional, timing, description);
             abilities.Add(ta);
         }

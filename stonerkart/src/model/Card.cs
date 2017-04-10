@@ -400,14 +400,12 @@ namespace stonerkart
         public ModifiableStats stat { get; }
         public Func<Card, bool> filter { get; }
 
-        private Func<int> val;
-        private Func<int, int, int> fn;
+        private Func<int, int> fn;
 
-        public ModifierStruct modifer => new ModifierStruct(val(), fn, LL.clearAura);
+        public ModifierStruct modifer => new ModifierStruct(fn, LL.clearAura);
 
-        public Aura(string description, Func<int> val, Func<int, int, int> fn, ModifiableStats stat, Func<Card, bool> filter)
+        public Aura(string description, Func<int, int> fn, ModifiableStats stat, Func<Card, bool> filter)
         {
-            this.val = val;
             this.fn = fn;
             this.description = description;
             this.stat = stat;
@@ -420,6 +418,9 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Feral_sImp,
+        Shotty_sContruct,
+        Houndmaster,
         Marilith,
         Seething_sRage,
         Ilas_sBargain,
@@ -472,6 +473,7 @@ namespace stonerkart
         Illegal_sGoblin_sLaboratory,
         Teleport,
         Squire,
+        Wolf,
         Call_sTo_sArms,
         Sanguine_sArtisan,
     }
@@ -506,6 +508,8 @@ namespace stonerkart
 
     internal enum Race
     {
+        Demon,
+        Mecha,
         Human,
         Undead,
         Zombie,
@@ -513,6 +517,7 @@ namespace stonerkart
         Giant,
         Beast,
         Dragon,
+        Vampire,
     }
 
     internal enum Subtype

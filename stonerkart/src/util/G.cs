@@ -208,18 +208,17 @@ namespace stonerkart
             return bmp;
         }
 
-        public static char colourless(int i)
+        public static char colourlessGlyph(int i)
         {
             return hackish[i-1];
         }
 
-        public static char coloured(ManaColour c)
+        public static char colouredGlyph(ManaColour c)
         {
             return hackedaf[(int)c];
         }
 
-        public static char exhaustGhyph => '\u24BA';
-
+        public static string exhaustGhyph => "Exhaust";
 
         public static IEnumerable<int> range(int min, int max)
         {
@@ -253,8 +252,15 @@ namespace stonerkart
 
     static class LL
     {
-        public static Func<int, int, int> add { get; } = (a, b) => a + b;
-        public static Func<int, int, int> set { get; } = (a, b) => b;
+        public static Func<int, int> add(int i)
+        {
+            return v => v + i;
+        }
+
+        public static Func<int, int> set(int i)
+        {
+            return v => i;
+        }
 
         //card filters
         public static bool isCreature(Card c)
@@ -274,6 +280,11 @@ namespace stonerkart
             return new Effect(
                 new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                     new ManaCostRule(castManaCost)), new PayManaDoer());
+        }
+
+        public static Effect manaCost(params ManaColour[] ms)
+        {
+            return manaCost(new ManaSet(ms));
         }
 
         public static Effect exhaustThis { get; } =

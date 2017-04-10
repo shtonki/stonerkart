@@ -43,6 +43,18 @@ namespace stonerkart
             var ps = doer.filterCostRows(rs);
             return ps != null;
         }
+
+        public static Effect summonTokensEffect(params CardTemplate[] templates)
+        {
+            return new Effect(new TargetRuleSet(
+                new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                    templates),
+                new PryTileRule(t => t.card == null && !t.isEdgy,
+                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, templates.Length, false)),
+                new SummonToTileDoer(),
+                true
+                );
+        }
     }
 
     abstract class Doer : TypeSigned
@@ -145,10 +157,10 @@ namespace stonerkart
         public ModifiableStats modifiableStats;
         public ModifierStruct modifier;
 
-        public ModifyDoer(ModifiableStats modifiableStats, int value, Func<int, int, int> f, GameEventFilter until) : base(typeof(Card))
+        public ModifyDoer(ModifiableStats modifiableStats, Func<int, int> f, GameEventFilter until) : base(typeof(Card))
         {
             this.modifiableStats = modifiableStats;
-            modifier = new ModifierStruct(value, f, until);
+            modifier = new ModifierStruct(f, until);
         }
 
         protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
