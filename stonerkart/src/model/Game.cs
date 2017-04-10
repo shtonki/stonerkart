@@ -733,20 +733,27 @@ namespace stonerkart
 
                 dp.close();
 
+                connection.sendAction(new ChoiceSelection(triggd.Select(t => pl.indexOf(t.dummyCard))));
+
                 foreach (ptas pt in triggd)
                 {
                     connection.sendAction(new CastSelection(pt.wrapper));
                     r.Add(pt.wrapper);
+                    Thread.Sleep(10);
                 }
             }
             else
             {
                 gameController.setPrompt("Opponent is handling triggered abilities.");
+
+                ChoiceSelection cs = connection.receiveAction<ChoiceSelection>();
+                if (cs.choices.Length != orig.Count()) throw new Exception();
+
                 for (int i = 0; i < orig.Count(); i++)
                 {
                     StackWrapper w = connection.receiveAction<CastSelection>().wrapper;
-                    Card dummy = pl.First(c => c.dummiedAbility == w.ability);
                     
+                    Card dummy = pl[cs.choices[i]];
                     r.Add(new StackWrapper(dummy, w.ability, w.targetMatrices, w.costMatricies));
                 }
             }

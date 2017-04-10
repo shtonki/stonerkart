@@ -147,7 +147,6 @@ namespace stonerkart
                 int abilityOrd = Int32.Parse(ss[1]);
                 Ability ability = card.abilityFromOrd(abilityOrd);
 
-
                 TargetMatrix[] targetMatricies = matriciesFromString(ss[2], g);
 
                 TargetMatrix[] costs = matriciesFromString(ss[3], g);

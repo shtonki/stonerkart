@@ -1195,6 +1195,7 @@ namespace stonerkart
 
                 #endregion
 
+                #region Rapture
                 case CardTemplate.Rapture:
                 {
                     cardType = CardType.Interrupt;
@@ -1210,7 +1211,9 @@ namespace stonerkart
                             new MoveToPileDoer(PileLocation.Displaced));
                     castRange = 4;
                 } break;
+                #endregion
 
+                #region Seething Rage
                 case CardTemplate.Seething_sRage:
                 {
                     cardType = CardType.Interrupt;
@@ -1227,7 +1230,9 @@ namespace stonerkart
                         new ModifyDoer(ModifiableStats.Power, 2, LL.add, LL.endOfTurn)));
                     castRange = 3;
                 } break;
+                #endregion
 
+                #region Ilas Bargain
                 case CardTemplate.Ilas_sBargain:
                 {
                     cardType = CardType.Channel;
@@ -1241,7 +1246,9 @@ namespace stonerkart
                         new DrawCardsDoer(2));
                     additionalCastCosts.Add(sacLambda);
                 } break;
+                #endregion
 
+                #region Marilith
                 case CardTemplate.Marilith:
                 {
                     cardType = CardType.Creature;
@@ -1255,7 +1262,40 @@ namespace stonerkart
 
                     keywordAbilities.Add(KeywordAbility.Ambush);
                 } break;
+                #endregion
                     
+                #region Sanguine Artisan
+                case CardTemplate.Sanguine_sArtisan:
+                    {
+                        cardType = CardType.Creature;
+                        race = Race.Human;
+                        subtype = Subtype.Cleric;
+
+                        basePower = 3;
+                        baseToughness = 4;
+                        baseMovement = 3;
+
+                        lifeCost = 2;
+                        greyCost = 2;
+
+                        addTriggeredAbility(
+                            "Whenever a creature enters the battlefield under your control, you may restore 1 toughness to your hero.",
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                                new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
+                            new ZepperDoer(-1),
+                            new Foo(),
+                            new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
+                                moveEvent.card.controller == controller &&
+                                moveEvent.to.location.pile == PileLocation.Field &&
+                                location.pile == PileLocation.Field),
+                            0,
+                            PileLocation.Field,
+                            true,
+                            TriggeredAbility.Timing.Post
+                            );
+                    } break;
+                #endregion
+
                 #region tokens
                 #region Squire
                 case CardTemplate.Squire:

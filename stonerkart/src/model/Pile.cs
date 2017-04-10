@@ -15,6 +15,12 @@ namespace stonerkart
 
         public int Count => cardList.Count;
 
+        public Card this[int i]
+        {
+            get { return cardList[i]; }
+            //set { InnerList[i] = value; }
+        }
+
         public Pile()
         {
         }
@@ -22,6 +28,15 @@ namespace stonerkart
         public Pile(Location location)
         {
             this.location = location;
+        }
+
+        public int indexOf(Card c)
+        {
+            for (int i = 0; i < cardList.Count; i++)
+            {
+                if (cardList[i] == c) return i;
+            }
+            return -1;
         }
 
         public void addTop(Card c)
