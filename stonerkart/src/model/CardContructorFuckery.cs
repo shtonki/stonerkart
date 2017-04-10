@@ -1068,7 +1068,7 @@ namespace stonerkart
                     rarity = Rarity.Common;
 
                     lifeCost = 1;
-                    greyCost = 1;
+                    greyCost = 2;
 
                     castDescription = "Set target non-life creatures movement to 1.";
                     castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Life)),
@@ -1086,9 +1086,9 @@ namespace stonerkart
                         deathCost = 1;
                         greyCost = 1;
 
-                        castDescription = "Reduce target non-death creatures movement by 2.";
+                        castDescription = "Reduce target non-death creatures movement by 2. This cannot reduce the targets movement below 1.";
                         castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Death)),
-                            new ModifyDoer(ModifiableStats.Movement, LL.add(-2), LL.never));
+                            new ModifyDoer(ModifiableStats.Movement, v => Math.Max(Math.Min(v, 1), v - 2), LL.never));
                         castRange = 4;
                     }
                     break;
@@ -1300,6 +1300,7 @@ namespace stonerkart
                 #region Houndmaster
                 case CardTemplate.Houndmaster:
                 {
+                    cardType = CardType.Creature;
                     race = Race.Human;
                     rarity = Rarity.Common;
 
@@ -1327,6 +1328,7 @@ namespace stonerkart
                     
                 case CardTemplate.Shotty_sContruct:
                 {
+                    cardType = CardType.Creature;
                     race = Race.Mecha;
                     subtype = Subtype.Warrior;
                     rarity = Rarity.Common;
@@ -1341,8 +1343,9 @@ namespace stonerkart
                 #endregion
 
                 #region Feral Imp
-                    case CardTemplate.Feral_sImp:
+                case CardTemplate.Feral_sImp:
                 {
+                    cardType = CardType.Creature;
                     race = Race.Demon;
                     rarity = Rarity.Common;
 
@@ -1354,6 +1357,33 @@ namespace stonerkart
                     baseMovement = 3;
 
                         keywordAbilities.Add(KeywordAbility.Fervor);
+                } break;
+                #endregion
+
+                #region Resounding Blast
+                case CardTemplate.Resounding_sBlast:
+                {
+                    cardType = CardType.Interrupt;
+                    rarity = Rarity.Uncommon;
+
+                    castRange = 3;
+                    chaosCost = 2;
+                    greyCost = 1;
+
+                    castEffect =
+                        new Effect(
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                                new PryCardRule(c => !c.isHeroic,
+                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                            new ZepperDoer(3));
+                        additionalCastEffects.Add(new Effect(
+                            new TargetRuleSet(
+                            new CopyPreviousRule<Card>(0),
+                            new ModifyPreviousRule<Card, Card>(1, c => c.controller.heroCard)),
+                            new ZepperDoer(3)
+                            ));
+                    castDescription = "Deal 3 damage to target non-heroic creature and 3 damage to that creatures controller.";
+
                 } break;
                 #endregion
 

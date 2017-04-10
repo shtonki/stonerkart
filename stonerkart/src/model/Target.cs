@@ -429,6 +429,30 @@ namespace stonerkart
         }
     }
 
+    class ModifyPreviousRule<P, T> : ResolveRule where P : Targetable where T : Targetable
+    {
+        private int column;
+        private Func<P, T> fn;
+
+        public ModifyPreviousRule(int column, Func<P, T> f) : base(typeof(T))
+        {
+            this.column = column;
+            this.fn = f;
+        }
+
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        {
+            return new TargetColumn(hs.previousTargets.columns[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
+            //return hs.previousTargets.columns[column];
+        }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return new TargetColumn(hs.previousColumn.targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
+            //return hs.previousColumn;
+        }
+    }
+
     class AoeRule : TargetRule
     {
         private PryTileRule ruler;

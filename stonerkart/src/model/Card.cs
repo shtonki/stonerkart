@@ -418,6 +418,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Resounding_sBlast,
         Feral_sImp,
         Shotty_sContruct,
         Houndmaster,
