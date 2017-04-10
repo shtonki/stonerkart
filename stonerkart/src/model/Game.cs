@@ -739,7 +739,6 @@ namespace stonerkart
                 {
                     connection.sendAction(new CastSelection(pt.wrapper));
                     r.Add(pt.wrapper);
-                    Thread.Sleep(10);
                 }
             }
             else
