@@ -411,7 +411,7 @@ namespace stonerkart
             if (b)
             {
                 var unpathed = movers.ToList();
-                var occupado = new List<Tile>();
+                var occupado = activePlayer.field.Where(c => !c.canMove).Select(c => c.tile).ToList();
 
                 while (true)
                 {

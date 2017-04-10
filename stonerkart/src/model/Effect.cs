@@ -43,6 +43,18 @@ namespace stonerkart
             var ps = doer.filterCostRows(rs);
             return ps != null;
         }
+
+        public static Effect summonTokensEffect(params CardTemplate[] templates)
+        {
+            return new Effect(new TargetRuleSet(
+                new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                    templates),
+                new PryTileRule(t => t.card == null && !t.isEdgy,
+                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, templates.Length, false)),
+                new SummonToTileDoer(),
+                true
+                );
+        }
     }
 
     abstract class Doer : TypeSigned

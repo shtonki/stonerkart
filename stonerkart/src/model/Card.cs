@@ -420,6 +420,9 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Feral_sImp
+        Shotty_sContruct,
+        Houndmaster,
         Marilith,
         Seething_sRage,
         Ilas_sBargain,
@@ -472,6 +475,7 @@ namespace stonerkart
         Illegal_sGoblin_sLaboratory,
         Teleport,
         Squire,
+        Wolf,
         Call_sTo_sArms,
         Sanguine_sArtisan,
     }
@@ -506,6 +510,7 @@ namespace stonerkart
 
     internal enum Race
     {
+        Mecha,
         Human,
         Undead,
         Zombie,
@@ -513,6 +518,7 @@ namespace stonerkart
         Giant,
         Beast,
         Dragon,
+        Vampire,
     }
 
     internal enum Subtype
