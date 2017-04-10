@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Resounding_sBlast:
+                {
+                    return Resources.artResoundingBlast;
+                }
+
                 case CardTemplate.Feral_sImp:
                 {
                     return Resources.artFeralImp;
