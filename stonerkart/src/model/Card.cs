@@ -473,6 +473,7 @@ namespace stonerkart
         Teleport,
         Squire,
         Call_sTo_sArms,
+        Sanguine_sArtisan,
     }
 
     internal enum CardType
