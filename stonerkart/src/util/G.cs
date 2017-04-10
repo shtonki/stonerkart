@@ -252,8 +252,15 @@ namespace stonerkart
 
     static class LL
     {
-        public static Func<int, int, int> add { get; } = (a, b) => a + b;
-        public static Func<int, int, int> set { get; } = (a, b) => b;
+        public static Func<int, int> add(int i)
+        {
+            return v => v + i;
+        }
+
+        public static Func<int, int> set(int i)
+        {
+            return v => i;
+        }
 
         //card filters
         public static bool isCreature(Card c)

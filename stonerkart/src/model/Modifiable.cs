@@ -57,14 +57,14 @@ namespace stonerkart
             modifiers.Add(ms);
         }
 
-        public void modify(int v, Func<int, int, int> f, GameEventFilter fltr)
+        public void modify(Func<int, int> f, GameEventFilter fltr)
         {
-            modify(new ModifierStruct(v, f, fltr));
+            modify(new ModifierStruct(f, fltr));
         }
 
         public void modifyAdd(int v, GameEventFilter f)
         {
-            modify(v, (a, b) => a + b, f);
+            modify(prevVal => prevVal + v, f);
         }
 
         public void modifySubtract(int v, GameEventFilter f)
@@ -78,7 +78,7 @@ namespace stonerkart
 
             foreach (ModifierStruct m in modifiers)
             {
-                v = m.operation(v, m.modifier);
+                v = m.operation(v);
             }
 
             cachedValue = v;
@@ -104,13 +104,11 @@ namespace stonerkart
     }
     struct ModifierStruct
     {
-        public readonly int modifier;
-        public readonly Func<int, int, int> operation;
+        public readonly Func<int, int> operation;
         public readonly GameEventFilter filter;
 
-        public ModifierStruct(int modifier, Func<int, int, int> operation, GameEventFilter filter) : this()
+        public ModifierStruct(Func<int, int> operation, GameEventFilter filter)
         {
-            this.modifier = modifier;
             this.operation = operation;
             this.filter = filter;
         }

@@ -87,7 +87,7 @@ namespace stonerkart
                         addActivatedAbility(
                             String.Format("{2}{1}{1}, {0}: Your other white creatures get +1/+0 until end of turn.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Life), G.colourlessGlyph(1)),
                             new TargetRuleSet(new AllCardsRule(c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
-                            new ModifyDoer(ModifiableStats.Power, 1, LL.add, LL.endOfTurn),
+                            new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.endOfTurn),
                             new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
                             0,
                             PileLocation.Field,
@@ -179,7 +179,7 @@ namespace stonerkart
                             new SelectCardRule(new PryPlayerRule(p => true,
                                 new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                                 PileLocation.Hand, c => false, SelectCardRule.Mode.Resolver),
-                            new ModifyDoer(ModifiableStats.Movement, 0, LL.add, LL.clearAura)));
+                            new ModifyDoer(ModifiableStats.Movement, LL.add(0), LL.clearAura))); //ugliest hack i've seen in a while
                     castDescription = "Look at target players hand. Draw a card.";
 
                 }
@@ -556,7 +556,7 @@ namespace stonerkart
                     castRange = 4;
                     castEffect = new Effect(
                         new TargetRuleSet(new PryCardRule()),
-                        new ModifyDoer(ModifiableStats.Toughness, 3, LL.add, LL.never));
+                        new ModifyDoer(ModifiableStats.Toughness, LL.add(3), LL.never));
                     castDescription = "Target creature gains 3 toughness.";
 
                 }
@@ -580,7 +580,7 @@ namespace stonerkart
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
                             new ZepperDoer(-2));
                     additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1),
-                        new ModifyDoer(ModifiableStats.Power, 2, LL.add, LL.endOfTurn)));
+                        new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.endOfTurn)));
                     castDescription =
                         "Target creature is healed for 2 and gains 2 power until the end of this turn.";
                 } break;
@@ -735,11 +735,9 @@ namespace stonerkart
 
                     auras.Add(new Aura(
                         "This creature gets +1/+0 for each card in its controllers hand.",
-                        () => controller.hand.Count,
-                        LL.add,
-                        ModifiableStats.Power,
-                        c => c == this
-                        ));
+                        v => v + controller.hand.Count,
+                        ModifiableStats.Power, 
+                        c => c == this));
                 }
                     break;
 
@@ -761,8 +759,7 @@ namespace stonerkart
 
                     auras.Add(new Aura(
                         "This creature gets +1/+0 for each Zombie in its controllers graveyard.",
-                        () => controller.graveyard.Count(c => c.race == Race.Zombie),
-                        LL.add,
+                        v => v + controller.graveyard.Count(c => c.race == Race.Zombie),
                         ModifiableStats.Power,
                         c => c == this
                         ));
@@ -789,16 +786,14 @@ namespace stonerkart
 
                     auras.Add(new Aura(
                         "",
-                        () => controller.graveyard.Count >= 5 ? 2 : 0,
-                        LL.add,
+                        v => v + controller.graveyard.Count >= 5 ? 2 : 0,
                         ModifiableStats.Power,
                         c => c == this
                         ));
 
                     auras.Add(new Aura(
                         "This creature has gets +2/+2 as long as its controllers graveyard contains five or more cards.",
-                        () => controller.graveyard.Count >= 7 ? 2 : 0,
-                        LL.add,
+                        v => v + controller.graveyard.Count >= 7 ? 2 : 0,
                         ModifiableStats.Toughness,
                         c => c == this
                         ));
@@ -1077,7 +1072,7 @@ namespace stonerkart
 
                     castDescription = "Set target non-life creatures movement to 1.";
                     castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Life)),
-                        new ModifyDoer(ModifiableStats.Movement, 1, LL.set, LL.never));
+                        new ModifyDoer(ModifiableStats.Movement, LL.set(1), LL.never));
                     castRange = 4;
                 } break;
                 #endregion
@@ -1093,7 +1088,7 @@ namespace stonerkart
 
                         castDescription = "Reduce target non-death creatures movement by 2.";
                         castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Death)),
-                            new ModifyDoer(ModifiableStats.Movement, -2, LL.add, LL.never));
+                            new ModifyDoer(ModifiableStats.Movement, LL.add(-2), LL.never));
                         castRange = 4;
                     }
                     break;
@@ -1232,7 +1227,7 @@ namespace stonerkart
                             new TargetRuleSet(new PryCardRule(LL.isCreature)),
                             new FatigueDoer(false));
                     additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(0),
-                        new ModifyDoer(ModifiableStats.Power, 2, LL.add, LL.endOfTurn)));
+                        new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.endOfTurn)));
                     castRange = 3;
                 } break;
                 #endregion
@@ -1346,7 +1341,20 @@ namespace stonerkart
                 #endregion
 
                 #region Feral Imp
+                    case CardTemplate.Feral_sImp:
+                {
+                    race = Race.Demon;
+                    rarity = Rarity.Common;
 
+                    mightCost = 1;
+                    greyCost = 1;
+
+                    basePower = 2;
+                    baseToughness = 1;
+                    baseMovement = 3;
+
+                        keywordAbilities.Add(KeywordAbility.Fervor);
+                } break;
                 #endregion
 
                 #region tokens

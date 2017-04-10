@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Feral_sImp:
+                {
+                    return Resources.artFeralImp;
+                }
+
                 case CardTemplate.Shotty_sContruct:
                 {
                     return Resources.artShottyContruct;
