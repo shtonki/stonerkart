@@ -109,8 +109,9 @@ namespace stonerkart
                     baseMovement = 2;
                     basePower = 2;
                     baseToughness = 3;
-                    orderCost = 3;
-                    greyCost = 1;
+
+                    orderCost = 2;
+                    greyCost = 2;
 
                     addTriggeredAbility(
                         "Whenever this creature enters the battlefield under your control, draw two cards.",
@@ -435,7 +436,9 @@ namespace stonerkart
                     cardType = CardType.Channel;
                     rarity = Rarity.Common;
 
-                    orderCost = 2;
+                    orderCost = 1;
+                    greyCost = 1;
+
                     castRange = 5;
                     castEffect = new Effect(
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
@@ -568,7 +571,9 @@ namespace stonerkart
                     rarity = Rarity.Common;
 
                     castRange = 3;
-                    natureCost = 2;
+                    natureCost = 1;
+                    greyCost = 1;
+
                     castEffect =
                         new Effect(
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
@@ -610,9 +615,9 @@ namespace stonerkart
 
                     #endregion
 
-                    #region Huntress of Nibememe
+                    #region Huntress of Nibemem
 
-                case CardTemplate.Huntress_sOf_sNibememe:
+                case CardTemplate.Huntress_sOf_sNibemem:
                 {
                     cardType = CardType.Creature;
                     race = Race.Human;
@@ -1070,7 +1075,8 @@ namespace stonerkart
                     cardType = CardType.Channel;
                     rarity = Rarity.Common;
 
-                    lifeCost = 2;
+                    lifeCost = 1;
+                    greyCost = 1;
 
                     castDescription = "Set target non-life creatures movement to 1.";
                     castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Life)),
@@ -1085,7 +1091,8 @@ namespace stonerkart
                         cardType = CardType.Channel;
                         rarity = Rarity.Common;
 
-                        deathCost = 2;
+                        deathCost = 1;
+                        greyCost = 1;
 
                         castDescription = "Reduce target non-death creatures movement by 2.";
                         castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Death)),
@@ -1126,7 +1133,7 @@ namespace stonerkart
                     chaosCost = 2;
                     greyCost = 1;
 
-                    castDescription = "Deal 1 damage to and exhaust target creature.";
+                    castDescription = "Deal 1 damage to target creature then exhaust it.";
                     castEffect =
                         new Effect(
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
@@ -1138,12 +1145,12 @@ namespace stonerkart
                 #endregion
 
                 #region Reanimate Dead
-                case CardTemplate.Reanimate_sDead:
+                case CardTemplate.Raise_sDead:
                 {
                     cardType = CardType.Channel;
-                    rarity = Rarity.Rare;
+                    rarity = Rarity.Uncommon;
 
-                    deathCost = 3;
+                    deathCost = 2;
                     greyCost = 2;
 
                     castDescription = "Return a creature from your graveyard to the battlefield under your control.";
@@ -1202,6 +1209,7 @@ namespace stonerkart
                     rarity = Rarity.Uncommon;
 
                     lifeCost = 2;
+                    greyCost = 1;
 
                     castDescription = "Displace target exhausted non-heroic creature.";
                     castEffect =
@@ -1258,7 +1266,8 @@ namespace stonerkart
                     baseToughness = 3;
                     basePower = 3;
 
-                    mightCost = 3;
+                    mightCost = 2;
+                    greyCost = 1;
 
                     keywordAbilities.Add(KeywordAbility.Ambush);
                 } break;

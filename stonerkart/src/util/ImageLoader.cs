@@ -140,7 +140,7 @@ namespace stonerkart
                     return Resources.artAncientDruid;
                 }
 
-                case CardTemplate.Reanimate_sDead:
+                case CardTemplate.Raise_sDead:
                 {
                     return Resources.artRaiseDead;
                 }
@@ -250,7 +250,7 @@ namespace stonerkart
                     return Resources.artCallToArmsAlternate;
                 }
 
-                case CardTemplate.Huntress_sOf_sNibememe:
+                case CardTemplate.Huntress_sOf_sNibemem:
                 {
                     return Resources.artHuntress;
                 }
