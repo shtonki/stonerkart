@@ -707,14 +707,12 @@ namespace stonerkart
                         String.Format("{1}{1}, {0}: Each player discards a card.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Death)),
                         new TargetRuleSet(new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), PileLocation.Hand, c => true, SelectCardRule.Mode.Reflexive)),
                         new MoveToPileDoer(PileLocation.Graveyard),
-                        new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                            new FatigueDoer(true))),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death, ManaColour.Death)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Slow
                         );
-                }
-                    break;
+                } break;
 
                     #endregion
 
@@ -786,14 +784,14 @@ namespace stonerkart
 
                     auras.Add(new Aura(
                         "",
-                        v => v + controller.graveyard.Count >= 5 ? 2 : 0,
+                        v => v + (controller.graveyard.Count >= 5 ? 2 : 0),
                         ModifiableStats.Power,
                         c => c == this
                         ));
 
                     auras.Add(new Aura(
                         "This creature has gets +2/+2 as long as its controllers graveyard contains five or more cards.",
-                        v => v + controller.graveyard.Count >= 7 ? 2 : 0,
+                        v => v + (controller.graveyard.Count >= 5 ? 2 : 0),
                         ModifiableStats.Toughness,
                         c => c == this
                         ));
