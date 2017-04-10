@@ -233,8 +233,7 @@ namespace stonerkart
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
                             moveEvent.card.controller == controller &&
-                            moveEvent.to.location.pile == PileLocation.Field &&
-                            location.pile == PileLocation.Field),
+                            moveEvent.to.location.pile == PileLocation.Field),
                         0,
                         PileLocation.Field,
                         true,
@@ -1142,10 +1141,11 @@ namespace stonerkart
 
                     deathCost = 2;
                     greyCost = 2;
+                    castRange = 2;
 
                     castDescription = "Return a creature from your graveyard to the battlefield under your control.";
                     castEffect = new Effect(new TargetRuleSet(
-                        new CastSelectCardRule(new SelectCardRule(PileLocation.Graveyard, c => c.cardType == CardType.Creature)),
+                        new SelectCardRule(PileLocation.Graveyard, c => c.cardType == CardType.Creature),
                         new PryTileRule(t => t.card == null && !t.isEdgy,
                             new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
                         new SummonToTileDoer());
@@ -1490,7 +1490,7 @@ namespace stonerkart
         private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, bool optional, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
         {
             Effect e = new Effect(trs, doer);
-            addTriggeredAbility(description, e, cost, filter, castRange, activeIn, optional);
+            addTriggeredAbility(description, e, cost, filter, castRange, activeIn, optional, timing);
         }
 
         private void addTriggeredAbility(string description, Effect e, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, bool optional, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
