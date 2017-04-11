@@ -359,26 +359,8 @@ namespace stonerkart
 
             if (activePlayer.manaPool.max.orbs.Count() < 12)
             {
-                ManaOrbSelection selection;
-                if (activePlayer == hero)
-                {
-                    activePlayer.stuntMana();
-
-                    gameController.setPrompt("Gain mana nerd");
-                    ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.currentMana(o.colour) != 6);
-
-                    activePlayer.unstuntMana();
-
-                    selection = new ManaOrbSelection(v.colour);
-                    connection.sendAction(selection);
-                }
-                else
-                {
-                    gameController.setPrompt("Opponent is gaining mana");
-                    selection = connection.receiveAction<ManaOrbSelection>();
-                }
-
-                activePlayer.gainMana(selection.orb);
+                var mc = selectManaColour(activePlayer);
+                activePlayer.gainMana(mc);
             }
 
             priority();
@@ -1119,6 +1101,29 @@ namespace stonerkart
         private HackStruct makeHackStruct(Player castingPlayer, Ability resolvingAbility)
         {
             return new HackStruct(this, resolvingAbility, castingPlayer);
+        }
+
+        public ManaColour selectManaColour(Player chooser)
+        {
+            ManaOrbSelection selection;
+            if (chooser == hero)
+            {
+                activePlayer.stuntMana();
+
+                gameController.setPrompt("Gain mana nerd");
+                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.currentMana(o.colour) != 6);
+
+                activePlayer.unstuntMana();
+
+                selection = new ManaOrbSelection(v.colour);
+                connection.sendAction(selection);
+            }
+            else
+            {
+                gameController.setPrompt("Opponent is gaining mana");
+                selection = connection.receiveAction<ManaOrbSelection>();
+            }
+            return selection.orb;
         }
 
         private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)

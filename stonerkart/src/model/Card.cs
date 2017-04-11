@@ -63,6 +63,7 @@ namespace stonerkart
         public bool isHeroic { get; }
 
         public bool hasPT => cardType == CardType.Creature;
+        public bool hasMovenemt => cardType == CardType.Creature || cardType == CardType.Relic;
 
         public int power => Power;
         public int toughness => Toughness - damageTaken;
@@ -345,7 +346,7 @@ namespace stonerkart
                 if (e.tile.card != null) throw new Exception();
 
                 moveTo(e.tile);
-                if (!e.dontExhaust && !hasAbility(KeywordAbility.Fervor)) exhaust();
+                if (!e.dontExhaust && (cardType == CardType.Creature && !hasAbility(KeywordAbility.Fervor))) exhaust();
             }));
 
             r.add(new TypedGameEventHandler<FatigueEvent>(e =>
@@ -418,6 +419,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        missingo,
         Resounding_sBlast,
         Feral_sImp,
         Shotty_sContruct,
@@ -498,8 +500,8 @@ namespace stonerkart
 
     internal enum CastSpeed
     {
-        Instant,
-        Slow
+        Interrupt,
+        Channel
     }
 
     internal enum CardSet

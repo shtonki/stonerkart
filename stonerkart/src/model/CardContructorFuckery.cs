@@ -91,7 +91,7 @@ namespace stonerkart
                             new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
                             0,
                             PileLocation.Field,
-                            CastSpeed.Instant 
+                            CastSpeed.Interrupt 
                             );
                 }
                     break;
@@ -266,7 +266,7 @@ namespace stonerkart
                         new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Nature)),
                         3,
                         PileLocation.Field,
-                        CastSpeed.Instant
+                        CastSpeed.Interrupt
                         );
                 }
                     break;
@@ -314,7 +314,7 @@ namespace stonerkart
                         fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
                         0,
                         PileLocation.Field,
-                        CastSpeed.Instant
+                        CastSpeed.Interrupt
                         );
 
                 }
@@ -642,7 +642,7 @@ namespace stonerkart
                             new FatigueDoer(true))),
                         3,
                         PileLocation.Field,
-                        CastSpeed.Instant
+                        CastSpeed.Interrupt
                         );
                 }
                     break;
@@ -709,7 +709,7 @@ namespace stonerkart
                         new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death, ManaColour.Death)),
                         0,
                         PileLocation.Field,
-                        CastSpeed.Slow
+                        CastSpeed.Channel
                         );
                 } break;
 
@@ -823,7 +823,7 @@ namespace stonerkart
                         new Foo(LL.manaCost(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
                         2,
                         PileLocation.Graveyard,
-                        CastSpeed.Slow,
+                        CastSpeed.Channel,
                         true
                         );
                 }
@@ -1171,7 +1171,7 @@ namespace stonerkart
                         new Foo(LL.exhaustThis),
                         0,
                         PileLocation.Field,
-                        CastSpeed.Instant
+                        CastSpeed.Interrupt
                         );
                 }break;
                 #endregion
@@ -1385,6 +1385,23 @@ namespace stonerkart
                 } break;
                 #endregion
 
+                case CardTemplate.missingo:
+                {
+                    cardType = CardType.Relic;
+
+                    baseMovement = 1;
+
+                        addActivatedAbility(
+                            "",
+                            new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                            new DrawCardsDoer(1),
+                            new Foo(LL.exhaustThis),
+                            0,
+                            PileLocation.Field, 
+                            CastSpeed.Interrupt 
+                            );
+                } break;
+
                 #region tokens
 
                 #region Squire
@@ -1451,15 +1468,15 @@ namespace stonerkart
 
             if (cardType == CardType.Interrupt)
             {
-                castSpeed = CastSpeed.Instant;
+                castSpeed = CastSpeed.Interrupt;
             }
             else if (cardType == CardType.Channel)
             {
-                castSpeed = CastSpeed.Slow;
+                castSpeed = CastSpeed.Channel;
             }
             else if (cardType == CardType.Creature || cardType == CardType.Relic)
             {
-                castSpeed = CastSpeed.Slow;
+                castSpeed = CastSpeed.Channel;
                 castRange = 2;
                 castEffect = new Effect(new TargetRuleSet(
                     new CardResolveRule(CardResolveRule.Rule.ResolveCard),

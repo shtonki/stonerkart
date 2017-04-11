@@ -46,7 +46,7 @@ namespace stonerkart
 
     class ActivatedAbility : Ability
     {
-        public bool isInstant => castSpeed == CastSpeed.Instant;
+        public bool isInstant => castSpeed == CastSpeed.Interrupt;
 
         private CastSpeed castSpeed;
 

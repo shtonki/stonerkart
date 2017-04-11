@@ -172,11 +172,14 @@ namespace stonerkart
 
                         Brush filler = card.owner.isHero ? Brushes.Green : Brushes.Red;
 
-                        if (card.hasPT)
+                        if (card.hasMovenemt)
                         {
                             g.FillEllipse(filler, vxR, vy, a, b);
                             g.DrawString(card.movement.ToString().PadLeft(2), f, Brushes.Black, vxR + xp, vy + yp);
+                        }
 
+                        if (card.hasPT)
+                        {
                             g.FillEllipse(filler, vxL, vy, a, b);
                             g.DrawString(card.toughness.ToString().PadLeft(2), f, Brushes.Black, vxL + xp, vy + yp);
 
