@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Moratian_sBattle_sStandard:
+                {
+                    return Resources.artMoratianBattleStandard;
+                }
+
                 case CardTemplate.Seraph:
                 {
                     return Resources.artSeraph;

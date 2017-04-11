@@ -598,6 +598,7 @@ namespace stonerkart
             {
                 foreach (Aura a in c.auras)
                 {
+                    if (c.location.pile != a.activeIn) continue;
                     foreach (Card affected in cards.Where(a.filter))
                     {
                         ae.Add(new ModifyEvent(affected, a.stat, a.modifer));

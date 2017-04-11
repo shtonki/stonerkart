@@ -425,17 +425,19 @@ namespace stonerkart
         public string description { get; }
         public ModifiableStats stat { get; }
         public Func<Card, bool> filter { get; }
+        public PileLocation activeIn { get; }
 
         private Func<int, int> fn;
 
         public ModifierStruct modifer => new ModifierStruct(fn, LL.clearAura);
 
-        public Aura(string description, Func<int, int> fn, ModifiableStats stat, Func<Card, bool> filter)
+        public Aura(string description, Func<int, int> fn, ModifiableStats stat, Func<Card, bool> filter, PileLocation activeIn)
         {
             this.fn = fn;
             this.description = description;
             this.stat = stat;
             this.filter = filter;
+            this.activeIn = activeIn;
         }
     }
 
@@ -444,6 +446,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Moratian_sBattle_sStandard,
         Seraph,
         Chromatic_sUnicorn,
         Enraged_sDragon,

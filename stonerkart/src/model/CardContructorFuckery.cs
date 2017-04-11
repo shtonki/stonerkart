@@ -84,15 +84,18 @@ namespace stonerkart
                 basePower = 2;
                 baseToughness = 25;
 
-                    addActivatedAbility(
-                        String.Format("{2}{1}{1}, {0}: Your other white creatures get +1/+0 until end of turn.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Life), G.colourlessGlyph(1)),
-                        new TargetRuleSet(new AllCardsRule(c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
-                        new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.endOfTurn),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
-                        0,
-                        PileLocation.Field,
-                        CastSpeed.Interrupt 
-                        );
+                addActivatedAbility(
+                    String.Format("{2}{1}{1}, {0}: Your other white creatures get +1/+0 until end of turn. {3}",
+                        G.exhaustGhyph, G.colouredGlyph(ManaColour.Life), G.colourlessGlyph(1), G.channelOnly),
+                    new TargetRuleSet(
+                        new AllCardsRule(
+                            c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
+                    new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.endOfTurn),
+                    new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
+                    0,
+                    PileLocation.Field,
+                    CastSpeed.Channel
+                    );
             }
                 break;
 
@@ -695,7 +698,8 @@ namespace stonerkart
                     "This creature gets +1/+0 for each card in its controllers hand.",
                     v => v + controller.hand.Count,
                     ModifiableStats.Power, 
-                    c => c == this));
+                    c => c == this, 
+                    PileLocation.Field));
             }
                 break;
 
@@ -718,7 +722,8 @@ namespace stonerkart
                     "This creature gets +1/+0 for each Zombie in its controllers graveyard.",
                     v => v + controller.graveyard.Count(c => c.race == Race.Zombie),
                     ModifiableStats.Power,
-                    c => c == this
+                    c => c == this,
+                    PileLocation.Field
                     ));
             }
                 break;
@@ -744,14 +749,16 @@ namespace stonerkart
                     "",
                     v => v + (controller.graveyard.Count >= 5 ? 2 : 0),
                     ModifiableStats.Power,
-                    c => c == this
+                    c => c == this,
+                    PileLocation.Field
                     ));
 
                 auras.Add(new Aura(
                     "This creature has gets +2/+2 as long as its controllers graveyard contains five or more cards.",
                     v => v + (controller.graveyard.Count >= 5 ? 2 : 0),
                     ModifiableStats.Toughness,
-                    c => c == this
+                    c => c == this,
+                    PileLocation.Field
                     ));
             }
                 break;
@@ -1277,7 +1284,8 @@ namespace stonerkart
                     baseToughness = 1;
                     baseMovement = 3;
 
-                        keywordAbilities.Add(KeywordAbility.Fervor);
+                    keywordAbilities.Add(KeywordAbility.Fervor);
+                    keywordAbilities.Add(KeywordAbility.Flying);
                 } break;
                 #endregion
                 #region Resounding Blast
@@ -1673,13 +1681,17 @@ namespace stonerkart
                         "",
                         v => v + (owner.game.allPlayers.SelectMany(p => p.graveyard.cards).SelectMany(c => c.colours).Where(c => c != ManaColour.Colourless).Distinct().Count()),
                         ModifiableStats.Power,
-                        c => c == this));
+                        c => c == this,
+                        PileLocation.Field
+                        ));
 
                     auras.Add(new Aura(
                         "This creature gets +1/+1 for each colour among cards in Graveyards.",
                         v => v + (owner.game.allPlayers.SelectMany(p => p.graveyard.cards).SelectMany(c => c.colours).Where(c => c != ManaColour.Colourless).Distinct().Count()),
                         ModifiableStats.Toughness,
-                        c => c == this));
+                        c => c == this,
+                        PileLocation.Field
+                        ));
 
                 } break;
                 #endregion
@@ -1723,6 +1735,32 @@ namespace stonerkart
 
                 } break;
                 #endregion
+                #region Moratian Battle Standard
+                case CardTemplate.Moratian_sBattle_sStandard:
+                {
+                    cardType = CardType.Relic;
+                    rarity = Rarity.Uncommon;
+
+                    lifeCost = 1;
+                    greyCost = 2;
+
+                    auras.Add(new Aura("",
+                        LL.add(1),
+                        ModifiableStats.Toughness,
+                        c => c.controller == this.controller && !c.isHeroic && c.isColour(ManaColour.Life),
+                        PileLocation.Field
+                        ));
+
+                    auras.Add(new Aura("Your non-heroic Life creatures get +1/+1",
+                        LL.add(1),
+                        ModifiableStats.Power,
+                        c => c.controller == this.controller && !c.isHeroic && c.isColour(ManaColour.Life),
+                        PileLocation.Field
+                        ));
+                } break;
+                #endregion
+
+
                 #region tokens
                 #region Spirit
                 case CardTemplate.Spirit:
