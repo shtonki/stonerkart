@@ -254,6 +254,8 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artFlamekindler.png" />
+    <None Include="Resources\artSparryz.png" />
     <None Include="Resources\artMoratianBattleStandard.png" />
     <None Include="Resources\artTarantula.png" />
     <None Include="Resources\artVibrantZinnia.png" />

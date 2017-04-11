@@ -446,6 +446,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Sparryz,
+        Flamekindler,
         Moratian_sBattle_sStandard,
         Seraph,
         Chromatic_sUnicorn,

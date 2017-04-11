@@ -110,6 +110,16 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Sparryz:
+                {
+                    return Resources.artSparryz;
+                }
+
+                case CardTemplate.Flamekindler:
+                {
+                    return Resources.artFlamekindler;
+                }
+
                 case CardTemplate.Moratian_sBattle_sStandard:
                 {
                     return Resources.artMoratianBattleStandard;

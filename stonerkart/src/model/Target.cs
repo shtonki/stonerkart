@@ -873,6 +873,11 @@ namespace stonerkart
                 {
                     return new TargetColumn(hs.cards.Where(crd => crd.isHeroic && crd.controller != hs.resolveCard.controller));
                 }
+
+                case Rule.AllHeroes:
+                {
+                    return new TargetColumn(hs.cards.Where(crd => crd.isHeroic));
+                }
             }
             throw new Exception();
         }
@@ -886,7 +891,7 @@ namespace stonerkart
         {
             ResolveControllerCard,
             ResolveCard,
-            
+            AllHeroes,
             VillainHeroes,
         }
     }

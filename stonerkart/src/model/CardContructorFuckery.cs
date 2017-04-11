@@ -664,7 +664,7 @@ namespace stonerkart
                 forceColour = ManaColour.Death;
 
                 baseMovement = 2;
-                basePower = 2;
+                basePower = 1;
                 baseToughness = 20;
 
                 addActivatedAbility(
@@ -1751,12 +1751,69 @@ namespace stonerkart
                         PileLocation.Field
                         ));
 
-                    auras.Add(new Aura("Your non-heroic Life creatures get +1/+1",
+                    auras.Add(new Aura("Your non-heroic Life creatures get +1/+1.",
                         LL.add(1),
                         ModifiableStats.Power,
                         c => c.controller == this.controller && !c.isHeroic && c.isColour(ManaColour.Life),
                         PileLocation.Field
                         ));
+                } break;
+                #endregion
+                #region Flamekindler
+                case CardTemplate.Flamekindler:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Human;
+                    subtype = Subtype.Wizard;
+                    rarity = Rarity.Rare;
+
+                    chaosCost = 2;
+
+                    basePower = 0;
+                    baseToughness = 3;
+                    baseMovement = 2;
+
+                    addActivatedAbility(
+                        String.Format(
+                            "{0}, {1}, Displace a Channel or Interrupt card from your Graveyard: Deal 2 damage to target Creature within 5 tiles.",
+                            G.colouredGlyph(ManaColour.Chaos), G.exhaustGhyph),
+                        zepLambda(2),
+                        new Foo(
+                            LL.manaCost(ManaColour.Chaos),
+                            displaceFromGraveyard(c => c.cardType == CardType.Channel || c.cardType == CardType.Interrupt),
+                            LL.exhaustThis),
+                        5,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
+                } break;
+                #endregion
+                #region Sparryz
+                case CardTemplate.Sparryz:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Demon;
+                    subtype = Subtype.Wizard;
+                    rarity = Rarity.Legendary;
+                    isHeroic = true;
+                    forceColour = ManaColour.Chaos;
+
+                    baseMovement = 2;
+                    basePower = 1;
+                    baseToughness = 20;
+
+                    addActivatedAbility(
+                        String.Format("{1}{1}, {0}: Deal 2 damage to all heroic creatures.",
+                            G.exhaustGhyph, G.colouredGlyph(ManaColour.Chaos)),
+                        new TargetRuleSet(
+                            new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new CardResolveRule(CardResolveRule.Rule.AllHeroes)),
+                        new ZepperDoer(2),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Chaos, ManaColour.Chaos)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
                 } break;
                 #endregion
 
