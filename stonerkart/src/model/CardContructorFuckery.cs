@@ -1592,7 +1592,8 @@ namespace stonerkart
                     race = Race.Mecha;
                     rarity = Rarity.Common;
 
-                    //greyCost = 2;
+                    greyCost = 2;
+
                     basePower = 1;
                     baseToughness = 2;
                     baseMovement = 4;
@@ -1601,6 +1602,26 @@ namespace stonerkart
                 } break;
                 #endregion
 
+                #region Famished Tarantula
+                case CardTemplate.Famished_sTarantula:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Beast;
+                    rarity = Rarity.Common;
+
+                    basePower = 1;
+                    baseToughness = 3;
+                    baseMovement = 3;
+
+                    natureCost = 2;
+                    greyCost = 1;
+
+                    deathtouchLambda();
+
+                    keywordAbilities.Add(KeywordAbility.Wingclipper);
+
+                } break;
+                #endregion
                 #region tokens
 
                 #region Gryphon
@@ -1760,6 +1781,20 @@ namespace stonerkart
             return
                 new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule(c => c.cardType == CardType.Creature)),
                     new ZepperDoer(damage));
+        }
+
+        public void deathtouchLambda()
+        {
+            addTriggeredAbility(
+                        "Whenever this creature deals damage to a non-heroic creature destroy it.",
+                        new TargetRuleSet(new TriggeredTargetRule<DamageEvent, Card>(de => de.target)),
+                        new MoveToPileDoer(PileLocation.Graveyard),
+                        new Foo(),
+                        new TypedGameEventFilter<DamageEvent>(de => de.source == this && !de.target.isHeroic),
+                        0,
+                        PileLocation.Field,
+                        false
+                        );
         }
 
         public Effect sacThisLambda =>

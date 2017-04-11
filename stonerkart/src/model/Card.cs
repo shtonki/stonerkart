@@ -444,6 +444,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Famished_sTarantula,
         Vibrant_sZinnia,
         Ancient_sChopter,
         Stark_sLily,

@@ -110,6 +110,11 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Famished_sTarantula:
+                {
+                    return Resources.artTarantula;
+                }
+
                 case CardTemplate.Vibrant_sZinnia:
                 {
                     return Resources.artVibrantZinnia;
