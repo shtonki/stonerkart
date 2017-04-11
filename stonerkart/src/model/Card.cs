@@ -444,6 +444,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Bubastis,
+        Morenian_sMedic,
         Famished_sTarantula,
         Vibrant_sZinnia,
         Ancient_sChopter,

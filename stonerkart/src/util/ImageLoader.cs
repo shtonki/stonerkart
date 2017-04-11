@@ -110,6 +110,16 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Bubastis:
+                {
+                    return Resources.artBubastis;
+                }
+
+                case CardTemplate.Morenian_sMedic:
+                {
+                    return Resources.artMorenianMedic;
+                }
+
                 case CardTemplate.Famished_sTarantula:
                 {
                     return Resources.artTarantula;

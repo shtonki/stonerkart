@@ -257,7 +257,7 @@ namespace stonerkart
 
                     addActivatedAbility(
                         String.Format("{1}, {0}: Exhaust another target creature within 3 tiles.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Nature)),
-                        new TargetRuleSet(new PryCardRule(c => c != this)),
+                        new TargetRuleSet(new PryCardRule(c => c.cardType == CardType.Creature && c != this)),
                         new FatigueDoer(true),
                         new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Nature)),
                         3,
@@ -330,9 +330,7 @@ namespace stonerkart
                     greyCost = 1;
 
                     castEffect =
-                        new Effect(
-                            new TargetRuleSet(new PryCardRule(c => !c.isHeroic,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                        new Effect(LL.nonheroicCreature,
                             new MoveToPileDoer(PileLocation.Hand));
                     castDescription = "Return target non-heroic creature to its owner's hand.";
                 }
@@ -872,9 +870,7 @@ namespace stonerkart
 
                     castDescription = "Destroy target non-heroic creature.";
                     castEffect =
-                        new Effect(
-                            new PryCardRule(c => !c.isHeroic,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new Effect(LL.nonheroicCreature,
                             new MoveToPileDoer(PileLocation.Graveyard));
                     castRange = 4;
                 }
@@ -893,9 +889,7 @@ namespace stonerkart
 
                     castDescription = "Destroy target relic.";
                     castEffect =
-                        new Effect(
-                            new PryCardRule(c => c.cardType == CardType.Relic,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new Effect(LL.relic,
                             new MoveToPileDoer(PileLocation.Graveyard));
                     castRange = 6;
                 }
@@ -908,10 +902,10 @@ namespace stonerkart
                 case CardTemplate.Gotterdammerung:
                 {
                     cardType = CardType.Channel;
-                    rarity = Rarity.Rare;
+                    rarity = Rarity.Uncommon;
 
                     lifeCost = 3;
-                    greyCost = 4;
+                    greyCost = 3;
 
                     castDescription = "Destroy all non-heroic creatures";
                     castEffect =
@@ -938,7 +932,7 @@ namespace stonerkart
 
                     addTriggeredAbility(
                         "Whenever Rider of Death enters the battlefield you may destroy target non-heroic creature.",
-                        new TargetRuleSet(new PryCardRule(c => !c.isHeroic)),
+                        new TargetRuleSet(LL.nonheroicCreature),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(
@@ -1053,7 +1047,7 @@ namespace stonerkart
                 } break;
                 #endregion
 
-                #region Chains of Gold
+                #region Chains of Virtue
                     case CardTemplate.Chains_sof_sVirtue:
                 {
                     cardType = CardType.Channel;
@@ -1063,13 +1057,13 @@ namespace stonerkart
                     greyCost = 2;
 
                     castDescription = "Set target non-life creatures movement to 1.";
-                    castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Life)),
+                    castEffect = new Effect(LL.nonColouredCreature(ManaColour.Life),
                         new ModifyDoer(ModifiableStats.Movement, LL.set(1), LL.never));
                     castRange = 4;
                 } break;
                 #endregion
 
-                #region Chains of Iron
+                #region Chains of Sin
                 case CardTemplate.Chains_sof_sSin:
                     {
                         cardType = CardType.Channel;
@@ -1079,7 +1073,7 @@ namespace stonerkart
                         greyCost = 1;
 
                         castDescription = "Reduce target non-death creatures movement by 2. This cannot reduce the targets movement below 1.";
-                        castEffect = new Effect(new PryCardRule(c => !c.isColour(ManaColour.Death)),
+                        castEffect = new Effect(LL.nonColouredCreature(ManaColour.Death),
                             new ModifyDoer(ModifiableStats.Movement, v => Math.Max(Math.Min(v, 1), v - 2), LL.never));
                         castRange = 4;
                     }
@@ -1098,9 +1092,7 @@ namespace stonerkart
 
                         castDescription = "Destroy target relic.";
                         castEffect =
-                            new Effect(
-                                new PryCardRule(c => c.cardType == CardType.Relic,
-                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                            new Effect(LL.relic,
                                 new MoveToPileDoer(PileLocation.Graveyard));
                         castRange = 6;
                     } break;
@@ -1191,13 +1183,12 @@ namespace stonerkart
                     rarity = Rarity.Uncommon;
 
                     lifeCost = 2;
-                    greyCost = 1;
+                    greyCost = 2;
 
                     castDescription = "Displace target exhausted non-heroic creature.";
                     castEffect =
                         new Effect(
-                            new PryCardRule(c => !c.isHeroic && c.isExhausted,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                            new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && c.isExhausted),
                             new MoveToPileDoer(PileLocation.Displaced));
                     castRange = 4;
                 } break;
@@ -1214,7 +1205,7 @@ namespace stonerkart
                     castDescription = "Return all movement to target creature and give it +2/+0 until end of turn.";
                     castEffect =
                         new Effect(
-                            new TargetRuleSet(new PryCardRule(LL.isCreature)),
+                            new TargetRuleSet(LL.creature),
                             new FatigueDoer(false));
                     additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(0),
                         new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.endOfTurn)));
@@ -1273,7 +1264,7 @@ namespace stonerkart
                         addTriggeredAbility(
                             "Whenever a creature enters the graveyard from the battlefield under your control, Sanguine Artisan deals 1 damage to target heroic creature.",
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                                new PryCardRule(c => c.isHeroic)),
+                                LL.player),
                             new ZepperDoer(1),
                             new Foo(),
                             new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
@@ -1567,7 +1558,7 @@ namespace stonerkart
                             );
 
 
-                        Effect e1 = new Effect(new PryCardRule(LL.isNonheroicCreature),
+                        Effect e1 = new Effect(LL.nonheroicCreature,
                             new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.never));
                         Effect e2 = new Effect(new CopyPreviousRule<Card>(0),
                             new ModifyDoer(ModifiableStats.Toughness, LL.add(2), LL.never));
@@ -1619,6 +1610,38 @@ namespace stonerkart
                     deathtouchLambda();
 
                     keywordAbilities.Add(KeywordAbility.Wingclipper);
+
+                } break;
+                #endregion
+
+                #region Morenian Medic
+                case CardTemplate.Morenian_sMedic:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Human;
+                    subtype = Subtype.Warrior;
+                    rarity = Rarity.Uncommon;
+
+                    basePower = 2;
+                    baseToughness = 2;
+                    baseMovement = 2;
+
+                    lifeCost = 2;
+
+                    etbLambda(
+                        "When Morenian Medic enters the battlefield restore 2 toughness to target creature within 3 tiles.",
+                        zepLambda(-2), 3);
+
+                } break;
+                #endregion
+
+                #region Bubastis
+                case CardTemplate.Bubastis:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Beast;
+                    rarity = Rarity.Legendary;
+
 
                 } break;
                 #endregion
@@ -1779,8 +1802,23 @@ namespace stonerkart
         public Effect zepLambda(int damage)
         {
             return
-                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule(c => c.cardType == CardType.Creature)),
+                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.creature),
                     new ZepperDoer(damage));
+        }
+
+        public void etbLambda(String description, Effect e, int range)
+        {
+            addTriggeredAbility(
+                        description, 
+                        e,
+                        new Foo(),
+                        new TypedGameEventFilter<MoveToPileEvent>(
+                            moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
+                        range,
+                        PileLocation.Field,
+                        false,
+                        TriggeredAbility.Timing.Post
+                        );
         }
 
         public void deathtouchLambda()

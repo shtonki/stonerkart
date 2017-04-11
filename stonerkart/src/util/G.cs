@@ -262,17 +262,17 @@ namespace stonerkart
             return v => i;
         }
 
-        //card filters
-        public static bool isCreature(Card c)
-        {
-            return c.cardType == CardType.Creature;
-        }
+        public static TargetRule player => new PryCardRule(c => c.isHeroic);
+        public static TargetRule relic => new PryCardRule(c => c.cardType == CardType.Relic);
 
-        public static bool isNonheroicCreature(Card c)
-        {
-            return c.cardType == CardType.Creature && !c.isHeroic;
-        }
+        public static TargetRule creature => new PryCardRule(c => c.cardType == CardType.Creature);
 
+        public static TargetRule nonheroicCreature => new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic);
+
+        public static TargetRule nonColouredCreature(ManaColour notAllowed)
+        {
+            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));
+        }
 
         //costs
         public static Effect manaCost(ManaSet castManaCost)
