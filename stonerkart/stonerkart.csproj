@@ -254,6 +254,16 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artFlamekindler.png" />
+    <None Include="Resources\artSparryz.png" />
+    <None Include="Resources\artMoratianBattleStandard.png" />
+    <None Include="Resources\artTarantula.png" />
+    <None Include="Resources\artVibrantZinnia.png" />
+    <None Include="Resources\artChopter.png" />
+    <None Include="Resources\artStartLily.png" />
+    <None Include="Resources\artGryphon.png" />
+    <None Include="Resources\artSereneDandelion.png" />
+    <None Include="Resources\artSolemnLotus.png" />
     <None Include="Resources\artResoundingBlast.png" />
     <None Include="Resources\artFeralImp.png" />
     <None Include="Resources\artShottyContruct.png" />

@@ -170,19 +170,38 @@ namespace stonerkart
         }
     }
 
+    class ForceStaticModifyDoer : SimpleDoer
+    {
+        public ModifiableStats modifiableStats;
+        private Func<Func<int, int>> f;
+        private GameEventFilter until;
+
+        public ForceStaticModifyDoer(ModifiableStats modifiableStats, Func<Func<int, int>> f, GameEventFilter until) : base(typeof(Card))
+        {
+            this.modifiableStats = modifiableStats;
+            this.f = f;
+            this.until = until;
+        }
+
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        {
+            Card card = (Card)row[0];
+            var fn = f();
+            return new GameEvent[] { new ModifyEvent(card, modifiableStats, new ModifierStruct(fn, until)) };
+        }
+    }
+
     class GainBonusManaDoer : SimpleDoer
     {
-        public IEnumerable<ManaColour> colour;
-
-        public GainBonusManaDoer(params ManaColour[] colour) : base(typeof(Player))
+        public GainBonusManaDoer() : base(typeof(Player), typeof(ManaOrb))
         {
-            this.colour = colour;
         }
 
         protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow ts)
         {
             Player p = (Player)ts[0];
-            return colour.Select(c => new GainBonusManaEvent(p, c)).Cast<GameEvent>().ToArray();
+            ManaOrb o = (ManaOrb)ts[1];
+            return new GameEvent[] { new GainBonusManaEvent(p, o) };
         }
     }
 

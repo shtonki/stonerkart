@@ -111,7 +111,7 @@ namespace stonerkart
                 }
                 else if (card.cardType == CardType.Relic)
                 {
-                    castRangeSlashMovementBox.Text = "";
+                    castRangeSlashMovementBox.Text = card.movement.ToString();
                     powerBox.Text = "";
                     toughnessBox.Text = "";
                     autoFontTextBox1.Text = "";

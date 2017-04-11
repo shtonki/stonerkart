@@ -14,7 +14,7 @@ namespace stonerkart
         public bool heroIsCasting => hero == castingPlayer;
         public Func<CardTemplate, Player, Card> createToken;
 
-        public Tile castFrom => !resolveAbility.isCastAbility ? resolveAbility.card.tile : hero.heroCard.tile;
+        public Tile castFrom => !resolveAbility.isCastAbility ? (resolveAbility.card.tile ?? resolveAbility.card.lastSeenAt) : hero.heroCard.tile;
         public int castRange => resolveAbility.castRange;
 
         public Func<Card, int> ordC { get; }
@@ -43,6 +43,7 @@ namespace stonerkart
 
         //ui stuff
         public Func<Stuff> getStuff { get; }
+        public Func<Player, Func<ManaOrb, bool>, ManaColour> selectColour { get; }
         private Action<string, ButtonOption[]> _setPrompt { get; }
 
         public Action clearHighlights { get; }
@@ -70,6 +71,7 @@ namespace stonerkart
             highlight = g.gameController.highlight;
             createToken = g.createToken;
             players = g.allPlayers;
+            selectColour = g.selectManaColour;
         }
 
         public HackStruct(Game g, Player p) : this(g)

@@ -110,6 +110,106 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Sparryz:
+                {
+                    return Resources.artSparryz;
+                }
+
+                case CardTemplate.Flamekindler:
+                {
+                    return Resources.artFlamekindler;
+                }
+
+                case CardTemplate.Moratian_sBattle_sStandard:
+                {
+                    return Resources.artMoratianBattleStandard;
+                }
+
+                case CardTemplate.Seraph:
+                {
+                    return Resources.artSeraph;
+                }
+
+                case CardTemplate.Chromatic_sUnicorn:
+                {
+                    return Resources.artChromaticUnicorn;
+                }
+
+                case CardTemplate.Enraged_sDragon:
+                {
+                    return Resources.artStampedingDragon;
+                }
+
+                case CardTemplate.Haunted_sChapel:
+                {
+                    return Resources.artHauntedChapel;
+                }
+
+                case CardTemplate.Unyeilding_sStalwart:
+                {
+                    return Resources.artUnyeildingStalwart;
+                }
+
+                case CardTemplate.Spirit:
+                {
+                    return Resources.artSpirit;
+                }
+
+                case CardTemplate.Bubastis:
+                {
+                    return Resources.artBubastis;
+                }
+
+                case CardTemplate.Morenian_sMedic:
+                {
+                    return Resources.artMorenianMedic;
+                }
+
+                case CardTemplate.Famished_sTarantula:
+                {
+                    return Resources.artTarantula;
+                }
+
+                case CardTemplate.Vibrant_sZinnia:
+                {
+                    return Resources.artVibrantZinnia;
+                }
+
+                case CardTemplate.Ancient_sChopter:
+                {
+                    return Resources.artAncientChopter;
+                }
+
+                case CardTemplate.Stark_sLily:
+                {
+                    return Resources.artStarkLily;
+                }
+                
+                case CardTemplate.Gryphon:
+                {
+                    return Resources.artGryphon;
+                }
+
+                case CardTemplate.Serene_sDandelion:
+                {
+                    return Resources.artSereneDandelion;
+                }
+
+                case CardTemplate.Mysterious_sLilac:
+                {
+                    return Resources.artMysteriousLilac;
+                }
+
+                case CardTemplate.Daring_sPoppy:
+                {
+                    return Resources.artDaringPoppy;
+                }
+
+                case CardTemplate.Solemn_sLotus:
+                {
+                    return Resources.artSolemnLotus;
+                }
+
                 case CardTemplate.Resounding_sBlast:
                 {
                     return Resources.artResoundingBlast;

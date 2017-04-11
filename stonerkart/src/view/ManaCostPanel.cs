@@ -49,7 +49,7 @@ namespace stonerkart
                 Image i = G.ResizeImage(b, dw, dh);
                 g.DrawImage(i, new PointF(w - j * dw - dw, 0));
                 var v1 = Math.Max(1, w - j*dw - dw + dw*0.1f);
-                var v2 = Math.Max(1, -0.1f * dh);
+                var v2 = -0.1f * dh;
                 var v3 = Math.Max(1, dw * 0.75f);
                 g.DrawString(colourless.ToString(), new Font(new FontFamily("Arial"), v3), Brushes.Black, v1, v2);
             }

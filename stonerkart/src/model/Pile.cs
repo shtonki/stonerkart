@@ -12,6 +12,7 @@ namespace stonerkart
         public readonly Location location;
 
         private List<Card> cardList = new List<Card>();
+        public IEnumerable<Card> cards => cardList;
 
         public int Count => cardList.Count;
 

@@ -57,21 +57,6 @@ namespace stonerkart
             modifiers.Add(ms);
         }
 
-        public void modify(Func<int, int> f, GameEventFilter fltr)
-        {
-            modify(new ModifierStruct(f, fltr));
-        }
-
-        public void modifyAdd(int v, GameEventFilter f)
-        {
-            modify(prevVal => prevVal + v, f);
-        }
-
-        public void modifySubtract(int v, GameEventFilter f)
-        {
-            modifyAdd(-v, f);
-        }
-
         public void recount()
         {
             int v = baseValue;

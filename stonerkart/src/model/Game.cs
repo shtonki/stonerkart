@@ -162,7 +162,7 @@ namespace stonerkart
 
             baseHandler.add(new TypedGameEventHandler<GainBonusManaEvent>(e =>
             {
-                e.player.gainBonusMana(e.colour);
+                e.player.gainBonusMana(e.orb.colour);
             }));
 
             baseHandler.add(new TypedGameEventHandler<ShuffleDeckEvent>(e =>
@@ -359,26 +359,8 @@ namespace stonerkart
 
             if (activePlayer.manaPool.max.orbs.Count() < 12)
             {
-                ManaOrbSelection selection;
-                if (activePlayer == hero)
-                {
-                    activePlayer.stuntMana();
-
-                    gameController.setPrompt("Gain mana nerd");
-                    ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.currentMana(o.colour) != 6);
-
-                    activePlayer.unstuntMana();
-
-                    selection = new ManaOrbSelection(v.colour);
-                    connection.sendAction(selection);
-                }
-                else
-                {
-                    gameController.setPrompt("Opponent is gaining mana");
-                    selection = connection.receiveAction<ManaOrbSelection>();
-                }
-
-                activePlayer.gainMana(selection.orb);
+                var mc = selectManaColour(activePlayer, o => activePlayer.manaPool.currentMana(o.colour) != 6);
+                activePlayer.gainMana(mc);
             }
 
             priority();
@@ -616,6 +598,7 @@ namespace stonerkart
             {
                 foreach (Aura a in c.auras)
                 {
+                    if (c.location.pile != a.activeIn) continue;
                     foreach (Card affected in cards.Where(a.filter))
                     {
                         ae.Add(new ModifyEvent(affected, a.stat, a.modifer));
@@ -985,10 +968,20 @@ namespace stonerkart
                 activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
             }
 
-            if (activatableAbilities.Length > 1) throw new NotImplementedException();
             if (activatableAbilities.Length == 0) return null;
+            if (activatableAbilities.Length > 1)
+            {
+                var v = activatableAbilities.Select(a => a.createDummy()).ToList();
+                var sl = selectCardFromCards(v, true, 1, crd => true).ToArray();
+                if (sl.Length == 0) return null;
+                int i = v.IndexOf(sl[0]);
+                r = activatableAbilities[i];
+            }
+            else
+            {
+                r = activatableAbilities[0];
+            }
 
-            r = activatableAbilities[0];
             if (!r.possible(makeHackStruct(r))) return null;
 
             return r;
@@ -1119,6 +1112,29 @@ namespace stonerkart
         private HackStruct makeHackStruct(Player castingPlayer, Ability resolvingAbility)
         {
             return new HackStruct(this, resolvingAbility, castingPlayer);
+        }
+
+        public ManaColour selectManaColour(Player chooser, Func<ManaOrb, bool> f)
+        {
+            ManaOrbSelection selection;
+            if (chooser == hero)
+            {
+                activePlayer.stuntMana();
+
+                gameController.setPrompt("Gain mana nerd");
+                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(f);
+
+                activePlayer.unstuntMana();
+
+                selection = new ManaOrbSelection(v.colour);
+                connection.sendAction(selection);
+            }
+            else
+            {
+                gameController.setPrompt("Opponent is gaining mana");
+                selection = connection.receiveAction<ManaOrbSelection>();
+            }
+            return selection.orb;
         }
 
         private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)

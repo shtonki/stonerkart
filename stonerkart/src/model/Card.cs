@@ -15,7 +15,21 @@ namespace stonerkart
     {
         public string name { get; }
         public Pile pile { get; private set; }
-        public Tile tile { get; set; }
+
+        public Tile tile
+        {
+            get { return Tile; } 
+            set
+            {
+                Tile = value;
+                if (Tile != null)
+                {
+                    lastSeenAt = Tile;
+                }
+            }
+        }
+        private Tile Tile;
+        public Tile lastSeenAt;
         public Player owner { get; }
         public Player controller { get; }
         public CardTemplate template { get; }
@@ -63,6 +77,7 @@ namespace stonerkart
         public bool isHeroic { get; }
 
         public bool hasPT => cardType == CardType.Creature;
+        public bool hasMovenemt => cardType == CardType.Creature || cardType == CardType.Relic;
 
         public int power => Power;
         public int toughness => Toughness - damageTaken;
@@ -94,12 +109,13 @@ namespace stonerkart
             return d;
         }
 
-        public bool canMove => movement > 0;
+        public bool canMove => cardType == CardType.Creature && movement > 0;
 
         public bool canAttack(Card defender)
         {
             if (defender.cardType != CardType.Creature) return false;
-
+            if (defender.hasAbility(KeywordAbility.Flying) &&
+                !(this.hasAbility(KeywordAbility.Flying) || this.hasAbility(KeywordAbility.Wingclipper))) return false;
             return true;
         }
 
@@ -154,7 +170,7 @@ namespace stonerkart
         {
             if (forceColour.HasValue) return new List<ManaColour>(new[] {forceColour.Value});
             HashSet<ManaColour> hs = new HashSet<ManaColour>(castManaCost.colours.Where(x => x != ManaColour.Colourless));
-            if (hs.Count == 0) return new List<ManaColour>(new[] {ManaColour.Colourless});
+            if (hs.Count == 0) return new List<ManaColour>(new ManaColour[] { ManaColour.Colourless });
 
             return hs.ToList();
         }
@@ -274,6 +290,16 @@ namespace stonerkart
                 {
                     return "When attacking this creature deals damage prior to the defender and is not retaliated against if it kills the defender.";
                 }
+
+                case KeywordAbility.Flying:
+                {
+                    return "Can only be attacked by creatures with Flying";
+                } 
+
+                case KeywordAbility.Wingclipper:
+                {
+                    return "Can attack creatures with Flying.";
+                }
             }
 
             return "";
@@ -345,7 +371,7 @@ namespace stonerkart
                 if (e.tile.card != null) throw new Exception();
 
                 moveTo(e.tile);
-                if (!e.dontExhaust && !hasAbility(KeywordAbility.Fervor)) exhaust();
+                if (!e.dontExhaust && (cardType == CardType.Creature && !hasAbility(KeywordAbility.Fervor))) exhaust();
             }));
 
             r.add(new TypedGameEventHandler<FatigueEvent>(e =>
@@ -399,17 +425,19 @@ namespace stonerkart
         public string description { get; }
         public ModifiableStats stat { get; }
         public Func<Card, bool> filter { get; }
+        public PileLocation activeIn { get; }
 
         private Func<int, int> fn;
 
         public ModifierStruct modifer => new ModifierStruct(fn, LL.clearAura);
 
-        public Aura(string description, Func<int, int> fn, ModifiableStats stat, Func<Card, bool> filter)
+        public Aura(string description, Func<int, int> fn, ModifiableStats stat, Func<Card, bool> filter, PileLocation activeIn)
         {
             this.fn = fn;
             this.description = description;
             this.stat = stat;
             this.filter = filter;
+            this.activeIn = activeIn;
         }
     }
 
@@ -418,6 +446,24 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Sparryz,
+        Flamekindler,
+        Moratian_sBattle_sStandard,
+        Seraph,
+        Chromatic_sUnicorn,
+        Enraged_sDragon,
+        Haunted_sChapel,
+        Unyeilding_sStalwart,
+        Bubastis,
+        Morenian_sMedic,
+        Famished_sTarantula,
+        Vibrant_sZinnia,
+        Ancient_sChopter,
+        Stark_sLily,
+        Serene_sDandelion,
+        Daring_sPoppy,
+        Mysterious_sLilac,
+        Solemn_sLotus,
         Resounding_sBlast,
         Feral_sImp,
         Shotty_sContruct,
@@ -474,6 +520,8 @@ namespace stonerkart
         Illegal_sGoblin_sLaboratory,
         Teleport,
         Squire,
+        Spirit,
+        Gryphon,
         Wolf,
         Call_sTo_sArms,
         Sanguine_sArtisan,
@@ -498,8 +546,8 @@ namespace stonerkart
 
     internal enum CastSpeed
     {
-        Instant,
-        Slow
+        Interrupt,
+        Channel
     }
 
     internal enum CardSet
@@ -509,6 +557,7 @@ namespace stonerkart
 
     internal enum Race
     {
+        Angel,
         Demon,
         Mecha,
         Human,
@@ -523,6 +572,7 @@ namespace stonerkart
 
     internal enum Subtype
     {
+        Guardian,
         Warrior,
         Wizard,
         Cleric,
@@ -535,5 +585,7 @@ namespace stonerkart
         Elusion,
         Kingslayer,
         Ambush,
+        Flying,
+        Wingclipper,
     }
 }

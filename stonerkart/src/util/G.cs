@@ -220,6 +220,8 @@ namespace stonerkart
 
         public static string exhaustGhyph => "Exhaust";
 
+        public const string channelOnly = "Use this only when you could cast a Channel.";
+
         public static IEnumerable<int> range(int min, int max)
         {
             int[] r = new int[max - min];
@@ -262,17 +264,25 @@ namespace stonerkart
             return v => i;
         }
 
-        //card filters
-        public static bool isCreature(Card c)
+        public static TargetRule player => new PryCardRule(c => c.isHeroic);
+        public static TargetRule relic => new PryCardRule(c => c.cardType == CardType.Relic);
+
+        public static TargetRule creature(Func<Card, bool> filter = null)
         {
-            return c.cardType == CardType.Creature;
+            filter = filter ?? (c => true);
+            return new PryCardRule(c => c.cardType == CardType.Creature && filter(c));
         }
 
-        public static bool isNonheroicCreature(Card c)
+        public static TargetRule nonheroicCreature(Func<Card, bool> filter = null)
         {
-            return c.cardType == CardType.Creature && !c.isHeroic;
+            filter = filter ?? (c =>true);
+            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));
         }
 
+        public static TargetRule nonColouredCreature(ManaColour notAllowed)
+        {
+            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));
+        }
 
         //costs
         public static Effect manaCost(ManaSet castManaCost)
@@ -286,6 +296,8 @@ namespace stonerkart
         {
             return manaCost(new ManaSet(ms));
         }
+
+        
 
         public static Effect exhaustThis { get; } =
             new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),

@@ -40,12 +40,12 @@ namespace stonerkart
     struct GainBonusManaEvent : GameEvent
     {
         public Player player { get; }
-        public ManaColour colour { get; }
+        public ManaOrb orb { get; }
 
-        public GainBonusManaEvent(Player player, ManaColour colour)
+        public GainBonusManaEvent(Player player, ManaOrb orb)
         {
             this.player = player;
-            this.colour = colour;
+            this.orb = orb;
         }
     }
 

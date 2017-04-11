@@ -172,7 +172,7 @@
   <data name="artBelwas" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Belwas.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="artBelwasGambit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="artSeraph" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BelwasGambit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="artBubastis" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -292,7 +292,7 @@
   <data name="artMattysGambit" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MattysGambit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="artmemes" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="artUnyeildingStalwart" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\memes.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="artMeteorRain" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -504,5 +504,35 @@
   </data>
   <data name="artResoundingBlast" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artResoundingBlast.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artSolemnLotus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artSolemnLotus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artGryphon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artGryphon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artSereneDandelion" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artSereneDandelion.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artStarkLily" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artStartLily.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artAncientChopter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artChopter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artVibrantZinnia" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artVibrantZinnia.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artTarantula" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artTarantula.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artMoratianBattleStandard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artMoratianBattleStandard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artFlamekindler" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artFlamekindler.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artSparryz" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artSparryz.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
