@@ -95,7 +95,7 @@ namespace stonerkart
             return d;
         }
 
-        public bool canMove => movement > 0;
+        public bool canMove => cardType == CardType.Creature && movement > 0;
 
         public bool canAttack(Card defender)
         {
@@ -419,7 +419,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
-        missingo,
+        Solemn_sLotus,
         Resounding_sBlast,
         Feral_sImp,
         Shotty_sContruct,

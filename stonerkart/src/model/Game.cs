@@ -162,7 +162,7 @@ namespace stonerkart
 
             baseHandler.add(new TypedGameEventHandler<GainBonusManaEvent>(e =>
             {
-                e.player.gainBonusMana(e.colour);
+                e.player.gainBonusMana(e.orb.colour);
             }));
 
             baseHandler.add(new TypedGameEventHandler<ShuffleDeckEvent>(e =>
@@ -359,7 +359,7 @@ namespace stonerkart
 
             if (activePlayer.manaPool.max.orbs.Count() < 12)
             {
-                var mc = selectManaColour(activePlayer);
+                var mc = selectManaColour(activePlayer, o => activePlayer.manaPool.currentMana(o.colour) != 6);
                 activePlayer.gainMana(mc);
             }
 
@@ -967,10 +967,20 @@ namespace stonerkart
                 activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
             }
 
-            if (activatableAbilities.Length > 1) throw new NotImplementedException();
             if (activatableAbilities.Length == 0) return null;
+            if (activatableAbilities.Length > 1)
+            {
+                var v = activatableAbilities.Select(a => a.createDummy()).ToList();
+                var sl = selectCardFromCards(v, true, 1, crd => true).ToArray();
+                if (sl.Length == 0) return null;
+                int i = v.IndexOf(sl[0]);
+                r = activatableAbilities[i];
+            }
+            else
+            {
+                r = activatableAbilities[0];
+            }
 
-            r = activatableAbilities[0];
             if (!r.possible(makeHackStruct(r))) return null;
 
             return r;
@@ -1103,7 +1113,7 @@ namespace stonerkart
             return new HackStruct(this, resolvingAbility, castingPlayer);
         }
 
-        public ManaColour selectManaColour(Player chooser)
+        public ManaColour selectManaColour(Player chooser, Func<ManaOrb, bool> f)
         {
             ManaOrbSelection selection;
             if (chooser == hero)
@@ -1111,7 +1121,7 @@ namespace stonerkart
                 activePlayer.stuntMana();
 
                 gameController.setPrompt("Gain mana nerd");
-                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(o => activePlayer.manaPool.currentMana(o.colour) != 6);
+                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(f);
 
                 activePlayer.unstuntMana();
 

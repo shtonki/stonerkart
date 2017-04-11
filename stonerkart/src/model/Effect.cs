@@ -172,17 +172,15 @@ namespace stonerkart
 
     class GainBonusManaDoer : SimpleDoer
     {
-        public IEnumerable<ManaColour> colour;
-
-        public GainBonusManaDoer(params ManaColour[] colour) : base(typeof(Player))
+        public GainBonusManaDoer() : base(typeof(Player), typeof(ManaOrb))
         {
-            this.colour = colour;
         }
 
         protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow ts)
         {
             Player p = (Player)ts[0];
-            return colour.Select(c => new GainBonusManaEvent(p, c)).Cast<GameEvent>().ToArray();
+            ManaOrb o = (ManaOrb)ts[1];
+            return new GameEvent[] { new GainBonusManaEvent(p, o) };
         }
     }
 

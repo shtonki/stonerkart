@@ -10,6 +10,7 @@ namespace stonerkart
 {
     partial class Card
     {
+
         public Card(CardTemplate ct, Player owner = null)
         {
             template = ct;
@@ -460,8 +461,11 @@ namespace stonerkart
                     natureCost = 1;
 
                     castEffect =
-                        new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                            new GainBonusManaDoer(ManaColour.Nature, ManaColour.Nature, ManaColour.Nature));
+                        new Effect
+                        (new TargetRuleSet(
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                            new StaticManaRule(ManaColour.Nature, ManaColour.Nature, ManaColour.Nature)),
+                            new GainBonusManaDoer());
                     castDescription = String.Format("You gain {0}{0}{0} until the end of the step.",
                         G.colouredGlyph(ManaColour.Nature));
                 }
@@ -704,7 +708,7 @@ namespace stonerkart
 
                     addActivatedAbility(
                         String.Format("{1}{1}, {0}: Each player discards a card.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Death)),
-                        new TargetRuleSet(new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), PileLocation.Hand, c => true, SelectCardRule.Mode.Reflexive)),
+                        new TargetRuleSet(new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), PileLocation.Hand, c => true, SelectCardRule.Mode.Reflective)),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death, ManaColour.Death)),
                         0,
@@ -1166,8 +1170,8 @@ namespace stonerkart
 
                     addActivatedAbility(
                         String.Format("{0}: Gain {1} until end of step.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Nature)),
-                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                        new GainBonusManaDoer(ManaColour.Nature),
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new StaticManaRule(ManaColour.Nature)),
+                        new GainBonusManaDoer(),
                         new Foo(LL.exhaustThis),
                         0,
                         PileLocation.Field,
@@ -1234,7 +1238,7 @@ namespace stonerkart
                 case CardTemplate.Ilas_sBargain:
                 {
                     cardType = CardType.Channel;
-                    rarity = Rarity.Rare;
+                    rarity = Rarity.Uncommon;
 
                     deathCost = 2;
 
@@ -1242,7 +1246,7 @@ namespace stonerkart
                         "As an additional cost to casting this card sacrifice a non-heroic creature. Draw two cards.";
                     castEffect = new Effect(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                         new DrawCardsDoer(2));
-                    additionalCastCosts.Add(sacLambda);
+                    additionalCastCosts.Add(sacCostLambda);
                 } break;
                 #endregion
 
@@ -1385,21 +1389,36 @@ namespace stonerkart
                 } break;
                 #endregion
 
-                case CardTemplate.missingo:
+                case CardTemplate.Solemn_sLotus:
                 {
                     cardType = CardType.Relic;
+                    rarity = Rarity.Common;
+
+                    deathCost = 1;
 
                     baseMovement = 1;
 
-                        addActivatedAbility(
-                            "",
-                            new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                            new DrawCardsDoer(1),
-                            new Foo(LL.exhaustThis),
-                            0,
-                            PileLocation.Field, 
-                            CastSpeed.Interrupt 
-                            );
+                    addActivatedAbility(
+                        String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
+                            G.colouredGlyph(ManaColour.Death), G.exhaustGhyph),
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                            new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                        new GainBonusManaDoer(),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
+                        
+                    addActivatedAbility(
+                        String.Format("{0}{0}, {1}, Sacrifice Solemn Lotus: Target player sacrifices a non-heroic creature.", G.colouredGlyph(ManaColour.Death), G.exhaustGhyph),
+                        playerSacLambda(new PryPlayerRule()),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death, ManaColour.Death), sacThisLambda),
+                        -1,
+                        PileLocation.Field, 
+                        CastSpeed.Channel
+                        );
+
                 } break;
 
                 #region tokens
@@ -1519,6 +1538,11 @@ namespace stonerkart
         private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed, bool alternateCast = false)
         {
             Effect e = new Effect(trs, doer);
+            addActivatedAbility(description, e, cost, castRange, activeIn, castSpeed, alternateCast);
+        }
+
+        private void addActivatedAbility(string description, Effect e, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed, bool alternateCast = false)
+        {
             ActivatedAbility aa = new ActivatedAbility(this, activeIn, castRange, cost, castSpeed, description, e);
             abilities.Add(aa);
             if (alternateCast) alternateCasts.Add(aa);
@@ -1530,13 +1554,23 @@ namespace stonerkart
             return new Foo(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                 new ManaCostRule(cs)), new PayManaDoer()));
         }
+        
+        public Effect sacThisLambda =>
+            new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new MoveToPileDoer(PileLocation.Graveyard));
 
-        public Effect sacLambda
+        public Effect sacCostLambda
             =>
                 new Effect(
                     new PryCardRule(
                         c => !c.isHeroic && c.controller == this.controller && c.cardType == CardType.Creature),
                     new MoveToPileDoer(PileLocation.Graveyard));
+
+
+        public Effect playerSacLambda(TargetRule sacrificer)
+        {
+            return new Effect(new SelectCardRule(sacrificer, PileLocation.Field, c => c.cardType == CardType.Creature && !c.isHeroic, SelectCardRule.Mode.Reflective),
+                new MoveToPileDoer(PileLocation.Graveyard));
+        }
 
     }
 }

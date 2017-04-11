@@ -154,6 +154,59 @@ namespace stonerkart
         public abstract TargetColumn possible(HackStruct hs);
     }
 
+    class SelectManaRule : TargetRule
+    {
+        private TargetRule playerRule;
+
+        public SelectManaRule(TargetRule playerRule) : base(typeof(ManaOrb))
+        {
+            this.playerRule = playerRule;
+        }
+
+        public override TargetColumn? fillCastTargets(HackStruct f)
+        {
+            return playerRule.fillCastTargets(f);
+        }
+
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        {
+            var selectingPlayers = playerRule.fillResolveTargets(hs, c).Value;
+            return
+                new TargetColumn(
+                    selectingPlayers.targets.Cast<Player>().Select(p => new ManaOrb(hs.selectColour(p, clr => true))));
+        }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return new TargetColumn(Enum.GetValues(typeof (ManaColour)).Cast<ManaColour>().Select(c => new ManaOrb(c)));
+        }
+    }
+
+    class StaticManaRule : TargetRule
+    {
+        private ManaColour[] colours;
+
+        public StaticManaRule(params ManaColour[] colours) : base(typeof(ManaOrb))
+        {
+            this.colours = colours;
+        }
+
+        public override TargetColumn? fillCastTargets(HackStruct f)
+        {
+            return TargetColumn.empty;
+        }
+
+        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        {
+            return new TargetColumn(colours.Select(clr => new ManaOrb(clr)));
+        }
+
+        public override TargetColumn possible(HackStruct hs)
+        {
+            return new TargetColumn(Enum.GetValues(typeof(ManaColour)).Cast<ManaColour>().Select(c => new ManaOrb(c)));
+        }
+    }
+
     class TriggeredTargetRule<G, T> : TargetRule where T : Targetable where G : GameEvent
     {
         private Func<G, T> func;
@@ -259,7 +312,7 @@ namespace stonerkart
 
     class SelectCardRule : TargetRule
     {
-        public enum Mode { Resolver, Reflexive}
+        public enum Mode { Resolver, Reflective}
 
         private TargetRule pg;
         private PileLocation l;
@@ -282,7 +335,7 @@ namespace stonerkart
         }
         */
         /*
-        public SelectCardRule(PileLocation l, Func<Card, bool> filter = null, TargetRule pg = null, Mode mode = Mode.Reflexive) : base(typeof(Card))
+        public SelectCardRule(PileLocation l, Func<Card, bool> filter = null, TargetRule pg = null, Mode mode = Mode.Reflective) : base(typeof(Card))
         {
             this.pg = pg ?? new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController);
             this.l = l;
@@ -342,7 +395,7 @@ namespace stonerkart
                 Card crd;
 
                 Player seer;
-                if (mode == Mode.Reflexive)
+                if (mode == Mode.Reflective)
                 {
                     seer = p;
                 }

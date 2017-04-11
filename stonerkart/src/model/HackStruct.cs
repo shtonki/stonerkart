@@ -43,7 +43,7 @@ namespace stonerkart
 
         //ui stuff
         public Func<Stuff> getStuff { get; }
-        public Func<Player, ManaColour> selectColour { get; }
+        public Func<Player, Func<ManaOrb, bool>, ManaColour> selectColour { get; }
         private Action<string, ButtonOption[]> _setPrompt { get; }
 
         public Action clearHighlights { get; }
