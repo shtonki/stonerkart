@@ -143,16 +143,6 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap artBelwasGambit {
-            get {
-                object obj = ResourceManager.GetObject("artBelwasGambit", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         public static System.Drawing.Bitmap artBubastis {
             get {
                 object obj = ResourceManager.GetObject("artBubastis", resourceCulture);
@@ -926,6 +916,16 @@ namespace stonerkart.Properties {
         public static System.Drawing.Bitmap artSebasGambit {
             get {
                 object obj = ResourceManager.GetObject("artSebasGambit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artSeraph {
+            get {
+                object obj = ResourceManager.GetObject("artSeraph", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -444,6 +444,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Seraph,
         Chromatic_sUnicorn,
         Enraged_sDragon,
         Haunted_sChapel,
@@ -551,6 +552,7 @@ namespace stonerkart
 
     internal enum Race
     {
+        Angel,
         Demon,
         Mecha,
         Human,
@@ -565,6 +567,7 @@ namespace stonerkart
 
     internal enum Subtype
     {
+        Guardian,
         Warrior,
         Wizard,
         Cleric,

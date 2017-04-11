@@ -1610,7 +1610,7 @@ namespace stonerkart
                 case CardTemplate.Haunted_sChapel:
                 {
                     cardType = CardType.Relic;
-                    rarity = Rarity.Rare;
+                    rarity = Rarity.Uncommon;
 
                     lifeCost = 1;
                     deathCost = 1;
@@ -1644,7 +1644,7 @@ namespace stonerkart
                     greyCost = 2;
 
                     addActivatedAbility(
-                        "",
+                        String.Format("{0}: Enraged Dragon gets +1/+0 until end of turn.", G.colouredGlyph(ManaColour.Chaos)),
                         new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                             new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.endOfTurn)),
                         new Foo(LL.manaCost(ManaColour.Chaos)),
@@ -1683,8 +1683,46 @@ namespace stonerkart
 
                 } break;
                 #endregion
+                #region Seraph
+                case CardTemplate.Seraph:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Angel;
+                    subtype = Subtype.Guardian;
+                    rarity = Rarity.Common;
 
+                    baseToughness = 2;
+                    basePower = 1;
+                    baseMovement = 4;
 
+                    lifeCost = 3;
+                    greyCost = 2;
+
+                    Func<Func<int, int>> grtr = () =>
+                    {
+                        int i = controller.field.cards.Where(c => c.cardType == CardType.Creature && !c.isHeroic).Count();
+                        return v => v + i;
+                    };
+
+                    Effect e1 = new Effect(
+                        new CardResolveRule(CardResolveRule.Rule.ResolveCard), new ForceStaticModifyDoer(ModifiableStats.Power, 
+                        grtr, 
+                        LL.never)
+                        );
+
+                    Effect e2 = new Effect(
+                        new CardResolveRule(CardResolveRule.Rule.ResolveCard), new ForceStaticModifyDoer(ModifiableStats.Toughness,
+                        grtr,
+                        LL.never)
+                        );
+
+                    etbLambda("When Seraph enters the battlefield it gets +1/+1 for every non-heroic you control.",
+                        new Effect[] {e1, e2});
+
+                    keywordAbilities.Add(KeywordAbility.Flying);
+
+                } break;
+                #endregion
                 #region tokens
                 #region Spirit
                 case CardTemplate.Spirit:
@@ -1820,6 +1858,12 @@ namespace stonerkart
             abilities.Add(ta);
         }
 
+        private void addTriggeredAbility(string description, Effect[] es, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, bool optional, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
+        {
+            TriggeredAbility ta = new TriggeredAbility(this, activeIn, es, castRange, cost, filter, optional, timing, description);
+            abilities.Add(ta);
+        }
+
         private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed, bool alternateCast = false)
         {
             Effect e = new Effect(trs, doer);
@@ -1859,6 +1903,21 @@ namespace stonerkart
             addTriggeredAbility(
                         description, 
                         e,
+                        new Foo(),
+                        new TypedGameEventFilter<MoveToPileEvent>(
+                            moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
+                        range,
+                        PileLocation.Field,
+                        optional,
+                        TriggeredAbility.Timing.Post
+                        );
+        }
+
+        public void etbLambda(String description, Effect[] es, int range = -1, bool optional = false)
+        {
+            addTriggeredAbility(
+                        description,
+                        es,
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(
                             moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),

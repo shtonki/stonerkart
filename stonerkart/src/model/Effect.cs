@@ -170,6 +170,27 @@ namespace stonerkart
         }
     }
 
+    class ForceStaticModifyDoer : SimpleDoer
+    {
+        public ModifiableStats modifiableStats;
+        private Func<Func<int, int>> f;
+        private GameEventFilter until;
+
+        public ForceStaticModifyDoer(ModifiableStats modifiableStats, Func<Func<int, int>> f, GameEventFilter until) : base(typeof(Card))
+        {
+            this.modifiableStats = modifiableStats;
+            this.f = f;
+            this.until = until;
+        }
+
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        {
+            Card card = (Card)row[0];
+            var fn = f();
+            return new GameEvent[] { new ModifyEvent(card, modifiableStats, new ModifierStruct(fn, until)) };
+        }
+    }
+
     class GainBonusManaDoer : SimpleDoer
     {
         public GainBonusManaDoer() : base(typeof(Player), typeof(ManaOrb))
