@@ -1629,6 +1629,62 @@ namespace stonerkart
                         CastSpeed.Channel);
                 } break;
                 #endregion
+                #region Enraged Dragon
+                case CardTemplate.Enraged_sDragon:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Dragon;
+                    rarity = Rarity.Common;
+
+                    basePower = 1;
+                    baseToughness = 4;
+                    baseMovement = 4;
+
+                    chaosCost = 1;
+                    greyCost = 2;
+
+                    addActivatedAbility(
+                        "",
+                        new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.endOfTurn)),
+                        new Foo(LL.manaCost(ManaColour.Chaos)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
+
+                    keywordAbilities.Add(KeywordAbility.Flying);
+                } break;
+                #endregion
+                #region Chromatic Unicorn
+                case CardTemplate.Chromatic_sUnicorn:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Beast;
+                    rarity = Rarity.Uncommon;
+
+                    natureCost = 2;
+
+                    basePower = 1;
+                    baseToughness = 2;
+                    baseMovement = 3;
+
+                    auras.Add(new Aura(
+                        "",
+                        v => v + (owner.game.allPlayers.SelectMany(p => p.graveyard.cards).SelectMany(c => c.colours).Where(c => c != ManaColour.Colourless).Distinct().Count()),
+                        ModifiableStats.Power,
+                        c => c == this));
+
+                    auras.Add(new Aura(
+                        "This creature gets +1/+1 for each colour among cards in Graveyards.",
+                        v => v + (owner.game.allPlayers.SelectMany(p => p.graveyard.cards).SelectMany(c => c.colours).Where(c => c != ManaColour.Colourless).Distinct().Count()),
+                        ModifiableStats.Toughness,
+                        c => c == this));
+
+                } break;
+                #endregion
+
+
                 #region tokens
                 #region Spirit
                 case CardTemplate.Spirit:
@@ -1864,6 +1920,6 @@ namespace stonerkart
             return new Effect(new SelectCardRule(sacrificer, PileLocation.Field, c => c.cardType == CardType.Creature && !c.isHeroic, SelectCardRule.Mode.Reflective),
                 new MoveToPileDoer(PileLocation.Graveyard));
         }
-
+        
     }
 }

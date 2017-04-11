@@ -110,6 +110,16 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Chromatic_sUnicorn:
+                {
+                    return Resources.artChromaticUnicorn;
+                }
+
+                case CardTemplate.Enraged_sDragon:
+                {
+                    return Resources.artStampedingDragon;
+                }
+
                 case CardTemplate.Haunted_sChapel:
                 {
                     return Resources.artHauntedChapel;

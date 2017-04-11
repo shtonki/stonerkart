@@ -170,7 +170,7 @@ namespace stonerkart
         {
             if (forceColour.HasValue) return new List<ManaColour>(new[] {forceColour.Value});
             HashSet<ManaColour> hs = new HashSet<ManaColour>(castManaCost.colours.Where(x => x != ManaColour.Colourless));
-            if (hs.Count == 0) return new List<ManaColour>(new[] {ManaColour.Colourless});
+            if (hs.Count == 0) return new List<ManaColour>(new ManaColour[] { ManaColour.Colourless });
 
             return hs.ToList();
         }
@@ -444,6 +444,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Chromatic_sUnicorn,
+        Enraged_sDragon,
         Haunted_sChapel,
         Unyeilding_sStalwart,
         Bubastis,
