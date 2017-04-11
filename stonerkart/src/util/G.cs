@@ -220,6 +220,8 @@ namespace stonerkart
 
         public static string exhaustGhyph => "Exhaust";
 
+        public const string channelOnly = "Use this only when you could cast a Channel.";
+
         public static IEnumerable<int> range(int min, int max)
         {
             int[] r = new int[max - min];
@@ -265,9 +267,17 @@ namespace stonerkart
         public static TargetRule player => new PryCardRule(c => c.isHeroic);
         public static TargetRule relic => new PryCardRule(c => c.cardType == CardType.Relic);
 
-        public static TargetRule creature => new PryCardRule(c => c.cardType == CardType.Creature);
+        public static TargetRule creature(Func<Card, bool> filter = null)
+        {
+            filter = filter ?? (c => true);
+            return new PryCardRule(c => c.cardType == CardType.Creature && filter(c));
+        }
 
-        public static TargetRule nonheroicCreature => new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic);
+        public static TargetRule nonheroicCreature(Func<Card, bool> filter = null)
+        {
+            filter = filter ?? (c =>true);
+            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));
+        }
 
         public static TargetRule nonColouredCreature(ManaColour notAllowed)
         {
@@ -286,6 +296,8 @@ namespace stonerkart
         {
             return manaCost(new ManaSet(ms));
         }
+
+        
 
         public static Effect exhaustThis { get; } =
             new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),

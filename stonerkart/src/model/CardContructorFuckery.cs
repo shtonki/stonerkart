@@ -43,860 +43,820 @@ namespace stonerkart
 
             switch (ct)
             {
-                    #region Illegal Goblin Laboratory
-
-                case CardTemplate.Illegal_sGoblin_sLaboratory:
-                {
-                    cardType = CardType.Relic;
-                    rarity = Rarity.Uncommon;
-
-                    chaosCost = 2;
-                    greyCost = 1;
-
-                    addTriggeredAbility(
-                        "At the end of your turn deal 1 damage to every enemy player.",
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                            new CardResolveRule(CardResolveRule.Rule.VillainHeroes)),
-                        new ZepperDoer(1),
-                        new Foo(),
-                        new TypedGameEventFilter<StartOfStepEvent>(
-                            e => e.step == Steps.End && e.activePlayer == controller),
-                        0,
-                        PileLocation.Field,
-                        false
-                        );
-                }
-                    break;
-
-                    #endregion
-
-                    #region Belwas
-
-                case CardTemplate.Belwas:
-                {
-                    cardType = CardType.Creature;
-                    race = Race.Human;
-                    subtype = Subtype.Warrior;
-                    rarity = Rarity.Legendary;
-                    isHeroic = true;
-                    forceColour = ManaColour.Life;
-
-                    baseMovement = 2;
-                    basePower = 2;
-                    baseToughness = 25;
-
-                        addActivatedAbility(
-                            String.Format("{2}{1}{1}, {0}: Your other white creatures get +1/+0 until end of turn.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Life), G.colourlessGlyph(1)),
-                            new TargetRuleSet(new AllCardsRule(c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
-                            new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.endOfTurn),
-                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
-                            0,
-                            PileLocation.Field,
-                            CastSpeed.Interrupt 
-                            );
-                }
-                    break;
-
-                    #endregion
-
-                    #region Kappa
-
-                case CardTemplate.Kappa:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Uncommon;
-                    race = Race.Beast;
-
-                    baseMovement = 2;
-                    basePower = 2;
-                    baseToughness = 3;
-
-                    orderCost = 2;
-                    greyCost = 2;
-
-                    addTriggeredAbility(
-                        "Whenever this creature enters the battlefield under your control, draw two cards.",
-                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                        new DrawCardsDoer(2),
-                        new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(
-                            moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
-                        0,
-                        PileLocation.Field,
-                        false,
-                        TriggeredAbility.Timing.Post
-                        );
-
-                }
-                    break;
-
-                    #endregion
-
-                    #region Yung Lich
-
-                case CardTemplate.Yung_sLich:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Rare;
-                    race = Race.Undead;
-                    subtype = Subtype.Wizard;
-
-                    baseMovement = 2;
-                    basePower = 2;
-                    baseToughness = 2;
-                    orderCost = 1;
-                    deathCost = 1;
-                    addTriggeredAbility(
-                        "Whenever this creature enters the graveyard from the battlefield under your control, draw a card.",
-                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                        new DrawCardsDoer(1),
-                        new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(
-                            moveEvent =>
-                                moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard &&
-                                location.pile == PileLocation.Field),
-                        0,
-                        PileLocation.Field,
-                        false
-                        );
-                }
-                    break;
-
-                    #endregion
-
-                    #region Cantrip
-
-                case CardTemplate.Cantrip:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Common;
-
-                    orderCost = 1;
-                    castEffect =
-                        new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                            new DrawCardsDoer(1));
-                    additionalCastEffects.Add(
-                        new Effect(
-                            new SelectCardRule(new PryPlayerRule(p => true,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                                PileLocation.Hand, c => false, SelectCardRule.Mode.Resolver),
-                            new ModifyDoer(ModifiableStats.Movement, LL.add(0), LL.clearAura))); //ugliest hack i've seen in a while
-                    castDescription = "Look at target players hand. Draw a card.";
-
-                }
-                    break;
-
-                    #endregion
-
-                    #region Zap
-
-                case CardTemplate.Zap:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Common;
-
-                    castRange = 3;
-                    chaosCost = 1;
-
-                    castEffect = zepLambda(2);
-                    castDescription = "Deal 2 damage to target creature.";
-                }
-                    break;
-
-                    #endregion
-
-                    #region Temple Healer
-
-                case CardTemplate.Temple_sHealer:
-                {
-                    cardType = CardType.Creature;
-                    race = Race.Human;
-                    subtype = Subtype.Cleric;
-                    rarity = Rarity.Uncommon;
-
-                    basePower = 3;
-                    baseToughness = 4;
-                    baseMovement = 3;
-
-                    lifeCost = 2;
-                    greyCost = 2;
-
-                    addTriggeredAbility(
-                        "Whenever a creature enters the battlefield under your control, you may restore 1 toughness to your hero.",
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                            new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
-                        new ZepperDoer(-1),
-                        new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
-                            moveEvent.card.controller == controller &&
-                            moveEvent.to.location.pile == PileLocation.Field),
-                        0,
-                        PileLocation.Field,
-                        true,
-                        TriggeredAbility.Timing.Post
-                        );
-                }
-                    break;
-
-                    #endregion
-
-                    #region Chieftain Slootboks
-
-                case CardTemplate.Chieftain_sZ_aloot_aboks:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Legendary;
-                    race = Race.Human;
-                    subtype = Subtype.Warrior;
-                    isHeroic = true;
-
-                    baseMovement = 3;
-                    basePower = 1;
-                    baseToughness = 20;
-                    forceColour = ManaColour.Nature;
-
-                    addActivatedAbility(
-                        String.Format("{1}, {0}: Exhaust another target creature within 3 tiles.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Nature)),
-                        new TargetRuleSet(new PryCardRule(c => c.cardType == CardType.Creature && c != this)),
-                        new FatigueDoer(true),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Nature)),
-                        3,
-                        PileLocation.Field,
-                        CastSpeed.Interrupt
-                        );
-                }
-                    break;
-
-                    #endregion
-
-                    #region Risen Abberation
-
-                case CardTemplate.Risen_sAbberation:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Common;
-                    race = Race.Zombie;
-
-                    basePower = 2;
-                    baseToughness = 2;
-                    baseMovement = 2;
-
-                    deathCost = 1;
-                }
-                    break;
-
-                    #endregion
-
-                    #region Shibby Shtank
-
-                case CardTemplate.Shibby_sShtank:
-                {
-                    cardType = CardType.Creature;
-                    race = Race.Human;
-                    subtype = Subtype.Wizard;
-                    rarity = Rarity.Legendary;
-                    isHeroic = true;
-                    forceColour = ManaColour.Order;
-
-                    baseMovement = 1;
-                    basePower = 1;
-                    baseToughness = 20;
-
-
-                    addActivatedAbility(
-                        String.Format("{1}{0}{0}, {2}: Draw a card", G.colouredGlyph(ManaColour.Order), G.colourlessGlyph(2), G.exhaustGhyph),
-                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                        new DrawCardsDoer(1),
-                        fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
-                        0,
-                        PileLocation.Field,
-                        CastSpeed.Interrupt
-                        );
-
-                }
-                    break;
-
-                    #endregion
-
-                    #region Unmake
-
-                case CardTemplate.Unmake:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Common;
-
-                    castRange = 4;
-                    orderCost = 1;
-                    greyCost = 1;
-
-                    castEffect =
-                        new Effect(LL.nonheroicCreature,
-                            new MoveToPileDoer(PileLocation.Hand));
-                    castDescription = "Return target non-heroic creature to its owner's hand.";
-                }
-                    break;
-
-                    #endregion
-
-                    #region Rockhand Ogre
-
-                case CardTemplate.Rockhand_sEchion:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Uncommon;
-                    race = Race.Giant;
-
-                    baseMovement = 3;
-                    basePower = 2;
-                    baseToughness = 2;
-                    mightCost = 1;
-                }
-                    break;
-
-                    #endregion
-
-                    #region Primeordial Chimera
-
-                case CardTemplate.Primordial_sChimera:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Common;
-                    race = Race.Beast;
-
-                    baseMovement = 3;
-                    basePower = 3;
-                    baseToughness = 3;
-                    mightCost = 2;
-                }
-                    break;
-
-                    #endregion
-
-                    #region Cleansing Fire
-
-                case CardTemplate.Cleansing_sFire:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Rare;
-
-                    chaosCost = 1;
-                    lifeCost = 1;
-
-                    castRange = 4;
-                    castEffect = zepLambda(3);
-                    additionalCastEffects.Add(
-                        new Effect(
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                                new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
-                            new ZepperDoer(-3)));
-                    castDescription = "Deal 3 damage to target creature. You gain 3 life.";
-
-
-                }
-                    break;
-
-                    #endregion
-
-                    #region Goblin Grenade
-
-                case CardTemplate.Goblin_sGrenade:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Common;
-
-                    chaosCost = 2;
-                    greyCost = 1;
-
-                    castRange = 5;
-                    castEffect =
-                        new Effect(
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                                new AoeRule(t => true, 2, c => true)),
-                            new ZepperDoer(1));
-                    castDescription = "Deal 1 damage to all creatures within 2 tiles of target tile.";
-
-                }
-                    break;
-
-                    #endregion
-
-                    #region Teleport
-
-                case CardTemplate.Teleport:
-                {
-                    cardType = CardType.Channel;
-                    rarity = Rarity.Common;
-
-                    orderCost = 1;
-                    greyCost = 1;
-
-                    castRange = 5;
-                    castEffect = new Effect(
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
-                            new PryTileRule(f => f.passable,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer(true));
-                    castDescription = "Move your hero to target tile.";
-                }
-                    break;
-
-                    #endregion
-
-                    #region One With Nature
-
-                case CardTemplate.One_sWith_sNature:
-                {
-                    cardType = CardType.Channel;
-                    rarity = Rarity.Rare;
-
-                    natureCost = 1;
-
-                    castEffect =
-                        new Effect
-                        (new TargetRuleSet(
-                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                            new StaticManaRule(ManaColour.Nature, ManaColour.Nature, ManaColour.Nature)),
-                            new GainBonusManaDoer());
-                    castDescription = String.Format("You gain {0}{0}{0} until the end of the step.",
-                        G.colouredGlyph(ManaColour.Nature));
-                }
-                    break;
-
-                    #endregion
-
-                    #region Graverobber Syrdin
-
-                case CardTemplate.Graverobber_sSyrdin:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Legendary;
-                    race = Race.Human;
-                    subtype = Subtype.Rogue;
-
-                    baseMovement = 3;
-                    basePower = 3;
-                    baseToughness = 3;
-
-                    deathCost = 1;
-                    lifeCost = 1;
-                    natureCost = 1;
-
-                    addTriggeredAbility(
-                        "Whenever this creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
-                        new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard)),
-                        new MoveToPileDoer(PileLocation.Hand),
-                        new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(
-                            moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Field),
-                        0,
-                        PileLocation.Field,
-                        true,
-                        TriggeredAbility.Timing.Post
-                        );
-
-                }
-                    break;
-
-                    #endregion
-
-                    #region Alter Fate
-
-                case CardTemplate.Alter_sFate:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Common;
-
-                    orderCost = 1;
-
-                    castEffect =
-                        new Effect(
-                            new TargetRuleSet(new SelectCardRule(PileLocation.Deck)),
-                            new MoveToPileDoer(PileLocation.Deck));
-                    castDescription =
-                        "Search your deck for a card. Shuffle your deck then put the selected card on top.";
-                }
-                    break;
-
-                    #endregion
-
-                    #region Fresh Fox
-
-                case CardTemplate.Fresh_sFox:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Uncommon;
-                    race = Race.Beast;
-
-                    baseToughness = 2;
-                    basePower = 2;
-                    baseMovement = 4;
-
-                    natureCost = 2;
-
-                    keywordAbilities.Add(KeywordAbility.Fervor);
-                }
-                    break;
-
-                    #endregion
-
-                    #region Damage Ward
-
-                case CardTemplate.Damage_sWard:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Uncommon;
-
-                    lifeCost = 1;
-                    castRange = 4;
-                    castEffect = new Effect(
-                        new TargetRuleSet(new PryCardRule()),
-                        new ModifyDoer(ModifiableStats.Toughness, LL.add(3), LL.never));
-                    castDescription = "Target creature gains 3 toughness.";
-
-                }
-                    break;
-
-                    #endregion
-
-                    #region Survival Instincts
-
-                case CardTemplate.Survival_sInstincts:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Common;
-
-                    castRange = 3;
-                    natureCost = 1;
-                    greyCost = 1;
-
-                    castEffect =
-                        new Effect(
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
-                            new ZepperDoer(-2));
-                    additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1),
-                        new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.endOfTurn)));
-                    castDescription =
-                        "Target creature is healed for 2 and gains 2 power until the end of this turn.";
-                } break;
-
-                    #endregion
-
-                    #region Baby Dragon
-
-                case CardTemplate.Baby_sDragon:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Common;
-                    race = Race.Dragon;
-
-                    basePower = 2;
-                    baseToughness = 1;
-                    baseMovement = 2;
-
-                    chaosCost = 1;
-                    greyCost = 1;
-
-
-                    addTriggeredAbility(
-                        "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
-                        new ZepperDoer(1),
-                        new Foo(),
-                        LL.thisEnters(this, PileLocation.Field),
-                        3,
-                        PileLocation.Field,
-                        true,
-                        TriggeredAbility.Timing.Post
-                        );
-                }
-                    break;
-
-                    #endregion
-
-                    #region Huntress of Nibemem
-
-                case CardTemplate.Huntress_sOf_sNibemem:
-                {
-                    cardType = CardType.Creature;
-                    race = Race.Human;
-                    subtype = Subtype.Warrior;
-                    rarity = Rarity.Common;
-
-                    natureCost = 1;
-                    greyCost = 2;
-
-                    baseToughness = 3;
-                    basePower = 1;
-                    baseMovement = 3;
-
-                    addActivatedAbility(
-                        String.Format("{0}: Deal 1 damage to target creature within 3 tiles.", G.exhaustGhyph),
-                        zepLambda(1),
-                        new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                            new FatigueDoer(true))),
-                        3,
-                        PileLocation.Field,
-                        CastSpeed.Interrupt
-                        );
-                }
-                    break;
-
-                    #endregion
-
-                    #region Call to arms
-
-                case CardTemplate.Call_sTo_sArms:
-                {
-                    cardType = CardType.Channel;
-                    rarity = Rarity.Common;
-
-                    lifeCost = 1;
-                    castRange = 2;
-
-                    castDescription = "Summon two 1/1 Squire tokens.";
-                    castEffect = Effect.summonTokensEffect(CardTemplate.Squire, CardTemplate.Squire);
-
-                }
-                    break;
-
-                    #endregion
-
-                    #region Wilt
-
-                case CardTemplate.Wilt:
-                {
-                    cardType = CardType.Channel;
-                    rarity = Rarity.Uncommon;
-
-                    deathCost = 2;
-
-                    castDescription = "Look at target players hand and select a creature. Selected card is discarded.";
-                    castEffect =
-                        new Effect(
-                            new SelectCardRule(new PryPlayerRule(),
-                                PileLocation.Hand, c => c.cardType == CardType.Creature, SelectCardRule.Mode.Resolver),
-                            new MoveToPileDoer(PileLocation.Graveyard));
-                }
-                    break;
-
-                    #endregion
-
-                    #region Price Ila
-
-                case CardTemplate.Prince_sIla:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Legendary;
-                    race = Race.Undead;
-                    subtype = Subtype.Rogue;
-                    isHeroic = true;
-                    forceColour = ManaColour.Death;
-
-                    baseMovement = 2;
-                    basePower = 2;
-                    baseToughness = 20;
-
-                    addActivatedAbility(
-                        String.Format("{1}{1}, {0}: Each player discards a card.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Death)),
-                        new TargetRuleSet(new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), PileLocation.Hand, c => true, SelectCardRule.Mode.Reflective)),
-                        new MoveToPileDoer(PileLocation.Graveyard),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death, ManaColour.Death)),
-                        0,
-                        PileLocation.Field,
-                        CastSpeed.Channel
-                        );
-                } break;
-
-                    #endregion
-
-                    #region Kraken
-
-                case CardTemplate.Kraken:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Rare;
-                    race = Race.Beast;
-
-                    baseMovement = 2;
-                    basePower = 0;
-                    baseToughness = 5;
-
-                    orderCost = 2;
-                    greyCost = 3;
-
-                    auras.Add(new Aura(
-                        "This creature gets +1/+0 for each card in its controllers hand.",
-                        v => v + controller.hand.Count,
-                        ModifiableStats.Power, 
-                        c => c == this));
-                }
-                    break;
-
-                    #endregion
-
-                    #region Ilas Gravekeeper
-
-                case CardTemplate.Ilas_sGravekeeper:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Uncommon;
-                    race = Race.Undead;
-
-                    baseMovement = 3;
-                    basePower = 0;
-                    baseToughness = 4;
-
-                    deathCost = 2;
-
-                    auras.Add(new Aura(
-                        "This creature gets +1/+0 for each Zombie in its controllers graveyard.",
-                        v => v + controller.graveyard.Count(c => c.race == Race.Zombie),
-                        ModifiableStats.Power,
-                        c => c == this
-                        ));
-                }
-                    break;
-
-                    #endregion
-
-                    #region Frenzied Pirhana
-
-                case CardTemplate.Frenzied_sPirhana:
-                {
-                    cardType = CardType.Creature;
-                    rarity = Rarity.Common;
-                    race = Race.Beast;
-
-                    baseMovement = 3;
-                    baseToughness = 1;
-                    basePower = 1;
-
-                    natureCost = 1;
-
-                    keywordAbilities.Add(KeywordAbility.Elusion);
-
-                    auras.Add(new Aura(
-                        "",
-                        v => v + (controller.graveyard.Count >= 5 ? 2 : 0),
-                        ModifiableStats.Power,
-                        c => c == this
-                        ));
-
-                    auras.Add(new Aura(
-                        "This creature has gets +2/+2 as long as its controllers graveyard contains five or more cards.",
-                        v => v + (controller.graveyard.Count >= 5 ? 2 : 0),
-                        ModifiableStats.Toughness,
-                        c => c == this
-                        ));
-                }
-                    break;
-
-                    #endregion
-
-                    #region Ilatian Haunter
-
-                case CardTemplate.Ilatian_sHaunter:
-                {
-                    cardType = CardType.Creature;
-                    race = Race.Zombie;
-                    rarity = Rarity.Common;
-
-                    baseMovement = 2;
-                    baseToughness = 1;
-                    basePower = 1;
-
-                    deathCost = 1;
-                    greyCost = 1;
-
-                    addActivatedAbility(
-                        "You may cast this card from the graveyard.",
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                            new PryTileRule(t => t.card == null && !t.isEdgy,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
-                        new SummonToTileDoer(),
-                        new Foo(LL.manaCost(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
-                        2,
-                        PileLocation.Graveyard,
-                        CastSpeed.Channel,
-                        true
-                        );
-                }
-                    break;
-
-                    #endregion
-
-                    #region Invigorate
-
-                case CardTemplate.Invigorate:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Common;
-
-                    natureCost = 1;
-
-                    castDescription = "Return all movement to target creature.";
-                    castEffect = new Effect(new PryCardRule(), new FatigueDoer(false));
-                    castRange = 4;
-                }
-                    break;
-
-                    #endregion
-
-                    #region Counterspell
-
-                case CardTemplate.Counterspell:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Common;
-
-                    orderCost = 2;
-                    greyCost = 1;
-
-                    castDescription = "Counter target spell.";
-                    castEffect = new Effect(new ClickCardRule(c => c.location.pile == PileLocation.Stack && !c.isDummy),
-                        new MoveToPileDoer(PileLocation.Graveyard));
-                }
-                    break;
-
-                    #endregion
-
-                    #region Gleeful Duty
-
-                case CardTemplate.Gleeful_sDuty:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Uncommon;
-
-                    deathCost = 3;
-
-                    castDescription = "Destroy target non-heroic creature.";
-                    castEffect =
-                        new Effect(LL.nonheroicCreature,
-                            new MoveToPileDoer(PileLocation.Graveyard));
-                    castRange = 4;
-                }
-                    break;
-
-                    #endregion
-
-                    #region Overgrow
-
-                case CardTemplate.Overgrow:
-                {
-                    cardType = CardType.Interrupt;
-                    rarity = Rarity.Common;
-
-                    natureCost = 2;
-
-                    castDescription = "Destroy target relic.";
-                    castEffect =
-                        new Effect(LL.relic,
-                            new MoveToPileDoer(PileLocation.Graveyard));
-                    castRange = 6;
-                }
-                    break;
+                #region Illegal Goblin Laboratory
+
+            case CardTemplate.Illegal_sGoblin_sLaboratory:
+            {
+                cardType = CardType.Relic;
+                rarity = Rarity.Uncommon;
+
+                chaosCost = 2;
+                greyCost = 1;
+
+                addTriggeredAbility(
+                    "At the end of your turn deal 1 damage to every enemy player.",
+                    new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                        new CardResolveRule(CardResolveRule.Rule.VillainHeroes)),
+                    new ZepperDoer(1),
+                    new Foo(),
+                    new TypedGameEventFilter<StartOfStepEvent>(
+                        e => e.step == Steps.End && e.activePlayer == controller),
+                    0,
+                    PileLocation.Field,
+                    false
+                    );
+            }
+                break;
 
                 #endregion
+                #region Belwas
 
+            case CardTemplate.Belwas:
+            {
+                cardType = CardType.Creature;
+                race = Race.Human;
+                subtype = Subtype.Warrior;
+                rarity = Rarity.Legendary;
+                isHeroic = true;
+                forceColour = ManaColour.Life;
+
+                baseMovement = 2;
+                basePower = 2;
+                baseToughness = 25;
+
+                    addActivatedAbility(
+                        String.Format("{2}{1}{1}, {0}: Your other white creatures get +1/+0 until end of turn.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Life), G.colourlessGlyph(1)),
+                        new TargetRuleSet(new AllCardsRule(c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
+                        new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.endOfTurn),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt 
+                        );
+            }
+                break;
+
+                #endregion
+                #region Kappa
+
+            case CardTemplate.Kappa:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Uncommon;
+                race = Race.Beast;
+
+                baseMovement = 2;
+                basePower = 2;
+                baseToughness = 3;
+
+                orderCost = 2;
+                greyCost = 2;
+
+                addTriggeredAbility(
+                    "Whenever this creature enters the battlefield under your control, draw two cards.",
+                    new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                    new DrawCardsDoer(2),
+                    new Foo(),
+                    new TypedGameEventFilter<MoveToPileEvent>(
+                        moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
+                    0,
+                    PileLocation.Field,
+                    false,
+                    TriggeredAbility.Timing.Post
+                    );
+
+            }
+                break;
+
+                #endregion
+                #region Yung Lich
+
+            case CardTemplate.Yung_sLich:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Rare;
+                race = Race.Undead;
+                subtype = Subtype.Wizard;
+
+                baseMovement = 2;
+                basePower = 2;
+                baseToughness = 2;
+
+                orderCost = 1;
+                deathCost = 1;
+
+                diesLambda(
+                    "Whenever Yung Lich enters the graveyard from the battlefield under your control, draw a card.",
+                    new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new DrawCardsDoer(1))
+                    );
+            }
+                break;
+
+                #endregion
+                #region Cantrip
+
+            case CardTemplate.Cantrip:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Common;
+
+                orderCost = 1;
+                castEffect =
+                    new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new DrawCardsDoer(1));
+                additionalCastEffects.Add(
+                    new Effect(
+                        new SelectCardRule(new PryPlayerRule(p => true,
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                            PileLocation.Hand, c => false, SelectCardRule.Mode.Resolver),
+                        new ModifyDoer(ModifiableStats.Movement, LL.add(0), LL.clearAura))); //ugliest hack i've seen in a while
+                castDescription = "Look at target players hand. Draw a card.";
+
+            }
+                break;
+
+                #endregion
+                #region Zap
+
+            case CardTemplate.Zap:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Common;
+
+                castRange = 3;
+                chaosCost = 1;
+
+                castEffect = zepLambda(2);
+                castDescription = "Deal 2 damage to target creature.";
+            }
+                break;
+
+                #endregion
+                #region Temple Healer
+
+            case CardTemplate.Temple_sHealer:
+            {
+                cardType = CardType.Creature;
+                race = Race.Human;
+                subtype = Subtype.Cleric;
+                rarity = Rarity.Uncommon;
+
+                basePower = 3;
+                baseToughness = 4;
+                baseMovement = 3;
+
+                lifeCost = 2;
+                greyCost = 2;
+
+                addTriggeredAbility(
+                    "Whenever a creature enters the battlefield under your control, you may restore 1 toughness to your hero.",
+                    new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                        new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
+                    new ZepperDoer(-1),
+                    new Foo(),
+                    new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
+                        moveEvent.card.controller == controller &&
+                        moveEvent.to.location.pile == PileLocation.Field),
+                    0,
+                    PileLocation.Field,
+                    true,
+                    TriggeredAbility.Timing.Post
+                    );
+            }
+                break;
+
+                #endregion
+                #region Chieftain Slootboks
+
+            case CardTemplate.Chieftain_sZ_aloot_aboks:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Legendary;
+                race = Race.Human;
+                subtype = Subtype.Warrior;
+                isHeroic = true;
+
+                baseMovement = 3;
+                basePower = 1;
+                baseToughness = 20;
+                forceColour = ManaColour.Nature;
+
+                addActivatedAbility(
+                    String.Format("{1}, {0}: Exhaust another target creature within 3 tiles.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Nature)),
+                    new TargetRuleSet(LL.creature(c => c != this)),
+                    new FatigueDoer(true),
+                    new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Nature)),
+                    3,
+                    PileLocation.Field,
+                    CastSpeed.Interrupt
+                    );
+            }
+                break;
+
+                #endregion
+                #region Risen Abberation
+
+            case CardTemplate.Risen_sAbberation:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Common;
+                race = Race.Zombie;
+
+                basePower = 2;
+                baseToughness = 2;
+                baseMovement = 2;
+
+                deathCost = 1;
+            }
+                break;
+
+                #endregion
+                #region Shibby Shtank
+
+            case CardTemplate.Shibby_sShtank:
+            {
+                cardType = CardType.Creature;
+                race = Race.Human;
+                subtype = Subtype.Wizard;
+                rarity = Rarity.Legendary;
+                isHeroic = true;
+                forceColour = ManaColour.Order;
+
+                baseMovement = 1;
+                basePower = 1;
+                baseToughness = 20;
+
+
+                addActivatedAbility(
+                    String.Format("{1}{0}{0}, {2}: Draw a card. {3}", G.colouredGlyph(ManaColour.Order),
+                        G.colourlessGlyph(2), G.exhaustGhyph, G.channelOnly),
+                    new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                    new DrawCardsDoer(1),
+                    fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
+                    0,
+                    PileLocation.Field,
+                    CastSpeed.Interrupt
+                    );
+
+            }
+                break;
+
+                #endregion
+                #region Unmake
+
+            case CardTemplate.Unmake:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Common;
+
+                castRange = 4;
+                orderCost = 1;
+                greyCost = 1;
+
+                castEffect =
+                    new Effect(LL.nonheroicCreature(),
+                        new MoveToPileDoer(PileLocation.Hand));
+                castDescription = "Return target non-heroic creature to its owner's hand.";
+            }
+                break;
+
+                #endregion
+                #region Rockhand Ogre
+
+            case CardTemplate.Rockhand_sEchion:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Uncommon;
+                race = Race.Giant;
+
+                baseMovement = 3;
+                basePower = 2;
+                baseToughness = 2;
+                mightCost = 1;
+            }
+                break;
+
+                #endregion
+                #region Primeordial Chimera
+
+            case CardTemplate.Primordial_sChimera:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Common;
+                race = Race.Beast;
+
+                baseMovement = 3;
+                basePower = 3;
+                baseToughness = 3;
+                mightCost = 2;
+            }
+                break;
+
+                #endregion
+                #region Cleansing Fire
+
+            case CardTemplate.Cleansing_sFire:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Uncommon;
+
+                chaosCost = 1;
+                lifeCost = 1;
+
+                castRange = 4;
+                castEffect = zepLambda(3);
+                additionalCastEffects.Add(
+                    new Effect(
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
+                        new ZepperDoer(-3)));
+                castDescription = "Deal 3 damage to target creature. You gain 3 life.";
+
+
+            }
+                break;
+
+                #endregion
+                #region Goblin Grenade
+
+            case CardTemplate.Goblin_sGrenade:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Common;
+
+                chaosCost = 2;
+                greyCost = 1;
+
+                castRange = 5;
+                castEffect =
+                    new Effect(
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new AoeRule(t => true, 2, c => true)),
+                        new ZepperDoer(1));
+                castDescription = "Deal 1 damage to all creatures within 2 tiles of target tile.";
+
+            }
+                break;
+
+                #endregion
+                #region Teleport
+
+            case CardTemplate.Teleport:
+            {
+                cardType = CardType.Channel;
+                rarity = Rarity.Common;
+
+                orderCost = 1;
+                greyCost = 1;
+
+                castRange = 5;
+                castEffect = new Effect(
+                    new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
+                        new PryTileRule(f => f.passable,
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer(true));
+                castDescription = "Move your hero to target tile.";
+            }
+                break;
+
+                #endregion
+                #region One With Nature
+
+            case CardTemplate.One_sWith_sNature:
+            {
+                cardType = CardType.Channel;
+                rarity = Rarity.Rare;
+
+                natureCost = 1;
+
+                castEffect =
+                    new Effect
+                    (new TargetRuleSet(
+                        new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                        new StaticManaRule(ManaColour.Nature, ManaColour.Nature, ManaColour.Nature)),
+                        new GainBonusManaDoer());
+                castDescription = String.Format("You gain {0}{0}{0} until the end of the step.",
+                    G.colouredGlyph(ManaColour.Nature));
+            }
+                break;
+
+                #endregion
+                #region Graverobber Syrdin
+
+            case CardTemplate.Graverobber_sSyrdin:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Legendary;
+                race = Race.Human;
+                subtype = Subtype.Rogue;
+
+                baseMovement = 3;
+                basePower = 3;
+                baseToughness = 3;
+
+                deathCost = 1;
+                lifeCost = 1;
+                natureCost = 1;
+
+                addTriggeredAbility(
+                    "Whenever this creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
+                    new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard)),
+                    new MoveToPileDoer(PileLocation.Hand),
+                    new Foo(),
+                    new TypedGameEventFilter<MoveToPileEvent>(
+                        moveEvent => moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Field),
+                    0,
+                    PileLocation.Field,
+                    true,
+                    TriggeredAbility.Timing.Post
+                    );
+
+            }
+                break;
+
+                #endregion
+                #region Alter Fate
+
+            case CardTemplate.Alter_sFate:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Common;
+
+                orderCost = 1;
+
+                castEffect =
+                    new Effect(
+                        new TargetRuleSet(new SelectCardRule(PileLocation.Deck)),
+                        new MoveToPileDoer(PileLocation.Deck));
+                castDescription =
+                    "Search your deck for a card. Shuffle your deck then put the selected card on top.";
+            }
+                break;
+
+                #endregion
+                #region Fresh Fox
+
+            case CardTemplate.Fresh_sFox:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Uncommon;
+                race = Race.Beast;
+
+                baseToughness = 2;
+                basePower = 2;
+                baseMovement = 4;
+
+                natureCost = 2;
+
+                keywordAbilities.Add(KeywordAbility.Fervor);
+            }
+                break;
+
+                #endregion
+                #region Damage Ward
+
+            case CardTemplate.Damage_sWard:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Uncommon;
+
+                lifeCost = 1;
+                castRange = 4;
+                castEffect = new Effect(
+                    new TargetRuleSet(new PryCardRule()),
+                    new ModifyDoer(ModifiableStats.Toughness, LL.add(3), LL.never));
+                castDescription = "Target creature gains 3 toughness.";
+
+            }
+                break;
+
+                #endregion
+                #region Survival Instincts
+
+            case CardTemplate.Survival_sInstincts:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Common;
+
+                castRange = 3;
+                natureCost = 1;
+                greyCost = 1;
+
+                castEffect =
+                    new Effect(
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                        new ZepperDoer(-2));
+                additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1),
+                    new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.endOfTurn)));
+                castDescription =
+                    "Target creature is healed for 2 and gains 2 power until the end of this turn.";
+            } break;
+
+                #endregion
+                #region Baby Dragon
+
+            case CardTemplate.Baby_sDragon:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Common;
+                race = Race.Dragon;
+
+                basePower = 2;
+                baseToughness = 1;
+                baseMovement = 2;
+
+                chaosCost = 1;
+                greyCost = 1;
+
+
+                addTriggeredAbility(
+                    "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
+                    new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                    new ZepperDoer(1),
+                    new Foo(),
+                    LL.thisEnters(this, PileLocation.Field),
+                    3,
+                    PileLocation.Field,
+                    true,
+                    TriggeredAbility.Timing.Post
+                    );
+            }
+                break;
+
+                #endregion
+                #region Huntress of Nibemem
+
+            case CardTemplate.Huntress_sOf_sNibemem:
+            {
+                cardType = CardType.Creature;
+                race = Race.Human;
+                subtype = Subtype.Warrior;
+                rarity = Rarity.Common;
+
+                natureCost = 1;
+                greyCost = 2;
+
+                baseToughness = 3;
+                basePower = 1;
+                baseMovement = 3;
+
+                addActivatedAbility(
+                    String.Format("{0}: Deal 1 damage to target creature within 3 tiles.", G.exhaustGhyph),
+                    zepLambda(1),
+                    new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
+                        new FatigueDoer(true))),
+                    3,
+                    PileLocation.Field,
+                    CastSpeed.Interrupt
+                    );
+            }
+                break;
+
+                #endregion
+                #region Call to arms
+
+            case CardTemplate.Call_sTo_sArms:
+            {
+                cardType = CardType.Channel;
+                rarity = Rarity.Common;
+
+                lifeCost = 1;
+                castRange = 2;
+
+                castDescription = "Summon two 1/1 Squire tokens.";
+                castEffect = Effect.summonTokensEffect(CardTemplate.Squire, CardTemplate.Squire);
+
+            }
+                break;
+
+                #endregion
+                #region Wilt
+
+            case CardTemplate.Wilt:
+            {
+                cardType = CardType.Channel;
+                rarity = Rarity.Uncommon;
+
+                deathCost = 2;
+
+                castDescription = "Look at target players hand and select a creature. Selected card is discarded.";
+                castEffect =
+                    new Effect(
+                        new SelectCardRule(new PryPlayerRule(),
+                            PileLocation.Hand, c => c.cardType == CardType.Creature, SelectCardRule.Mode.Resolver),
+                        new MoveToPileDoer(PileLocation.Graveyard));
+            }
+                break;
+
+                #endregion
+                #region Price Ila
+
+            case CardTemplate.Prince_sIla:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Legendary;
+                race = Race.Undead;
+                subtype = Subtype.Rogue;
+                isHeroic = true;
+                forceColour = ManaColour.Death;
+
+                baseMovement = 2;
+                basePower = 2;
+                baseToughness = 20;
+
+                addActivatedAbility(
+                    String.Format("{1}{1}, {0}: Each player discards a card. {2}", G.exhaustGhyph, G.colouredGlyph(ManaColour.Death), G.channelOnly),
+                    new TargetRuleSet(new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), PileLocation.Hand, c => true, SelectCardRule.Mode.Reflective)),
+                    new MoveToPileDoer(PileLocation.Graveyard),
+                    new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death, ManaColour.Death)),
+                    0,
+                    PileLocation.Field,
+                    CastSpeed.Channel
+                    );
+            } break;
+
+                #endregion
+                #region Kraken
+
+            case CardTemplate.Kraken:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Rare;
+                race = Race.Beast;
+
+                baseMovement = 2;
+                basePower = 0;
+                baseToughness = 5;
+
+                orderCost = 2;
+                greyCost = 3;
+
+                auras.Add(new Aura(
+                    "This creature gets +1/+0 for each card in its controllers hand.",
+                    v => v + controller.hand.Count,
+                    ModifiableStats.Power, 
+                    c => c == this));
+            }
+                break;
+
+                #endregion
+                #region Ilas Gravekeeper
+
+            case CardTemplate.Ilas_sGravekeeper:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Uncommon;
+                race = Race.Undead;
+
+                baseMovement = 3;
+                basePower = 0;
+                baseToughness = 4;
+
+                deathCost = 2;
+
+                auras.Add(new Aura(
+                    "This creature gets +1/+0 for each Zombie in its controllers graveyard.",
+                    v => v + controller.graveyard.Count(c => c.race == Race.Zombie),
+                    ModifiableStats.Power,
+                    c => c == this
+                    ));
+            }
+                break;
+
+                #endregion
+                #region Frenzied Pirhana
+
+            case CardTemplate.Frenzied_sPirhana:
+            {
+                cardType = CardType.Creature;
+                rarity = Rarity.Common;
+                race = Race.Beast;
+
+                baseMovement = 3;
+                baseToughness = 1;
+                basePower = 1;
+
+                natureCost = 1;
+
+                keywordAbilities.Add(KeywordAbility.Elusion);
+
+                auras.Add(new Aura(
+                    "",
+                    v => v + (controller.graveyard.Count >= 5 ? 2 : 0),
+                    ModifiableStats.Power,
+                    c => c == this
+                    ));
+
+                auras.Add(new Aura(
+                    "This creature has gets +2/+2 as long as its controllers graveyard contains five or more cards.",
+                    v => v + (controller.graveyard.Count >= 5 ? 2 : 0),
+                    ModifiableStats.Toughness,
+                    c => c == this
+                    ));
+            }
+                break;
+
+                #endregion
+                #region Ilatian Haunter
+
+            case CardTemplate.Ilatian_sHaunter:
+            {
+                cardType = CardType.Creature;
+                race = Race.Zombie;
+                rarity = Rarity.Common;
+
+                baseMovement = 2;
+                baseToughness = 1;
+                basePower = 1;
+
+                deathCost = 1;
+                greyCost = 1;
+
+                addActivatedAbility(
+                    "You may cast this card from the graveyard.",
+                    new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                        new PryTileRule(t => t.card == null && !t.isEdgy,
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
+                    new SummonToTileDoer(),
+                    new Foo(LL.manaCost(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
+                    2,
+                    PileLocation.Graveyard,
+                    CastSpeed.Channel,
+                    true
+                    );
+            }
+                break;
+
+                #endregion
+                #region Invigorate
+
+            case CardTemplate.Invigorate:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Common;
+
+                natureCost = 1;
+
+                castDescription = "Return all movement to target creature.";
+                castEffect = new Effect(new PryCardRule(), new FatigueDoer(false));
+                castRange = 4;
+            }
+                break;
+
+                #endregion
+                #region Counterspell
+
+            case CardTemplate.Counterspell:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Common;
+
+                orderCost = 2;
+                greyCost = 1;
+
+                castDescription = "Counter target spell.";
+                castEffect = new Effect(new ClickCardRule(c => c.location.pile == PileLocation.Stack && !c.isDummy),
+                    new MoveToPileDoer(PileLocation.Graveyard));
+            }
+                break;
+
+                #endregion
+                #region Gleeful Duty
+
+            case CardTemplate.Gleeful_sDuty:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Uncommon;
+
+                deathCost = 3;
+
+                castDescription = "Destroy target non-heroic creature.";
+                castEffect =
+                    new Effect(LL.nonheroicCreature(),
+                        new MoveToPileDoer(PileLocation.Graveyard));
+                castRange = 4;
+            }
+                break;
+
+                #endregion
+                #region Overgrow
+
+            case CardTemplate.Overgrow:
+            {
+                cardType = CardType.Interrupt;
+                rarity = Rarity.Common;
+
+                natureCost = 2;
+
+                castDescription = "Destroy target relic.";
+                castEffect =
+                    new Effect(LL.relic,
+                        new MoveToPileDoer(PileLocation.Graveyard));
+                castRange = 6;
+            }
+                break;
+
+            #endregion
                 #region Gotterdammerun
 
                 case CardTemplate.Gotterdammerung:
@@ -915,7 +875,6 @@ namespace stonerkart
                     } break;
 
                 #endregion
-
                 #region Rider of Death
 
                 case CardTemplate.Rider_sof_sDeath:
@@ -932,7 +891,7 @@ namespace stonerkart
 
                     addTriggeredAbility(
                         "Whenever Rider of Death enters the battlefield you may destroy target non-heroic creature.",
-                        new TargetRuleSet(LL.nonheroicCreature),
+                        new TargetRuleSet(LL.nonheroicCreature()),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(
@@ -948,7 +907,6 @@ namespace stonerkart
                 } break;
 
                 #endregion
-
                 #region Rider of War
 
                 case CardTemplate.Rider_sof_sWar:
@@ -968,7 +926,6 @@ namespace stonerkart
                 } break;
 
                 #endregion
-
                 #region Rider of Famine
                 case CardTemplate.Rider_sof_sPestilence:
                     {
@@ -994,7 +951,6 @@ namespace stonerkart
                         );
                 } break;
                 #endregion
-
                 #region Rider of Pestilence
                 case CardTemplate.Rider_sof_sFamine:
                     {
@@ -1021,7 +977,6 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-
                 #region Magma Vents
                 case CardTemplate.Magma_sVents:
                 {
@@ -1046,7 +1001,6 @@ namespace stonerkart
                         );
                 } break;
                 #endregion
-
                 #region Chains of Virtue
                     case CardTemplate.Chains_sof_sVirtue:
                 {
@@ -1062,7 +1016,6 @@ namespace stonerkart
                     castRange = 4;
                 } break;
                 #endregion
-
                 #region Chains of Sin
                 case CardTemplate.Chains_sof_sSin:
                     {
@@ -1079,7 +1032,6 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-
                 #region Abolish
 
                 case CardTemplate.Abolish:
@@ -1098,7 +1050,6 @@ namespace stonerkart
                     } break;
 
                 #endregion
-
                 #region Deep Fry
 
                 case CardTemplate.Deep_sFry:
@@ -1116,7 +1067,6 @@ namespace stonerkart
 
                 } break;
                 #endregion
-
                 #region Reanimate Dead
                 case CardTemplate.Raise_sDead:
                 {
@@ -1135,7 +1085,6 @@ namespace stonerkart
                         new SummonToTileDoer());
                 } break;
                 #endregion
-
                 #region Ancient Druid
                 case CardTemplate.Ancient_sDruid:
                 {
@@ -1159,7 +1108,6 @@ namespace stonerkart
                         );
                 }break;
                 #endregion
-
                 #region Suspicious Vortex
 
                 case CardTemplate.Suspicious_sVortex:
@@ -1175,7 +1123,6 @@ namespace stonerkart
                 } break;
 
                 #endregion
-
                 #region Rapture
                 case CardTemplate.Rapture:
                 {
@@ -1193,7 +1140,6 @@ namespace stonerkart
                     castRange = 4;
                 } break;
                 #endregion
-
                 #region Seething Rage
                 case CardTemplate.Seething_sRage:
                 {
@@ -1205,14 +1151,13 @@ namespace stonerkart
                     castDescription = "Return all movement to target creature and give it +2/+0 until end of turn.";
                     castEffect =
                         new Effect(
-                            new TargetRuleSet(LL.creature),
+                            new TargetRuleSet(LL.creature()),
                             new FatigueDoer(false));
                     additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(0),
                         new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.endOfTurn)));
                     castRange = 3;
                 } break;
                 #endregion
-
                 #region Ilas Bargain
                 case CardTemplate.Ilas_sBargain:
                 {
@@ -1228,7 +1173,6 @@ namespace stonerkart
                     additionalCastCosts.Add(sacCostLambda);
                 } break;
                 #endregion
-
                 #region Marilith
                 case CardTemplate.Marilith:
                 {
@@ -1245,7 +1189,6 @@ namespace stonerkart
                     keywordAbilities.Add(KeywordAbility.Ambush);
                 } break;
                 #endregion
-                    
                 #region Sanguine Artisan
                 case CardTemplate.Sanguine_sArtisan:
                     {
@@ -1277,7 +1220,6 @@ namespace stonerkart
                             );
                     } break;
                 #endregion
-
                 #region Houndmaster
                 case CardTemplate.Houndmaster:
                 {
@@ -1304,7 +1246,6 @@ namespace stonerkart
                         );
                 } break;
                 #endregion
-
                 #region Shotty Contruct
                     
                 case CardTemplate.Shotty_sContruct:
@@ -1322,7 +1263,6 @@ namespace stonerkart
                 } break;
 
                 #endregion
-
                 #region Feral Imp
                 case CardTemplate.Feral_sImp:
                 {
@@ -1340,7 +1280,6 @@ namespace stonerkart
                         keywordAbilities.Add(KeywordAbility.Fervor);
                 } break;
                 #endregion
-
                 #region Resounding Blast
                 case CardTemplate.Resounding_sBlast:
                 {
@@ -1362,7 +1301,6 @@ namespace stonerkart
 
                 } break;
                 #endregion
-
                 #region Solemn Lotus
                 case CardTemplate.Solemn_sLotus:
                 {
@@ -1396,7 +1334,6 @@ namespace stonerkart
 
                 } break;
                 #endregion
-
                 #region Mysterious Lilac
                 case CardTemplate.Mysterious_sLilac:
                 {
@@ -1430,7 +1367,6 @@ namespace stonerkart
 
                 } break;
                 #endregion
-
                 #region Daring Poppy
                 case CardTemplate.Daring_sPoppy:
                     {
@@ -1465,7 +1401,6 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-
                 #region Serene Dandelion
                 case CardTemplate.Serene_sDandelion:
                     {
@@ -1500,7 +1435,6 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-
                 #region Stark Lily
                 case CardTemplate.Stark_sLily:
                 {
@@ -1524,7 +1458,7 @@ namespace stonerkart
                         );
 
                     addActivatedAbility(
-                        String.Format("{0}{0}, {1}, Sacrifice Stark Lily: Summon a 2/2 Gryphon token.", G.colouredGlyph(ManaColour.Might), G.exhaustGhyph),
+                        String.Format("{0}{0}, {1}, Sacrifice Stark Lily: Summon a 2/2 Gryphon token with Flying.", G.colouredGlyph(ManaColour.Might), G.exhaustGhyph),
                         Effect.summonTokensEffect(CardTemplate.Gryphon),
                         new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Might, ManaColour.Might), sacThisLambda),
                         2,
@@ -1534,7 +1468,6 @@ namespace stonerkart
 
                 } break;
                 #endregion
-
                 #region Vibrant Zinnia
                 case CardTemplate.Vibrant_sZinnia:
                     {
@@ -1558,7 +1491,7 @@ namespace stonerkart
                             );
 
 
-                        Effect e1 = new Effect(LL.nonheroicCreature,
+                        Effect e1 = new Effect(LL.nonheroicCreature(),
                             new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.never));
                         Effect e2 = new Effect(new CopyPreviousRule<Card>(0),
                             new ModifyDoer(ModifiableStats.Toughness, LL.add(2), LL.never));
@@ -1575,7 +1508,6 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-
                 #region Ancient Chopter
                 case CardTemplate.Ancient_sChopter:
                 {
@@ -1592,13 +1524,12 @@ namespace stonerkart
                     keywordAbilities.Add(KeywordAbility.Flying);
                 } break;
                 #endregion
-
                 #region Famished Tarantula
                 case CardTemplate.Famished_sTarantula:
                 {
                     cardType = CardType.Creature;
                     race = Race.Beast;
-                    rarity = Rarity.Common;
+                    rarity = Rarity.Uncommon;
 
                     basePower = 1;
                     baseToughness = 3;
@@ -1613,7 +1544,6 @@ namespace stonerkart
 
                 } break;
                 #endregion
-
                 #region Morenian Medic
                 case CardTemplate.Morenian_sMedic:
                 {
@@ -1634,7 +1564,6 @@ namespace stonerkart
 
                 } break;
                 #endregion
-
                 #region Bubastis
                 case CardTemplate.Bubastis:
                 {
@@ -1642,11 +1571,77 @@ namespace stonerkart
                     race = Race.Beast;
                     rarity = Rarity.Legendary;
 
+                    basePower = 4;
+                    baseToughness = 5;
+                    baseMovement = 3;
 
+                    orderCost = 3;
+                    greyCost = 3;
+
+                    etbLambda(
+                        "When Bubastis enters the battlefield you may return target non-heroic creature within 5 tiles to it's owners hand.",
+                        new Effect(LL.nonheroicCreature(), new MoveToPileDoer(PileLocation.Hand)),
+                        5,
+                        true
+                        );
+                } break;
+                #endregion
+                #region Unyeilding Stalwart
+                case CardTemplate.Unyeilding_sStalwart:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Human;
+                    subtype = Subtype.Warrior;
+                    rarity = Rarity.Common;
+
+                    lifeCost = 1;
+
+                    basePower = 1;
+                    baseToughness = 1;
+                    baseMovement = 3;
+
+                    diesLambda(
+                        "Whenever Unyeilding Stalward enters the graveyard from the battlefield under your control, summon a 1/1 Spirit token with Flying.",
+                        Effect.summonTokensEffect(CardTemplate.Spirit),
+                        2);
+                } break;
+                #endregion
+                #region Haunted Chapel
+                case CardTemplate.Haunted_sChapel:
+                {
+                    cardType = CardType.Relic;
+                    rarity = Rarity.Rare;
+
+                    lifeCost = 1;
+                    deathCost = 1;
+                    greyCost = 2;
+
+                    addActivatedAbility(
+                        String.Format(
+                            "{0}{1}, Displace a Creature card from your Graveyard: Summon a 1/1 Spirit token with Flying. {2}",
+                            G.colouredGlyph(ManaColour.Life), G.colouredGlyph(ManaColour.Death), G.channelOnly),
+                        Effect.summonTokensEffect(CardTemplate.Spirit),
+                        new Foo(
+                            LL.manaCost(ManaColour.Death, ManaColour.Life),
+                            displaceFromGraveyard(c => c.cardType == CardType.Creature)),
+                        2,
+                        PileLocation.Field,
+                        CastSpeed.Channel);
                 } break;
                 #endregion
                 #region tokens
-
+                #region Spirit
+                case CardTemplate.Spirit:
+                {
+                    forceColour = ManaColour.Life;
+                    basePower = 1;
+                    baseToughness = 1;
+                    baseMovement = 2;
+                    race = Race.Undead;
+                    isToken = true;
+                    keywordAbilities.Add(KeywordAbility.Flying);
+                } break;
+                #endregion
                 #region Gryphon
                 case CardTemplate.Gryphon:
                 {
@@ -1659,7 +1654,6 @@ namespace stonerkart
                     keywordAbilities.Add(KeywordAbility.Flying);
                 } break;
                 #endregion
-
                 #region Squire
                 case CardTemplate.Squire:
                 {
@@ -1672,7 +1666,6 @@ namespace stonerkart
                     isToken = true;
                 } break;
                 #endregion
-
                 #region Wolf
                 case CardTemplate.Wolf:
                     {
@@ -1684,7 +1677,6 @@ namespace stonerkart
                         isToken = true;
                     } break;
                 #endregion
-
                 #endregion
 
                 default:
@@ -1802,11 +1794,11 @@ namespace stonerkart
         public Effect zepLambda(int damage)
         {
             return
-                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.creature),
+                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.creature()),
                     new ZepperDoer(damage));
         }
 
-        public void etbLambda(String description, Effect e, int range)
+        public void etbLambda(String description, Effect e, int range = -1, bool optional = false)
         {
             addTriggeredAbility(
                         description, 
@@ -1816,9 +1808,25 @@ namespace stonerkart
                             moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
                         range,
                         PileLocation.Field,
-                        false,
+                        optional,
                         TriggeredAbility.Timing.Post
                         );
+        }
+
+        public void diesLambda(String description, Effect e, int range = -1, bool optional = false)
+        {
+            addTriggeredAbility(
+                description,
+                e,
+                new Foo(),
+                new TypedGameEventFilter<MoveToPileEvent>(
+                    moveEvent =>
+                        moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard &&
+                        location.pile == PileLocation.Field),
+                range,
+                PileLocation.Field,
+                optional
+                );
         }
 
         public void deathtouchLambda()
@@ -1845,6 +1853,11 @@ namespace stonerkart
                         c => !c.isHeroic && c.controller == this.controller && c.cardType == CardType.Creature),
                     new MoveToPileDoer(PileLocation.Graveyard));
 
+        public static Effect displaceFromGraveyard(Func<Card, bool> filter = null)
+        {
+            filter = filter ?? (c => true);
+            return new Effect(new SelectCardRule(PileLocation.Graveyard, filter), new MoveToPileDoer(PileLocation.Displaced));
+        }
 
         public Effect playerSacLambda(TargetRule sacrificer)
         {

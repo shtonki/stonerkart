@@ -444,6 +444,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Haunted_sChapel,
+        Unyeilding_sStalwart,
         Bubastis,
         Morenian_sMedic,
         Famished_sTarantula,
@@ -510,6 +512,7 @@ namespace stonerkart
         Illegal_sGoblin_sLaboratory,
         Teleport,
         Squire,
+        Spirit,
         Gryphon,
         Wolf,
         Call_sTo_sArms,
