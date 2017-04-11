@@ -254,6 +254,11 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artVibrantZinnia.png" />
+    <None Include="Resources\artChopter.png" />
+    <None Include="Resources\artStartLily.png" />
+    <None Include="Resources\artGryphon.png" />
+    <None Include="Resources\artSereneDandelion.png" />
     <None Include="Resources\artSolemnLotus.png" />
     <None Include="Resources\artResoundingBlast.png" />
     <None Include="Resources\artFeralImp.png" />

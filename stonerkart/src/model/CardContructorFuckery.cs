@@ -198,12 +198,7 @@ namespace stonerkart
                     castRange = 3;
                     chaosCost = 1;
 
-                    castEffect =
-                        new Effect(
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                                new PryCardRule(c => true,
-                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
-                            new ZepperDoer(2));
+                    castEffect = zepLambda(2);
                     castDescription = "Deal 2 damage to target creature.";
                 }
                     break;
@@ -390,10 +385,7 @@ namespace stonerkart
                     lifeCost = 1;
 
                     castRange = 4;
-                    castEffect =
-                        new Effect(
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
-                            new ZepperDoer(3));
+                    castEffect = zepLambda(3);
                     additionalCastEffects.Add(
                         new Effect(
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
@@ -640,8 +632,7 @@ namespace stonerkart
 
                     addActivatedAbility(
                         String.Format("{0}: Deal 1 damage to target creature within 3 tiles.", G.exhaustGhyph),
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
-                        new ZepperDoer(1),
+                        zepLambda(1),
                         new Foo(new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
                             new FatigueDoer(true))),
                         3,
@@ -1123,14 +1114,11 @@ namespace stonerkart
                     cardType = CardType.Interrupt;
                     rarity = Rarity.Uncommon;
 
-                    chaosCost = 2;
+                    chaosCost = 1;
                     greyCost = 1;
 
                     castDescription = "Deal 1 damage to target creature then exhaust it.";
-                    castEffect =
-                        new Effect(
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
-                            new ZepperDoer(1));
+                    castEffect = zepLambda(1);
                     additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1), new FatigueDoer(true)));
                     castRange = 5;
 
@@ -1372,23 +1360,19 @@ namespace stonerkart
                     chaosCost = 2;
                     greyCost = 1;
 
-                    castEffect =
-                        new Effect(
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                                new PryCardRule(c => !c.isHeroic,
-                                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
-                            new ZepperDoer(3));
-                        additionalCastEffects.Add(new Effect(
-                            new TargetRuleSet(
+                    castEffect =zepLambda(3);
+                    additionalCastEffects.Add(new Effect(
+                        new TargetRuleSet(
                             new CopyPreviousRule<Card>(0),
                             new ModifyPreviousRule<Card, Card>(1, c => c.controller.heroCard)),
-                            new ZepperDoer(3)
-                            ));
+                        new ZepperDoer(3)
+                        ));
                     castDescription = "Deal 3 damage to target non-heroic creature and 3 damage to that creatures controller.";
 
                 } break;
                 #endregion
 
+                #region Solemn Lotus
                 case CardTemplate.Solemn_sLotus:
                 {
                     cardType = CardType.Relic;
@@ -1420,8 +1404,217 @@ namespace stonerkart
                         );
 
                 } break;
+                #endregion
+
+                #region Mysterious Lilac
+                case CardTemplate.Mysterious_sLilac:
+                {
+                    cardType = CardType.Relic;
+                    rarity = Rarity.Common;
+
+                    orderCost = 1;
+
+                    baseMovement = 1;
+
+                    addActivatedAbility(
+                        String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
+                            G.colouredGlyph(ManaColour.Order), G.exhaustGhyph),
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                            new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                        new GainBonusManaDoer(),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Order)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
+
+                    addActivatedAbility(
+                        String.Format("{0}{0}, {1}, Sacrifice Mysterious Lilac: Draw a card.", G.colouredGlyph(ManaColour.Order), G.exhaustGhyph),
+                        new Effect(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new DrawCardsDoer(1)),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Order, ManaColour.Order), sacThisLambda),
+                        -1,
+                        PileLocation.Field,
+                        CastSpeed.Channel
+                        );
+
+                } break;
+                #endregion
+
+                #region Daring Poppy
+                case CardTemplate.Daring_sPoppy:
+                    {
+                        cardType = CardType.Relic;
+                        rarity = Rarity.Common;
+
+                        chaosCost = 1;
+
+                        baseMovement = 1;
+
+                        addActivatedAbility(
+                            String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
+                                G.colouredGlyph(ManaColour.Chaos), G.exhaustGhyph),
+                            new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                                new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                            new GainBonusManaDoer(),
+                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Chaos)),
+                            0,
+                            PileLocation.Field,
+                            CastSpeed.Interrupt
+                            );
+
+                        addActivatedAbility(
+                            String.Format("{0}{0}, {1}, Sacrifice Daring Poppy: Deal 2 damage to target creature.", G.colouredGlyph(ManaColour.Chaos), G.exhaustGhyph),
+                            zepLambda(2),
+                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Chaos, ManaColour.Chaos), sacThisLambda),
+                            -1,
+                            PileLocation.Field,
+                            CastSpeed.Channel
+                            );
+
+                    }
+                    break;
+                #endregion
+
+                #region Serene Dandelion
+                case CardTemplate.Serene_sDandelion:
+                    {
+                        cardType = CardType.Relic;
+                        rarity = Rarity.Common;
+
+                        lifeCost = 1;
+
+                        baseMovement = 1;
+
+                        addActivatedAbility(
+                            String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
+                                G.colouredGlyph(ManaColour.Life), G.exhaustGhyph),
+                            new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                                new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                            new GainBonusManaDoer(),
+                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life)),
+                            0,
+                            PileLocation.Field,
+                            CastSpeed.Interrupt
+                            );
+
+                        addActivatedAbility(
+                            String.Format("{0}{0}, {1}, Sacrifice Serene Dandelion: Restore 4 toughness to target creature.", G.colouredGlyph(ManaColour.Life), G.exhaustGhyph),
+                            zepLambda(-4),
+                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life), sacThisLambda),
+                            -1,
+                            PileLocation.Field,
+                            CastSpeed.Channel
+                            );
+
+                    }
+                    break;
+                #endregion
+
+                #region Stark Lily
+                case CardTemplate.Stark_sLily:
+                {
+                    cardType = CardType.Relic;
+                    rarity = Rarity.Common;
+
+                    mightCost = 1;
+
+                    baseMovement = 1;
+
+                    addActivatedAbility(
+                        String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
+                            G.colouredGlyph(ManaColour.Might), G.exhaustGhyph),
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                            new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                        new GainBonusManaDoer(),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Might)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
+
+                    addActivatedAbility(
+                        String.Format("{0}{0}, {1}, Sacrifice Stark Lily: Summon a 2/2 Gryphon token.", G.colouredGlyph(ManaColour.Might), G.exhaustGhyph),
+                        Effect.summonTokensEffect(CardTemplate.Gryphon),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Might, ManaColour.Might), sacThisLambda),
+                        2,
+                        PileLocation.Field,
+                        CastSpeed.Channel
+                        );
+
+                } break;
+                #endregion
+
+                #region Vibrant Zinnia
+                case CardTemplate.Vibrant_sZinnia:
+                    {
+                        cardType = CardType.Relic;
+                        rarity = Rarity.Common;
+
+                        natureCost = 1;
+
+                        baseMovement = 1;
+
+                        addActivatedAbility(
+                            String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
+                                G.colouredGlyph(ManaColour.Nature), G.exhaustGhyph),
+                            new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                                new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                            new GainBonusManaDoer(),
+                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Nature)),
+                            0,
+                            PileLocation.Field,
+                            CastSpeed.Interrupt
+                            );
+
+
+                        Effect e1 = new Effect(new PryCardRule(LL.isNonheroicCreature),
+                            new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.never));
+                        Effect e2 = new Effect(new CopyPreviousRule<Card>(0),
+                            new ModifyDoer(ModifiableStats.Toughness, LL.add(2), LL.never));
+
+                        addActivatedAbility(
+                            String.Format("{0}{0}, {1}, Sacrifice Vibrant Zinnia: Target non-heroic creature gets +2/+2", G.colouredGlyph(ManaColour.Nature), G.exhaustGhyph),
+                            new Effect[] {e1, e2}, 
+                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Nature, ManaColour.Nature), sacThisLambda),
+                            -1,
+                            PileLocation.Field,
+                            CastSpeed.Channel
+                            );
+
+                    }
+                    break;
+                #endregion
+
+                #region Ancient Chopter
+                case CardTemplate.Ancient_sChopter:
+                {
+                    cardType = CardType.Creature;
+                    race = Race.Mecha;
+                    rarity = Rarity.Common;
+
+                    //greyCost = 2;
+                    basePower = 1;
+                    baseToughness = 2;
+                    baseMovement = 4;
+
+                    keywordAbilities.Add(KeywordAbility.Flying);
+                } break;
+                #endregion
 
                 #region tokens
+
+                #region Gryphon
+                case CardTemplate.Gryphon:
+                {
+                    forceColour = ManaColour.Might;
+                    basePower = 2;
+                    baseToughness = 2;
+                    baseMovement = 3;
+                    race = Race.Beast;
+                    isToken = true;
+                    keywordAbilities.Add(KeywordAbility.Flying);
+                } break;
+                #endregion
 
                 #region Squire
                 case CardTemplate.Squire:
@@ -1548,13 +1741,27 @@ namespace stonerkart
             if (alternateCast) alternateCasts.Add(aa);
         }
 
+        private void addActivatedAbility(string description, Effect[] es, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed, bool alternateCast = false)
+        {
+            ActivatedAbility aa = new ActivatedAbility(this, activeIn, castRange, cost, castSpeed, description, es);
+            abilities.Add(aa);
+            if (alternateCast) alternateCasts.Add(aa);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)] //yagni said no one ever
         private static Foo fooFromManaCost(params ManaColour[] cs)
         {
             return new Foo(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                 new ManaCostRule(cs)), new PayManaDoer()));
         }
-        
+
+        public Effect zepLambda(int damage)
+        {
+            return
+                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule(c => c.cardType == CardType.Creature)),
+                    new ZepperDoer(damage));
+        }
+
         public Effect sacThisLambda =>
             new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new MoveToPileDoer(PileLocation.Graveyard));
 

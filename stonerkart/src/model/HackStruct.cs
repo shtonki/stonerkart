@@ -14,7 +14,7 @@ namespace stonerkart
         public bool heroIsCasting => hero == castingPlayer;
         public Func<CardTemplate, Player, Card> createToken;
 
-        public Tile castFrom => !resolveAbility.isCastAbility ? resolveAbility.card.tile : hero.heroCard.tile;
+        public Tile castFrom => !resolveAbility.isCastAbility ? (resolveAbility.card.tile ?? resolveAbility.card.lastSeenAt) : hero.heroCard.tile;
         public int castRange => resolveAbility.castRange;
 
         public Func<Card, int> ordC { get; }

@@ -110,6 +110,41 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Vibrant_sZinnia:
+                {
+                    return Resources.artVibrantZinnia;
+                }
+
+                case CardTemplate.Ancient_sChopter:
+                {
+                    return Resources.artAncientChopter;
+                }
+
+                case CardTemplate.Stark_sLily:
+                {
+                    return Resources.artStarkLily;
+                }
+                
+                case CardTemplate.Gryphon:
+                {
+                    return Resources.artGryphon;
+                }
+
+                case CardTemplate.Serene_sDandelion:
+                {
+                    return Resources.artSereneDandelion;
+                }
+
+                case CardTemplate.Mysterious_sLilac:
+                {
+                    return Resources.artMysteriousLilac;
+                }
+
+                case CardTemplate.Daring_sPoppy:
+                {
+                    return Resources.artDaringPoppy;
+                }
+
                 case CardTemplate.Solemn_sLotus:
                 {
                     return Resources.artSolemnLotus;

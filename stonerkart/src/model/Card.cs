@@ -15,7 +15,21 @@ namespace stonerkart
     {
         public string name { get; }
         public Pile pile { get; private set; }
-        public Tile tile { get; set; }
+
+        public Tile tile
+        {
+            get { return Tile; } 
+            set
+            {
+                Tile = value;
+                if (Tile != null)
+                {
+                    lastSeenAt = Tile;
+                }
+            }
+        }
+        private Tile Tile;
+        public Tile lastSeenAt;
         public Player owner { get; }
         public Player controller { get; }
         public CardTemplate template { get; }
@@ -100,7 +114,8 @@ namespace stonerkart
         public bool canAttack(Card defender)
         {
             if (defender.cardType != CardType.Creature) return false;
-
+            if (defender.hasAbility(KeywordAbility.Flying) &&
+                !(this.hasAbility(KeywordAbility.Flying) || this.hasAbility(KeywordAbility.Wingclipper))) return false;
             return true;
         }
 
@@ -275,6 +290,16 @@ namespace stonerkart
                 {
                     return "When attacking this creature deals damage prior to the defender and is not retaliated against if it kills the defender.";
                 }
+
+                case KeywordAbility.Flying:
+                {
+                    return "Can only be attacked by creatures with Flying";
+                } 
+
+                case KeywordAbility.Wingclipper:
+                {
+                    return "Can attack creatures with Flying.";
+                }
             }
 
             return "";
@@ -419,6 +444,12 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Vibrant_sZinnia,
+        Ancient_sChopter,
+        Stark_sLily,
+        Serene_sDandelion,
+        Daring_sPoppy,
+        Mysterious_sLilac,
         Solemn_sLotus,
         Resounding_sBlast,
         Feral_sImp,
@@ -476,6 +507,7 @@ namespace stonerkart
         Illegal_sGoblin_sLaboratory,
         Teleport,
         Squire,
+        Gryphon,
         Wolf,
         Call_sTo_sArms,
         Sanguine_sArtisan,
@@ -537,5 +569,7 @@ namespace stonerkart
         Elusion,
         Kingslayer,
         Ambush,
+        Flying,
+        Wingclipper,
     }
 }
