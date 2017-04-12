@@ -44,6 +44,11 @@ namespace stonerkart
             return ps != null;
         }
 
+        public bool allowEmpty()
+        {
+            return ts.rules.Any(r => r.allowEmpty());
+        }
+
         public static Effect summonTokensEffect(params CardTemplate[] templates)
         {
             return new Effect(new TargetRuleSet(
@@ -55,6 +60,7 @@ namespace stonerkart
                 true
                 );
         }
+
     }
 
     abstract class Doer : TypeSigned

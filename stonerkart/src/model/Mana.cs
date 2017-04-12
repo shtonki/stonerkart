@@ -221,6 +221,11 @@ namespace stonerkart
         {
             this.colour = colour;
         }
+
+        public int stateCtr()
+        {
+            return 0;
+        }
     }
 
     enum ManaColour

@@ -79,6 +79,11 @@ namespace stonerkart
             }
         }
 
+        public int stateCtr()
+        {
+            return 0;
+        }
+
         #region mana voodoo
         public void resetMana()
         {

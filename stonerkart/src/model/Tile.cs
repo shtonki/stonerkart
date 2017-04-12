@@ -113,6 +113,11 @@ namespace stonerkart
             return ta;
         }
 
+        public int stateCtr()
+        {
+            return 0;
+        }
+
         #region Coordnonsense
         class XYCoord
         {

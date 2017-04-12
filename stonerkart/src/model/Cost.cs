@@ -30,7 +30,12 @@ namespace stonerkart
             for (int i = 0; i < ts.Length; i++)
             {
                 Effect effect = effects[i];
-                rt.AddRange(effect.doer.act(hs, ts[i].generateRows(effect.straightRows)));
+                TargetRow[] rows = ts[i].generateRows(effect.straightRows);
+                if (rows.Length == 0)
+                {
+                    if (!effects[i].allowEmpty()) return new GameEvent[0];
+                }
+                rt.AddRange(effect.doer.act(hs, rows));
             }
 
             return rt;

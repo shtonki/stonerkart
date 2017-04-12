@@ -1,4 +1,4 @@
-﻿#define testx
+﻿#define test
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1816,7 +1816,21 @@ namespace stonerkart
                         );
                 } break;
                 #endregion
+                case CardTemplate.missingo:
+                {
+                    cardType = CardType.Interrupt;
 
+                    castEffect = new Effect(
+                        new TargetRuleSet(
+                            new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new AllCardsRule(c => c.cardType == CardType.Creature && !c.isHeroic)), 
+                        new ZepperDoer(1));
+
+                    additionalCastEffects.Add(new Effect(
+                        new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                        new DrawCardsDoer(1)
+                        ));
+                } break;
 
                 #region tokens
                 #region Spirit
