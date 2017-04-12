@@ -664,7 +664,7 @@ namespace stonerkart
         private List<StackWrapper> handlePendingTrigs(Player p, IEnumerable<TriggerGlueHack> abilities)
         {
             List<StackWrapper> r = new List<StackWrapper>();
-            TriggerGlueHack[] orig = abilities.ToArray();
+            TriggerGlueHack[] orig = abilities.Where(a => a.ta.possible(makeHackStruct(a.ta))).ToArray();
 
             Pile pl = new Pile();
 

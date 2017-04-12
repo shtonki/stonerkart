@@ -74,5 +74,18 @@ namespace stonerkart
         {
             return effects.All(e => e.possibleAsCost(hs));
         }
+
+        public bool possibleTargets(HackStruct hs)
+        {
+            foreach (Effect e in effects)
+            {
+                foreach (var r in e.ts.rules)
+                {
+                    int i = r.possible(hs).targets.Length;
+                    if (i == 0 && !r.allowEmpty()) return false;
+                }
+            }
+            return true;
+        }
     }
 }

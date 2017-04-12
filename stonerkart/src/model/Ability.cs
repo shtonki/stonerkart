@@ -35,7 +35,7 @@ namespace stonerkart
 
         public bool possible(HackStruct hs)
         {
-            return cost.possibleAsCost(hs);
+            return effects.possibleTargets(hs) && cost.possibleAsCost(hs);
         }
 
         public Card createDummy()

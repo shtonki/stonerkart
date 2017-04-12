@@ -1,4 +1,4 @@
-﻿#define test
+﻿#define testx
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1587,8 +1587,8 @@ namespace stonerkart
                     greyCost = 3;
 
                     etbLambda(
-                        "When Bubastis enters the battlefield you may return target non-heroic creature within 5 tiles to it's owners hand.",
-                        new Effect(LL.nonheroicCreature(), new MoveToPileDoer(PileLocation.Hand)),
+                        "When Bubastis enters the battlefield you may return another target non-heroic creature within 5 tiles to it's owners hand.",
+                        new Effect(LL.nonheroicCreature(c => c != this), new MoveToPileDoer(PileLocation.Hand)),
                         5,
                         true
                         );
