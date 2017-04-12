@@ -154,6 +154,8 @@ namespace stonerkart
 
         public abstract TargetColumn possible(HackStruct hs);
 
+        protected const bool IGNORE = false;
+
         public abstract bool allowEmpty();
     }
 
@@ -248,7 +250,7 @@ namespace stonerkart
 
         public override bool allowEmpty()
         {
-            return false;
+            return true;
         }
     }
 
@@ -498,7 +500,7 @@ namespace stonerkart
 
         public override bool allowEmpty()
         {
-            return true;
+            return IGNORE;
         }
     }
 
@@ -527,7 +529,7 @@ namespace stonerkart
 
         public override bool allowEmpty()
         {
-            return true;
+            return IGNORE;
         }
     }
 
@@ -1041,7 +1043,7 @@ namespace stonerkart
         public Targetable[] targets;
         private int[] stateCtrs;
 
-        public static TargetColumn empty => new TargetColumn();
+        public static TargetColumn empty => new TargetColumn(new Targetable[0]);
 
         public TargetColumn(params Targetable[] targets)
         {
