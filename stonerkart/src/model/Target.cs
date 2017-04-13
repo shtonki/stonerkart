@@ -93,27 +93,28 @@ namespace stonerkart
 
         public TargetRow[] generateRows(bool straightRows)
         {
+            TargetColumn[] cls = columns.Select(c => c.valid()).ToArray();
             if (straightRows) return straightRowsEx();
-            int l = columns.Aggregate(1, (current, c) => current*c.targets.Length);
+            int l = cls.Aggregate(1, (current, c) => current*c.targets.Length);
             if (l == 0) return new TargetRow[] {};
 
-            int[] ms = columns.Select(c => c.targets.Length).ToArray();
-            int[] cs = columns.Select(c => 0).ToArray();
+            int[] ms = cls.Select(c => c.targets.Length).ToArray();
+            int[] cs = cls.Select(c => 0).ToArray();
 
             TargetRow[] r = new TargetRow[l];
             int rc = 0;
             while (true)
             {
-                Targetable[] tr = new Targetable[columns.Length];
-                for (int i = 0; i < columns.Length; i++)
+                Targetable[] tr = new Targetable[cls.Length];
+                for (int i = 0; i < cls.Length; i++)
                 {
-                    tr[i] = columns[i].targets[cs[i]];
+                    tr[i] = cls[i].targets[cs[i]];
                 }
                 r[rc++] = new TargetRow(tr);
 
-                cs[columns.Length - 1]++;
+                cs[cls.Length - 1]++;
 
-                for (int i = columns.Length - 1; i > 0; i--)
+                for (int i = cls.Length - 1; i > 0; i--)
                 {
                     if (cs[i] == ms[i])
                     {
@@ -152,6 +153,10 @@ namespace stonerkart
         public abstract TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c);
 
         public abstract TargetColumn possible(HackStruct hs);
+
+        protected const bool IGNORE = true;
+
+        public abstract bool allowEmpty();
     }
 
     class SelectManaRule : TargetRule
@@ -180,6 +185,11 @@ namespace stonerkart
         {
             return new TargetColumn(Enum.GetValues(typeof (ManaColour)).Cast<ManaColour>().Select(c => new ManaOrb(c)));
         }
+
+        public override bool allowEmpty()
+        {
+            return false;
+        }
     }
 
     class StaticManaRule : TargetRule
@@ -204,6 +214,11 @@ namespace stonerkart
         public override TargetColumn possible(HackStruct hs)
         {
             return new TargetColumn(Enum.GetValues(typeof(ManaColour)).Cast<ManaColour>().Select(c => new ManaOrb(c)));
+        }
+
+        public override bool allowEmpty()
+        {
+            return false;
         }
     }
 
@@ -231,6 +246,11 @@ namespace stonerkart
         public override TargetColumn possible(HackStruct hs)
         {
             return fillCastTargets(hs).Value;
+        }
+
+        public override bool allowEmpty()
+        {
+            return true;
         }
     }
 
@@ -270,6 +290,11 @@ namespace stonerkart
         {
             return new TargetColumn(hs.cards.Where(filter));
         }
+
+        public override bool allowEmpty()
+        {
+            return false;
+        }
     }
 
     class CreateTokenRule : TargetRule
@@ -308,6 +333,11 @@ namespace stonerkart
         {
             return TargetColumn.empty;
         }
+
+        public override bool allowEmpty()
+        {
+            return true;
+        }
     }
 
     class SelectCardRule : TargetRule
@@ -320,29 +350,6 @@ namespace stonerkart
         private Mode mode;
         public bool cancelable { get; set; }
         public bool sync { get; set; } = true;
-        /*
-        public SelectCardRule(PileLocation l, TargetRule pg, Func<Card, bool> filter) : base(typeof(Card))
-        {
-            this.pg = pg;
-            this.l = l;
-            this.filter = filter;
-        }
-
-        public SelectCardRule(PileLocation location, TargetRule playerGenerator) : this(location, playerGenerator, c => true)
-        {
-            pg = playerGenerator;
-            l = location;
-        }
-        */
-        /*
-        public SelectCardRule(PileLocation l, Func<Card, bool> filter = null, TargetRule pg = null, Mode mode = Mode.Reflective) : base(typeof(Card))
-        {
-            this.pg = pg ?? new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController);
-            this.l = l;
-            this.filter = filter ?? (c => true);
-            this.mode = mode;
-        }
-        */
 
         public SelectCardRule(TargetRule pileOwnerRule, PileLocation pile, Func<Card, bool> filter, Mode mode) : this(pileOwnerRule, pile, filter, mode, false)
         {
@@ -426,6 +433,11 @@ namespace stonerkart
 
             return new TargetColumn(psbl);
         }
+
+        public override bool allowEmpty()
+        {
+            return cancelable;
+        }
     }
 
     class CastSelectCardRule : TargetRule
@@ -460,6 +472,11 @@ namespace stonerkart
         {
             return r.possible(hs);
         }
+
+        public override bool allowEmpty()
+        {
+            return r.allowEmpty();
+        }
     }
 
     class CopyPreviousRule<T> : ResolveRule
@@ -478,7 +495,12 @@ namespace stonerkart
 
         public override TargetColumn possible(HackStruct hs)
         {
-            return hs.previousColumn;
+            return TargetColumn.empty;
+        }
+
+        public override bool allowEmpty()
+        {
+            return IGNORE;
         }
     }
 
@@ -501,8 +523,14 @@ namespace stonerkart
 
         public override TargetColumn possible(HackStruct hs)
         {
-            return new TargetColumn(hs.previousColumn.targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
+            return TargetColumn.empty;
+            //return new TargetColumn(hs.previousColumn.targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
             //return hs.previousColumn;
+        }
+
+        public override bool allowEmpty()
+        {
+            return IGNORE;
         }
     }
 
@@ -536,6 +564,11 @@ namespace stonerkart
         public override TargetColumn possible(HackStruct hs)
         {
             return ruler.possible(hs);
+        }
+
+        public override bool allowEmpty()
+        {
+            return true;
         }
     }
 
@@ -626,6 +659,11 @@ namespace stonerkart
         public override TargetColumn possible(HackStruct hs)
         {
             return new TargetColumn(ms.orbs);
+        }
+
+        public override bool allowEmpty()
+        {
+            return false;
         }
     }
 
@@ -749,6 +787,11 @@ namespace stonerkart
         }
 
         protected abstract Targetable pry(Tile t);
+
+        public override bool allowEmpty()
+        {
+            return false;
+        }
     }
 
     class PryTileRule : PryRule
@@ -894,6 +937,11 @@ namespace stonerkart
             AllHeroes,
             VillainHeroes,
         }
+
+        public override bool allowEmpty()
+        {
+            return false;
+        }
     }
 
     class AllCardsRule : ResolveRule
@@ -913,6 +961,11 @@ namespace stonerkart
         public override TargetColumn possible(HackStruct hs)
         {
             return new TargetColumn(hs.cards.Where(filter));
+        }
+
+        public override bool allowEmpty()
+        {
+            return true;
         }
     }
 
@@ -953,6 +1006,10 @@ namespace stonerkart
             ResolveController,
             AllPlayers,
         }
+        public override bool allowEmpty()
+        {
+            return false;
+        }
     }
 
     abstract class ResolveRule : TargetRule
@@ -985,23 +1042,31 @@ namespace stonerkart
     struct TargetColumn
     {
         public Targetable[] targets;
+        private int[] stateCtrs;
 
-        public static TargetColumn empty => new TargetColumn();
+        public static TargetColumn empty => new TargetColumn(new Targetable[0]);
 
         public TargetColumn(params Targetable[] targets)
         {
             this.targets = targets;
+            stateCtrs = targets.Select(t => t.stateCtr()).ToArray();
         }
 
         public TargetColumn(IEnumerable<Targetable> ts) : this(ts.ToArray())
         {
             
         }
+
+        public TargetColumn valid()
+        {
+            var ebinLanguage = stateCtrs;
+            return new TargetColumn(targets.Where((t, i) => t.stateCtr() == ebinLanguage[i]));
+        }
     }
     
     
     interface Targetable
     {
-        
+        int stateCtr();
     }
 }

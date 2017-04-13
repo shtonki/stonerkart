@@ -664,7 +664,7 @@ namespace stonerkart
         private List<StackWrapper> handlePendingTrigs(Player p, IEnumerable<TriggerGlueHack> abilities)
         {
             List<StackWrapper> r = new List<StackWrapper>();
-            TriggerGlueHack[] orig = abilities.ToArray();
+            TriggerGlueHack[] orig = abilities.Where(a => a.ta.possible(makeHackStruct(a.ta))).ToArray();
 
             Pile pl = new Pile();
 
@@ -716,24 +716,28 @@ namespace stonerkart
 
                 dp.close();
 
-                connection.sendAction(new ChoiceSelection(triggd.Select(t => pl.indexOf(t.dummyCard))));
-
                 foreach (ptas pt in triggd)
                 {
-                    connection.sendAction(new CastSelection(pt.wrapper));
                     r.Add(pt.wrapper);
                 }
+
+                connection.sendAction(new TriggeredAbilitiesGluer(
+                    new ChoiceSelection(triggd.Select(t => pl.indexOf(t.dummyCard))),
+                    triggd.Select(t => new CastSelection(t.wrapper)).ToArray()
+                    ));
             }
             else
             {
                 gameController.setPrompt("Opponent is handling triggered abilities.");
 
-                ChoiceSelection cs = connection.receiveAction<ChoiceSelection>();
-                if (cs.choices.Length != orig.Count()) throw new Exception();
+                TriggeredAbilitiesGluer glue = connection.receiveAction<TriggeredAbilitiesGluer>();
+
+                var cs = glue.choices;
+                var css = glue.castSelections;
 
                 for (int i = 0; i < orig.Count(); i++)
                 {
-                    StackWrapper w = connection.receiveAction<CastSelection>().wrapper;
+                    StackWrapper w = css[i].wrapper;
                     
                     Card dummy = pl[cs.choices[i]];
                     r.Add(new StackWrapper(dummy, w.ability, w.targetMatrices, w.costMatricies));

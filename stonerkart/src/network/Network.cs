@@ -104,7 +104,6 @@ namespace stonerkart
                 GameMessageBody b = new GameMessageBody(message);
                 Message m = new Message(recipient, Message.MessageType.GAMEMESSAGE, b);
                 serverConnection.send(m);
-                Thread.Sleep(2);
             }
         }
 

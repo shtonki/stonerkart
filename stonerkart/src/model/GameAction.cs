@@ -325,4 +325,48 @@ namespace stonerkart
             return b.ToString();
         }
     }
+
+    class TriggeredAbilitiesGluer : GameAction
+    {
+        public ChoiceSelection choices;
+        public CastSelection[] castSelections;
+
+        public TriggeredAbilitiesGluer()
+        {
+            choices = new ChoiceSelection();
+            castSelections = new CastSelection[0];
+        }
+
+        public TriggeredAbilitiesGluer(ChoiceSelection choices, CastSelection[] castSelections)
+        {
+            this.choices = choices;
+            this.castSelections = castSelections;
+        }
+
+        public TriggeredAbilitiesGluer(Game g, string s)
+        {
+            var ss = s.Split('+');
+
+            choices = new ChoiceSelection(g, ss[0]);
+            castSelections = ss.Skip(1).Select(str => new CastSelection(g, str)).ToArray();
+
+            if (choices.choices.Length != castSelections.Length) throw new Exception();
+        }
+
+        public string toString(Game g)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(choices.toString(g));
+            sb.Append('+');
+
+            foreach (var c in castSelections)
+            {
+                sb.Append(c.toString(g));
+                sb.Append('+');
+            }
+            sb.Length--;
+            return sb.ToString();
+        }
+    }
 }

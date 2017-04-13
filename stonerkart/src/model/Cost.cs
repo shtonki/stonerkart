@@ -30,7 +30,12 @@ namespace stonerkart
             for (int i = 0; i < ts.Length; i++)
             {
                 Effect effect = effects[i];
-                rt.AddRange(effect.doer.act(hs, ts[i].generateRows(effect.straightRows)));
+                TargetRow[] rows = ts[i].generateRows(effect.straightRows);
+                if (rows.Length == 0)
+                {
+                    if (!effects[i].allowEmpty()) return new GameEvent[0];
+                }
+                rt.AddRange(effect.doer.act(hs, rows));
             }
 
             return rt;
@@ -68,6 +73,21 @@ namespace stonerkart
         public bool possibleAsCost(HackStruct hs)
         {
             return effects.All(e => e.possibleAsCost(hs));
+        }
+
+        public bool possibleTargets(HackStruct hs)
+        {
+            foreach (Effect e in effects)
+            {
+                foreach (var r in e.ts.rules)
+                {
+                    var v = r.possible(hs);
+                    int i = v.targets.Length;
+                    if (i == 0 && !r.allowEmpty()) return false;
+                    //hs.previousColumn = v;
+                }
+            }
+            return true;
         }
     }
 }

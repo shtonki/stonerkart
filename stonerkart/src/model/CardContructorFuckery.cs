@@ -1298,7 +1298,7 @@ namespace stonerkart
                     chaosCost = 2;
                     greyCost = 1;
 
-                    castEffect =zepLambda(3);
+                    castEffect = zepNonHeroicLambda(3);
                     additionalCastEffects.Add(new Effect(
                         new TargetRuleSet(
                             new CopyPreviousRule<Card>(0),
@@ -1587,8 +1587,8 @@ namespace stonerkart
                     greyCost = 3;
 
                     etbLambda(
-                        "When Bubastis enters the battlefield you may return target non-heroic creature within 5 tiles to it's owners hand.",
-                        new Effect(LL.nonheroicCreature(), new MoveToPileDoer(PileLocation.Hand)),
+                        "When Bubastis enters the battlefield you may return another target non-heroic creature within 5 tiles to it's owners hand.",
+                        new Effect(LL.nonheroicCreature(c => c != this), new MoveToPileDoer(PileLocation.Hand)),
                         5,
                         true
                         );
@@ -1816,7 +1816,21 @@ namespace stonerkart
                         );
                 } break;
                 #endregion
+                case CardTemplate.missingo:
+                {
+                    cardType = CardType.Interrupt;
 
+                    castEffect = new Effect(
+                        new TargetRuleSet(
+                            new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new AllCardsRule(c => c.cardType == CardType.Creature && !c.isHeroic)), 
+                        new ZepperDoer(1));
+
+                    additionalCastEffects.Add(new Effect(
+                        new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                        new DrawCardsDoer(1)
+                        ));
+                } break;
 
                 #region tokens
                 #region Spirit
@@ -1990,6 +2004,13 @@ namespace stonerkart
         {
             return
                 new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.creature()),
+                    new ZepperDoer(damage));
+        }
+
+        public Effect zepNonHeroicLambda(int damage)
+        {
+            return
+                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.nonheroicCreature()),
                     new ZepperDoer(damage));
         }
 

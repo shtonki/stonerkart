@@ -30,6 +30,7 @@ namespace stonerkart
         }
         private Tile Tile;
         public Tile lastSeenAt;
+        private int moveCount;
         public Player owner { get; }
         public Player controller { get; }
         public CardTemplate template { get; }
@@ -219,6 +220,11 @@ namespace stonerkart
 
         }
 
+        public int stateCtr()
+        {
+            return moveCount;
+        }
+
         public void updateState()
         {
             foreach (Modifiable modifiable in modifiables)
@@ -394,6 +400,7 @@ namespace stonerkart
 
             r.add(new TypedGameEventHandler<MoveToPileEvent>(e =>
             {
+                moveCount++;
                 if (e.nullTile && tile != null)
                 {
                     tile.removeCard();
@@ -446,6 +453,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        missingo,
         Sparryz,
         Flamekindler,
         Moratian_sBattle_sStandard,
