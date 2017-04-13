@@ -175,7 +175,7 @@ namespace stonerkart
                     return Resources.artVibrantZinnia;
                 }
 
-                case CardTemplate.Ancient_sChopter:
+                case CardTemplate.Primal_sChopter:
                 {
                     return Resources.artAncientChopter;
                 }
