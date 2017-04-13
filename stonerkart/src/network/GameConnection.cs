@@ -119,6 +119,10 @@ namespace stonerkart
             {
                 r = new ChoiceSelection();
             }
+            else if (typeof (T) == typeof(TriggeredAbilitiesGluer))
+            {
+                r = new TriggeredAbilitiesGluer();
+            }
             else
             {
                 throw new NotImplementedException();

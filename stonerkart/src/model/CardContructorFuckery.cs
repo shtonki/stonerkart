@@ -1298,7 +1298,7 @@ namespace stonerkart
                     chaosCost = 2;
                     greyCost = 1;
 
-                    castEffect =zepLambda(3);
+                    castEffect = zepNonHeroicLambda(3);
                     additionalCastEffects.Add(new Effect(
                         new TargetRuleSet(
                             new CopyPreviousRule<Card>(0),
@@ -2004,6 +2004,13 @@ namespace stonerkart
         {
             return
                 new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.creature()),
+                    new ZepperDoer(damage));
+        }
+
+        public Effect zepNonHeroicLambda(int damage)
+        {
+            return
+                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.nonheroicCreature()),
                     new ZepperDoer(damage));
         }
 

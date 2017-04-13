@@ -81,8 +81,10 @@ namespace stonerkart
             {
                 foreach (var r in e.ts.rules)
                 {
-                    int i = r.possible(hs).targets.Length;
+                    var v = r.possible(hs);
+                    int i = v.targets.Length;
                     if (i == 0 && !r.allowEmpty()) return false;
+                    //hs.previousColumn = v;
                 }
             }
             return true;

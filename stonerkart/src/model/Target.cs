@@ -154,7 +154,7 @@ namespace stonerkart
 
         public abstract TargetColumn possible(HackStruct hs);
 
-        protected const bool IGNORE = false;
+        protected const bool IGNORE = true;
 
         public abstract bool allowEmpty();
     }
@@ -495,7 +495,7 @@ namespace stonerkart
 
         public override TargetColumn possible(HackStruct hs)
         {
-            return hs.previousColumn;
+            return TargetColumn.empty;
         }
 
         public override bool allowEmpty()
@@ -523,7 +523,8 @@ namespace stonerkart
 
         public override TargetColumn possible(HackStruct hs)
         {
-            return new TargetColumn(hs.previousColumn.targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
+            return TargetColumn.empty;
+            //return new TargetColumn(hs.previousColumn.targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
             //return hs.previousColumn;
         }
 
