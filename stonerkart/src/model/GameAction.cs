@@ -331,6 +331,12 @@ namespace stonerkart
         public ChoiceSelection choices;
         public CastSelection[] castSelections;
 
+        public TriggeredAbilitiesGluer()
+        {
+            choices = new ChoiceSelection();
+            castSelections = new CastSelection[0];
+        }
+
         public TriggeredAbilitiesGluer(ChoiceSelection choices, CastSelection[] castSelections)
         {
             this.choices = choices;

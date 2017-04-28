@@ -116,7 +116,7 @@ namespace stonerkart
                 greyCost = 2;
 
                 addTriggeredAbility(
-                    "Whenever this creature enters the battlefield under your control, draw two cards.",
+                    "Whenever Kappa enters the battlefield under your control, draw two cards.",
                     new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                     new DrawCardsDoer(2),
                     new Foo(),
@@ -462,7 +462,7 @@ namespace stonerkart
                 natureCost = 1;
 
                 addTriggeredAbility(
-                    "Whenever this creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
+                    "Whenever Graverobber Syrdin creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
                     new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard)),
                     new MoveToPileDoer(PileLocation.Hand),
                     new Foo(),
@@ -573,7 +573,7 @@ namespace stonerkart
 
 
                 addTriggeredAbility(
-                    "When this creature enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
+                    "When Baby Dragon enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
                     new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
                     new ZepperDoer(1),
                     new Foo(),
@@ -719,7 +719,7 @@ namespace stonerkart
                 deathCost = 2;
 
                 auras.Add(new Aura(
-                    "This creature gets +1/+0 for each Zombie in its controllers graveyard.",
+                    "Ilas Gravekeeper gets +1/+0 for each Zombie in its controllers graveyard.",
                     v => v + controller.graveyard.Count(c => c.race == Race.Zombie),
                     ModifiableStats.Power,
                     c => c == this,
@@ -780,7 +780,7 @@ namespace stonerkart
                 greyCost = 1;
 
                 addActivatedAbility(
-                    "You may cast this card from the graveyard.",
+                    "You may cast Ilatian Haunter from the graveyard.",
                     new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                         new PryTileRule(t => t.card == null && !t.isEdgy,
                             new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
@@ -947,7 +947,7 @@ namespace stonerkart
                     greyCost = 3;
                         
                     addTriggeredAbility(
-                        "Whenever Rider of Famine deals damage to a player that player discards a card.",
+                        "Whenever Rider of Pestilence deals damage to a player that player discards a card.",
                         new TargetRuleSet(new SelectCardRule(new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller), PileLocation.Hand, c => true)),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(),
@@ -972,7 +972,7 @@ namespace stonerkart
                         greyCost = 3;
 
                         addTriggeredAbility(
-                            "Whenever Rider of Pestilence deals damage to a player that player sacrifices a non-heroic creature.",
+                            "Whenever Rider of Famine deals damage to a player that player sacrifices a non-heroic creature.",
                             new TargetRuleSet(new SelectCardRule(new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller), PileLocation.Field, c => !c.isHeroic && c.cardType == CardType.Creature)),
                             new MoveToPileDoer(PileLocation.Graveyard),
                             new Foo(),
@@ -1298,7 +1298,7 @@ namespace stonerkart
                     chaosCost = 2;
                     greyCost = 1;
 
-                    castEffect =zepLambda(3);
+                    castEffect = zepNonHeroicLambda(3);
                     additionalCastEffects.Add(new Effect(
                         new TargetRuleSet(
                             new CopyPreviousRule<Card>(0),
@@ -1516,8 +1516,8 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-                #region Ancient Chopter
-                case CardTemplate.Ancient_sChopter:
+                #region Primal Chopter
+                case CardTemplate.Primal_sChopter:
                 {
                     cardType = CardType.Creature;
                     race = Race.Mecha;
@@ -1609,7 +1609,7 @@ namespace stonerkart
                     baseMovement = 3;
 
                     diesLambda(
-                        "Whenever Unyeilding Stalward enters the graveyard from the battlefield under your control, summon a 1/1 Spirit token with Flying.",
+                        "Whenever Unyeilding Stalwart enters the graveyard from the battlefield under your control, summon a 1/1 Spirit token with Flying.",
                         Effect.summonTokensEffect(CardTemplate.Spirit),
                         2);
                 } break;
@@ -1686,7 +1686,7 @@ namespace stonerkart
                         ));
 
                     auras.Add(new Aura(
-                        "This creature gets +1/+1 for each colour among cards in Graveyards.",
+                        "Chromatic Unicorn gets +1/+1 for each colour among cards in Graveyards.",
                         v => v + (owner.game.allPlayers.SelectMany(p => p.graveyard.cards).SelectMany(c => c.colours).Where(c => c != ManaColour.Colourless).Distinct().Count()),
                         ModifiableStats.Toughness,
                         c => c == this,
@@ -2004,6 +2004,13 @@ namespace stonerkart
         {
             return
                 new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.creature()),
+                    new ZepperDoer(damage));
+        }
+
+        public Effect zepNonHeroicLambda(int damage)
+        {
+            return
+                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.nonheroicCreature()),
                     new ZepperDoer(damage));
         }
 

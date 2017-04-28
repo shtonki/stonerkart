@@ -466,7 +466,7 @@ namespace stonerkart
         Morenian_sMedic,
         Famished_sTarantula,
         Vibrant_sZinnia,
-        Ancient_sChopter,
+        Primal_sChopter,
         Stark_sLily,
         Serene_sDandelion,
         Daring_sPoppy,
