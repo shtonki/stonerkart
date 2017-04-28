@@ -172,7 +172,7 @@ namespace stonerkart
                     new Effect(
                         new SelectCardRule(new PryPlayerRule(p => true,
                             new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                            PileLocation.Hand, c => false, SelectCardRule.Mode.Resolver),
+                            PileLocation.Hand, c => false, SelectCardRule.Mode.Resolver, true),
                         new ModifyDoer(ModifiableStats.Movement, LL.add(0), LL.clearAura))); //ugliest hack i've seen in a while
                 castDescription = "Look at target players hand. Draw a card.";
 
