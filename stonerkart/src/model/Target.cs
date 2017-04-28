@@ -645,7 +645,7 @@ namespace stonerkart
                 }
                 else
                 {
-                    cost = hs.castingPlayer.manaPool.current;
+                    cost = new ManaSet(hs.castingPlayer.manaPool.orbs);
                 }
             }
             return new TargetColumn(cost.orbs);
