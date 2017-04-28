@@ -215,6 +215,7 @@ namespace stonerkart
 
         public static char colouredGlyph(ManaColour c)
         {
+            if (c == ManaColour.Colourless) throw new Exception();
             return hackedaf[(int)c];
         }
 

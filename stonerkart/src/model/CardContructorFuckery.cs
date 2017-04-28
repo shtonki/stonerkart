@@ -1313,19 +1313,19 @@ namespace stonerkart
                 case CardTemplate.Solemn_sLotus:
                 {
                     cardType = CardType.Relic;
-                    rarity = Rarity.Common;
+                    rarity = Rarity.Uncommon;
+                    forceColour = ManaColour.Death;
 
-                    deathCost = 1;
+                    greyCost = 1;
 
                     baseMovement = 1;
 
                     addActivatedAbility(
-                        String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
-                            G.colouredGlyph(ManaColour.Death), G.exhaustGhyph),
-                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                            new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                        String.Format("{0}, {1}: Gain one Death mana until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph),
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new StaticManaRule(ManaColour.Death)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death)),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -1346,25 +1346,26 @@ namespace stonerkart
                 case CardTemplate.Mysterious_sLilac:
                 {
                     cardType = CardType.Relic;
-                    rarity = Rarity.Common;
+                    rarity = Rarity.Uncommon;
+                    forceColour = ManaColour.Order;
 
-                    orderCost = 1;
+                    greyCost = 1;
 
                     baseMovement = 1;
 
                     addActivatedAbility(
-                        String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
-                            G.colouredGlyph(ManaColour.Order), G.exhaustGhyph),
+                        String.Format("{0}, {1}: Gain one Order mana until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                            new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                            new StaticManaRule(ManaColour.Order)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Order)),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
                         );
 
-                    addActivatedAbility(
+                        addActivatedAbility(
                         String.Format("{0}{0}, {1}, Sacrifice Mysterious Lilac: Draw a card.", G.colouredGlyph(ManaColour.Order), G.exhaustGhyph),
                         new Effect(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new DrawCardsDoer(1)),
                         new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Order, ManaColour.Order), sacThisLambda),
@@ -1379,23 +1380,23 @@ namespace stonerkart
                 case CardTemplate.Daring_sPoppy:
                     {
                         cardType = CardType.Relic;
-                        rarity = Rarity.Common;
+                        rarity = Rarity.Uncommon;
+                        forceColour = ManaColour.Chaos;
 
-                        chaosCost = 1;
+                        greyCost = 1;
 
                         baseMovement = 1;
 
                         addActivatedAbility(
-                            String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
-                                G.colouredGlyph(ManaColour.Chaos), G.exhaustGhyph),
-                            new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                                new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
-                            new GainBonusManaDoer(),
-                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Chaos)),
-                            0,
-                            PileLocation.Field,
-                            CastSpeed.Interrupt
-                            );
+                        String.Format("{0}, {1}: Gain one Chaos mana until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph),
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new StaticManaRule(ManaColour.Chaos)),
+                        new GainBonusManaDoer(),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
 
                         addActivatedAbility(
                             String.Format("{0}{0}, {1}, Sacrifice Daring Poppy: Deal 2 damage to target creature.", G.colouredGlyph(ManaColour.Chaos), G.exhaustGhyph),
@@ -1413,23 +1414,23 @@ namespace stonerkart
                 case CardTemplate.Serene_sDandelion:
                     {
                         cardType = CardType.Relic;
-                        rarity = Rarity.Common;
+                        rarity = Rarity.Uncommon;
+                        forceColour = ManaColour.Life;
 
-                        lifeCost = 1;
+                        greyCost = 1;
 
                         baseMovement = 1;
 
                         addActivatedAbility(
-                            String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
-                                G.colouredGlyph(ManaColour.Life), G.exhaustGhyph),
-                            new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                                new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
-                            new GainBonusManaDoer(),
-                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life)),
-                            0,
-                            PileLocation.Field,
-                            CastSpeed.Interrupt
-                            );
+                        String.Format("{0}, {1}: Gain one Life mana until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph),
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new StaticManaRule(ManaColour.Life)),
+                        new GainBonusManaDoer(),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
 
                         addActivatedAbility(
                             String.Format("{0}{0}, {1}, Sacrifice Serene Dandelion: Restore 4 toughness to target creature.", G.colouredGlyph(ManaColour.Life), G.exhaustGhyph),
@@ -1447,25 +1448,26 @@ namespace stonerkart
                 case CardTemplate.Stark_sLily:
                 {
                     cardType = CardType.Relic;
-                    rarity = Rarity.Common;
+                        rarity = Rarity.Uncommon;
+                        forceColour = ManaColour.Might;
 
-                    mightCost = 1;
+                    greyCost = 1;
 
                     baseMovement = 1;
 
                     addActivatedAbility(
-                        String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
-                            G.colouredGlyph(ManaColour.Might), G.exhaustGhyph),
+                        String.Format("{0}, {1}: Gain one Might mana until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                            new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
+                            new StaticManaRule(ManaColour.Might)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Might)),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
                         );
 
-                    addActivatedAbility(
+                        addActivatedAbility(
                         String.Format("{0}{0}, {1}, Sacrifice Stark Lily: Summon a 2/2 Gryphon token with Flying.", G.colouredGlyph(ManaColour.Might), G.exhaustGhyph),
                         Effect.summonTokensEffect(CardTemplate.Gryphon),
                         new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Might, ManaColour.Might), sacThisLambda),
@@ -1480,23 +1482,23 @@ namespace stonerkart
                 case CardTemplate.Vibrant_sZinnia:
                     {
                         cardType = CardType.Relic;
-                        rarity = Rarity.Common;
+                        rarity = Rarity.Uncommon;
+                        forceColour = ManaColour.Nature;
 
-                        natureCost = 1;
+                        greyCost = 1;
 
                         baseMovement = 1;
 
                         addActivatedAbility(
-                            String.Format("{0}, {1}: Gain one mana of any colour until end of step.",
-                                G.colouredGlyph(ManaColour.Nature), G.exhaustGhyph),
-                            new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                                new SelectManaRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))),
-                            new GainBonusManaDoer(),
-                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Nature)),
-                            0,
-                            PileLocation.Field,
-                            CastSpeed.Interrupt
-                            );
+                        String.Format("{0}, {1}: Gain one Nature mana until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph),
+                        new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new StaticManaRule(ManaColour.Nature)),
+                        new GainBonusManaDoer(),
+                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
 
 
                         Effect e1 = new Effect(LL.nonheroicCreature(),
