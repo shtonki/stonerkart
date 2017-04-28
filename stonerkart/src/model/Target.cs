@@ -772,12 +772,12 @@ namespace stonerkart
             if (ts.Count < count) return null;
             return new TargetColumn(ts);
         }
-
+        
         public override TargetColumn possible(HackStruct hs)
         {
-            return new TargetColumn(hs.tilesInRange.Where(t => pry(t) != null));
+            return new TargetColumn(hs.tilesInRange.Select(t => pry(t)).Where(t => t != null));
         }
-
+        
         protected Targetable pryx(Tile t, HackStruct hs)
         {
             Card c = t.card;
