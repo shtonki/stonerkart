@@ -1,32 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace stonerkart
 {
     class MultiplayerConnection : GameConnection
     {
         private Game game;
-        private string[] otherPlayers;
-
 
         public MultiplayerConnection(Game g, NewGameStruct ngs)
         {
             game = g;
-
-            List<string> ps = new List<string>();
-            for (int i = 0; i < ngs.playerNames.Length; i++)
-            {
-                if (i == ngs.heroIndex) continue;
-                ps.Add(ngs.playerNames[i]);
-            }
-            otherPlayers = ps.ToArray();
         }
 
         public T receiveAction<T>() where T : GameAction
         {
             GameAction r;
-            string s = Network.dequeueGameMessage();
+            string s = dequeueGameMessage();
             if (typeof(T) == typeof (ManaOrbSelection))
             {
                 r = new ManaOrbSelection(game, s);
@@ -57,12 +48,12 @@ namespace stonerkart
         public void sendAction(GameAction g)
         {
             string s = g.toString(game);
-            Network.sendGameMessage(s, otherPlayers);
+            Network.sendGameMessage(game, s);
         }
 
         public Deck[] deckify(Deck myDeck, int myIndex)
         {
-            Deck[] decks = new Deck[otherPlayers.Length + 1];
+            Deck[] decks = new Deck[2]; //todo this is fucked
             decks[myIndex] = myDeck;
 
             List<int> send = new List<int>();
@@ -74,7 +65,7 @@ namespace stonerkart
 
             for (int i = 1; i < decks.Length; i++)
             {
-                string s = Network.dequeueGameMessage();
+                string s = dequeueGameMessage();
                 var c = new ChoiceSelection(null, s);
 
                 int pix = c.choices[0];
@@ -90,6 +81,25 @@ namespace stonerkart
             }
             
             return decks;
+        }
+
+
+        private string qdstring;
+        private ManualResetEventSlim mre = new ManualResetEventSlim();
+        public void enqueueGameMessage(string s)
+        {
+            if (qdstring != null) throw new Exception();
+            qdstring = s;
+            mre.Set();
+        }
+
+        private string dequeueGameMessage()
+        {
+            mre.Wait();
+            string r = qdstring;
+            qdstring = null;
+            mre.Reset();
+            return r;
         }
     }
 
@@ -170,12 +180,18 @@ namespace stonerkart
 
             return r;
         }
+
+        public void enqueueGameMessage(string s)
+        {
+            throw new Exception();
+        }
     }
 
     interface GameConnection
     {
         void sendAction(GameAction g);
         T receiveAction<T>() where T : GameAction;
+        void enqueueGameMessage(string s);
         Deck[] deckify(Deck myDeck, int myIndex);
     }
 }

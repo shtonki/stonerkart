@@ -31,6 +31,7 @@ namespace stonerkart
 
         public GameController gameController;
 
+        public int gameid { get; }
 
         private GameEventHandlerBuckets baseHandler = new GameEventHandlerBuckets();
         private Stack<StackWrapper> wrapperStack { get; } = new Stack<StackWrapper>();
@@ -44,6 +45,8 @@ namespace stonerkart
 
         public Game(NewGameStruct ngs, bool local)
         {
+            gameid = ngs.gameid;
+
             if (local)
             {
                 connection = new DummyConnection();
@@ -1240,6 +1243,12 @@ namespace stonerkart
                 }
             }
             return rt;
+        }
+
+
+        public void enqueueGameMessage(string gmb)
+        {
+            connection.enqueueGameMessage(gmb);
         }
     }
 
