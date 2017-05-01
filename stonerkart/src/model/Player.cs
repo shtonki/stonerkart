@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class Player : Observable<PlayerChangedArgs>, Observer<PileChangedMessage>, Targetable
+    internal class Player : Observable<PlayerChangedArgs>, Observer<PileChangedMessage>, Targetable
     {
         public Card heroCard { get; private set; }
         public readonly Game game;
+
+        public string name { get; }
 
         public Pile deck { get; }
         public Pile field { get; }
@@ -22,9 +24,10 @@ namespace stonerkart
 
         public bool isHero => this == game.hero;
 
-        public Player(Game g)
+        public Player(Game g, string name)
         {
             game = g;
+            this.name = name;
 
             deck = new Pile(new Location(this, PileLocation.Deck));
             field = new Pile(new Location(this, PileLocation.Field));

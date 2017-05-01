@@ -69,6 +69,13 @@ namespace stonerkart
                     gm.enqueueGameMessage(b.message);
                 } break;
 
+                case Message.MessageType.ENDGAME:
+                {
+                    EndGameMessageBody b = new EndGameMessageBody(m.body);
+                    var gm = activeGames.First(g => g.gameid == b.gameid);
+                    gm.endGame(b.ges);
+                } break;
+
                 default:
                     throw new Exception(m.messageType.ToString());
             }
@@ -138,6 +145,12 @@ namespace stonerkart
             MatchmakemeBody mmb = new MatchmakemeBody();
             serverConnection.send(new Message(servername, Message.MessageType.MATCHMAKEME, mmb));
             return true;
+        }
+
+        public static void surrender(int gameid, GameEndStateReason reason)
+        {
+            SurrenderMessageBody egmb = new SurrenderMessageBody(gameid, reason);
+            serverConnection.send(new Message(servername, Message.MessageType.SURRENDER, egmb));
         }
 
         public static bool submitBug(string s)

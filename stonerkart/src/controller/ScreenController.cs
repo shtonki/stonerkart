@@ -45,9 +45,9 @@ namespace stonerkart
             UIController.gameFrame.transitionTo(new RankedScreen());
         }
 
-        public static void transtitionToPostGameScreen(Game g)
+        public static void transtitionToPostGameScreen(Game g, GameEndStruct ges)
         {
-            UIController.gameFrame.transitionTo(new PostGameScreen());
+            UIController.gameFrame.transitionTo(new PostGameScreen(g, ges));
         }
     }
 }

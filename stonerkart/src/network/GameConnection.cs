@@ -101,6 +101,11 @@ namespace stonerkart
             mre.Reset();
             return r;
         }
+
+        public void surrender(GameEndStateReason reason)
+        {
+            Network.surrender(game.gameid, reason);
+        }
     }
 
     class DummyConnection : GameConnection
@@ -185,6 +190,11 @@ namespace stonerkart
         {
             throw new Exception();
         }
+
+        public void surrender(GameEndStateReason rn)
+        {
+            ScreenController.transitionToMainMenu();
+        }
     }
 
     interface GameConnection
@@ -193,5 +203,6 @@ namespace stonerkart
         T receiveAction<T>() where T : GameAction;
         void enqueueGameMessage(string s);
         Deck[] deckify(Deck myDeck, int myIndex);
+        void surrender(GameEndStateReason r);
     }
 }

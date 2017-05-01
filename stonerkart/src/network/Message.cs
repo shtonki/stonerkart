@@ -56,9 +56,11 @@ namespace stonerkart
             CHALLENGE,
             ACCEPTCHALLENGE,
             NEWGAME,
+            ENDGAME,
             GAMEMESSAGE,
             BUGREPORT,
             MATCHMAKEME,
+            SURRENDER,
         }
     }
 
@@ -224,6 +226,137 @@ namespace stonerkart
             sb.Append(gameid);
             sb.Append('.');
             sb.Append(message);
+
+            return sb.ToString();
+        }
+    }
+
+    class EndGameMessageBody : MessageBody
+    {
+        public int gameid { get; }
+        public GameEndStruct ges { get; }
+
+        public EndGameMessageBody(int gameid, GameEndStruct ges)
+        {
+            this.gameid = gameid;
+            this.ges = ges;
+        }
+
+        public EndGameMessageBody(string s)
+        {
+            string[] ss = s.Split(';');
+
+            gameid = Int32.Parse(ss[0]);
+
+            string winner = ss[1];
+
+            GameEndStateReason rsn;
+            if (!GameEndStateReason.TryParse(ss[2], out rsn)) throw new Exception();
+
+            if (ss[3] == "x")
+            {
+                ges = new GameEndStruct(winner, rsn);
+            }
+            else
+            {
+                int rc = Int32.Parse(ss[3]);
+                int yr = Int32.Parse(ss[4]);
+                int tr = Int32.Parse(ss[5]);
+
+                ges = new GameEndStruct(winner, rsn, rc, yr, tr);
+            }
+        }
+
+        public string toBody()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(gameid);
+            sb.Append(";");
+
+            sb.Append(ges.winningPlayer);
+            sb.Append(";");
+
+            sb.Append(ges.reason);
+            sb.Append(";");
+
+            if (ges.yourRating > 0)
+            {
+                sb.Append(ges.ratingChange);
+                sb.Append(";");
+                sb.Append(ges.yourRating);
+                sb.Append(";");
+                sb.Append(ges.theirRating);
+            }
+            else
+            {
+                sb.Append("x");
+            }
+
+            return sb.ToString();
+        }
+    }
+
+    public enum GameEndStateReason
+    {
+        Surrender,
+        Flop,
+        Decking,
+        Ragequit,
+    }
+
+    public struct GameEndStruct
+    {
+        public string winningPlayer { get; }
+        public GameEndStateReason reason { get; }
+        public int ratingChange { get; }
+        public int yourRating { get; }
+        public int theirRating { get; }
+
+        public GameEndStruct(string winningPlayer, GameEndStateReason reason, int ratingChange, int yourRating, int theirRating)
+        {
+            this.winningPlayer = winningPlayer;
+            this.reason = reason;
+            this.ratingChange = ratingChange;
+            this.yourRating = yourRating;
+            this.theirRating = theirRating;
+        }
+
+        public GameEndStruct(string winningPlayer, GameEndStateReason reason) : this()
+        {
+            this.winningPlayer = winningPlayer;
+            this.reason = reason;
+        }
+    }
+
+    class SurrenderMessageBody : MessageBody
+    {
+        public int gameid { get; }
+        public GameEndStateReason reason { get; }
+
+        public SurrenderMessageBody(string s)
+        {
+            int ix = s.IndexOf('.');
+            gameid = Int32.Parse(s.Substring(0, ix));
+
+            GameEndStateReason rsnhck;
+            if (!GameEndStateReason.TryParse(s.Substring(ix + 1, s.Length - ix - 1), out rsnhck)) throw new Exception();
+            reason = rsnhck;
+        }
+
+        public SurrenderMessageBody(int gameid, GameEndStateReason reason)
+        {
+            this.gameid = gameid;
+            this.reason = reason;
+        }
+
+        public string toBody()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(gameid);
+            sb.Append('.');
+            sb.Append(reason);
 
             return sb.ToString();
         }

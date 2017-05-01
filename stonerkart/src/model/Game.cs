@@ -63,7 +63,7 @@ namespace stonerkart
 
             for (int i = 0; i < ngs.playerNames.Length; i++)
             {
-                Player p = new Player(this);
+                Player p = new Player(this, ngs.playerNames[i]);
 
                 players.Add(p);
                 if (i == ngs.heroIndex) hero = p;
@@ -142,6 +142,11 @@ namespace stonerkart
         {
             baseHandler.add(new TypedGameEventHandler<MoveToPileEvent>(e =>
             {
+                if (e.card == hero.heroCard)
+                {
+                    forfeit(GameEndStateReason.Flop);
+                }
+
                 if (e.card.location.pile == PileLocation.Stack)
                 {
                     Stack<StackWrapper> t = new Stack<StackWrapper>();
@@ -1041,12 +1046,20 @@ namespace stonerkart
 
             handleTransaction(gt);
         }
-        
+
+        public void forfeit(GameEndStateReason r)
+        {
+            connection.surrender(r);
+        }
+
+        public void endGame(GameEndStruct ras)
+        {
+            ScreenController.transtitionToPostGameScreen(this, ras);
+        }
+
         private ManualResetEventSlim callerBacker;
         private InputEventFilter filter;
         private Stuff waitedForStuff;
-        
-
         private Func<Stuff> generateStuff(IEnumerable<Tile> allowedTiles)
         {
             Tile[] allowed = allowedTiles.ToArray();
