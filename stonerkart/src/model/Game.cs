@@ -714,7 +714,11 @@ namespace stonerkart
                     }
                     int i = Array.IndexOf(orig.Select(g => g.ta).ToArray(), c.dummiedAbility);
                     TriggeredAbility tab = orig[i].ta;
+
+                    dp.hide();
                     StackWrapper v = tryCastDx(p, tab, c, orig[i].ge);
+                    dp.show();
+
                     if (v == null) continue;
 
                     ptas ptas = new ptas(tab,i,c,v);

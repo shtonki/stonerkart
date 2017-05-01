@@ -148,7 +148,7 @@ namespace stonerkart
 
         public Deck[] deckify(Deck myDeck, int myIndex)
         {
-            Deck fucked = new Deck(CardTemplate.Belwas, new []
+            Deck fucked = new Deck(CardTemplate.Bhewas, new []
             {
                 CardTemplate.Cantrip, 
                 CardTemplate.Cantrip, 

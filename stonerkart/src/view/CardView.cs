@@ -28,7 +28,7 @@ namespace stonerkart
 
         public Card card { get; private set; }
         
-        public CardView() : this(CardTemplate.Belwas)
+        public CardView() : this(CardTemplate.Bhewas)
         { 
         }
 
