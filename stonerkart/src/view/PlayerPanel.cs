@@ -19,6 +19,7 @@ namespace stonerkart
         private bool stunt;
 
         private hackery[] hack;
+        private Label playerNameLabel;
 
         private struct hackery
         {
@@ -66,6 +67,14 @@ namespace stonerkart
 
         public void notify(object o, PlayerChangedArgs t)
         {
+            if (hackp == null)
+            {
+                playerNameLabel.memeout(() =>
+                {
+                    playerNameLabel.Text = ((Player)o).name;
+                });
+            }
+
             hackp = (Player)o;
             if (t.pileChanged.HasValue)
             {
@@ -93,6 +102,7 @@ namespace stonerkart
             this.exileButton = new System.Windows.Forms.Button();
             this.handButton = new System.Windows.Forms.Button();
             this.deckButton = new System.Windows.Forms.Button();
+            this.playerNameLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // manaPanel1
@@ -121,7 +131,7 @@ namespace stonerkart
             this.exileButton.Text = "button2";
             this.exileButton.UseVisualStyleBackColor = true;
             // 
-            // handbutton
+            // handButton
             // 
             this.handButton.Location = new System.Drawing.Point(401, 188);
             this.handButton.Name = "handButton";
@@ -139,8 +149,19 @@ namespace stonerkart
             this.deckButton.Text = "button4";
             this.deckButton.UseVisualStyleBackColor = true;
             // 
+            // playerNameLabel
+            // 
+            this.playerNameLabel.BackColor = System.Drawing.Color.DarkGray;
+            this.playerNameLabel.Enabled = false;
+            this.playerNameLabel.Location = new System.Drawing.Point(401, 15);
+            this.playerNameLabel.Name = "playerNameLabel";
+            this.playerNameLabel.Size = new System.Drawing.Size(170, 77);
+            this.playerNameLabel.TabIndex = 5;
+            this.playerNameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // PlayerPanel
             // 
+            this.Controls.Add(this.playerNameLabel);
             this.Controls.Add(this.deckButton);
             this.Controls.Add(this.handButton);
             this.Controls.Add(this.exileButton);

@@ -349,7 +349,9 @@ namespace stonerkart
         private Func<Card, bool> filter;
         private Mode mode;
         public bool cancelable { get; set; }
+        public bool breakOnEmpty { get; }
         public bool sync { get; set; } = true;
+        public int count;
 
         public SelectCardRule(TargetRule pileOwnerRule, PileLocation pile, Func<Card, bool> filter, Mode mode) : this(pileOwnerRule, pile, filter, mode, false)
         {
@@ -376,13 +378,15 @@ namespace stonerkart
 
         }
 
-        public SelectCardRule(TargetRule pg, PileLocation l, Func<Card, bool> filter, Mode mode, bool cancelable) : base(typeof(Card))
+        public SelectCardRule(TargetRule pg, PileLocation l, Func<Card, bool> filter, Mode mode, bool cancelable, int count = 1, bool breakOnEmpty = true) : base(typeof(Card))
         {
             this.pg = pg;
             this.l = l;
             this.filter = filter;
             this.mode = mode;
             this.cancelable = cancelable;
+            this.count = count;
+            this.breakOnEmpty = breakOnEmpty;
         }
 
         public override TargetColumn? fillCastTargets(HackStruct f)
@@ -412,9 +416,17 @@ namespace stonerkart
                 }
                 else throw new Exception();
 
-                crd = sync ? hs.selectCardHalfSynchronized(p.pileFrom(l), seer, filter, cancelable) : hs.selectCardUnsynchronized(p.pileFrom(l), seer, filter, cancelable);
-                if (crd == null) continue; //todo allow canceling or something
-                rt.Add(crd);
+                for (int i = 0; i < Math.Min(count, p.pileFrom(l).Count); i++)
+                {
+                    crd = sync ? hs.selectCardHalfSynchronized(p.pileFrom(l), seer, filter, cancelable) : hs.selectCardUnsynchronized(p.pileFrom(l), seer, filter, cancelable);
+                    if (crd == null) break; //todo allow canceling or something
+                    if (rt.Contains(crd))
+                    {
+                        i--;
+                        continue;
+                    }
+                    rt.Add(crd);
+                }
             }
             return new TargetColumn(rt);
         }
@@ -436,7 +448,7 @@ namespace stonerkart
 
         public override bool allowEmpty()
         {
-            return cancelable;
+            return !breakOnEmpty || cancelable;
         }
     }
 
@@ -645,7 +657,7 @@ namespace stonerkart
                 }
                 else
                 {
-                    cost = hs.castingPlayer.manaPool.current;
+                    cost = new ManaSet(hs.castingPlayer.manaPool.orbs);
                 }
             }
             return new TargetColumn(cost.orbs);
@@ -773,12 +785,12 @@ namespace stonerkart
             if (ts.Count < count) return null;
             return new TargetColumn(ts);
         }
-
+        
         public override TargetColumn possible(HackStruct hs)
         {
-            return new TargetColumn(hs.tilesInRange.Where(t => pry(t) != null));
+            return new TargetColumn(hs.tilesInRange.Select(t => pry(t)).Where(t => t != null));
         }
-
+        
         protected Targetable pryx(Tile t, HackStruct hs)
         {
             Card c = t.card;
@@ -921,6 +933,11 @@ namespace stonerkart
                 {
                     return new TargetColumn(hs.cards.Where(crd => crd.isHeroic));
                 }
+
+                case Rule.AllFieldCards:
+                {
+                    return new TargetColumn(hs.cards.Where(crd => crd.location.pile == PileLocation.Field));
+                }
             }
             throw new Exception();
         }
@@ -936,6 +953,7 @@ namespace stonerkart
             ResolveCard,
             AllHeroes,
             VillainHeroes,
+            AllFieldCards,
         }
 
         public override bool allowEmpty()

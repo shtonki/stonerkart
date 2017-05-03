@@ -137,7 +137,7 @@ namespace stonerkart
             if (Card.fromTemplate(ct).isHeroic)
                 heroic = ct;
 
-            if (!currentConstraint.willBeLegal(CardTemplate.Belwas, deck.Select(c => c.template).ToArray(), ct))
+            if (!currentConstraint.willBeLegal(CardTemplate.Bhewas, deck.Select(c => c.template).ToArray(), ct))
                 return;
 
             nicememe();
@@ -590,7 +590,7 @@ namespace stonerkart
 
             formatTextBox.memeout(() =>
             {
-                formatTextBox.BackColor = currentConstraint.testLegal(CardTemplate.Belwas, deck.Select(c => c.template).ToArray()) ? Color.ForestGreen : Color.IndianRed;
+                formatTextBox.BackColor = currentConstraint.testLegal(CardTemplate.Bhewas, deck.Select(c => c.template).ToArray()) ? Color.ForestGreen : Color.IndianRed;
             });
         }
 

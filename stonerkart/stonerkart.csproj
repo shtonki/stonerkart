@@ -167,6 +167,12 @@
     <Compile Include="src\view\PostGameScreen.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="src\view\RankedScreen.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="src\view\RankedScreen.Designer.cs">
+      <DependentUpon>RankedScreen.cs</DependentUpon>
+    </Compile>
     <Compile Include="src\view\ShiButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -237,6 +243,9 @@
     <EmbeddedResource Include="src\view\PostGameScreen.resx">
       <DependentUpon>PostGameScreen.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="src\view\RankedScreen.resx">
+      <DependentUpon>RankedScreen.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="codemap.dgml" />
@@ -254,6 +263,27 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artWaterBolt.png" />
+    <None Include="Resources\artRavagingGreed.png" />
+    <None Include="Resources\artScrollOfEarth.png" />
+    <None Include="Resources\artElvenCultivator.png" />
+    <None Include="Resources\artGryphonRider.png" />
+    <None Include="Resources\artLordPlevin.png" />
+    <None Include="Resources\artFireheartPheonix.png" />
+    <None Include="Resources\artBloodclaw.png" />
+    <None Include="Resources\artRockToken.png" />
+    <None Include="Resources\artBruteForce.png" />
+    <None Include="Resources\artTaouyRuins.png" />
+    <None Include="Resources\artHeroicMight.png" />
+    <None Include="Resources\artCerebus.png" />
+    <None Include="Resources\artFacelessSphinx.png" />
+    <None Include="Resources\artPyrostorm.png" />
+    <None Include="Resources\artBenedictor.png" />
+    <None Include="Resources\artSpiritOfSalvation.png" />
+    <None Include="Resources\artTerminate.png" />
+    <None Include="Resources\artRelentlessConscriptor.png" />
+    <None Include="Resources\artZombieToken.png" />
+    <None Include="Resources\artZap.png" />
     <None Include="Resources\artFlamekindler.png" />
     <None Include="Resources\artSparryz.png" />
     <None Include="Resources\artMoratianBattleStandard.png" />

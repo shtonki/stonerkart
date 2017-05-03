@@ -91,6 +91,22 @@ namespace stonerkart
             layoutShit();
         }
 
+        public void hide()
+        {
+            this.memeout(() =>
+            {
+                this.Visible = false;
+            });
+        }
+
+        public void show()
+        {
+            this.memeout(() =>
+            {
+                this.Visible = true;
+            });
+        }
+
         public void close()
         {
             this.memeout(() => { Parent?.Controls.Remove(this); });

@@ -306,6 +306,11 @@ namespace stonerkart
                 {
                     return "Can attack creatures with Flying.";
                 }
+
+                case KeywordAbility.Reinforcement:
+                {
+                    return "May be cast whenever you may cast an interrupt.";
+                }
             }
 
             return "";
@@ -453,7 +458,6 @@ namespace stonerkart
 
     enum CardTemplate
     {
-        missingo,
         Sparryz,
         Flamekindler,
         Moratian_sBattle_sStandard,
@@ -466,7 +470,7 @@ namespace stonerkart
         Morenian_sMedic,
         Famished_sTarantula,
         Vibrant_sZinnia,
-        Ancient_sChopter,
+        Primal_sChopter,
         Stark_sLily,
         Serene_sDandelion,
         Daring_sPoppy,
@@ -513,7 +517,7 @@ namespace stonerkart
         Alter_sFate,
         Goblin_sGrenade,
         Cleansing_sFire,
-        Belwas,
+        Bhewas,
         Zap,
         Kappa,
         Cantrip,
@@ -531,8 +535,33 @@ namespace stonerkart
         Spirit,
         Gryphon,
         Wolf,
+        Zombie,
+        Rock,
         Call_sTo_sArms,
         Sanguine_sArtisan,
+        Shimmering_sKoi,
+        Decaying_sHorror,
+        Relentless_sConsriptor,
+        Terminate,
+        Spirit_sof_sSalvation,
+        Benedictor,
+        Pyrostorm,
+        Elven_sCultivator,
+        Faceless_sSphinx,
+        Cerberus,
+        Heroic_sMight,
+        Taouy_sRuins,
+        Shibby_as_sSaboteur,
+        Brute_sForce,
+        Scroll_sof_Earth,
+        Maleficent_sSpirit,
+        Thirstclaw,
+        Flameheart_sPheonix,
+        Lord_sPlevin,
+        Gryphon_sRider,
+        Ravaging_sGreed,
+        Water_sBolt,
+        Lone_sRanger,
     }
 
     internal enum CardType
@@ -565,6 +594,8 @@ namespace stonerkart
 
     internal enum Race
     {
+        Elemental,
+        Elf,
         Angel,
         Demon,
         Mecha,
@@ -576,10 +607,12 @@ namespace stonerkart
         Beast,
         Dragon,
         Vampire,
+        Spirit,
     }
 
     internal enum Subtype
     {
+        Hunter,
         Guardian,
         Warrior,
         Wizard,
@@ -595,5 +628,6 @@ namespace stonerkart
         Ambush,
         Flying,
         Wingclipper,
+        Reinforcement,
     }
 }

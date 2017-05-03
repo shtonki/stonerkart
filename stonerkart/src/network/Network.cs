@@ -21,9 +21,7 @@ namespace stonerkart
         private static ManualResetEvent messageReceived = new ManualResetEvent(false);
         private static Message receivedMessage;
 
-        private static Object GameMessageLockObject = new Object();
-        private static Queue<string> gameActionQueue = new Queue<string>();
-        private static ManualResetEvent gameMessageReceived = new ManualResetEvent(false);
+        private static List<Game> activeGames = new List<Game>();
 
         public static bool connectToServer()
         {
@@ -54,19 +52,28 @@ namespace stonerkart
                 case Message.MessageType.CHALLENGE:
                 {
                     ChallengeBody cb = new ChallengeBody(m.body);
-                    serverConnection.send(new Message("_server", Message.MessageType.ACCEPTCHALLENGE, new ChallengeBody(cb.username)));
+                    serverConnection.send(new Message("_server", Message.MessageType.ACCEPTCHALLENGE, new ChallengeBody(cb.challengee)));
                 } break;
 
                 case Message.MessageType.NEWGAME:
                 {
                     NewGameBody b = new NewGameBody(m.body);
-                    ScreenController.transitionToGamePanel(b.newGameStruct, false);
+                    Game g = ScreenController.transitionToGamePanel(b.newGameStruct, false);
+                    activeGames.Add(g);
                 } break;
 
                 case Message.MessageType.GAMEMESSAGE:
                 {
                     GameMessageBody b = new GameMessageBody(m.body);
-                    enqueueGameMessage(b.message);
+                    var gm = activeGames.First(g => g.gameid == b.gameid);
+                    gm.enqueueGameMessage(b.message);
+                } break;
+
+                case Message.MessageType.ENDGAME:
+                {
+                    EndGameMessageBody b = new EndGameMessageBody(m.body);
+                    var gm = activeGames.First(g => g.gameid == b.gameid);
+                    gm.endGame(b.ges);
                 } break;
 
                 default:
@@ -74,37 +81,11 @@ namespace stonerkart
             }
         }
 
-        private static void enqueueGameMessage(string message)
+        public static void sendGameMessage(Game g, string message)
         {
-            lock (GameMessageLockObject)
-            {
-                gameActionQueue.Enqueue(message);
-                gameMessageReceived.Set();
-            }
-        }
-
-        public static string dequeueGameMessage()
-        {
-            if (gameActionQueue.Count == 0)
-            {
-                gameMessageReceived.WaitOne();
-            }
-            lock (GameMessageLockObject)
-            {
-                string r = gameActionQueue.Dequeue();
-                gameMessageReceived.Reset();
-                return r;
-            }
-        }
-
-        public static void sendGameMessage(string message, string[] recipients)
-        {
-            foreach (string recipient in recipients)
-            {
-                GameMessageBody b = new GameMessageBody(message);
-                Message m = new Message(recipient, Message.MessageType.GAMEMESSAGE, b);
-                serverConnection.send(m);
-            }
+            GameMessageBody b = new GameMessageBody(g.gameid, message);
+            Message m = new Message(servername, Message.MessageType.GAMEMESSAGE, b);
+            serverConnection.send(m);
         }
 
         private static Message awaitResponseMessage()
@@ -157,6 +138,19 @@ namespace stonerkart
             Message m = awaitResponseMessage();
             ResponseBody rb = new ResponseBody(m.body);
             return rb.code == ResponseBody.ResponseCode.OK;
+        }
+
+        public static bool matchmake()
+        {
+            MatchmakemeBody mmb = new MatchmakemeBody();
+            serverConnection.send(new Message(servername, Message.MessageType.MATCHMAKEME, mmb));
+            return true;
+        }
+
+        public static void surrender(int gameid, GameEndStateReason reason)
+        {
+            SurrenderMessageBody egmb = new SurrenderMessageBody(gameid, reason);
+            serverConnection.send(new Message(servername, Message.MessageType.SURRENDER, egmb));
         }
 
         public static bool submitBug(string s)
