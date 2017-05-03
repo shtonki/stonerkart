@@ -245,7 +245,7 @@ namespace stonerkart
 
         public override TargetColumn possible(HackStruct hs)
         {
-            return fillCastTargets(hs).Value;
+            return TargetColumn.empty;
         }
 
         public override bool allowEmpty()
