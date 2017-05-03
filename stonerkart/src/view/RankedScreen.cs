@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
-    public partial class RankedScreen : UserControl, Screen
+    partial class RankedScreen : StickyPanel, Screen
     {
         public RankedScreen()
         {
