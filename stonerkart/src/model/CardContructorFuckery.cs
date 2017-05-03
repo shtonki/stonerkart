@@ -1790,7 +1790,7 @@ namespace stonerkart
                         );
                 } break;
                 #endregion
-                #region Commander Sparryz
+                #region Commander Commander_sSparryz
                 case CardTemplate.Commander_sSparryz:
                 {
                     cardType = CardType.Creature;
