@@ -458,6 +458,14 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Count_sFera_sII,
+        Seblastian,
+        Warp,
+        Hosro,
+        Iradj,
+        Paralyzing_sSpider,
+        Arachosa,
+        Spiderling,
         Sparryz,
         Flamekindler,
         Moratian_sBattle_sStandard,

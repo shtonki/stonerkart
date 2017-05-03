@@ -2320,8 +2320,151 @@ namespace stonerkart
                         ));
                     } break;
                 #endregion
+                #region Arachosa
+                case CardTemplate.Arachosa:
+                {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Legendary;
+                        race = Race.Beast;
 
+                        natureCost = 4;
 
+                        basePower = 4;
+                        baseToughness = 2;
+                        baseMovement = 2;
+
+                        diesLambda(
+                        "When Arachosa enters the graveyard from the battlefield spawn two spiderlings",
+                        Effect.summonTokensEffect(CardTemplate.Spiderling, CardTemplate.Spiderling),
+                        1);
+
+                        
+                    } break;
+
+                #endregion
+                #region Paralyzing_sSpider
+                case CardTemplate.Paralyzing_sSpider:
+                {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Common;
+                        race = Race.Beast;
+
+                        natureCost = 1;
+
+                        basePower = 1;
+                        baseToughness = 4;
+                        baseMovement = 2;
+
+                        addTriggeredAbility(
+                            "Whenever this Paralyzing Spider deals damage to a non-heroic creature, reduce that creature's movement speed by 2. This cannot reduce the targets movement below 1.",
+                            new Effect(new TargetRuleSet(
+                            new TriggeredTargetRule<DamageEvent, Card>(g => g.target)),
+                            new ModifyDoer(ModifiableStats.Movement, v => Math.Max(Math.Min(v, 1), v - 2), LL.never)), 
+                            new Foo(),
+                            new TypedGameEventFilter<DamageEvent>(damageEvent => damageEvent.source == this),
+                            -1,
+                            PileLocation.Field,
+                            true,
+                            TriggeredAbility.Timing.Post
+                        );
+
+                    } break;
+                #endregion
+                    
+                #region Seblastian
+                case CardTemplate.Seblastian:
+                    {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Rare;
+                        race = Race.Human;
+
+                        baseMovement = 2;
+                        basePower = 0;
+                        baseToughness = 5;
+
+                        orderCost = 1;
+
+                        addActivatedAbility(
+                        String.Format("{0}: deals 3 damage to ALL cards within 3 range.", G.kys),
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                        new AoeRule(tile1 => true, 3, card => true)), new ZepperDoer(3), new Foo(killLambdaWhere(c => c.race != Race.Undead)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
+                    }
+                    break;
+                #endregion
+
+                #region Count Fera II
+                case CardTemplate.Count_sFera_sII:
+                    {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Legendary;
+                        race = Race.Undead;
+
+                        baseMovement = 3;
+                        basePower = 3;
+                        baseToughness = 3;
+                        deathCost = 1;
+
+                        addActivatedAbility("Sacrifice non undead you control, give Count Fera II +1/+1.",
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
+                            new ModifyDoer(1, LL.add, LL.never, ModifiableStats.Power, ModifiableStats.Toughness),
+                            new Foo(killLambdaWhere(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero)),
+                            -1,
+                            PileLocation.Field,
+                            CastSpeed.Interrupt
+                        );
+                    }
+                    break;
+                #endregion
+
+                #region Warp
+
+                case CardTemplate.Warp:
+                    {
+                        cardType = CardType.Channel;
+                        orderCost = 1;
+                        castRange = 5;
+                        castEffect = new Effect(
+                            new TargetRuleSet(new PryCardRule(t => !t.isHeroic),
+                            new PryTileRule(f => f.passable,
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer(true));
+                        castDescription = "warp target card to target tile.";
+                    }
+                    break;
+                #endregion
+    
+                #region Hosro
+                case CardTemplate.Hosro:
+                {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        race = Race.Human;
+
+                        baseMovement = 2;
+                        basePower = 2;
+                        baseToughness = 3;
+                        orderCost = 2;
+
+                } break;
+                #endregion
+                #region Iradj
+                case CardTemplate.Iradj:
+                {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        race = Race.Beast;
+
+                        baseMovement = 2;
+                        basePower = 4;
+                        baseToughness = 3;
+
+                        orderCost = 2;
+                        greyCost = 1;
+                    } break;
+                #endregion
                 #region tokens
 
                 #region Spirit
@@ -2396,7 +2539,19 @@ namespace stonerkart
                     isToken = true;
                 } break;
                 #endregion
-
+                #region Spiderling
+                case CardTemplate.Spiderling:
+                    {
+                        forceColour = ManaColour.Nature;
+                        basePower = 1;
+                        baseToughness = 1;
+                        baseMovement = 2;
+                        race = Race.Beast;
+                        isToken = true;
+                        keywordAbilities.Add(KeywordAbility.Fervor);
+                    }
+                    break;
+                #endregion
 
                 #endregion
 
@@ -2530,6 +2685,11 @@ namespace stonerkart
             return
                 new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.nonheroicCreature()),
                     new ZepperDoer(damage));
+        }
+
+        public Effect killLambdaWhere(Func<Card, bool> f)
+        {
+            return new Effect(new PryCardRule(f), new MoveToPileDoer(PileLocation.Graveyard));
         }
 
         public void etbLambda(String description, Effect e, int range = -1, bool optional = false)

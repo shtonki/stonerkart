@@ -630,6 +630,31 @@ namespace stonerkart
                     return Resources.artTempleHealer;
                 }
 
+                case CardTemplate.Arachosa:
+                {
+                    return Resources.Arachosa;
+                }
+
+                case CardTemplate.Spiderling:
+                {
+                    return Resources.Spiderling;
+                }
+
+                case CardTemplate.Paralyzing_sSpider:
+                {
+                    return Resources.Paralyzing_sSpider;
+                }
+
+                case CardTemplate.Hosro:
+                {
+                    return Resources.Hosro;
+                }
+
+                case CardTemplate.Iradj:
+                {
+                    return Resources.Iradj;
+                }
+
                 default:
                 {
                     return Resources.artNothing;
