@@ -2326,8 +2326,58 @@ namespace stonerkart
                         ));
                     } break;
                 #endregion
+                #region Arachosa
+                case CardTemplate.Arachosa:
+                {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Legendary;
+                        race = Race.Beast;
+
+                        natureCost = 4;
+
+                        basePower = 4;
+                        baseToughness = 2;
+                        baseMovement = 2;
+
+                        diesLambda(
+                        "When Arachosa enters the graveyard from the battlefield spawn two spiderlings",
+                        Effect.summonTokensEffect(CardTemplate.Spiderling, CardTemplate.Spiderling),
+                        1);
+
+                        
+                    } break;
+
+                #endregion
+                #region Paralyzing_sSpider
+                case CardTemplate.Paralyzing_sSpider:
+                {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Common;
+                        race = Race.Beast;
+
+                        natureCost = 1;
+
+                        basePower = 1;
+                        baseToughness = 4;
+                        baseMovement = 2;
 
 
+                        castEffect = new Effect(LL.nonheroicCreature(),
+                          new ModifyDoer(ModifiableStats.Movement, v => Math.Max(Math.Min(v, 1), v - 2), LL.never));
+
+                        addTriggeredAbility(
+                            "Whenever this Paralyzing Spider(name subject to change) deals damage to a non-heroic creature, reduce that creature's movement speed by 2. This cannot reduce the targets movement below 1.",
+                            castEffect, 
+                            new Foo(),
+                            new TypedGameEventFilter<DamageEvent>(damageEvent => damageEvent.source == this),
+                            -1,
+                            PileLocation.Field,
+                            true,
+                            TriggeredAbility.Timing.Post
+                        );
+
+                    } break;
+                #endregion
                 #region tokens
 
                 #region Spirit
@@ -2402,7 +2452,19 @@ namespace stonerkart
                     isToken = true;
                 } break;
                 #endregion
-
+                #region Spiderling
+                case CardTemplate.Spiderling:
+                    {
+                        forceColour = ManaColour.Nature;
+                        basePower = 1;
+                        baseToughness = 1;
+                        baseMovement = 2;
+                        race = Race.Beast;
+                        isToken = true;
+                        keywordAbilities.Add(KeywordAbility.Fervor);
+                    }
+                    break;
+                #endregion
 
                 #endregion
 

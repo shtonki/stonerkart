@@ -589,4 +589,13 @@
   <data name="artWaterBolt" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artWaterBolt.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Arachosa" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Arachosa.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Paralyzing_sSpider" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Poisonous_sSpider.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Spiderling" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Spiderling.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

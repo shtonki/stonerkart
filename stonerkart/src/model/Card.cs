@@ -458,6 +458,9 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Paralyzing_sSpider,
+        Arachosa,
+        Spiderling,
         Sparryz,
         Flamekindler,
         Moratian_sBattle_sStandard,

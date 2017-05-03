@@ -63,6 +63,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Arachosa {
+            get {
+                object obj = ResourceManager.GetObject("Arachosa", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artAberrantSacrifice {
             get {
                 object obj = ResourceManager.GetObject("artAberrantSacrifice", resourceCulture);
@@ -1623,9 +1633,29 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Paralyzing_sSpider {
+            get {
+                object obj = ResourceManager.GetObject("Paralyzing_sSpider", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap setFirstedition {
             get {
                 object obj = ResourceManager.GetObject("setFirstedition", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Spiderling {
+            get {
+                object obj = ResourceManager.GetObject("Spiderling", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
