@@ -143,6 +143,26 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artBenedictor {
+            get {
+                object obj = ResourceManager.GetObject("artBenedictor", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artBloodclaw {
+            get {
+                object obj = ResourceManager.GetObject("artBloodclaw", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artBubastis {
             get {
                 object obj = ResourceManager.GetObject("artBubastis", resourceCulture);
@@ -166,6 +186,16 @@ namespace stonerkart.Properties {
         public static System.Drawing.Bitmap artCallToArmsAlternate {
             get {
                 object obj = ResourceManager.GetObject("artCallToArmsAlternate", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artCerebus {
+            get {
+                object obj = ResourceManager.GetObject("artCerebus", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -313,6 +343,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artElvenCultivator {
+            get {
+                object obj = ResourceManager.GetObject("artElvenCultivator", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artElvenDruid {
             get {
                 object obj = ResourceManager.GetObject("artElvenDruid", resourceCulture);
@@ -383,6 +423,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artFacelessSphinx {
+            get {
+                object obj = ResourceManager.GetObject("artFacelessSphinx", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artFamine {
             get {
                 object obj = ResourceManager.GetObject("artFamine", resourceCulture);
@@ -406,6 +456,16 @@ namespace stonerkart.Properties {
         public static System.Drawing.Bitmap artFigment {
             get {
                 object obj = ResourceManager.GetObject("artFigment", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artFireheartPheonix {
+            get {
+                object obj = ResourceManager.GetObject("artFireheartPheonix", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -563,9 +623,29 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artGryphonRider {
+            get {
+                object obj = ResourceManager.GetObject("artGryphonRider", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artHauntedChapel {
             get {
                 object obj = ResourceManager.GetObject("artHauntedChapel", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artHeroicMight {
+            get {
+                object obj = ResourceManager.GetObject("artHeroicMight", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -733,6 +813,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artLordPlevin {
+            get {
+                object obj = ResourceManager.GetObject("artLordPlevin", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artMagmaVents {
             get {
                 object obj = ResourceManager.GetObject("artMagmaVents", resourceCulture);
@@ -863,6 +953,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artPyrostorm {
+            get {
+                object obj = ResourceManager.GetObject("artPyrostorm", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artRaiseDead {
             get {
                 object obj = ResourceManager.GetObject("artRaiseDead", resourceCulture);
@@ -876,6 +976,26 @@ namespace stonerkart.Properties {
         public static System.Drawing.Bitmap artRapture {
             get {
                 object obj = ResourceManager.GetObject("artRapture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artRavagingGreed {
+            get {
+                object obj = ResourceManager.GetObject("artRavagingGreed", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artRelentlessConscriptor {
+            get {
+                object obj = ResourceManager.GetObject("artRelentlessConscriptor", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -913,6 +1033,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artRockToken {
+            get {
+                object obj = ResourceManager.GetObject("artRockToken", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artRottingZombie {
             get {
                 object obj = ResourceManager.GetObject("artRottingZombie", resourceCulture);
@@ -926,6 +1056,16 @@ namespace stonerkart.Properties {
         public static System.Drawing.Bitmap artSanguineArtisan {
             get {
                 object obj = ResourceManager.GetObject("artSanguineArtisan", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artScrollOfEarth {
+            get {
+                object obj = ResourceManager.GetObject("artScrollOfEarth", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1013,16 +1153,6 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap artSoothingRhapsode {
-            get {
-                object obj = ResourceManager.GetObject("artSoothingRhapsode", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         public static System.Drawing.Bitmap artSpark {
             get {
                 object obj = ResourceManager.GetObject("artSpark", resourceCulture);
@@ -1046,6 +1176,16 @@ namespace stonerkart.Properties {
         public static System.Drawing.Bitmap artSpirit {
             get {
                 object obj = ResourceManager.GetObject("artSpirit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artSpiritOfSalvation {
+            get {
+                object obj = ResourceManager.GetObject("artSpiritOfSalvation", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1113,6 +1253,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artTaouyRuins {
+            get {
+                object obj = ResourceManager.GetObject("artTaouyRuins", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artTarantula {
             get {
                 object obj = ResourceManager.GetObject("artTarantula", resourceCulture);
@@ -1136,6 +1286,16 @@ namespace stonerkart.Properties {
         public static System.Drawing.Bitmap artTempleHealer {
             get {
                 object obj = ResourceManager.GetObject("artTempleHealer", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artTerminate {
+            get {
+                object obj = ResourceManager.GetObject("artTerminate", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1193,6 +1353,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artWaterBolt {
+            get {
+                object obj = ResourceManager.GetObject("artWaterBolt", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artWilt {
             get {
                 object obj = ResourceManager.GetObject("artWilt", resourceCulture);
@@ -1236,6 +1406,16 @@ namespace stonerkart.Properties {
         public static System.Drawing.Bitmap artZap {
             get {
                 object obj = ResourceManager.GetObject("artZap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artZombieToken {
+            get {
+                object obj = ResourceManager.GetObject("artZombieToken", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

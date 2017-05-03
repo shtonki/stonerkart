@@ -27,10 +27,15 @@ namespace stonerkart
         private AutoFontTextBox cardDescriptionBox;
         public HexPanel hexPanel;
 
+        private Game game;
+
         public GamePanel(Game g)
         {
             InitializeComponent();
             if (g == null) return;
+
+            game = g;
+
             hexPanel.setMap(g.map);
             hexPanel.tileClicked.Add(g.clicked);
             hexPanel.tileEntered.Add(clickable => setHightlight(clickable?.getStuff()));
@@ -113,10 +118,10 @@ namespace stonerkart
         public IEnumerable<MenuItem> getMenuPanel()
         {
             MenuItem surrender = new MenuItem("French out",
-                () => ScreenController.transtitionToPostGameScreen(null)
+                () => game.forfeit(GameEndStateReason.Surrender)
                 );
-            return new [] {surrender};
 
+            return new [] {surrender};
         }
 
         private void InitializeComponent()

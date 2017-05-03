@@ -173,7 +173,7 @@ namespace stonerkart
         IEnumerable<MenuItem> getMenuPanel();
     }
 
-    struct MenuItem
+    public struct MenuItem
     {
         public string title;
         public Action action;
