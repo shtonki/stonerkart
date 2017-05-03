@@ -1790,8 +1790,8 @@ namespace stonerkart
                         );
                 } break;
                 #endregion
-                #region Sparryz
-                case CardTemplate.Sparryz:
+                #region Commander Sparryz
+                case CardTemplate.Commander_sSparryz:
                 {
                     cardType = CardType.Creature;
                     race = Race.Demon;
@@ -2125,7 +2125,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Scroll of Earth
-                case CardTemplate.Scroll_sof_Earth:
+                case CardTemplate.Scroll_sof_sEarth:
                 {
                     cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
@@ -2181,7 +2181,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Flameheart Pheonix
-                case CardTemplate.Flameheart_sPheonix:
+                case CardTemplate.Flameheart_sPhoenix:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Rare;
