@@ -458,6 +458,9 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Count_sFera_sII,
+        Seblastian,
+        Warp,
         Hosro,
         Iradj,
         Paralyzing_sSpider,
