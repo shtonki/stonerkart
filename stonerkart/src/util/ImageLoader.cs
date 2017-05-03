@@ -645,6 +645,16 @@ namespace stonerkart
                     return Resources.Paralyzing_sSpider;
                 }
 
+                case CardTemplate.Hosro:
+                {
+                    return Resources.Hosro;
+                }
+
+                case CardTemplate.Iradj:
+                {
+                    return Resources.Iradj;
+                }
+
                 default:
                 {
                     return Resources.artNothing;

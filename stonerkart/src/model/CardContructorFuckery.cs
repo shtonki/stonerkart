@@ -2378,6 +2378,35 @@ namespace stonerkart
 
                     } break;
                 #endregion
+                #region Hosro
+                case CardTemplate.Hosro:
+                {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        race = Race.Human;
+
+                        baseMovement = 2;
+                        basePower = 2;
+                        baseToughness = 3;
+                        orderCost = 2;
+
+                } break;
+                #endregion
+                #region Iradj
+                case CardTemplate.Iradj:
+                {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        race = Race.Beast;
+
+                        baseMovement = 2;
+                        basePower = 4;
+                        baseToughness = 3;
+
+                        orderCost = 2;
+                        greyCost = 1;
+                    } break;
+                #endregion
                 #region tokens
 
                 #region Spirit

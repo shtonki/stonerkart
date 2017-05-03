@@ -458,6 +458,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Hosro,
+        Iradj,
         Paralyzing_sSpider,
         Arachosa,
         Spiderling,
