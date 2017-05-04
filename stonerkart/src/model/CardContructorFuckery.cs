@@ -1872,7 +1872,7 @@ namespace stonerkart
                     subtype = Subtype.Warrior;
 
                     lifeCost = 2;
-                    greyCost = 1;
+                    greyCost = 2;
 
                     basePower = 2;
                     baseToughness = 3;
