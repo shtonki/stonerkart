@@ -2349,7 +2349,8 @@ namespace stonerkart
                         rarity = Rarity.Common;
                         race = Race.Beast;
 
-                        natureCost = 1;
+                        natureCost = 3;
+                        greyCost = 2;
 
                         basePower = 1;
                         baseToughness = 4;
@@ -2382,10 +2383,11 @@ namespace stonerkart
                         basePower = 0;
                         baseToughness = 5;
 
-                        orderCost = 1;
+                        orderCost = 3;
+                        chaosCost = 1;
 
                         addActivatedAbility(
-                        String.Format("{0}: deals 3 damage to ALL cards within 3 range.", G.kys),
+                        String.Format("Sacrifice this creature, deal 3 damage to ALL cards within 3 range."),
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                         new AoeRule(tile1 => true, 3, card => true)), new ZepperDoer(3), new Foo(killLambdaWhere(c => c.race != Race.Undead)),
                         0,
@@ -2395,7 +2397,7 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-
+                
                 #region Count Fera II
                 case CardTemplate.Count_sFera_sII:
                     {
@@ -2406,7 +2408,8 @@ namespace stonerkart
                         baseMovement = 3;
                         basePower = 3;
                         baseToughness = 3;
-                        deathCost = 1;
+                        deathCost = 4;
+                        greyCost = 1;
 
                         addActivatedAbility("Sacrifice non undead you control, give Count Fera II +1/+1.",
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
@@ -2419,13 +2422,14 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-
+                
                 #region Warp
 
                 case CardTemplate.Warp:
                     {
                         cardType = CardType.Channel;
                         orderCost = 1;
+                        
                         castRange = 5;
                         castEffect = new Effect(
                             new TargetRuleSet(new PryCardRule(t => !t.isHeroic),
@@ -2465,6 +2469,12 @@ namespace stonerkart
                         greyCost = 1;
                     } break;
                 #endregion
+
+
+
+
+
+
                 #region tokens
 
                 #region Spirit
