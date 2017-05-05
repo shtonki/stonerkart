@@ -2360,7 +2360,7 @@ namespace stonerkart
                             "Whenever this Paralyzing Spider deals damage to a non-heroic creature, reduce that creature's movement speed by 2. This cannot reduce the targets movement below 1.",
                             new Effect(new TargetRuleSet(
                             new TriggeredTargetRule<DamageEvent, Card>(g => g.target)),
-                            new ModifyDoer(ModifiableStats.Movement, v => Math.Max(Math.Min(v, 1), v - 2), LL.never)), 
+                            new ModifyDoer(v => Math.Max(Math.Min(v, 1), v - 2), LL.never, ModifiableStats.Movement)), 
                             new Foo(),
                             new TypedGameEventFilter<DamageEvent>(damageEvent => damageEvent.source == this),
                             -1,
@@ -2413,7 +2413,7 @@ namespace stonerkart
 
                         addActivatedAbility("Sacrifice non undead you control, give Count Fera II +1/+1.",
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                            new ModifyDoer(1, LL.add, LL.never, ModifiableStats.Power, ModifiableStats.Toughness),
+                            new ModifyDoer(LL.add(1), LL.never, ModifiableStats.Power, ModifiableStats.Toughness),
                             new Foo(killLambdaWhere(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero)),
                             -1,
                             PileLocation.Field,
