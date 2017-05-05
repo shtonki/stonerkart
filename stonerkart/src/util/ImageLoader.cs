@@ -155,6 +155,21 @@ namespace stonerkart
                     return Resources.artScrollOfEarth;
                 }
 
+                case CardTemplate.Seblastian:
+                {
+                    return Resources.artSeblastian;
+                }
+
+                case CardTemplate.Warp:
+                {
+                    return Resources.artWarp;
+                }
+
+                case CardTemplate.Count_sFera_sII:
+                {
+                    return Resources.artCountFeraII;
+                }
+
                 case CardTemplate.Rock:
                 {
                     return Resources.artRockToken;
