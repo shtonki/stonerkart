@@ -2384,7 +2384,6 @@ namespace stonerkart
                         baseToughness = 5;
 
                         orderCost = 3;
-                        chaosCost = 1;
 
                         addActivatedAbility(
                         String.Format("Sacrifice this creature, deal 3 damage to ALL cards within 3 range."),
@@ -2429,7 +2428,7 @@ namespace stonerkart
                     {
                         cardType = CardType.Channel;
                         orderCost = 1;
-                        
+                        rarity = Rarity.Common;
                         castRange = 5;
                         castEffect = new Effect(
                             new TargetRuleSet(new PryCardRule(t => !t.isHeroic),

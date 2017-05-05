@@ -467,7 +467,6 @@ namespace stonerkart
         Paralyzing_sSpider,
         Arachosa,
         Spiderling,
-        Sparryz,
         Flamekindler,
         Moratian_sBattle_sStandard,
         Seraph,
