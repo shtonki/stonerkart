@@ -2371,24 +2371,23 @@ namespace stonerkart
 
                     } break;
                 #endregion
-                    
                 #region Seblastian
                 case CardTemplate.Seblastian:
                     {
                         cardType = CardType.Creature;
-                        rarity = Rarity.Rare;
+                        //rarity = Rarity.Rare;
                         race = Race.Human;
 
                         baseMovement = 2;
                         basePower = 0;
                         baseToughness = 5;
 
-                        orderCost = 3;
+                        chaosCost = 0;
 
                         addActivatedAbility(
-                        String.Format("Sacrifice this creature, deal 3 damage to ALL cards within 3 range."),
+                        String.Format("Sacrifice this creature: deal 3 damage to all creatures within 1 tile."),
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                        new AoeRule(tile1 => true, 3, card => true)), new ZepperDoer(3), new Foo(killLambdaWhere(c => c.race != Race.Undead)),
+                        new AoeRule(t => true, 3, card => true)), new ZepperDoer(3), new Foo(killLambdaWhere(c => c.race != Race.Undead)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -2396,7 +2395,6 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-                
                 #region Count Fera II
                 case CardTemplate.Count_sFera_sII:
                     {
@@ -2410,7 +2408,7 @@ namespace stonerkart
                         deathCost = 4;
                         greyCost = 1;
 
-                        addActivatedAbility("Sacrifice non undead you control, give Count Fera II +1/+1.",
+                        addActivatedAbility("Sacrifice non-undead creature you control: give Count Fera II +1/+1.",
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
                             new ModifyDoer(LL.add(1), LL.never, ModifiableStats.Power, ModifiableStats.Toughness),
                             new Foo(killLambdaWhere(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero)),
@@ -2421,7 +2419,6 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-                
                 #region Warp
 
                 case CardTemplate.Warp:
@@ -2434,11 +2431,10 @@ namespace stonerkart
                             new TargetRuleSet(new PryCardRule(t => !t.isHeroic),
                             new PryTileRule(f => f.passable,
                             new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer(true));
-                        castDescription = "warp target card to target tile.";
+                        castDescription = "Move target non-heroic creature to target tile.";
                     }
                     break;
-                #endregion
-    
+                #endregion    
                 #region Hosro
                 case CardTemplate.Hosro:
                 {
@@ -2449,7 +2445,7 @@ namespace stonerkart
                         baseMovement = 2;
                         basePower = 2;
                         baseToughness = 3;
-                        orderCost = 2;
+                        chaosCost = 2;
 
                 } break;
                 #endregion
@@ -2464,7 +2460,7 @@ namespace stonerkart
                         basePower = 4;
                         baseToughness = 3;
 
-                        orderCost = 2;
+                        mightCost = 2;
                         greyCost = 1;
                     } break;
                 #endregion
