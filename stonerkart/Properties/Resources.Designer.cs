@@ -283,6 +283,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artCountFeraII {
+            get {
+                object obj = ResourceManager.GetObject("artCountFeraII", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artCoupDeGrace {
             get {
                 object obj = ResourceManager.GetObject("artCoupDeGrace", resourceCulture);
@@ -1093,6 +1103,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artSeblastian {
+            get {
+                object obj = ResourceManager.GetObject("artSeblastian", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artSeraph {
             get {
                 object obj = ResourceManager.GetObject("artSeraph", resourceCulture);
@@ -1356,6 +1376,16 @@ namespace stonerkart.Properties {
         public static System.Drawing.Bitmap artWar {
             get {
                 object obj = ResourceManager.GetObject("artWar", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap artWarp {
+            get {
+                object obj = ResourceManager.GetObject("artWarp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
