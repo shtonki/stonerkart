@@ -1790,7 +1790,7 @@ namespace stonerkart
                         );
                 } break;
                 #endregion
-                #region Commander Sparryz
+                #region Commander Commander_sSparryz
                 case CardTemplate.Commander_sSparryz:
                 {
                     cardType = CardType.Creature;
@@ -1872,7 +1872,7 @@ namespace stonerkart
                     subtype = Subtype.Warrior;
 
                     lifeCost = 2;
-                    greyCost = 1;
+                    greyCost = 2;
 
                     basePower = 2;
                     baseToughness = 3;
