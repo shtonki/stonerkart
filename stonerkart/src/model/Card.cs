@@ -458,6 +458,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Commander_sSparryz,
         Count_sFera_sII,
         Seblastian,
         Warp,
@@ -561,10 +562,10 @@ namespace stonerkart
         Taouy_sRuins,
         Shibby_as_sSaboteur,
         Brute_sForce,
-        Scroll_sof_Earth,
+        Scroll_sof_sEarth,
         Maleficent_sSpirit,
         Thirstclaw,
-        Flameheart_sPheonix,
+        Flameheart_sPhoenix,
         Lord_sPlevin,
         Gryphon_sRider,
         Ravaging_sGreed,

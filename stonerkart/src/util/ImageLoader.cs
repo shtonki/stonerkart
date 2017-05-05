@@ -135,7 +135,7 @@ namespace stonerkart
                     return Resources.artLordPlevin;
                 }
 
-                case CardTemplate.Flameheart_sPheonix:
+                case CardTemplate.Flameheart_sPhoenix:
                 {
                     return Resources.artFireheartPheonix;
                 }
@@ -150,7 +150,7 @@ namespace stonerkart
                     return Resources.artMaleficentSpirit;
                 }
 
-                case CardTemplate.Scroll_sof_Earth:
+                case CardTemplate.Scroll_sof_sEarth:
                 {
                     return Resources.artScrollOfEarth;
                 }
@@ -250,7 +250,7 @@ namespace stonerkart
                     return Resources.artShimmeringKoi;
                 }
 
-                case CardTemplate.Sparryz:
+                case CardTemplate.Commander_sSparryz:
                 {
                     return Resources.artSparryz;
                 }

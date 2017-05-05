@@ -90,7 +90,7 @@ namespace stonerkart
                     new TargetRuleSet(
                         new AllCardsRule(
                             c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
-                    new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.endOfTurn),
+                    new ModifyDoer(LL.add(1), LL.endOfTurn, ModifiableStats.Power),
                     new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
                     0,
                     PileLocation.Field,
@@ -173,7 +173,7 @@ namespace stonerkart
                         new SelectCardRule(new PryPlayerRule(p => true,
                             new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                             PileLocation.Hand, c => false, SelectCardRule.Mode.Resolver, true),
-                        new ModifyDoer(ModifiableStats.Movement, LL.add(0), LL.clearAura))); //ugliest hack i've seen in a while
+                        new ModifyDoer(LL.add(0), LL.clearAura, ModifiableStats.Movement))); //ugliest hack i've seen in a while
                 castDescription = "Look at target players hand. Draw a card.";
 
             }
@@ -527,7 +527,7 @@ namespace stonerkart
                 castRange = 4;
                 castEffect = new Effect(
                     new TargetRuleSet(new PryCardRule()),
-                    new ModifyDoer(ModifiableStats.Toughness, LL.add(3), LL.never));
+                    new ModifyDoer(LL.add(3), LL.never, ModifiableStats.Toughness));
                 castDescription = "Target creature gains 3 toughness.";
 
             }
@@ -550,7 +550,7 @@ namespace stonerkart
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
                         new ZepperDoer(-2));
                 additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1),
-                    new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.endOfTurn)));
+                    new ModifyDoer(LL.add(2), LL.endOfTurn, ModifiableStats.Power)));
                 castDescription =
                     "Target creature is healed for 2 and gains 2 power until the end of this turn.";
             } break;
@@ -1019,7 +1019,7 @@ namespace stonerkart
 
                     castDescription = "Set target non-life creatures movement to 1.";
                     castEffect = new Effect(LL.nonColouredCreature(ManaColour.Life),
-                        new ModifyDoer(ModifiableStats.Movement, LL.set(1), LL.never));
+                        new ModifyDoer(LL.set(1), LL.never, ModifiableStats.Movement));
                     castRange = 4;
                 } break;
                 #endregion
@@ -1034,7 +1034,7 @@ namespace stonerkart
 
                         castDescription = "Reduce target non-death creatures movement by 2. This cannot reduce the targets movement below 1.";
                         castEffect = new Effect(LL.nonColouredCreature(ManaColour.Death),
-                            new ModifyDoer(ModifiableStats.Movement, v => Math.Max(Math.Min(v, 1), v - 2), LL.never));
+                            new ModifyDoer(v => Math.Max(Math.Min(v, 1), v - 2), LL.never, ModifiableStats.Movement));
                         castRange = 4;
                     }
                     break;
@@ -1163,7 +1163,7 @@ namespace stonerkart
                             new TargetRuleSet(LL.creature()),
                             new FatigueDoer(false));
                     additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(0),
-                        new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.endOfTurn)));
+                        new ModifyDoer(LL.add(2), LL.endOfTurn, ModifiableStats.Power)));
                     castRange = 3;
                 } break;
                 #endregion
@@ -1503,9 +1503,9 @@ namespace stonerkart
 
 
                         Effect e1 = new Effect(LL.nonheroicCreature(),
-                            new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.never));
+                            new ModifyDoer(LL.add(2), LL.never, ModifiableStats.Power));
                         Effect e2 = new Effect(new CopyPreviousRule<Card>(0),
-                            new ModifyDoer(ModifiableStats.Toughness, LL.add(2), LL.never));
+                            new ModifyDoer(LL.add(2), LL.never, ModifiableStats.Toughness));
 
                         addActivatedAbility(
                             String.Format("{0}{0}, {1}, Sacrifice Vibrant Zinnia: Target non-heroic creature gets +2/+2", G.colouredGlyph(ManaColour.Nature), G.exhaustGhyph),
@@ -1657,7 +1657,7 @@ namespace stonerkart
                     addActivatedAbility(
                         String.Format("{0}: Enraged Dragon gets +1/+0 until end of turn.", G.colouredGlyph(ManaColour.Chaos)),
                         new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                            new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.endOfTurn)),
+                            new ModifyDoer(LL.add(1), LL.endOfTurn, ModifiableStats.Power)),
                         new Foo(LL.manaCost(ManaColour.Chaos)),
                         0,
                         PileLocation.Field,
@@ -1790,8 +1790,8 @@ namespace stonerkart
                         );
                 } break;
                 #endregion
-                #region Sparryz
-                case CardTemplate.Sparryz:
+                #region Commander Commander_sSparryz
+                case CardTemplate.Commander_sSparryz:
                 {
                     cardType = CardType.Creature;
                     race = Race.Demon;
@@ -1872,7 +1872,7 @@ namespace stonerkart
                     subtype = Subtype.Warrior;
 
                     lifeCost = 2;
-                    greyCost = 1;
+                    greyCost = 2;
 
                     basePower = 2;
                     baseToughness = 3;
@@ -1992,12 +1992,9 @@ namespace stonerkart
                     natureCost = 1;
                     greyCost = 2;
 
-                    Effect e1 = new Effect(new PryCardRule(c => c != this && !c.isHeroic && c.controller == this.controller), new ModifyDoer(ModifiableStats.Power, LL.add(1), LL.never));
-                    Effect e2 = new Effect(new CopyPreviousRule<Card>(0), new ModifyDoer(ModifiableStats.Toughness, LL.add(1), LL.never));
-
                     etbLambda(
                         "When Elven Cultivator enters the battlefield give another non-heroic creature you control +1/+1.",
-                        new Effect[] {e1, e2},
+                        new Effect(new PryCardRule(c => c != this && !c.isHeroic && c.controller == this.controller), new ModifyDoer(LL.add(1), LL.never, ModifiableStats.Power, ModifiableStats.Toughness)),
                         3
                         );
 
@@ -2059,11 +2056,8 @@ namespace stonerkart
                     castRange = 5;
                     castDescription = "Give target damaged non-heroic creature +2/+2.";
 
-                    Effect e1 = new Effect(new PryCardRule(c => c.damageTaken > 0 && !c.isHeroic), new ModifyDoer(ModifiableStats.Power, LL.add(2), LL.never));
-                    Effect e2 = new Effect(new CopyPreviousRule<Card>(0), new ModifyDoer(ModifiableStats.Toughness, LL.add(2), LL.never));
 
-                    castEffect = e1;
-                    additionalCastEffects.Add(e2);
+                    castEffect = new Effect(new PryCardRule(c => c.damageTaken > 0 && !c.isHeroic), new ModifyDoer(LL.add(2), LL.never, ModifiableStats.Power, ModifiableStats.Toughness));
 
                 } break;
                 #endregion
@@ -2110,7 +2104,7 @@ namespace stonerkart
 
                     etbLambda(
                         "When Shibby's Saboteur you may set target non-heroic creature's power to 1.",
-                        new Effect(new PryCardRule(c => !c.isHeroic), new ModifyDoer(ModifiableStats.Power, LL.set(1), LL.never)),
+                        new Effect(new PryCardRule(c => !c.isHeroic), new ModifyDoer(LL.set(1), LL.never, ModifiableStats.Power)),
                         4, 
                         true
                         );
@@ -2127,11 +2121,11 @@ namespace stonerkart
 
                     castDescription = "Heroic creatures you control get +2/+0 until end of turn.";
                     castEffect = new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
-                        new ModifyDoer(ModifiableStats.Power, LL.add(3), LL.endOfTurn));
+                        new ModifyDoer(LL.add(3), LL.endOfTurn, ModifiableStats.Power));
                 } break;
                 #endregion
                 #region Scroll of Earth
-                case CardTemplate.Scroll_sof_Earth:
+                case CardTemplate.Scroll_sof_sEarth:
                 {
                     cardType = CardType.Interrupt;
                     rarity = Rarity.Common;
@@ -2187,7 +2181,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Flameheart Pheonix
-                case CardTemplate.Flameheart_sPheonix:
+                case CardTemplate.Flameheart_sPhoenix:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Rare;
@@ -2366,7 +2360,7 @@ namespace stonerkart
                             "Whenever this Paralyzing Spider deals damage to a non-heroic creature, reduce that creature's movement speed by 2. This cannot reduce the targets movement below 1.",
                             new Effect(new TargetRuleSet(
                             new TriggeredTargetRule<DamageEvent, Card>(g => g.target)),
-                            new ModifyDoer(ModifiableStats.Movement, v => Math.Max(Math.Min(v, 1), v - 2), LL.never)), 
+                            new ModifyDoer(v => Math.Max(Math.Min(v, 1), v - 2), LL.never, ModifiableStats.Movement)), 
                             new Foo(),
                             new TypedGameEventFilter<DamageEvent>(damageEvent => damageEvent.source == this),
                             -1,
@@ -2419,7 +2413,7 @@ namespace stonerkart
 
                         addActivatedAbility("Sacrifice non undead you control, give Count Fera II +1/+1.",
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                            new ModifyDoer(1, LL.add, LL.never, ModifiableStats.Power, ModifiableStats.Toughness),
+                            new ModifyDoer(LL.add(1), LL.never, ModifiableStats.Power, ModifiableStats.Toughness),
                             new Foo(killLambdaWhere(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero)),
                             -1,
                             PileLocation.Field,
