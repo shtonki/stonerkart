@@ -2419,6 +2419,7 @@ namespace stonerkart
                     }
                     break;
                 #endregion
+
                 #region Warp
 
                 case CardTemplate.Warp:
