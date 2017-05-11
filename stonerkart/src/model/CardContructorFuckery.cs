@@ -1,4 +1,4 @@
-﻿#define testx
+﻿#define test
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -296,7 +296,7 @@ namespace stonerkart
                         G.colourlessGlyph(2), G.exhaustGhyph, G.channelOnly),
                     new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                     new DrawCardsDoer(1),
-                    fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
+                    fooFromManaCost(new List<Effect>() {LL.exhaustThis}, ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
                     0,
                     PileLocation.Field,
                     CastSpeed.Interrupt
@@ -2419,7 +2419,6 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-
                 #region Warp
 
                 case CardTemplate.Warp:
@@ -2465,6 +2464,25 @@ namespace stonerkart
                         greyCost = 1;
                     } break;
                 #endregion
+                #region Jabroni
+                case CardTemplate.Jabroni:
+                    {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Rare;
+                        race = Race.Human;
+
+                        baseMovement = 2;
+                        basePower = 3;
+                        baseToughness = 3;
+
+                        deathCost = 4;
+                        diesLambda(
+                            "Whenever Jabroni enters the graveyard from the battlefield under your control, spawn a Makaroni token.",
+                            Effect.summonTokensEffect(CardTemplate.Makaroni), 0, false);
+                    }
+                    break;
+                #endregion
+                
 
 
 
@@ -2473,6 +2491,20 @@ namespace stonerkart
 
                 #region tokens
 
+                #region Makaroni
+                case CardTemplate.Makaroni:
+                    {
+                        forceColour = ManaColour.Death;
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        race = Race.Undead;
+                        isToken = true;
+                        baseMovement = 2;
+                        basePower = 2;
+                        baseToughness = 2;
+                    }
+                    break;
+                #endregion
                 #region Spirit
                 case CardTemplate.Spirit:
                     {
@@ -2677,6 +2709,13 @@ namespace stonerkart
         {
             return new Foo(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                 new ManaCostRule(cs)), new PayManaDoer()));
+        }
+
+        private static Foo fooFromManaCost(List<Effect> effects, params ManaColour[] cs)
+        {
+            effects.Add(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                new ManaCostRule(cs)), new PayManaDoer()));
+            return new Foo(effects.ToArray());
         }
 
         public Effect zepLambda(int damage)

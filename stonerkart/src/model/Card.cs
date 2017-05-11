@@ -458,6 +458,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Jabroni,
+        Makaroni,
         Commander_sSparryz,
         Count_sFera_sII,
         Seblastian,
