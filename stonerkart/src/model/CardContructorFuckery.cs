@@ -2548,6 +2548,33 @@ namespace stonerkart
                 } break;
                 #endregion
 
+                #region Ilatian Ghoul
+                case CardTemplate.Ilatian_sGhoul:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Uncommon;
+                    race = Race.Undead;
+                    deathCost = 2;
+                    greyCost = 2;
+
+                    baseMovement = 2;
+                    basePower = 3;
+                    baseToughness = 3;
+
+                    addActivatedAbility(
+                    "You may cast Ilatian Ghoul from the graveyard.",
+                    new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                        new PryTileRule(t => t.card == null && !t.isEdgy,
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
+                    new SummonToTileDoer(),
+                    new Foo(LL.manaCost(new ManaSet(ManaColour.Colourless, ManaColour.Colourless,ManaColour.Death, ManaColour.Death))),
+                    2,
+                    PileLocation.Graveyard,
+                    CastSpeed.Channel,
+                    true
+                    );
+                } break;
+                #endregion
 
 
 
