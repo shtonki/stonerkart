@@ -1,4 +1,4 @@
-﻿#define testx
+﻿#define test
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -2514,18 +2514,39 @@ namespace stonerkart
                 #region Hungry Felhound
                 case CardTemplate.Hungry_sFelhound:
                 {
-                        cardType = CardType.Creature;
-                        rarity = Rarity.Uncommon;
-                        race = Race.Demon;
-                        deathCost = 1;
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Uncommon;
+                    race = Race.Demon;
+                    deathCost = 1;
 
-                        baseMovement = 3;
-                        basePower = 1;
-                        baseToughness = 1;
-                        keywordAbilities.Add(KeywordAbility.Fervor);
+                    baseMovement = 3;
+                    basePower = 1;
+                    baseToughness = 1;
+                    keywordAbilities.Add(KeywordAbility.Fervor);
                 } break;
                 #endregion
+                #region Vincennes
+                case CardTemplate.Vincennes:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Rare;
+                    race = Race.Mecha;
+                    lifeCost = 2;
+                    greyCost = 2;
 
+                    baseMovement = 1;
+                    basePower = 2;
+                    baseToughness = 3;
+                    addActivatedAbility(String.Format(
+                            "{0}, Select a flying target within 5 tiles and deal 5 damage to it.",
+                            G.exhaustGhyph),
+                        zepLambdaWhere(5, c => c.keywordAbilities.Contains(KeywordAbility.Flying)),
+                        new Foo(LL.exhaustThis), 
+                        5,
+                        PileLocation.Field,
+                        CastSpeed.Channel); 
+                } break;
+                #endregion
 
 
 
@@ -2772,6 +2793,11 @@ namespace stonerkart
             return
                 new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.nonheroicCreature()),
                     new ZepperDoer(damage));
+        }
+
+        public Effect zepLambdaWhere(int damage, Func<Card, bool> filter)
+        {
+            return new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule(filter)), new ZepperDoer(damage));
         }
 
         public Effect killLambdaWhere(Func<Card, bool> f)

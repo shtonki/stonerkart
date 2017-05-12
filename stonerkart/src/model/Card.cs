@@ -458,6 +458,7 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Vincennes,
         Hungry_sFelhound,
         Archfather,
         Jabroni,
