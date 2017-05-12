@@ -367,7 +367,7 @@ namespace stonerkart
                 Modifiable m;
                 switch (e.stat)
                 {
-                    case ModifiableStats.Movement: m = Movement; break;
+                    case ModifiableStats.Movement: m = Movement; break; 
                     case ModifiableStats.Toughness: m = Toughness; break;
                     case ModifiableStats.Power: m = Power; break;
 
@@ -458,6 +458,8 @@ namespace stonerkart
 
     enum CardTemplate
     {
+        Hungry_sFelhound,
+        Archfather,
         Jabroni,
         Makaroni,
         Commander_sSparryz,

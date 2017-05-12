@@ -1,4 +1,4 @@
-﻿#define test
+﻿#define testx
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -2482,7 +2482,49 @@ namespace stonerkart
                     }
                     break;
                 #endregion
-                
+                #region Archfather
+                case CardTemplate.Archfather:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Uncommon;
+                    race = Race.Human;
+
+                    baseMovement = 2;
+                    basePower = 2;
+                    baseToughness = 2;
+
+                    deathCost = 2;
+
+                    auras.Add(new Aura(
+                        "Archfather gets +1/+1 for for every loyal undead creature.",
+                        v => v + (owner.game.activePlayer.field.Count(c => c.race == Race.Undead)),
+                        ModifiableStats.Toughness,
+                        c => c == this,
+                        PileLocation.Field
+                        ));
+                    auras.Add(new Aura(
+                        "",
+                        v => v + (owner.game.activePlayer.field.Count(c => c.race == Race.Undead)),
+                        ModifiableStats.Power,
+                        c => c == this,
+                        PileLocation.Field
+                        ));
+                    } break;
+                #endregion
+                #region Hungry Felhound
+                case CardTemplate.Hungry_sFelhound:
+                {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        race = Race.Demon;
+                        deathCost = 1;
+
+                        baseMovement = 3;
+                        basePower = 1;
+                        baseToughness = 1;
+                        keywordAbilities.Add(KeywordAbility.Fervor);
+                } break;
+                #endregion
 
 
 
