@@ -90,9 +90,9 @@ namespace stonerkart
                     breadText.Text = card.breadText;
                     manaCostPanel1.setCost(card.castManaCost);
                     cardTypeText.Text = card.typeText;
-                    if (card.race.HasValue)
+                    if (card.racex.HasValue)
                     {
-                        cardTypeText.Text = card.typeText + " -- " + card.race.Value + " " + (card.subtype?.ToString() ?? "");
+                        cardTypeText.Text = card.typeText + " -- " + card.racex.Value + " " + (card.subtype?.ToString() ?? "");
                     }
                 }
 

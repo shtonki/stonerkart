@@ -39,7 +39,10 @@ namespace stonerkart
         public CardType cardType { get; }
         public Rarity rarity { get; set; }
         public CardSet set { get; }
-        public Race? race { get; }
+        public Race? race => forceRace.HasValue ? forceRace : baseRace;
+        private Race? baseRace { get; }
+        private Race? forceRace { get; set; }
+
         public Subtype? subtype { get; }
         public int convertedManaCost => castManaCost.colours.Count();
 
