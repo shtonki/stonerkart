@@ -54,7 +54,7 @@ namespace stonerkart
             loginButton.addChild(logintext);
             logintext.moveTo(MoveTo.Center, 0);
             loginButton.Border = new AnimatedBorder(Textures.border0, 5);
-            loginButton.clicked += a => System.Console.WriteLine("logging in");
+            loginButton.clicked += a => Controller.attemptLogin(username.Text, password.Text);
 
             registerButton = new Button(500, 90);
             registerButton.Backimege = new MemeImege(Textures.buttonbg2);

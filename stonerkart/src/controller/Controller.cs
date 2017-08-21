@@ -14,13 +14,14 @@ namespace stonerkart
     /// </summary>
     static class Controller
     {
-
-
-        public static bool inGame;
-
-        public static void startup()
+        public static void launchGame()
         {
+            if (!Network.connectToServer()) throw new Exception("Serber offline");
+
             GUI.launch();
+
+            GUI.setScreen(new LoginScreen());
+
             //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             //UIController.launchUI();
             
@@ -36,6 +37,18 @@ namespace stonerkart
             }
             */
 
+        }
+
+        public static void attemptLogin(string username, string password)
+        {
+            if (Network.login(username, password))
+            {
+                GUI.setScreen(new GameScreen());
+            }
+            else
+            {
+                
+            }
         }
 
         public static void quit()

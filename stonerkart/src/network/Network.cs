@@ -102,8 +102,6 @@ namespace stonerkart
 
         public static bool login(string username, string password)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             LoginBody b = new LoginBody(username, password);
             serverConnection.send(new Message(servername, Message.MessageType.LOGIN, b));
             Message m = awaitResponseMessage();
@@ -111,14 +109,13 @@ namespace stonerkart
             if (rb.code == ResponseBody.ResponseCode.OKWITHFRIENDS)
             {
                 FriendListBody fb = new FriendListBody(rb.text);
-                UIController.setFriendList(fb.friends);
+                //UIController.setFriendList(fb.friends);
                 return true;
             }
             else
             {
                 return false;
             }
-            */
         }
 
         public static bool register(string username, string password)

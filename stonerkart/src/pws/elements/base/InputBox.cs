@@ -39,6 +39,10 @@ namespace stonerkart
                 if (v.Length == 1)
                 {
                     c = v[0];
+                    if (!args.Shift)
+                    {
+                        c = Char.ToLowerInvariant(c.Value);
+                    }
                 }
             }
 
