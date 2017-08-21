@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using stonerkart.src.view;
 
 namespace stonerkart
 {
@@ -43,6 +44,11 @@ namespace stonerkart
         public static void transitionToRankedScreen()
         {
             UIController.gameFrame.transitionTo(new RankedScreen());
+        }
+
+        public static void transitionToShowMeYourDeckScreen()
+        {
+            UIController.gameFrame.transitionTo(new ShowMeYourDeck());
         }
 
         public static void transtitionToPostGameScreen(Game g, GameEndStruct ges)

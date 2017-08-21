@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CFC26B37-6090-4492-A003-E558D8324FDE}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>stonerkart</RootNamespace>
     <AssemblyName>stonerkart</AssemblyName>
@@ -176,6 +176,12 @@
     <Compile Include="src\view\ShiButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="src\view\ShowMeYourDeck.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="src\view\ShowMeYourDeck.Designer.cs">
+      <DependentUpon>ShowMeYourDeck.cs</DependentUpon>
+    </Compile>
     <Compile Include="src\view\StepPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -245,6 +251,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\RankedScreen.resx">
       <DependentUpon>RankedScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="src\view\ShowMeYourDeck.resx">
+      <DependentUpon>ShowMeYourDeck.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

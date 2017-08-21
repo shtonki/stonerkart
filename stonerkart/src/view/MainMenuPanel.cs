@@ -11,6 +11,7 @@ namespace stonerkart
     {
         private Button button1;
         private Button button3;
+        private Button button4;
         private Button button2;
 
         public MainMenuPanel()
@@ -28,6 +29,7 @@ namespace stonerkart
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -60,9 +62,20 @@ namespace stonerkart
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(672, 513);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(41, 27);
+            this.button4.TabIndex = 3;
+            this.button4.Text = "button4";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
             // MainMenuPanel
             // 
             this.BackColor = System.Drawing.Color.Firebrick;
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -87,6 +100,11 @@ namespace stonerkart
         private void button3_Click(object sender, EventArgs e)
         {
             ScreenController.transitionToRankedScreen();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            ScreenController.transitionToShowMeYourDeckScreen();
         }
     }
 }
