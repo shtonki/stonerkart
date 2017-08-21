@@ -47,42 +47,64 @@ namespace stonerkart
 
         public DraggablePanel showPile(Pile p, bool closeable, Action<Clickable> clicked)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            /*
             CardsPanel cp = new CardsPanel(p);
             cp.clickedCallbacks.Add(clicked);
             return UIController.showControl(cp, true, closeable);
+            */
         }
 
         public DraggablePanel showCards(IEnumerable<Card> cards, bool closeable, Action<Clickable> clicked)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            /*
             CardsPanel p = new CardsPanel();
             p.clickedCallbacks.Add(clicked);
             p.setCards(cards);
             return UIController.showControl(p, true, closeable);
+            */
         }
 
         public void setHeroActive(bool b)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             gameScreen.setHeroActive(b);
+            */
         }
 
         public void addArrow(Path l)
         {
-            hexPanel.paths.Add(l);
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            //hexPanel.paths.Add(l);
         }
 
         public void removeArrow(Path l)
         {
-            hexPanel.paths.Remove(l);
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            //hexPanel.paths.Remove(l);
         }
 
         public void clearArrows()
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            /*
             hexPanel.paths.Clear();
             redraw();
+            */
         }
 
         public void setPrompt(string message, params ButtonOption[] buttons)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            /*
             gameScreen.memeout(() =>
             {
                 gameScreen.promtText.Text = message;
@@ -106,21 +128,28 @@ namespace stonerkart
                 }
                 gameScreen.Invalidate();
             });
+            */
         }
 
-        private List<TileView> hled = new List<TileView>();
+        //private List<TileView> hled = new List<TileView>();
 
         public void clearHighlights(bool rd = true)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             foreach (var v in hled) v.colour = Color.Black;
             hled.Clear();
             if (rd) redraw();
+            */
         }
 
-        private void highlight(TileView tv, Color c)
+        private void highlight(/*TileView tv, */Color c)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             tv.colour = c;
             hled.Add(tv);
+            */
         }
 
         private void highlight(Color c, params Tile[] tvs)
@@ -135,19 +164,25 @@ namespace stonerkart
 
         private  void highlight(IEnumerable<Tuple<Color, Tile>> l, bool rd = true)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             foreach (var v in l)
             {
                 highlight(hexPanel.viewOf(v.Item2), v.Item1);
             }
             if (rd) redraw();
+            */
         }
 
         public void redraw()
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             Control v = gameScreen;
             //v.memeout(v.Refresh);
             v = gameScreen.hexPanel;
             v.memeout(v.Invalidate);
+            */
         }
     }
 }

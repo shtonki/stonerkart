@@ -57,9 +57,12 @@ namespace stonerkart
 
                 case Message.MessageType.NEWGAME:
                 {
+
+                        throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                     NewGameBody b = new NewGameBody(m.body);
                     Game g = ScreenController.transitionToGamePanel(b.newGameStruct, false);
                     activeGames.Add(g);
+                    */
                 } break;
 
                 case Message.MessageType.GAMEMESSAGE:
@@ -99,6 +102,8 @@ namespace stonerkart
 
         public static bool login(string username, string password)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             LoginBody b = new LoginBody(username, password);
             serverConnection.send(new Message(servername, Message.MessageType.LOGIN, b));
             Message m = awaitResponseMessage();
@@ -113,6 +118,7 @@ namespace stonerkart
             {
                 return false;
             }
+            */
         }
 
         public static bool register(string username, string password)

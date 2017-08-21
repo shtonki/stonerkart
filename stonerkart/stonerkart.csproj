@@ -93,10 +93,10 @@
     <Compile Include="src\pws\DrawerMaym.cs" />
     <Compile Include="src\pws\elements\base\Button.cs" />
     <Compile Include="src\pws\elements\base\GuiElement.cs" />
-    <Compile Include="src\pws\elements\base\ImageBox.cs" />
     <Compile Include="src\pws\elements\base\InputBox.cs" />
     <Compile Include="src\pws\elements\base\Square.cs" />
     <Compile Include="src\pws\elements\CardView.cs" />
+    <Compile Include="src\pws\elements\DraggablePanel.cs" />
     <Compile Include="src\pws\elements\HexPanel.cs" />
     <Compile Include="src\pws\elements\MemeButton.cs" />
     <Compile Include="src\pws\elements\PileView.cs" />
@@ -133,7 +133,7 @@
     <Compile Include="src\network\Network.cs" />
     <Compile Include="src\network\ServerConnection.cs" />
     <Compile Include="src\pws\TextureLoader.cs" />
-    <Compile Include="src\util\ImageLoader.cs" />
+    <Compile Include="src\util\ImageLoaderx.cs" />
     <Compile Include="src\util\Observable.cs" />
     <Compile Include="src\util\Settings.cs" />
     <Compile Include="src\util\G.cs" />
@@ -168,6 +168,12 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\table0.png" />
+    <None Include="Resources\whiteframe4.png" />
+    <None Include="Resources\buttonbg2.png" />
+    <None Include="Resources\border0.png" />
+    <None Include="Resources\background3.png" />
+    <None Include="Resources\font0.png" />
     <None Include="Resources\artWaterBolt.png" />
     <None Include="Resources\artRavagingGreed.png" />
     <None Include="Resources\artScrollOfEarth.png" />

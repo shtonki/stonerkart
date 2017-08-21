@@ -671,6 +671,7 @@ namespace stonerkart
 
                 List<ptas> triggd = new List<ptas>();
 
+                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                 while (triggd.Count < orig.Length)
                 {
                     gameController.setPrompt("Select which ability to place on the stack next.");
@@ -704,7 +705,7 @@ namespace stonerkart
                 }
 
                 dp.close();
-
+                */
                 foreach (ptas pt in triggd)
                 {
                     r.Add(pt.wrapper);
@@ -816,6 +817,8 @@ namespace stonerkart
         /// <returns></returns>
         private Card chooseCastCard(Player p)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             gameController.setPrompt("Cast a card.", ButtonOption.Pass);
             while (true)
             {
@@ -838,6 +841,7 @@ namespace stonerkart
                 if (c != null && c.controller == p) return c;
 
             }
+            */
         }
 
         /// <summary>
@@ -848,6 +852,7 @@ namespace stonerkart
         /// <returns></returns>
         private Tile getTile(Func<Tile, bool> f, string prompt, params ButtonOption[] buttons)
         {
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             gameController.setPrompt(prompt, buttons);
             var v = waitForButtonOr<Tile>(f);
             if (v is ShibbuttonStuff)
@@ -855,6 +860,7 @@ namespace stonerkart
                 return null;
             }
             return (Tile)v;
+            */
         }
 
         private void cast(StackWrapper w)
@@ -1035,7 +1041,9 @@ namespace stonerkart
 
         public void endGame(GameEndStruct ras)
         {
-            ScreenController.transtitionToPostGameScreen(this, ras);
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            ScreenController.transtitionToPostGameScreen(this, ras);*/
         }
 
         private ManualResetEventSlim callerBacker;
@@ -1070,8 +1078,10 @@ namespace stonerkart
 
         private Stuff waitForButtonOr<T>(Func<T, bool> fn) where T : Stuff
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || (o is T && fn((T)o)));
-            return waitFor(f);
+            return waitFor(f);*/
         }
 
         public Stuff waitForAnything()
@@ -1095,9 +1105,10 @@ namespace stonerkart
 
         private ButtonOption waitForButton(string prompt, params ButtonOption[] options)
         {
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             gameController.setPrompt(prompt, options);
             ShibbuttonStuff s = (ShibbuttonStuff)waitFor(new InputEventFilter((c, o) => c is Shibbutton));
-            return s.option;
+            return s.option;*/
         }
 
         private HackStruct makeHackStruct(Player castingPlayer)
@@ -1145,6 +1156,7 @@ namespace stonerkart
 
         public IEnumerable<Card> selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount, Func<Card, bool> filter)
         {
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             List<Card> rt = new List<Card>(cardCount);
             var ca = cards.ToArray();
 
@@ -1155,7 +1167,6 @@ namespace stonerkart
                 vv.close();
                 return new Card[0];
             }
-
             gameController.setPrompt("Select card", cancelable ? new ButtonOption[]{ButtonOption.Cancel, } : new ButtonOption[]{ButtonOption.NOTHING});
             var v = showCards(ca, false);
 
@@ -1182,6 +1193,8 @@ namespace stonerkart
             }
             v.close();
             return rt;
+            */
+
         }
 
         public void sendChoices(int[] cs)

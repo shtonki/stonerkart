@@ -193,7 +193,10 @@ namespace stonerkart
 
         public void surrender(GameEndStateReason rn)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             ScreenController.transitionToMainMenu();
+            */
         }
     }
 

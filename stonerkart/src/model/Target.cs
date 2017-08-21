@@ -265,6 +265,8 @@ namespace stonerkart
 
         public override TargetColumn? fillCastTargets(HackStruct f)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             f.setPrompt("Select target.", ButtonOption.Cancel);
             while (true)
             {
@@ -279,6 +281,7 @@ namespace stonerkart
                     if (filter(c)) return new TargetColumn(c);
                 }
             }
+            */
         }
 
         public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
@@ -643,6 +646,7 @@ namespace stonerkart
                                 p.stuntLoss(colours);
                             }
                         }
+                        throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                         if (v is ShibbuttonStuff)
                         {
                             ShibbuttonStuff b = (ShibbuttonStuff)v;
@@ -652,6 +656,7 @@ namespace stonerkart
                                 return null;
                             }
                         }
+                        */
                     }
                     p.unstuntMana();
                 }
@@ -750,6 +755,7 @@ namespace stonerkart
             {
                 Stuff v = hs.getStuff();
 
+                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                 if (v is ShibbuttonStuff)
                 {
                     var b = (ShibbuttonStuff)v;
@@ -759,7 +765,7 @@ namespace stonerkart
                         break;
                     }
                 }
-
+                */
                 if (!(v is Tile)) continue;
 
                 Tile t = (Tile)v;

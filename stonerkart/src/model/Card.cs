@@ -633,4 +633,14 @@ namespace stonerkart
         Wingclipper,
         Reinforcement,
     }
+
+    struct CardChangedMessage
+    {
+        public Modifiable modified { get; }
+
+        public CardChangedMessage(Modifiable modified)
+        {
+            this.modified = modified;
+        }
+    }
 }

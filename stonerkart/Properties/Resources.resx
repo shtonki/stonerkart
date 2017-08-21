@@ -601,4 +601,87 @@
   <data name="font0" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\font0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="font1" xml:space="preserve">
+    <value>A 0 62
+B 62 56
+C 118 54
+D 172 60
+E 232 54
+F 286 50
+G 336 62
+H 398 66
+I 464 34
+J 498 36
+K 534 63
+L 597 46
+M 643 73
+N 716 60
+O 776 64
+P 840 59
+Q 899 65
+R 964 60
+S 1024 52
+T 1076 53
+U 1129 62
+V 1191 58
+W 1249 84
+X 1333 54
+Y 1387 57
+Z 1444 45
+a 1489 48
+b 1537 51
+c 1588 42
+d 1630 51
+e 1681 46
+f 1727 36
+g 1763 44
+h 1807 54
+i 1861 30
+j 1891 29
+k 1920 54
+l 1974 27
+m 2001 81
+n 2082 56
+o 2138 53
+p 2191 51
+q 2242 51
+r 2293 41
+s 2334 37
+t 2371 32
+u 2403 52
+v 2455 45
+w 2500 70
+x 2570 43
+y 2613 48
+z 2661 39
+1 2700 38
+2 2738 49
+3 2787 43
+4 2830 46
+5 2876 42
+6 2918 47
+7 2965 42
+8 3007 45
+9 3052 45
+0 3097 47
+! 3144 27
+' 3171 16
+. 3187 22
+" 3209 31
+, 3240 20
+? 3260 42
+* 3302 41
+/ 3343 31
+- 3374 30
++ 3404 62
+&amp; 3466 70
+( 3536 26
+) 3562 27</value>
+  </data>
+  <data name="whiteframe4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\whiteframe4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="table0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\table0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

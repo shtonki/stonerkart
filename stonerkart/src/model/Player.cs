@@ -148,4 +148,20 @@ namespace stonerkart
             notify(new PlayerChangedArgs(p.location.pile));
         }
     }
+
+    class PlayerChangedArgs
+    {
+        public readonly Player player;
+        public readonly PileLocation? pileChanged;
+
+        public PlayerChangedArgs(Player player)
+        {
+            this.player = player;
+        }
+
+        public PlayerChangedArgs(PileLocation pileChanged)
+        {
+            this.pileChanged = pileChanged;
+        }
+    }
 }
