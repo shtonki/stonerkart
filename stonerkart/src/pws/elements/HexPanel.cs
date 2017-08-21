@@ -82,7 +82,7 @@ namespace stonerkart
             return null;
         }
 
-        public override void draw(DrawerMaym dm)
+        protected override void draw(DrawerMaym dm)
         {
             base.draw(dm);
 

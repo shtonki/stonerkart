@@ -18,8 +18,10 @@ namespace stonerkart
             this.charHeight = charHeight;
         }
 
-        public void draw(DrawerMaym dm, int yoffset, int xoffset, int maxWidth, Color textColor)
+        public void draw(DrawerMaym dm, int yoffset, int xoffset, int maxWidth, Color textColor, LaidText fk, int cksm)
         {
+            int b = fk.xs.Sum(x => x.width);
+            if (b != cksm) throw new Exception();
             foreach (var xdd in xs)
             {
                 var xp = xdd.xpos + xoffset;
@@ -27,7 +29,7 @@ namespace stonerkart
                 {
                     dm.drawTexture(
                         ff.fontImage,
-                        xdd.xpos + xoffset,
+                        xp,
                         xdd.ypos + yoffset,
                         xdd.width,
                         charHeight,
@@ -227,10 +229,10 @@ namespace stonerkart
 
     public struct characterLayout
     {
-        public int xpos;
-        public int ypos;
-        public int width;
-        public Box crop;
+        public int xpos { get; }
+        public int ypos { get; }
+        public int width { get; }
+        public Box crop { get;}
 
         public characterLayout(int xpos, int ypos, int width, Box crop)
         {

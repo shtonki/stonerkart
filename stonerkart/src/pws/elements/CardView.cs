@@ -122,7 +122,7 @@ namespace stonerkart
 
             if (c.colours.Count > 1)
             {
-                frameColor = Color.Chocolate;
+                frameColor = Color.Gold;
             }
             else
             {
@@ -261,7 +261,7 @@ namespace stonerkart
         private const double imgxw = 96.0/framewidth;
 
 
-        public override void draw(DrawerMaym dm)
+        protected override void draw(DrawerMaym dm)
         {
             //base.draw(dm);
 

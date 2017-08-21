@@ -128,12 +128,15 @@ namespace stonerkart
 
         private void layoutText()
         {
-            laidText = TextLayout.layout(Text, Width - textPaddingX - 2, Height, FontFamily);
+            lock (this)
+            {
+                laidText = TextLayout.layout(Text, Width - textPaddingX, Height, FontFamily);
+            }
         }
 
         protected LaidText laidText;
 
-        public override void draw(DrawerMaym dm)
+        protected override void draw(DrawerMaym dm)
         {
             if (Backimege == null)
             {
@@ -143,8 +146,9 @@ namespace stonerkart
             {
                 dm.drawImege(Backimege, 0, 0, Width, Height);
             }
+            var ck = laidText?.xs.Sum(x => x.width);
 
-            laidText?.draw(dm, textPaddingY, textPaddingX, Width, textColor);
+            laidText?.draw(dm, textPaddingY, textPaddingX, Width, textColor, laidText, ck.Value);
             Border?.draw(dm, 0, 0, Width, Height);
         }
     }

@@ -57,13 +57,13 @@ namespace stonerkart
         public virtual int Width
         {
             get { return width; }
-            set { width = value; }
+            set { lock (this) width = value; }
         }
 
         public virtual int Height
         {
             get { return height; }
-            set { height = value; }
+            set { lock (this) height = value; }
         }
 
         public GuiElement(int x, int y, int width, int height)
@@ -180,7 +180,15 @@ namespace stonerkart
             }
         }
 
-        public abstract void draw(DrawerMaym dm);
+        public void Draw(DrawerMaym dm)
+        {
+            lock (this)
+            {
+                draw(dm);
+            }
+        }
+
+        protected abstract void draw(DrawerMaym dm);
 
         protected bool pressed;
 

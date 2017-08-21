@@ -57,7 +57,7 @@ namespace stonerkart
 
         public static void chooseDeck(Action<Deck> cb)
         {
-            Deck d = DeckController.loadDeck("nigra");
+            Deck d = new Deck(CardTemplate.Shibby_sShtank, Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().ToArray());
             cb(d);
             return;
             throw new Exception();

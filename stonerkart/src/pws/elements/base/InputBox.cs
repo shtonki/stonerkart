@@ -68,7 +68,7 @@ namespace stonerkart
 
         private int caretBlinkCounter;
 
-        public override void draw(DrawerMaym dm)
+        protected override void draw(DrawerMaym dm)
         {
             base.draw(dm);
 

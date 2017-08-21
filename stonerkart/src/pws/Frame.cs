@@ -66,6 +66,8 @@ namespace stonerkart
             
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.ClearColor(Color.CornflowerBlue);
+            GL.PushMatrix();
+
 
             if (activeScreen != null)
             {
@@ -80,13 +82,14 @@ namespace stonerkart
             }
 
             this.SwapBuffers();
+            GL.PopMatrix();
         }
 
         private void drawElement(GuiElement ge, DrawerMaym dm)
         {
             dm.translate(ge.X, ge.Y);
 
-            ge.draw(dm);
+            ge.Draw(dm);
 
             var threadHack = ge.children.ToArray();
 
