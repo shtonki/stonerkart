@@ -7,9 +7,9 @@ namespace stonerkart
 {
     class MultiplayerConnection : GameConnection
     {
-        private Game game;
+        private GameState game;
 
-        public MultiplayerConnection(Game g, NewGameStruct ngs)
+        public MultiplayerConnection(GameState g, NewGameStruct ngs)
         {
             game = g;
         }
@@ -104,7 +104,9 @@ namespace stonerkart
 
         public void surrender(GameEndStateReason reason)
         {
-            Network.surrender(game.gameid, reason);
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            Network.surrender(game.gameid, reason);*/
         }
     }
 

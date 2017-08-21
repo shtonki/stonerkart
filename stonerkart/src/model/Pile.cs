@@ -147,8 +147,8 @@ namespace stonerkart
 
     struct PileChangedMessage
     {
-        public readonly bool added;
-        public readonly Card[] cards;
+        public bool added { get; }
+        public Card[] cards { get; }
 
         public PileChangedMessage(bool added, Card card) : this(added, new[] { card})
         {

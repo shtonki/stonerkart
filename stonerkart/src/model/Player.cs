@@ -9,7 +9,7 @@ namespace stonerkart
     internal class Player : Observable<PlayerChangedArgs>, Observer<PileChangedMessage>, Targetable
     {
         public Card heroCard { get; private set; }
-        public readonly Game game;
+        public GameState game { get; }
 
         public string name { get; }
 
@@ -24,7 +24,7 @@ namespace stonerkart
 
         public bool isHero => this == game.hero;
 
-        public Player(Game g, string name)
+        public Player(GameState g, string name)
         {
             game = g;
             this.name = name;

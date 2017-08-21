@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace stonerkart
 {
@@ -58,6 +57,27 @@ namespace stonerkart
 
         public static void chooseDeck(Action<Deck> cb)
         {
+            Deck d = new Deck(
+                CardTemplate.Shibby_sShtank,
+                new []
+                {
+                    
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                    CardTemplate.Seraph, 
+                }
+                );
+            cb(d);
+            return;
             throw new Exception();
             /*
             Panel p = new Panel();

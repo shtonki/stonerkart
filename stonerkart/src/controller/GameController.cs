@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace stonerkart
 {
@@ -102,7 +101,7 @@ namespace stonerkart
 
         public void setPrompt(string message, params ButtonOption[] buttons)
         {
-
+            return;
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             /*
             gameScreen.memeout(() =>
@@ -171,17 +170,6 @@ namespace stonerkart
                 highlight(hexPanel.viewOf(v.Item2), v.Item1);
             }
             if (rd) redraw();
-            */
-        }
-
-        public void redraw()
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            Control v = gameScreen;
-            //v.memeout(v.Refresh);
-            v = gameScreen.hexPanel;
-            v.memeout(v.Invalidate);
             */
         }
     }

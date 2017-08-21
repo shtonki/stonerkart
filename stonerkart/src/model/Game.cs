@@ -10,42 +10,23 @@ namespace stonerkart
 {
     class Game
     {
-        public Map map { get; }
-        public Player hero { get; }
-        public Player villain { get; }
-        public IEnumerable<Player> allPlayers => players;
-
-        private List<Player> players;
-        private List<Card> cards;
-
-        public IEnumerable<Card> ca => cards;
-
-        public Pile stack { get; } = new Pile(new Location(null, PileLocation.Stack));
-
-        private List<TriggerGlueHack> pendingTriggeredAbilities { get; }= new List<TriggerGlueHack>();
-
-        private int activePlayerIndex { get; set; }
-        public Player activePlayer => players[activePlayerIndex];
-
-        public StepHandler stepHandler;
-
         public GameController gameController;
 
         public int gameid { get; }
-
-        private GameEventHandlerBuckets baseHandler = new GameEventHandlerBuckets();
-        private Stack<StackWrapper> wrapperStack { get; } = new Stack<StackWrapper>();
-
-        private IEnumerable<Card> triggerableCards => cards.Where(card => card.location.pile != PileLocation.Deck && !card.isDummy);
-        private IEnumerable<Card> fieldCards => cards.Where(card => card.location.pile == PileLocation.Field);
-
-        private Random random;
+        
         private GameConnection connection;
+
+        public GameState game;
+
         private bool skipFirstDraw = true;
 
         public Game(NewGameStruct ngs, bool local)
         {
             gameid = ngs.gameid;
+            
+            gameController = new GameController(null, null);
+
+            game = new GameState(ngs);
 
             if (local)
             {
@@ -53,30 +34,8 @@ namespace stonerkart
             }
             else
             {
-                connection = new MultiplayerConnection(this, ngs);
+                connection = new MultiplayerConnection(game, ngs);
             }
-
-            random = new Random(ngs.randomSeed);
-            map = new Map(11, 7, false, false);
-            cards = new List<Card>();
-            players = new List<Player>();
-
-            for (int i = 0; i < ngs.playerNames.Length; i++)
-            {
-                Player p = new Player(this, ngs.playerNames[i]);
-
-                players.Add(p);
-                if (i == ngs.heroIndex) hero = p;
-                else
-                {
-                    if (villain != null) throw new Exception();
-                    villain = p;
-                }
-            }
-
-            stepHandler = new StepHandler();
-
-            setupHandlers();
         }
 
         public Card createToken(CardTemplate ct, Player owner)
@@ -89,7 +48,7 @@ namespace stonerkart
         private Card createCard(CardTemplate ct, Pile pile, Player owner)
         {
             Card r = new Card(ct, owner);
-            cards.Add(r);
+            game.cards.Add(r);
             r.moveTo(pile);
             return r;
         }
@@ -99,100 +58,15 @@ namespace stonerkart
             Card r = a.createDummy();
 
             r.moveTo(pile);
-            cards.Add(r);
+            game.cards.Add(r);
             return r;
-        }
-
-        public int ord(Card c)
-        {
-            return cards.IndexOf(c);
-        }
-
-        public Card cardFromOrd(int i)
-        {
-            return cards[i];
-        }
-
-        public int ord(Player p)
-        {
-            return players.IndexOf(p);
-        }
-
-        public Player playerFromOrd(int i)
-        {
-            return players[i];
-        }
-
-        public int ord(Tile t)
-        {
-            return map.ord(t);
-        }
-
-        public Tile tileFromOrd(int i)
-        {
-            return map.tileAt(i);
         }
 
         public Path pathTo(Card c, Tile t)
         {
-            return map.path(c, t);
-        }
 
-        private void setupHandlers()
-        {
-            baseHandler.add(new TypedGameEventHandler<MoveToPileEvent>(e =>
-            {
-                if (e.card == hero.heroCard)
-                {
-                    forfeit(GameEndStateReason.Flop);
-                }
-
-                if (e.card.location.pile == PileLocation.Stack)
-                {
-                    Stack<StackWrapper> t = new Stack<StackWrapper>();
-                    while (wrapperStack.Count > 0) //todo this is p ugly coachella
-                    {
-                        var v = wrapperStack.Pop();
-                        if (v.stackCard == e.card) break;
-                        t.Push(v);
-                    }
-                    while (t.Count > 0)
-                    {
-                        wrapperStack.Push(t.Pop());
-                    }
-                }
-            }));
-
-            baseHandler.add(new TypedGameEventHandler<PayManaEvent>(e =>
-            {
-                e.player.payMana(e.manaSet);
-            }));
-
-            baseHandler.add(new TypedGameEventHandler<GainBonusManaEvent>(e =>
-            {
-                e.player.gainBonusMana(e.orb.colour);
-            }));
-
-            baseHandler.add(new TypedGameEventHandler<ShuffleDeckEvent>(e =>
-            {
-                e.player.deck.shuffle(random);
-            }));
-            
-            baseHandler.add(new TypedGameEventHandler<DrawEvent>(e =>
-            {
-                for (int i = 0; i < e.cards; i++)
-                {
-                    e.player.deck.peek().moveTo(e.player.hand);
-                }
-            }));
-
-            baseHandler.add(new TypedGameEventHandler<CastEvent>(e =>
-            {
-                wrapperStack.Push(e.wrapper);
-                e.wrapper.stackCard.moveTo(stack);
-
-                gameController.redraw();
-            }));
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            return map.path(c, t);*/
         }
 
         public void startGame()
@@ -205,11 +79,11 @@ namespace stonerkart
         {
             Deck d = DeckController.chooseDeck();
 
-            Deck[] decks = connection.deckify(d, ord(hero));
+            Deck[] decks = connection.deckify(d, game.ord(game.hero));
 
-            for (int i = 0; i < players.Count; i++)
+            for (int i = 0; i < game.players.Count; i++)
             {
-                Player p = players[i];
+                Player p = game.players[i];
                 Deck deck = decks[i];
 
                 Card heroCard = createCard(deck.hero, p.field, p);
@@ -219,29 +93,29 @@ namespace stonerkart
                 {
                     createCard(ct, p.deck, p);
                 }
-                p.deck.shuffle(random);
+                game.shuffle(p.deck);
             }
 
 
             Tile[] ts = new[]
             {
-                map.tileAt(2, 2),
-                map.tileAt(map.width - 3, map.height - 3),
+                game.map.tileAt(2, 2),
+                game.map.tileAt(game.map.width - 3, game.map.height - 3),
             };
             int ix = 0;
-            gameController.redraw();
-            foreach (Player p in players)
+            foreach (Player p in game.players)
             {
                 if (ix >= ts.Length) throw new Exception();
 
                 ts[ix++].place(p.heroCard);
             }
 
-            int xi = random.Next();
-            if (connection is DummyConnection) xi = ord(hero);
-            Player flipwinner = players[xi%players.Count];
+            int xi = game.random.Next();
+
+            if (connection is DummyConnection) xi = game.ord(game.hero);
+            Player flipwinner = game.players[xi % game.players.Count];
             ButtonOption bopt;
-            if (flipwinner == hero)
+            if (flipwinner == game.hero)
             {
                 bopt = waitForButton("Do you wish to go first?", ButtonOption.Yes, ButtonOption.No);
                 connection.sendAction(new ChoiceSelection((int)bopt));
@@ -252,15 +126,15 @@ namespace stonerkart
                 ChoiceSelection v = connection.receiveAction<ChoiceSelection>();
                 bopt = (ButtonOption)v.choices[0];
             }
-            activePlayerIndex = (xi + (bopt == ButtonOption.Yes ? 0 : 1))%players.Count;
+            game.activePlayerIndex = (xi + (bopt == ButtonOption.Yes ? 0 : 1)) % game.players.Count;
 
-            int[] draws = {5, 5, 4, 3, 2, 1};
+            int[] draws = { 5, 5, 4, 3, 2, 1 };
 
-            for (int i = 0; i < players.Count; i++)
+            for (int i = 0; i < game.players.Count; i++)
             {
                 for (int j = 0; j < draws.Length; j++)
                 {
-                    Player p = players[(i + activePlayerIndex)%players.Count];
+                    Player p = game.players[(i + game.activePlayerIndex) % game.players.Count];
                     int cards = draws[j];
                     handleTransaction(new DrawEvent(p, cards));
 
@@ -268,9 +142,9 @@ namespace stonerkart
 
                     ChoiceSelection cs;
 
-                    if (p == hero)
+                    if (p == game.hero)
                     {
-                        ButtonOption b = waitForButton(String.Format("Redraw to {0}?", draws[j+1]), ButtonOption.Yes, ButtonOption.No);
+                        ButtonOption b = waitForButton(String.Format("Redraw to {0}?", draws[j + 1]), ButtonOption.Yes, ButtonOption.No);
                         cs = new ChoiceSelection((int)b);
                         connection.sendAction(cs);
                     }
@@ -289,7 +163,7 @@ namespace stonerkart
                             Card crd = p.hand.peek();
                             crd.moveTo(p.deck);
                         }
-                        p.deck.shuffle(random);
+                        game.shuffle(p.deck);
                     }
                     else
                     {
@@ -299,23 +173,22 @@ namespace stonerkart
             }
         }
 
+
         private void loopEx()
         {
             gameController.setPrompt("Game starting");
             initGame();
-            gameController.redraw();
-
 
             while (true)
             {
-                doStep(stepHandler.step);
-                stepHandler.nextStep();
+                doStep(game.stepCounter.step);
+                game.stepCounter.nextStep();
             }
         }
 
         private void doStep(Steps step)
         {
-            handleTransaction(new StartOfStepEvent(activePlayer, step));
+            handleTransaction(new StartOfStepEvent(game.activePlayer, step));
             switch (step)
             {
                 case Steps.Replenish:
@@ -344,9 +217,9 @@ namespace stonerkart
                 } break;
             }
 
-            handleTransaction(new EndOfStepEvent(activePlayer, step));
+            handleTransaction(new EndOfStepEvent(game.activePlayer, step));
 
-            foreach (Player p in players)
+            foreach (Player p in game.players)
             {
                 p.clearBonusMana();
             }
@@ -354,21 +227,21 @@ namespace stonerkart
 
         private void untapStep()
         {
-            activePlayer.resetMana();
+            game.activePlayer.resetMana();
 
             if (!skipFirstDraw)
             {
-                handleTransaction(new DrawEvent(activePlayer, 1));
+                handleTransaction(new DrawEvent(game.activePlayer, 1));
             }
             else
             {
                 skipFirstDraw = false;
             }
 
-            if (activePlayer.manaPool.max.orbs.Count() < 12)
+            if (game.activePlayer.manaPool.max.orbs.Count() < 12)
             {
-                var mc = selectManaColour(activePlayer, o => activePlayer.manaPool.currentMana(o.colour) != 6);
-                activePlayer.gainMana(mc);
+                var mc = selectManaColour(game.activePlayer, o => game.activePlayer.manaPool.currentMana(o.colour) != 6);
+                game.activePlayer.gainMana(mc);
             }
 
             priority();
@@ -394,14 +267,14 @@ namespace stonerkart
         {
             List<Tuple<Card, Path>> paths;
 
-            bool b = activePlayer == hero;
-            gameController.setHeroActive(b);
-            var movers = activePlayer.field.Where(c => c.canMove);
+            bool heroMoving = game.activePlayer == game.hero;
+            gameController.setHeroActive(heroMoving);
+            var movers = game.activePlayer.field.Where(c => c.canMove);
 
-            if (b)
+            if (heroMoving)
             {
                 var unpathed = movers.ToList();
-                var occupado = activePlayer.field.Where(c => !c.canMove).Select(c => c.tile).ToList();
+                var occupado = game.activePlayer.field.Where(c => !c.canMove).Select(c => c.tile).ToList();
 
                 while (true)
                 {
@@ -409,7 +282,7 @@ namespace stonerkart
                     //gameController.highlight(pathed.Select(c => c.tile), Color.ForestGreen);
 
                     var from = getTile(
-                        tile => tile.card != null && tile.card.canMove && tile.card.owner == activePlayer,
+                        tile => tile.card != null && tile.card.canMove && tile.card.owner == game.activePlayer,
                         "Move your cards nigra", unpathed.Count == 0 ? ButtonOption.Pass : ButtonOption.NOTHING);
                     if (from == null) break;
                     Card mover = from.card;
@@ -419,13 +292,13 @@ namespace stonerkart
                         occupado.Remove(mover.combatPath.last);
                     }
                     Path pth = new Path(from);
-                    pth.colorHack = clrs[ord(mover)%clrs.Length];
+                    pth.colorHack = clrs[game.ord(mover)%clrs.Length];
                     gameController.addArrow(pth);
 
                     while (true)
                     {
 
-                        var options = map.pathCosts(mover, from).Where(path =>
+                        var options = game.map.pathCosts(mover, from).Where(path =>
                             path.length <= mover.movement - pth.length //card can reach the tile
                             &&
                             (
@@ -438,7 +311,7 @@ namespace stonerkart
                             !occupado.Any(p => p == path.last) //there isn't a card in the tile we want to move to
                             ).ToList();
                         if (options.Count == 1) break;
-                        var v = map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
+                        var v = game.map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
                         gameController.highlight(options.Select(p => p.to), Color.Green);
                         var to = getTile(tile => options.Select(p => p.to).Contains(tile), "Move to where?");
                         gameController.clearHighlights();
@@ -473,7 +346,7 @@ namespace stonerkart
                 paths = v.moves;
                 foreach (var p in paths)
                 {
-                    p.Item2.colorHack = clrs[ord(p.Item1) % clrs.Length];
+                    p.Item2.colorHack = clrs[game.ord(p.Item1) % clrs.Length];
                     gameController.addArrow(p.Item2);
                 }
             }
@@ -507,7 +380,7 @@ namespace stonerkart
             foreach (var v in paths) v.Item1.tile.removeCard();
             handleTransaction(gt);
 
-            foreach (var c in cards) c.combatPath = null;
+            foreach (var c in game.cards) c.combatPath = null;
             gameController.clearArrows();
             gameController.clearHighlights();
         }
@@ -516,7 +389,7 @@ namespace stonerkart
         {
             priority();
 
-            activePlayerIndex = (activePlayerIndex + 1)%players.Count;
+            game.activePlayerIndex = (game.activePlayerIndex + 1)% game.players.Count;
         }
 
         private void handleTransaction(GameEvent e)
@@ -537,61 +410,29 @@ namespace stonerkart
         private void handleTransaction(GameTransaction t)
         {
             logTransaction(t);
-            var gameEvents = t.events;
-
-            foreach (GameEvent e in gameEvents)
-            {
-                foreach (Card card in triggerableCards)
-                {
-                    pendAbilities(e, card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Pre));
-                }
-            }
-
-            foreach (GameEvent e in gameEvents)
-            {
-                baseHandler.handle(e);
-
-                foreach (Card card in cards)
-                {
-                    card.handleEvent(e);
-                }
-            }
-
-            foreach (GameEvent e in gameEvents)
-            {
-                foreach (Card card in triggerableCards)
-                {
-                    pendAbilities(e, card.abilitiesTriggeredBy(e).Where(a => a.timing == TriggeredAbility.Timing.Post));
-                }
-            }
-        }
-
-        private void pendAbilities(GameEvent trigger, IEnumerable<TriggeredAbility> tas)
-        {
-            if (tas.Count() == 0) return;
-            pendingTriggeredAbilities.AddRange(tas.Select(ta => new TriggerGlueHack(ta, trigger)));
+            game.handleTransaction(t);
         }
 
         private void enforceRules()
         {
-            foreach (Card c in cards)
+            foreach (Card c in game.cards)
             {
                 c.handleEvent(new ClearAurasEvent());
             }
             List<GameEvent> ae = new List<GameEvent>();
-            foreach (Card c in cards)
+            foreach (Card c in game.cards)
             {
                 foreach (Aura a in c.auras)
                 {
                     if (c.location.pile != a.activeIn) continue;
-                    foreach (Card affected in cards.Where(a.filter))
+                    foreach (Card affected in game.cards.Where(a.filter))
                     {
                         ae.Add(new ModifyEvent(affected, a.stat, a.modifer));
                     }
                 }
             }
 
-            foreach (Card c in cards)
+            foreach (Card c in game.cards)
             {
                 foreach (GameEvent e in ae)
                 {
@@ -599,7 +440,7 @@ namespace stonerkart
                 }
             }
 
-            foreach (Card c in cards)
+            foreach (Card c in game.cards)
             {
                 c.updateState();
             }
@@ -608,22 +449,19 @@ namespace stonerkart
             {
                 handlePendingTrigs();
                 trashcanDeadCreatures();
-            } while (pendingTriggeredAbilities.Count > 0);
-
-
-            gameController.redraw();
+            } while (game.pendingTriggeredAbilities.Count > 0);
         }
 
         private void handlePendingTrigs()
         {
-            if (pendingTriggeredAbilities.Count > 0)
+            if (game.pendingTriggeredAbilities.Count > 0)
             {
                 List<TriggerGlueHack>[] abilityArrays =
-                    players.Select(p => new List<TriggerGlueHack>()).ToArray();
+                    game.players.Select(p => new List<TriggerGlueHack>()).ToArray();
 
-                foreach (TriggerGlueHack pending in pendingTriggeredAbilities)
+                foreach (TriggerGlueHack pending in game.pendingTriggeredAbilities)
                 {
-                    int ix = ord(pending.ta.card.controller);
+                    int ix = game.ord(pending.ta.card.controller);
                     abilityArrays[ix].Add(pending);
                 }
 
@@ -631,13 +469,13 @@ namespace stonerkart
 
                 for (int i = 0; i < abilityArrays.Length; i++)
                 {
-                    Player p = playerFromOrd(i);
+                    Player p = game.playerFromOrd(i);
                     List<TriggerGlueHack> abilityList = abilityArrays[i];
                     
                     wrappers.AddRange(handlePendingTrigs(p, abilityList));
                 }
 
-                pendingTriggeredAbilities.Clear();
+                game.pendingTriggeredAbilities.Clear();
 
                 foreach (var w in wrappers)
                 {
@@ -648,6 +486,7 @@ namespace stonerkart
 
         private List<StackWrapper> handlePendingTrigs(Player p, IEnumerable<TriggerGlueHack> abilities)
         {
+            throw new Exception();/*
             List<StackWrapper> r = new List<StackWrapper>();
             TriggerGlueHack[] orig = abilities.Where(a => a.ta.possible(makeHackStruct(a.ta))).ToArray();
 
@@ -659,7 +498,7 @@ namespace stonerkart
                 c.tghack = orig[i];
             }
 
-            if (p == hero)
+            if (p == game.hero)
             {
                 ManualResetEventSlim re = new ManualResetEventSlim();
                 Clickable clkd = null;
@@ -670,8 +509,7 @@ namespace stonerkart
                 });
 
                 List<ptas> triggd = new List<ptas>();
-
-                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+                
                 while (triggd.Count < orig.Length)
                 {
                     gameController.setPrompt("Select which ability to place on the stack next.");
@@ -705,7 +543,7 @@ namespace stonerkart
                 }
 
                 dp.close();
-                */
+                
                 foreach (ptas pt in triggd)
                 {
                     r.Add(pt.wrapper);
@@ -734,6 +572,7 @@ namespace stonerkart
                 }
             }
             return r;
+            */
         }
         #region hack
         private class ptas
@@ -756,7 +595,7 @@ namespace stonerkart
         private void trashcanDeadCreatures()
         { 
             List<Card> trashcan = new List<Card>();
-            foreach (Card c in fieldCards)
+            foreach (Card c in game.fieldCards)
             {
                 if (c.toughness <= 0 && c.cardType == CardType.Creature)
                 {
@@ -780,7 +619,7 @@ namespace stonerkart
             while (true)
             {
                 enforceRules();
-                Player fuckboy = players[(activePlayerIndex + c)%players.Count];
+                Player fuckboy = game.players[(game.activePlayerIndex + c)% game.players.Count];
                 StackWrapper w = tryCast(fuckboy);
 
                 if (w != null)
@@ -791,15 +630,15 @@ namespace stonerkart
                 else //pass
                 {
                     c++;
-                    if (c == players.Count)
+                    if (c == game.players.Count)
                     {
-                        if (wrapperStack.Count == 0)
+                        if (game.wrapperStack.Count == 0)
                         {
                             break;
                         }
 
-                        StackWrapper wrapper = wrapperStack.Pop();
-                        if (wrapper.castingCard != stack.peekTop() && wrapper.castingCard != stack.peekTop().dummyFor) throw new Exception();
+                        StackWrapper wrapper = game.wrapperStack.Pop();
+                        if (wrapper.castingCard != game.stack.peekTop() && wrapper.castingCard != game.stack.peekTop().dummyFor) throw new Exception();
                         resolve(wrapper);
                         c = 0;
 
@@ -808,13 +647,7 @@ namespace stonerkart
                 }
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param text="f"></param>
-        /// <param text="prompt"></param>
-        /// <returns></returns>
+        
         private Card chooseCastCard(Player p)
         {
 
@@ -877,14 +710,14 @@ namespace stonerkart
         { 
             StackWrapper r;
 
-            bool b = p == hero;
+            bool b = p == game.hero;
             gameController.setHeroActive(b);
             if (b)
             {
-                if ((stack.Any() ||
-                     Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
+                if ((game.stack.Any() ||
+                     Settings.stopTurnSetting.getTurnStop(game.stepCounter.step, game.hero == game.activePlayer)))
                 {
-                    r = tryCastDx(hero);
+                    r = tryCastDx(game.hero);
                 }
                 else
                 {
@@ -915,8 +748,8 @@ namespace stonerkart
                 TargetMatrix[] costmxs;
                 TargetMatrix[] targetmxs;
 
-                if (!(stack.Any() ||
-                        Settings.stopTurnSetting.getTurnStop(stepHandler.step, hero == activePlayer)))
+                if (!(game.stack.Any() ||
+                        Settings.stopTurnSetting.getTurnStop(game.stepCounter.step, game.hero == game.activePlayer)))
                 {
                     return null;    //auto pass
                 }
@@ -961,7 +794,7 @@ namespace stonerkart
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere;
 
-            bool canCastSlow = stack.Count == 0 && activePlayer == hero && (stepHandler.step == Steps.Main1 || stepHandler.step == Steps.Main2);
+            bool canCastSlow = game.stack.Count == 0 && game.activePlayer == game.hero && (game.stepCounter.step == Steps.Main1 || game.stepCounter.step == Steps.Main2);
             if (!canCastSlow)
             {
                 activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
@@ -1004,7 +837,7 @@ namespace stonerkart
 
         private void resolve(StackWrapper wrapper)
         {
-            Card stackpopped = stack.peekTop();
+            Card stackpopped = game.stack.peekTop();
             Card card = wrapper.castingCard;
             TargetMatrix[] ts = wrapper.targetMatrices;
             Ability ability = wrapper.ability;
@@ -1105,6 +938,7 @@ namespace stonerkart
 
         private ButtonOption waitForButton(string prompt, params ButtonOption[] options)
         {
+            Thread.Sleep(10000000);
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             gameController.setPrompt(prompt, options);
             ShibbuttonStuff s = (ShibbuttonStuff)waitFor(new InputEventFilter((c, o) => c is Shibbutton));
@@ -1113,30 +947,30 @@ namespace stonerkart
 
         private HackStruct makeHackStruct(Player castingPlayer)
         {
-            return new HackStruct(this, castingPlayer);
+            return new HackStruct(game, this, castingPlayer);
         }
 
         private HackStruct makeHackStruct(Ability resolvingAbility)
         {
-            return new HackStruct(this, resolvingAbility);
+            return new HackStruct(game, this, resolvingAbility);
         }
 
         private HackStruct makeHackStruct(Player castingPlayer, Ability resolvingAbility)
         {
-            return new HackStruct(this, resolvingAbility, castingPlayer);
+            return new HackStruct(game, this, resolvingAbility, castingPlayer);
         }
 
         public ManaColour selectManaColour(Player chooser, Func<ManaOrb, bool> f)
         {
             ManaOrbSelection selection;
-            if (chooser == hero)
+            if (chooser == game.hero)
             {
-                activePlayer.stuntMana();
+                game.hero.stuntMana();
 
                 gameController.setPrompt("Gain mana nerd");
                 ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(f);
 
-                activePlayer.unstuntMana();
+                game.hero.unstuntMana();
 
                 selection = new ManaOrbSelection(v.colour);
                 connection.sendAction(selection);
@@ -1214,7 +1048,7 @@ namespace stonerkart
 
         public void setTargetHighlight(Card c)
         {
-            StackWrapper w = wrapperStack.FirstOrDefault(sw => sw.stackCard == c);
+            StackWrapper w = game.wrapperStack.FirstOrDefault(sw => sw.stackCard == c);
 
             if (w == null) return;
 
@@ -1281,7 +1115,7 @@ namespace stonerkart
     }
 
 
-    class StepHandler : Observable<Steps>
+    class StepCounter : Observable<Steps>
     {
         public Steps step { get; private set; }
 

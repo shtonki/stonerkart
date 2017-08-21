@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace stonerkart
 {
@@ -20,7 +19,10 @@ namespace stonerkart
 
             GUI.launch();
 
-            GUI.setScreen(new LoginScreen());
+            GUI.setScreen(new GameScreen());
+
+            Game g = new Game(new NewGameStruct(0, 0, new []{"a", "b"}, 0), true);
+            g.startGame();
 
             //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             //UIController.launchUI();

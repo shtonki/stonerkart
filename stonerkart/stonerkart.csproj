@@ -81,6 +81,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="src\GameState.cs" />
     <Compile Include="src\pws\Border.cs" />
     <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />

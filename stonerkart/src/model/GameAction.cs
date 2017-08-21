@@ -8,7 +8,7 @@ namespace stonerkart
 {
     interface GameAction
     {
-        string toString(Game g);
+        string toString(GameState g);
     }
 
     class ManaOrbSelection : GameAction
@@ -20,13 +20,13 @@ namespace stonerkart
             this.orb = orb;
         }
 
-        public ManaOrbSelection(Game g, string data)
+        public ManaOrbSelection(GameState g, string data)
         {
             int i = Int32.Parse(data);
             orb = (ManaColour)i;
         }
 
-        public string toString(Game g)
+        public string toString(GameState g)
         {
             return ((int)orb).ToString();
         }
@@ -41,7 +41,7 @@ namespace stonerkart
             this.wrapper = wrapper;
         }
 
-        private static TargetMatrix[] matriciesFromString(String s, Game g)
+        private static TargetMatrix[] matriciesFromString(String s, GameState g)
         {
             int i = 0;
 
@@ -131,7 +131,7 @@ namespace stonerkart
             return matricies.ToArray();
         }
 
-        public CastSelection(Game g, string s)
+        public CastSelection(GameState g, string s)
         {
             if (s.Length == 0)
             {
@@ -155,7 +155,7 @@ namespace stonerkart
             }
         }
 
-        private static void matriciesToString(StringBuilder sb, TargetMatrix[] ms, Game g)
+        private static void matriciesToString(StringBuilder sb, TargetMatrix[] ms, GameState g)
         {
             foreach (TargetMatrix tm in ms)
             {
@@ -197,7 +197,7 @@ namespace stonerkart
             }
         }
 
-        public string toString(Game g)
+        public string toString(GameState g)
         {
             if (wrapper == null)
             {
@@ -234,7 +234,7 @@ namespace stonerkart
             this.moves = moves;
         }
 
-        public MoveSelection(Game g, string s)
+        public MoveSelection(GameState g, string s)
         {
             moves = new List<Tuple<Card, Path>>();
             if (s.Length == 0) return;
@@ -257,7 +257,7 @@ namespace stonerkart
             }
         }
 
-        public string toString(Game g)
+        public string toString(GameState g)
         {
             if (moves.Count == 0) return "";
             StringBuilder sb = new StringBuilder();
@@ -296,7 +296,7 @@ namespace stonerkart
             this.choices = choices;
         }
 
-        public ChoiceSelection(Game g, string s)
+        public ChoiceSelection(GameState g, string s)
         {
             if (s.Length == 0)
             {
@@ -309,7 +309,7 @@ namespace stonerkart
             }
         }
 
-        public string toString(Game g)
+        public string toString(GameState g)
         {
             if (!choices.Any()) return "";
             StringBuilder b = new StringBuilder();
@@ -343,7 +343,7 @@ namespace stonerkart
             this.castSelections = castSelections;
         }
 
-        public TriggeredAbilitiesGluer(Game g, string s)
+        public TriggeredAbilitiesGluer(GameState g, string s)
         {
             var ss = s.Split('+');
 
@@ -353,7 +353,7 @@ namespace stonerkart
             if (choices.choices.Length != castSelections.Length) throw new Exception();
         }
 
-        public string toString(Game g)
+        public string toString(GameState g)
         {
             StringBuilder sb = new StringBuilder();
 

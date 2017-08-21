@@ -84,11 +84,14 @@ namespace stonerkart
             }
         }
 
-        public static void sendGameMessage(Game g, string message)
+        public static void sendGameMessage(GameState g, string message)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             GameMessageBody b = new GameMessageBody(g.gameid, message);
             Message m = new Message(servername, Message.MessageType.GAMEMESSAGE, b);
             serverConnection.send(m);
+            */
         }
 
         private static Message awaitResponseMessage()
