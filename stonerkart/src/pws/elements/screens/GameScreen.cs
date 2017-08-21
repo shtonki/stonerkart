@@ -8,19 +8,15 @@ namespace stonerkart
 {
     class GameScreen : Screen
     {
+        public PileView pw;
+
         public GameScreen() : base(new Imege(Textures.table0))
         {
+            //
+                CardView cv = new CardView(new Card(CardTemplate.Seraph));
+                addElement(cv);
             /*/
-            var v = new HexPanel(11, 7, 80);
-            var p = new Square();
-            p.width = v.width + 50;
-            p.height = v.height + 50;
-            p.Backimege = new Imege(Textures.table0);
-            p.addChild(v);
-            v.moveTo(MoveTo.Center, MoveTo.Center);
-            addElement(p);
-            /*/
-            PileView pw = new PileView();
+            pw = new PileView();
             addElement(pw);
             pw.setSize(800, 300);
             //*/

@@ -9,7 +9,8 @@ namespace stonerkart
 {
     class Square : GuiElement
     {
-        public int textPaddingX = 5;
+        public int textPaddingX { get; set; }= 0;
+        public int textPaddingY { get; set; }= 0;
 
         private Color bclr = Color.Transparent;
         private Imege backimege;
@@ -143,7 +144,7 @@ namespace stonerkart
                 dm.drawImege(Backimege, 0, 0, Width, Height);
             }
 
-            laidText?.draw(dm, 5, textPaddingX, Width, textColor);
+            laidText?.draw(dm, textPaddingY, textPaddingX, Width, textColor);
             Border?.draw(dm, 0, 0, Width, Height);
         }
     }

@@ -61,19 +61,12 @@ namespace stonerkart
                 CardTemplate.Shibby_sShtank,
                 new []
                 {
-                    
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
-                    CardTemplate.Seraph, 
+                    CardTemplate.Commander_sSparryz,
+                    CardTemplate.Flamekindler,
+                    CardTemplate.Moratian_sBattle_sStandard,
+                    CardTemplate.Seraph,
+                    CardTemplate.Chromatic_sUnicorn,
+                    CardTemplate.Enraged_sDragon,
                 }
                 );
             cb(d);

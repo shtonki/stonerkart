@@ -72,6 +72,8 @@ namespace stonerkart
 
         public override LaidText layout(string text, int width, int height, FontFamille ff)
         {
+            if (text == "") return new LaidText(new List<characterLayout>(), ff, height);
+
             List<characterLayout> xs = new List<characterLayout>();
 
             var sz = TextureLoader.sizeOf(ff.fontImage);

@@ -598,9 +598,6 @@
   <data name="buttonbg2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\buttonbg2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="font0" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\font0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="font1" xml:space="preserve">
     <value>A 0 62
 B 62 56
@@ -676,12 +673,16 @@ z 2661 39
 + 3404 62
 &amp; 3466 70
 ( 3536 26
-) 3562 27</value>
+) 3562 27
+: 3589 17</value>
   </data>
   <data name="whiteframe4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\whiteframe4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="table0" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\table0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="font0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\font0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

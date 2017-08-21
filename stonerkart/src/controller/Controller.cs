@@ -19,9 +19,14 @@ namespace stonerkart
 
             GUI.launch();
 
-            GUI.setScreen(new GameScreen());
+            var gsc = new GameScreen();
+
+            GUI.setScreen(gsc);
 
             Game g = new Game(new NewGameStruct(0, 0, new []{"a", "b"}, 0), true);
+
+            g.game.hero.deck.addObserver(gsc.pw);
+
             g.startGame();
 
             //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
@@ -43,6 +48,7 @@ namespace stonerkart
 
         public static void attemptLogin(string username, string password)
         {
+            throw new Exception();
             if (Network.login(username, password))
             {
                 GUI.setScreen(new GameScreen());

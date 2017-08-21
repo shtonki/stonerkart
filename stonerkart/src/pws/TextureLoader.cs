@@ -29,7 +29,13 @@ namespace stonerkart
 
         cardframegrey,
 
-        orbchaos,
+        orbChaos,
+        orbNature,
+        orbOrder,
+        orbLife,
+        orbDeath,
+        orbColourless,
+        orbMight,
     };
 
     public static class TextureLoader
@@ -51,7 +57,29 @@ namespace stonerkart
 
             images[Textures.cardframegrey] = Resources.whiteframe4;
 
-            images[Textures.orbchaos] = Resources.orbChaos;
+            images[Textures.orbChaos] = Resources.orbChaos;
+            images[Textures.orbNature] = Resources.orbNature;
+            images[Textures.orbOrder] = Resources.orbOrder;
+            images[Textures.orbLife] = Resources.orbLife;
+            images[Textures.orbDeath] = Resources.orbDeath;
+            images[Textures.orbColourless] = Resources.orbColourless;
+            images[Textures.orbMight] = Resources.orbMight;
+        }
+
+        public static Textures orbTexture(ManaColour mc)
+        {
+            switch (mc)
+            {
+                case ManaColour.Chaos: return Textures.orbChaos;
+                case ManaColour.Colourless: return Textures.orbColourless;
+                case ManaColour.Death: return Textures.orbDeath;
+                case ManaColour.Life: return Textures.orbLife;
+                case ManaColour.Might: return Textures.orbMight;
+                case ManaColour.Nature: return Textures.orbNature;
+                case ManaColour.Order: return Textures.orbOrder;
+                default:
+                    throw new Exception();
+            }
         }
 
         public static Size sizeOf(Textures t)

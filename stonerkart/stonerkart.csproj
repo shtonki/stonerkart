@@ -169,12 +169,12 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\font0.png" />
     <None Include="Resources\table0.png" />
     <None Include="Resources\whiteframe4.png" />
     <None Include="Resources\buttonbg2.png" />
     <None Include="Resources\border0.png" />
     <None Include="Resources\background3.png" />
-    <None Include="Resources\font0.png" />
     <None Include="Resources\artWaterBolt.png" />
     <None Include="Resources\artRavagingGreed.png" />
     <None Include="Resources\artScrollOfEarth.png" />

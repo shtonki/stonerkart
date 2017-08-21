@@ -88,7 +88,9 @@ namespace stonerkart
 
             ge.draw(dm);
 
-            foreach (var kid in ge.children)
+            var threadHack = ge.children.ToArray();
+
+            foreach (var kid in threadHack)
             {
                 drawElement(kid, dm);
             }
@@ -140,6 +142,12 @@ namespace stonerkart
         {
             base.OnKeyDown(e);
             focused?.onKeyDown(e);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Controller.quit();
         }
 
         private void focus(GuiElement f)

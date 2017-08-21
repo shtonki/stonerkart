@@ -7,39 +7,33 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class CardView : Square
+    class CardView : Square, Observer<CardChangedMessage>
     {
         private const int framewidth = 500;
         private const int frameheight = 700;
 
-        public CardView() : base(framewidth, frameheight)
+        public CardView(Card c) : base(framewidth, frameheight)
         {
             namebox = new Square();
-            namebox.Text = "Rasputin the Mad";
-            namebox.TextLayout = new SingleLineFitLayout();
+            namebox.TextLayout = new SingleLineFitLayout(Justify.Left);
             addChild(namebox);
 
             breadbox = new Square();
-            breadbox.Text = "Whenever Rasputin the Mad attacks you may draw a card.";
             addChild(breadbox);
 
             movementbox = new Square();
-            movementbox.Text = "3";
             movementbox.TextLayout = new SingleLineFitLayout();
             addChild(movementbox);
 
             ptbox = new Square();
-            ptbox.Text = "3/4";
             ptbox.TextLayout = new SingleLineFitLayout();
             addChild(ptbox);
 
             typebox = new Square();
-            typebox.Text = "Human Mystic";
             typebox.TextLayout = new SingleLineFitLayout(Justify.Middle);
             addChild(typebox);
 
             artbox = new Square();
-            artbox.Backimege = new Imege(Textures.A);
             addChild(artbox);
 
             orbbox = new Square();
@@ -53,26 +47,30 @@ namespace stonerkart
             };
             //addChild(topbutton);
 
-            layoutStuff();
+            //layoutStuff();
+            populate(c);
+            Height = frameheight;
         }
+
+        #region yup
 
         private Square topbutton;
 
         private  Square namebox;
         private const int nameboxOrigX = 26;
-        private const int nameboxOrigY = 9;
+        private const int nameboxOrigY = 16;
         private const int nameboxOrigW = 246;
         private const int nameboxOrigH = 40;
                  
         private  Square breadbox;
         private const int breadboxOrigX = 44;
-        private const int breadboxOrigY = 396;
+        private const int breadboxOrigY = 402;
         private const int breadboxOrigW = 408;
         private const int breadboxOrigH = 236;
                  
         private  Square movementbox;
         private const int movementboxOrigX = 32;
-        private const int movementboxOrigY = 636;
+        private const int movementboxOrigY = 646;
         private const int movementboxOrigW = 40;
         private const int movementboxOrigH = 48;
                  
@@ -84,7 +82,7 @@ namespace stonerkart
                  
         private  Square typebox;
         private const int typeboxOrigX = 134;
-        private const int typeboxOrigY = 639;
+        private const int typeboxOrigY = movementboxOrigY;
         private const int typeboxOrigW = 236;
         private const int typeboxOrigH = 50;
                  
@@ -100,6 +98,49 @@ namespace stonerkart
         private const int orbboxOrigW = 398;
         private const int orbboxOrigH = 30;
 
+        #endregion
+
+        private Color frameColor;
+        private IEnumerable<ManaOrb> orbs;
+
+        public void notify(object o, CardChangedMessage t)
+        {
+            populate((Card)o);
+            layoutStuff();
+        }
+
+        private void populate(Card c)
+        {
+            namebox.Text = c.name;
+            breadbox.Text = c.breadText;
+            movementbox.Text = c.movement.ToString();
+            ptbox.Text = c.power + "/" + c.toughness;
+            typebox.Text = c.typeText;
+            artbox.Backimege = new Imege(Textures.A);
+
+            orbs = c.castManaCost.orbs;
+
+            if (c.colours.Count > 1)
+            {
+                frameColor = Color.Chocolate;
+            }
+            else
+            {
+                var v = c.colours[0];
+
+                switch (v)
+                {
+                    case ManaColour.Chaos: frameColor = Color.Red; break;
+                    case ManaColour.Death: frameColor = Color.DarkGray; break;
+                    case ManaColour.Life: frameColor = Color.White; break;
+                    case ManaColour.Might: frameColor = Color.Purple; break;
+                    case ManaColour.Nature: frameColor = Color.Green; break;
+                    case ManaColour.Order: frameColor = Color.Blue; break;
+                    case ManaColour.Colourless: frameColor = Color.Silver; break;
+                }
+            }
+        }
+
         public void layoutStuff()
         {
             topbutton.setSize(width, height);
@@ -109,9 +150,15 @@ namespace stonerkart
             int adj1 = height < 380 ? 3 : 0;
             #endregion
 
+            adj = adj1 = 0;
+
             var scale = ((double)(height-adj1))/frameheight;
 
-            int orbcount = 3;
+            var colours = orbs.Where(o => o.colour != ManaColour.Colourless).ToArray();
+            var colourlessCount = orbs.Count() - colours.Count();
+
+            var orbcount = colours.Count() + (colourlessCount > 0 ? 1 : 0);
+
             int pad = 1;
 
             orbbox.clearChildren();
@@ -125,14 +172,26 @@ namespace stonerkart
                 orbsize
                 );
 
-            for (int i = 0; i < orbcount; i++)
+            int i;
+            for (i = 0; i < colours.Count(); i++)
             {
+                var o = colours[i];
                 Square orbsquare = new Square(orbsize, orbsize);
                 orbbox.addChild(orbsquare);
                 orbsquare.X = i * (orbsize + pad);
-                orbsquare.Backimege = new Imege(Textures.orbchaos);
+                orbsquare.Backimege = new Imege(TextureLoader.orbTexture(o.colour));
             }
 
+            if (colourlessCount > 0)
+            {
+                Square orbsquare = new Square(orbsize, orbsize);
+                orbsquare.textPaddingX = 0;
+                orbsquare.textPaddingY = 0;
+                orbbox.addChild(orbsquare);
+                orbsquare.X = i * (orbsize + pad);
+                orbsquare.Backimege = new Imege(TextureLoader.orbTexture(ManaColour.Colourless));
+                orbsquare.Text = colourlessCount.ToString();
+            }
 
             namebox.X = (int)Math.Round((scale * nameboxOrigX));
             namebox.Y = (int)Math.Floor((scale * nameboxOrigY)) - adj;
@@ -212,7 +271,8 @@ namespace stonerkart
         public override void draw(DrawerMaym dm)
         {
             //base.draw(dm);
-            dm.drawTexture(Textures.cardframegrey, 0, 0, width, height, null, Color.FromArgb(70, 70, 70));
+
+            dm.drawTexture(Textures.cardframegrey, 0, 0, width, height, null, frameColor);
         }
     }
 }

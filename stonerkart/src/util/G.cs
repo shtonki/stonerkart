@@ -35,6 +35,7 @@ namespace stonerkart
 
     static class G
     {
+        /*
         private static char[] hackish = G.range(0, 20).Select(v => (char)('\u2460' + v)).ToArray();
 
         private static char[] hackedaf =
@@ -42,6 +43,7 @@ namespace stonerkart
                 .Cast<ManaColour>()
                 .Select(c => (char)('\u24b6' + (c.ToString().ToLower())[0] - 97))
                 .ToArray();
+        */
 
         public static ReduceResult<T> Reduce<T>(this IEnumerable<T> e)
         {
@@ -208,15 +210,14 @@ namespace stonerkart
             return bmp;
         }
 
-        public static char colourlessGlyph(int i)
+        public static string colourlessGlyph(int i)
         {
-            return hackish[i-1];
+            return "/" + i + "/";
         }
 
-        public static char colouredGlyph(ManaColour c)
+        public static string colouredGlyph(ManaColour c)
         {
-            if (c == ManaColour.Colourless) throw new Exception();
-            return hackedaf[(int)c];
+            return "/" + c + "/";
         }
 
         public static string exhaustGhyph => "Exhaust";

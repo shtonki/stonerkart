@@ -7,23 +7,18 @@ using OpenTK.Input;
 
 namespace stonerkart
 {
-    class PileView : Square
+    class PileView : Square, Observer<PileChangedMessage>
     {
-        private List<CardView> cardViews;
+        private List<CardView> cardViews = new List<CardView>();
 
         public PileView()
         {
-            cardViews = new List<CardView>();
-            for (int i = 0; i < 5; i++)
-            {
-                CardView cv = new CardView();
-                cardViews.Add(cv);
-                addChild(cv);
-                cv.hoverable = false;
-            }
+        }
 
-            var c = cardViews[1];
-            c.DrawOrder = -1;
+        public PileView(CardList cl)
+        {
+            cl.addObserver(this);
+            layoutCards();
         }
 
         public override int Height
@@ -50,8 +45,30 @@ namespace stonerkart
             layoutCards();
         }
 
+        public void notify(object o, PileChangedMessage t)
+        {
+            populate((CardList)o);
+            layoutCards();
+        }
+
+        private void populate(CardList list)
+        {
+            children.Clear();
+            cardViews.Clear();
+
+            foreach (var c in list)
+            {
+                CardView cv = new CardView(c);
+                cardViews.Add(cv);
+                addChild(cv);
+                cv.hoverable = false;
+            }
+        }
+
         private void layoutCards()
         {
+            if (cardViews.Count == 0) return;
+
             var cvWidth = Width/cardViews.Count;
 
             for (int i = 0; i < cardViews.Count; i++)
