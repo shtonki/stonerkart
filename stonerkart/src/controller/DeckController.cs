@@ -62,11 +62,11 @@ namespace stonerkart
                 new []
                 {
                     CardTemplate.Commander_sSparryz,
-                    CardTemplate.Flamekindler,
                     CardTemplate.Moratian_sBattle_sStandard,
-                    CardTemplate.Seraph,
                     CardTemplate.Chromatic_sUnicorn,
-                    CardTemplate.Enraged_sDragon,
+                    CardTemplate.Sanguine_sArtisan, 
+                    CardTemplate.Rider_sof_sWar, 
+                    CardTemplate.Kraken, 
                 }
                 );
             cb(d);

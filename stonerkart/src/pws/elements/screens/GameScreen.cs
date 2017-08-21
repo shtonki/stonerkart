@@ -13,8 +13,15 @@ namespace stonerkart
         public GameScreen() : base(new Imege(Textures.table0))
         {
             //
+            int xp = 0;
+            for (int i = 0; i < 5; i++)
+            {
                 CardView cv = new CardView(new Card(CardTemplate.Seraph));
+                cv.Height = 100 + i*100;
+                cv.X = xp;
+                xp += cv.Width;
                 addElement(cv);
+            }
             /*/
             pw = new PileView();
             addElement(pw);
