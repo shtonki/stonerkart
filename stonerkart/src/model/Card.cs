@@ -94,7 +94,7 @@ namespace stonerkart
         private int damageTaken;
         public int fatigue { get; private set; }
 
-        private ManaColour? forceColour;
+        private ManaColour? forceColour { get; }
         private Modifiable[] modifiables;
 
         private List<KeywordAbility> keywordAbilities;

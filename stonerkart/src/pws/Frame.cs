@@ -172,7 +172,7 @@ namespace stonerkart
             int x = sp.X;
             int y = sp.Y;
             GuiElement r = null;
-            var l = activeScreen.Elements;
+            var l = activeScreen.Elements.ToArray();
 
             while (true)
             {
@@ -187,7 +187,7 @@ namespace stonerkart
                         v.Y + v.Height > y)
                     {
                         r = v;
-                        l = v.children;
+                        l = v.children.ToArray();
                         c = true;
                         x -= v.X;
                         y -= v.Y;

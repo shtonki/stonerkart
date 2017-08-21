@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,15 +10,17 @@ namespace stonerkart
 {
     class PileView : Square, Observer<PileChangedMessage>
     {
-        private List<CardView> cardViews = new List<CardView>();
+        private List<CardView> cardViews;
 
         public PileView()
         {
+            Backcolor = Color.Aqua;
         }
 
-        public PileView(CardList cl)
+        public PileView(CardList cl) : this()
         {
             cl.addObserver(this);
+            populate(cl);
             layoutCards();
         }
 
@@ -47,17 +50,41 @@ namespace stonerkart
 
         public void notify(object o, PileChangedMessage t)
         {
-            populate((CardList)o);
+            if (cardViews == null)
+            {
+                populate((CardList)o);
+            }
+            else
+            {
+                update(t);
+            }
             layoutCards();
         }
 
-        private void populate(CardList list)
+        private void update(PileChangedMessage m)
         {
-            children.Clear();
-            cardViews.Clear();
-
-            foreach (var c in list)
+            foreach (var c in m.cards)
             {
+                if (m.arg == PileChangedArg.Add)
+                {
+                    addCardView(c);
+                }
+                else if (m.arg == PileChangedArg.Remove)
+                {
+                    removeCardView(c);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+        }
+
+        private void addCardView(Card c)
+        {
+            lock (this)
+            {
+                if (cardViews.Any(crd => crd.card == c)) throw new Exception();
                 CardView cv = new CardView(c);
                 cardViews.Add(cv);
                 addChild(cv);
@@ -65,17 +92,41 @@ namespace stonerkart
             }
         }
 
+        private void removeCardView(Card c)
+        {
+            lock (this)
+            {
+                CardView cv = cardViews.First(cw => cw.card == c);
+                cardViews.Remove(cv);
+                removeChild(cv);
+            }
+        }
+
+        private void populate(CardList list)
+        {
+            cardViews = new List<CardView>();
+
+            foreach (var c in list)
+            {
+                addCardView(c);
+            }
+        }
+
         private void layoutCards()
         {
-            if (cardViews.Count == 0) return;
-
-            var cvWidth = Width/cardViews.Count;
-
-            for (int i = 0; i < cardViews.Count; i++)
+            if (cardViews == null || cardViews.Count == 0) return;
+            lock (this)
             {
-                CardView cv = cardViews[i];
-                cv.X = i*cvWidth;
-                cv.Height = Height;
+                cardViews[0].Height = Height;
+                var cvWidth = cardViews[0].Width;
+                var pad = cardViews.Count == 1 ? 0 : ((double)(Width-cvWidth))/(cardViews.Count - 1);
+
+                for (int i = 0; i < cardViews.Count; i++)
+                {
+                    CardView cv = cardViews[i];
+                    cv.X = (int)Math.Round(i*pad);
+                    cv.Height = Height;
+                }
             }
         }
 
@@ -107,7 +158,7 @@ namespace stonerkart
 
         private CardView viewAt(int clickx, int clicky)
         {
-            if (cardViews.Count == 0) return null;
+            if (cardViews == null || cardViews.Count == 0) return null;
 
             int clickxadj = clickx + cardViews[0].Width/2;
             int clickyadj = clicky + cardViews[0].Height/2;

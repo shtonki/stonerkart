@@ -25,7 +25,7 @@ namespace stonerkart
             /*/
             pw = new PileView();
             addElement(pw);
-            pw.setSize(800, 300);
+            pw.setSize(1700, 300);
             //*/
         }
     }

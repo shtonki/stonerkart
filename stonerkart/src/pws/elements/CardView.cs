@@ -9,11 +9,15 @@ namespace stonerkart
 {
     class CardView : Square, Observer<CardChangedMessage>
     {
-        private const int framewidth = 500;
-        private const int frameheight = 700;
+        public const int framewidth = 500;
+        public const int frameheight = 700;
+
+        public Card card { get; }
 
         public CardView(Card c) : base(framewidth, frameheight)
         {
+            card = c;
+
             namebox = new Square();
             namebox.TextLayout = new SingleLineFitLayout(Justify.Left);
             addChild(namebox);
@@ -111,6 +115,8 @@ namespace stonerkart
 
         private void populate(Card c)
         {
+            if (card != c) throw new Exception();
+
             namebox.Text = c.name;
             breadbox.Text = c.breadText;
             movementbox.Text = c.movement.ToString();

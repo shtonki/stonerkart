@@ -2188,7 +2188,8 @@ namespace stonerkart
                     baseRace = Race.Elemental;
                     subtype = Subtype.Guardian;
 
-                    chaosCost = 2;
+                    lifeCost = 1;
+                    chaosCost = 1;
                     greyCost = 2;
 
                     basePower = 2;
