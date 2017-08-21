@@ -5,8 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
-using stonerkart.src.view;
 
 namespace stonerkart
 {
@@ -15,15 +13,26 @@ namespace stonerkart
     /// </summary>
     static class Controller
     {
-
-
-        public static bool inGame;
-
-        public static void startup()
+        public static void launchGame()
         {
-            UIController.launchUI();
-            
+            if (!Network.connectToServer()) throw new Exception("Serber offline");
 
+            GUI.launch();
+
+            var gsc = new GameScreen();
+
+            GUI.setScreen(gsc);
+
+            Game g = new Game(new NewGameStruct(0, 0, new []{"a", "b"}, 0), true);
+
+            g.game.hero.deck.addObserver(gsc.pw);
+
+            g.startGame();
+
+            //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            //UIController.launchUI();
+            
+            /*
 
             if (Network.connectToServer())
             {
@@ -32,6 +41,21 @@ namespace stonerkart
             else
             {
                 ScreenController.transitionToMainMenu();
+            }
+            */
+
+        }
+
+        public static void attemptLogin(string username, string password)
+        {
+            throw new Exception();
+            if (Network.login(username, password))
+            {
+                GUI.setScreen(new GameScreen());
+            }
+            else
+            {
+                
             }
         }
 

@@ -245,7 +245,7 @@ namespace stonerkart
 
         public override TargetColumn possible(HackStruct hs)
         {
-            return fillCastTargets(hs).Value;
+            return TargetColumn.empty;
         }
 
         public override bool allowEmpty()
@@ -265,6 +265,8 @@ namespace stonerkart
 
         public override TargetColumn? fillCastTargets(HackStruct f)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             f.setPrompt("Select target.", ButtonOption.Cancel);
             while (true)
             {
@@ -279,6 +281,7 @@ namespace stonerkart
                     if (filter(c)) return new TargetColumn(c);
                 }
             }
+            */
         }
 
         public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
@@ -349,7 +352,9 @@ namespace stonerkart
         private Func<Card, bool> filter;
         private Mode mode;
         public bool cancelable { get; set; }
+        public bool breakOnEmpty { get; }
         public bool sync { get; set; } = true;
+        public int count;
 
         public SelectCardRule(TargetRule pileOwnerRule, PileLocation pile, Func<Card, bool> filter, Mode mode) : this(pileOwnerRule, pile, filter, mode, false)
         {
@@ -376,13 +381,15 @@ namespace stonerkart
 
         }
 
-        public SelectCardRule(TargetRule pg, PileLocation l, Func<Card, bool> filter, Mode mode, bool cancelable) : base(typeof(Card))
+        public SelectCardRule(TargetRule pg, PileLocation l, Func<Card, bool> filter, Mode mode, bool cancelable, int count = 1, bool breakOnEmpty = true) : base(typeof(Card))
         {
             this.pg = pg;
             this.l = l;
             this.filter = filter;
             this.mode = mode;
             this.cancelable = cancelable;
+            this.count = count;
+            this.breakOnEmpty = breakOnEmpty;
         }
 
         public override TargetColumn? fillCastTargets(HackStruct f)
@@ -412,9 +419,17 @@ namespace stonerkart
                 }
                 else throw new Exception();
 
-                crd = sync ? hs.selectCardHalfSynchronized(p.pileFrom(l), seer, filter, cancelable) : hs.selectCardUnsynchronized(p.pileFrom(l), seer, filter, cancelable);
-                if (crd == null) continue; //todo allow canceling or something
-                rt.Add(crd);
+                for (int i = 0; i < Math.Min(count, p.pileFrom(l).Count); i++)
+                {
+                    crd = sync ? hs.selectCardHalfSynchronized(p.pileFrom(l), seer, filter, cancelable) : hs.selectCardUnsynchronized(p.pileFrom(l), seer, filter, cancelable);
+                    if (crd == null) break; //todo allow canceling or something
+                    if (rt.Contains(crd))
+                    {
+                        i--;
+                        continue;
+                    }
+                    rt.Add(crd);
+                }
             }
             return new TargetColumn(rt);
         }
@@ -436,7 +451,7 @@ namespace stonerkart
 
         public override bool allowEmpty()
         {
-            return cancelable;
+            return !breakOnEmpty || cancelable;
         }
     }
 
@@ -631,6 +646,7 @@ namespace stonerkart
                                 p.stuntLoss(colours);
                             }
                         }
+                        throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                         if (v is ShibbuttonStuff)
                         {
                             ShibbuttonStuff b = (ShibbuttonStuff)v;
@@ -640,6 +656,7 @@ namespace stonerkart
                                 return null;
                             }
                         }
+                        */
                     }
                     p.unstuntMana();
                 }
@@ -738,6 +755,7 @@ namespace stonerkart
             {
                 Stuff v = hs.getStuff();
 
+                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                 if (v is ShibbuttonStuff)
                 {
                     var b = (ShibbuttonStuff)v;
@@ -747,7 +765,7 @@ namespace stonerkart
                         break;
                     }
                 }
-
+                */
                 if (!(v is Tile)) continue;
 
                 Tile t = (Tile)v;
@@ -921,6 +939,11 @@ namespace stonerkart
                 {
                     return new TargetColumn(hs.cards.Where(crd => crd.isHeroic));
                 }
+
+                case Rule.AllFieldCards:
+                {
+                    return new TargetColumn(hs.cards.Where(crd => crd.location.pile == PileLocation.Field));
+                }
             }
             throw new Exception();
         }
@@ -936,6 +959,7 @@ namespace stonerkart
             ResolveCard,
             AllHeroes,
             VillainHeroes,
+            AllFieldCards,
         }
 
         public override bool allowEmpty()

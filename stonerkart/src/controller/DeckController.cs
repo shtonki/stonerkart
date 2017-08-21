@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace stonerkart
 {
@@ -58,6 +57,11 @@ namespace stonerkart
 
         public static void chooseDeck(Action<Deck> cb)
         {
+            Deck d = new Deck(CardTemplate.Shibby_sShtank, Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().ToArray());
+            cb(d);
+            return;
+            throw new Exception();
+            /*
             Panel p = new Panel();
             p.BackColor = Color.Tomato;
             Deck[] decks = getDecks().ToArray();
@@ -79,6 +83,7 @@ namespace stonerkart
             }
 
             dp = UIController.showControl(p, true, false);
+            */
         }
 
     }

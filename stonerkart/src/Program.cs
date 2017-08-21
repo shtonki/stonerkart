@@ -12,11 +12,13 @@ namespace stonerkart
 {
     class Program
     {
+        public static bool design = true;
+
         static void Main(string[] args)
         {
-            //System.AppDomain.CurrentDomain.UnhandledException += G.clapTrap;
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
-            Controller.startup();
+
+            Controller.launchGame();
         }
     }
 }

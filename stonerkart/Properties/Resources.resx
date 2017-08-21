@@ -139,27 +139,6 @@
   <data name="orbOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\order.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="lifeFrame" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\white3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="artZap" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\LightningBolt.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameChaos" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\red3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameDeath" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\black3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameGrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\grey3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameMulti" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\multi3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameNature" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\green3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="artAbolish" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Abolish.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -340,9 +319,6 @@
   <data name="artSolemnAberration" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SolemnAberration.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="artSoothingRhapsode" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\SoothingRhapsode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="artSpark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Spark.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -372,12 +348,6 @@
   </data>
   <data name="orbColourless" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Namnlös.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameMight" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\frameMight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\frameOrder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="setFirstedition" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\firstedition.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -534,5 +504,185 @@
   </data>
   <data name="artSparryz" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artSparryz.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artBenedictor" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artBenedictor.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artCerebus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artCerebus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artFacelessSphinx" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artFacelessSphinx.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artHeroicMight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artHeroicMight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artPyrostorm" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artPyrostorm.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artRelentlessConscriptor" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artRelentlessConscriptor.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artRockToken" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artRockToken.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artSpiritOfSalvation" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artSpiritOfSalvation.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artTaouyRuins" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artTaouyRuins.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artTerminate" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artTerminate.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artZap" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artZap.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artZombieToken" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artZombieToken.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artBloodclaw" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artBloodclaw.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artElvenCultivator" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artElvenCultivator.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artFireheartPheonix" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artFireheartPheonix.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artGryphonRider" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artGryphonRider.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artLordPlevin" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artLordPlevin.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artRavagingGreed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artRavagingGreed.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artScrollOfEarth" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artScrollOfEarth.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artWaterBolt" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artWaterBolt.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameChaos" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\red3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameDeath" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\black3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameGrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\grey3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameMight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\frameMight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameMulti" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\multi3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameNature" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\green3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\frameOrder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lifeFrame" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\white3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="background3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\background3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="border0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\border0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="buttonbg2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\buttonbg2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="font1" xml:space="preserve">
+    <value>A 0 62
+B 62 56
+C 118 54
+D 172 60
+E 232 54
+F 286 50
+G 336 62
+H 398 66
+I 464 34
+J 498 36
+K 534 63
+L 597 46
+M 643 73
+N 716 60
+O 776 64
+P 840 59
+Q 899 65
+R 964 60
+S 1024 52
+T 1076 53
+U 1129 62
+V 1191 58
+W 1249 84
+X 1333 54
+Y 1387 57
+Z 1444 45
+a 1489 48
+b 1537 51
+c 1588 42
+d 1630 51
+e 1681 46
+f 1727 36
+g 1763 44
+h 1807 54
+i 1861 30
+j 1891 29
+k 1920 54
+l 1974 27
+m 2001 81
+n 2082 56
+o 2138 53
+p 2191 51
+q 2242 51
+r 2293 41
+s 2334 37
+t 2371 32
+u 2403 52
+v 2455 45
+w 2500 70
+x 2570 43
+y 2613 48
+z 2661 39
+1 2700 38
+2 2738 49
+3 2787 43
+4 2830 46
+5 2876 42
+6 2918 47
+7 2965 42
+8 3007 45
+9 3052 45
+0 3097 47
+! 3144 27
+' 3171 16
+. 3187 22
+" 3209 31
+, 3240 20
+? 3260 42
+* 3302 41
+/ 3343 31
+- 3374 30
++ 3404 62
+&amp; 3466 70
+( 3536 26
+) 3562 27
+: 3589 17</value>
+  </data>
+  <data name="whiteframe4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\whiteframe4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="table0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\table0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="font0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\font0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

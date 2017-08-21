@@ -160,10 +160,10 @@ namespace stonerkart
 
     class ModifyDoer : SimpleDoer
     {
-        public ModifiableStats modifiableStats;
+        public ModifiableStats[] modifiableStats;
         public ModifierStruct modifier;
 
-        public ModifyDoer(ModifiableStats modifiableStats, Func<int, int> f, GameEventFilter until) : base(typeof(Card))
+        public ModifyDoer(Func<int, int> f, GameEventFilter until, params ModifiableStats[] modifiableStats) : base(typeof(Card))
         {
             this.modifiableStats = modifiableStats;
             modifier = new ModifierStruct(f, until);
@@ -172,7 +172,7 @@ namespace stonerkart
         protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Card card = (Card)row[0];
-            return new GameEvent[] {new ModifyEvent(card, modifiableStats, modifier)};
+            return modifiableStats.Select(s => new ModifyEvent(card, s, modifier)).Cast<GameEvent>().ToArray();
         }
     }
 

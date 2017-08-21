@@ -52,7 +52,7 @@ namespace stonerkart
         private Func<IEnumerable<Card>, bool, int, Func<Card, bool>, IEnumerable<Card>> selectCardEx;
 
 
-        public HackStruct(Game g) : this()
+        public HackStruct(GameState g, Game gg) : this()
         {
             ordP = g.ord;
             ordC = g.ord;
@@ -60,31 +60,32 @@ namespace stonerkart
             Cord = g.cardFromOrd;
             Pord = g.playerFromOrd;
             Tord = g.tileFromOrd;
-            cards = g.ca;
-            sendChoices = g.sendChoices;
-            receiveChoices = g.receiveChoices;
-            selectCardEx = g.selectCardFromCards;
-            getStuff = g.waitForAnything;
-            hero = g.hero;
-            _setPrompt = g.gameController.setPrompt;
-            clearHighlights = () => g.gameController.clearHighlights(true);
-            highlight = g.gameController.highlight;
-            createToken = g.createToken;
+            cards = g.cards;
             players = g.allPlayers;
-            selectColour = g.selectManaColour;
+
+            sendChoices = gg.sendChoices;
+            receiveChoices = gg.receiveChoices;
+            selectCardEx = gg.selectCardFromCards;
+            getStuff = gg.waitForAnything;
+            hero = g.hero;
+            _setPrompt = gg.gameController.setPrompt;
+            clearHighlights = () => gg.gameController.clearHighlights(true);
+            highlight = gg.gameController.highlight;
+            createToken = gg.createToken;
+            selectColour = gg.selectManaColour;
         }
 
-        public HackStruct(Game g, Player p) : this(g)
+        public HackStruct(GameState g, Game gg, Player p) : this(g, gg)
         {
             castingPlayer = p;
         }
 
-        public HackStruct(Game g, Ability a) : this(g)
+        public HackStruct(GameState g, Game gg, Ability a) : this(g, gg)
         {
             resolveAbility = a;
         }
 
-        public HackStruct(Game g, Ability a, Player p) : this(g)
+        public HackStruct(GameState g, Game gg, Ability a, Player p) : this(g, gg)
         {
             resolveAbility = a;
             castingPlayer = p;

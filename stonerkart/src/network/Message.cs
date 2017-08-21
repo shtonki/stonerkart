@@ -56,8 +56,11 @@ namespace stonerkart
             CHALLENGE,
             ACCEPTCHALLENGE,
             NEWGAME,
+            ENDGAME,
             GAMEMESSAGE,
             BUGREPORT,
+            MATCHMAKEME,
+            SURRENDER,
         }
     }
 
@@ -122,6 +125,24 @@ namespace stonerkart
         }
     }
 
+    class MatchmakemeBody : MessageBody
+    {
+        public MatchmakemeBody()
+        {
+
+        }
+
+        public MatchmakemeBody(string s)
+        {
+            
+        }
+
+        public string toBody()
+        {
+            return "";
+        }
+    }
+
     class AddFriendBody : MessageBody
     {
         public string name;
@@ -182,54 +203,193 @@ namespace stonerkart
 
     class GameMessageBody : MessageBody
     {
-        public string message;
+        public int gameid { get; }
+        public string message { get; }
 
         public GameMessageBody(string s)
         {
+            int ix = s.IndexOf('.');
+            gameid = Int32.Parse(s.Substring(0, ix));
+            message = s.Substring(ix + 1, s.Length - ix - 1);
+        }
+
+        public GameMessageBody(int gameid, string s)
+        {
             message = s;
+            this.gameid = gameid;
         }
 
         public string toBody()
         {
-            return message;
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(gameid);
+            sb.Append('.');
+            sb.Append(message);
+
+            return sb.ToString();
+        }
+    }
+
+    class EndGameMessageBody : MessageBody
+    {
+        public int gameid { get; }
+        public GameEndStruct ges { get; }
+
+        public EndGameMessageBody(int gameid, GameEndStruct ges)
+        {
+            this.gameid = gameid;
+            this.ges = ges;
+        }
+
+        public EndGameMessageBody(string s)
+        {
+            string[] ss = s.Split(';');
+
+            gameid = Int32.Parse(ss[0]);
+
+            string winner = ss[1];
+
+            GameEndStateReason rsn;
+            if (!GameEndStateReason.TryParse(ss[2], out rsn)) throw new Exception();
+
+            if (ss[3] == "x")
+            {
+                ges = new GameEndStruct(winner, rsn);
+            }
+            else
+            {
+                int rc = Int32.Parse(ss[3]);
+                int yr = Int32.Parse(ss[4]);
+                int tr = Int32.Parse(ss[5]);
+
+                ges = new GameEndStruct(winner, rsn, rc, yr, tr);
+            }
+        }
+
+        public string toBody()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(gameid);
+            sb.Append(";");
+
+            sb.Append(ges.winningPlayer);
+            sb.Append(";");
+
+            sb.Append(ges.reason);
+            sb.Append(";");
+
+            if (ges.yourRating > 0)
+            {
+                sb.Append(ges.ratingChange);
+                sb.Append(";");
+                sb.Append(ges.yourRating);
+                sb.Append(";");
+                sb.Append(ges.theirRating);
+            }
+            else
+            {
+                sb.Append("x");
+            }
+
+            return sb.ToString();
+        }
+    }
+
+    public enum GameEndStateReason
+    {
+        Surrender,
+        Flop,
+        Decking,
+        Ragequit,
+    }
+
+    public struct GameEndStruct
+    {
+        public string winningPlayer { get; }
+        public GameEndStateReason reason { get; }
+        public int ratingChange { get; }
+        public int yourRating { get; }
+        public int theirRating { get; }
+
+        public GameEndStruct(string winningPlayer, GameEndStateReason reason, int ratingChange, int yourRating, int theirRating)
+        {
+            this.winningPlayer = winningPlayer;
+            this.reason = reason;
+            this.ratingChange = ratingChange;
+            this.yourRating = yourRating;
+            this.theirRating = theirRating;
+        }
+
+        public GameEndStruct(string winningPlayer, GameEndStateReason reason) : this()
+        {
+            this.winningPlayer = winningPlayer;
+            this.reason = reason;
+        }
+    }
+
+    class SurrenderMessageBody : MessageBody
+    {
+        public int gameid { get; }
+        public GameEndStateReason reason { get; }
+
+        public SurrenderMessageBody(string s)
+        {
+            int ix = s.IndexOf('.');
+            gameid = Int32.Parse(s.Substring(0, ix));
+
+            GameEndStateReason rsnhck;
+            if (!GameEndStateReason.TryParse(s.Substring(ix + 1, s.Length - ix - 1), out rsnhck)) throw new Exception();
+            reason = rsnhck;
+        }
+
+        public SurrenderMessageBody(int gameid, GameEndStateReason reason)
+        {
+            this.gameid = gameid;
+            this.reason = reason;
+        }
+
+        public string toBody()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(gameid);
+            sb.Append('.');
+            sb.Append(reason);
+
+            return sb.ToString();
         }
     }
 
     class ChallengeBody : MessageBody
     {
-        public string username;
+        public string challengee;
 
         public ChallengeBody(string s)
         {
-            this.username = s;
+            this.challengee = s;
         }
 
         public string toBody()
         {
-            return username;
+            return challengee;
         }
     }
 
     class NewGameStruct
     {
+        public readonly int gameid;
         public readonly int randomSeed;
         public readonly string[] playerNames;
         public readonly int heroIndex;
-        public bool local;
 
-        public NewGameStruct(int randomSeed, string[] playerNames, int heroIndex, bool local)
+        public NewGameStruct(int gameid, int randomSeed, string[] playerNames, int heroIndex)
         {
             this.randomSeed = randomSeed;
             this.playerNames = playerNames;
             this.heroIndex = heroIndex;
-            this.local = local;
-        }
-
-        public NewGameStruct(int randomSeed, string[] playerNames, int heroIndex)
-        {
-            this.randomSeed = randomSeed;
-            this.playerNames = playerNames;
-            this.heroIndex = heroIndex;
+            this.gameid = gameid;
         }
     }
 
@@ -237,24 +397,29 @@ namespace stonerkart
     {
         public NewGameStruct newGameStruct;
 
-        public NewGameBody(int randoSeed, string[] playerNames, int heroIndex)
+        public NewGameBody(int gameid, int randoSeed, string[] playerNames, int heroIndex)
         {
-            newGameStruct = new NewGameStruct(randoSeed, playerNames, heroIndex);
+            newGameStruct = new NewGameStruct(gameid, randoSeed, playerNames, heroIndex);
         }
 
         public NewGameBody(string body)
         {
             string[] ss = body.Split(',');
-            int randoSeed = Int32.Parse(ss[0]);
-            string[] names = ss[1].Split(':');
+            int gid = Int32.Parse(ss[0]);
+            int randoSeed = Int32.Parse(ss[1]);
+            string[] names = ss[2].Split(':');
             string [] playerNames = names.Where(n => n.Length > 0).ToArray();
-            int heroIndex = Int32.Parse(ss[2]);
-            newGameStruct = new NewGameStruct(randoSeed, playerNames, heroIndex);
+            int heroIndex = Int32.Parse(ss[3]);
+            newGameStruct = new NewGameStruct(gid, randoSeed, playerNames, heroIndex);
         }
 
         public string toBody()
         {
             StringBuilder sb = new StringBuilder();
+
+            sb.Append(newGameStruct.gameid.ToString());
+            sb.Append(',');
+
             sb.Append(newGameStruct.randomSeed.ToString());
             sb.Append(',');
 

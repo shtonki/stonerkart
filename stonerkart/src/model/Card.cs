@@ -30,7 +30,7 @@ namespace stonerkart
         }
         private Tile Tile;
         public Tile lastSeenAt;
-        private int moveCount;
+        public int moveCount { get; private set; }
         public Player owner { get; }
         public Player controller { get; }
         public CardTemplate template { get; }
@@ -39,7 +39,10 @@ namespace stonerkart
         public CardType cardType { get; }
         public Rarity rarity { get; set; }
         public CardSet set { get; }
-        public Race? race { get; }
+        public Race? race => forceRace.HasValue ? forceRace : baseRace;
+        private Race? baseRace { get; }
+        private Race? forceRace { get; set; }
+
         public Subtype? subtype { get; }
         public int convertedManaCost => castManaCost.colours.Count();
 
@@ -251,7 +254,7 @@ namespace stonerkart
                 if (s.Length > 0)
                 {
                     sb.Append(a.description);
-                    sb.Append("\r\n");
+                    //sb.Append("\r\n");
                 }
             }
 
@@ -261,13 +264,13 @@ namespace stonerkart
                 sb.Append(" -- (");
                 sb.Append(kaExplainer(a));
                 sb.Append(')');
-                sb.Append("\r\n");
+                //sb.Append("\r\n");
             }
 
             foreach (var a in auras)
             {
                 sb.Append(a.description);
-                sb.Append("\r\n");
+                //sb.Append("\r\n");
             }
 
             return sb.ToString();
@@ -305,6 +308,11 @@ namespace stonerkart
                 case KeywordAbility.Wingclipper:
                 {
                     return "Can attack creatures with Flying.";
+                }
+
+                case KeywordAbility.Reinforcement:
+                {
+                    return "May be cast whenever you may cast an interrupt.";
                 }
             }
 
@@ -451,10 +459,9 @@ namespace stonerkart
     enum ModifiableStats { Power, Toughness, Movement };
 
 
-    enum CardTemplate
+    public enum CardTemplate
     {
-        missingo,
-        Sparryz,
+        Commander_sSparryz,
         Flamekindler,
         Moratian_sBattle_sStandard,
         Seraph,
@@ -513,7 +520,7 @@ namespace stonerkart
         Alter_sFate,
         Goblin_sGrenade,
         Cleansing_sFire,
-        Belwas,
+        Bhewas,
         Zap,
         Kappa,
         Cantrip,
@@ -531,8 +538,33 @@ namespace stonerkart
         Spirit,
         Gryphon,
         Wolf,
+        Zombie,
+        Rock,
         Call_sTo_sArms,
         Sanguine_sArtisan,
+        Shimmering_sKoi,
+        Decaying_sHorror,
+        Relentless_sConsriptor,
+        Terminate,
+        Spirit_sof_sSalvation,
+        Benedictor,
+        Pyrostorm,
+        Elven_sCultivator,
+        Faceless_sSphinx,
+        Cerberus,
+        Heroic_sMight,
+        Taouy_sRuins,
+        Shibby_as_sSaboteur,
+        Brute_sForce,
+        Scroll_sof_sEarth,
+        Maleficent_sSpirit,
+        Thirstclaw,
+        Flameheart_sPhoenix,
+        Lord_sPlevin,
+        Gryphon_sRider,
+        Ravaging_sGreed,
+        Water_sBolt,
+        Lone_sRanger,
     }
 
     internal enum CardType
@@ -565,6 +597,8 @@ namespace stonerkart
 
     internal enum Race
     {
+        Elemental,
+        Elf,
         Angel,
         Demon,
         Mecha,
@@ -576,10 +610,12 @@ namespace stonerkart
         Beast,
         Dragon,
         Vampire,
+        Spirit,
     }
 
     internal enum Subtype
     {
+        Hunter,
         Guardian,
         Warrior,
         Wizard,
@@ -595,5 +631,16 @@ namespace stonerkart
         Ambush,
         Flying,
         Wingclipper,
+        Reinforcement,
+    }
+
+    struct CardChangedMessage
+    {
+        public Modifiable modified { get; }
+
+        public CardChangedMessage(Modifiable modified)
+        {
+            this.modified = modified;
+        }
     }
 }

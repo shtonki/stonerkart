@@ -228,7 +228,7 @@ namespace stonerkart
         }
     }
 
-    enum ManaColour
+    public enum ManaColour
     {
         Colourless,
         Death,

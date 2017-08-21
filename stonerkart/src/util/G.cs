@@ -35,6 +35,7 @@ namespace stonerkart
 
     static class G
     {
+        /*
         private static char[] hackish = G.range(0, 20).Select(v => (char)('\u2460' + v)).ToArray();
 
         private static char[] hackedaf =
@@ -42,6 +43,7 @@ namespace stonerkart
                 .Cast<ManaColour>()
                 .Select(c => (char)('\u24b6' + (c.ToString().ToLower())[0] - 97))
                 .ToArray();
+        */
 
         public static ReduceResult<T> Reduce<T>(this IEnumerable<T> e)
         {
@@ -208,15 +210,14 @@ namespace stonerkart
             return bmp;
         }
 
-        public static char colourlessGlyph(int i)
+        public static string colourlessGlyph(int i)
         {
-            return hackish[i-1];
+            return "/" + i + "/";
         }
 
-        public static char colouredGlyph(ManaColour c)
+        public static string colouredGlyph(ManaColour c)
         {
-            if (c == ManaColour.Colourless) throw new Exception();
-            return hackedaf[(int)c];
+            return "/" + c + "/";
         }
 
         public static string exhaustGhyph => "Exhaust";
@@ -233,23 +234,6 @@ namespace stonerkart
             }
 
             return r;
-        }
-
-        public static void clapTrap(object sender, UnhandledExceptionEventArgs e)
-        {
-            Form2 f = new Form2();
-            AutoFontTextBox b = new AutoFontTextBox();
-            b.Text = e.ExceptionObject.ToString();
-            f.Controls.Add(b);
-            f.Closed += (_, __) => Environment.Exit(2);
-            f.Resize += (_, __) => b.Size = f.ClientSize;
-            f.Size = new Size(600, 600);
-            Application.Run(f);
-        }
-
-        private class Form2 : Form
-        {
-            
         }
     }
 

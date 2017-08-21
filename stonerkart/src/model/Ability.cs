@@ -81,8 +81,12 @@ namespace stonerkart
                 if (hs.heroIsResolver)
                 {
                     hs.setPrompt("Do you want to use this ability?", ButtonOption.Yes, ButtonOption.No);
+
+                    throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+                    /*
                     ShibbuttonStuff ss = hs.waitForStuff<ShibbuttonStuff>(b => true);
                     opt = ss.option;
+                    */
                     hs.sendChoices(new[] {(int)opt});
                 }
                 else

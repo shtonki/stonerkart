@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
+    /*
     static class ScreenController
     {
-        public static void transitionToGamePanel(NewGameStruct ngs, bool local)
+        public static Game transitionToGamePanel(NewGameStruct ngs, bool local)
         {
             Game g = new Game(ngs, local);
             GamePanel gp = new GamePanel(g);
@@ -16,6 +17,8 @@ namespace stonerkart
             g.gameController = gc;
             UIController.gameFrame.transitionTo(gp);
             g.startGame();
+
+            return g;
         }
 
         public static void transitionToMapEditor()
@@ -38,9 +41,15 @@ namespace stonerkart
             UIController.gameFrame.transitionTo(new DeckEditorPanel());
         }
 
-        public static void transtitionToPostGameScreen(Game g)
+        public static void transitionToRankedScreen()
         {
-            UIController.gameFrame.transitionTo(new PostGameScreen());
+            UIController.gameFrame.transitionTo(new RankedScreen());
+        }
+
+        public static void transtitionToPostGameScreen(Game g, GameEndStruct ges)
+        {
+            UIController.gameFrame.transitionTo(new PostGameScreen(g, ges));
         }
     }
+    */
 }
