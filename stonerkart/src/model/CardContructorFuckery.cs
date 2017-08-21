@@ -1,4 +1,4 @@
-﻿#define test
+﻿#define testx
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,7 +74,7 @@ namespace stonerkart
             case CardTemplate.Bhewas:
             {
                 cardType = CardType.Creature;
-                race = Race.Human;
+                baseRace = Race.Human;
                 subtype = Subtype.Warrior;
                 rarity = Rarity.Legendary;
                 isHeroic = true;
@@ -106,7 +106,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Uncommon;
-                race = Race.Beast;
+                baseRace = Race.Beast;
 
                 baseMovement = 2;
                 basePower = 2;
@@ -138,7 +138,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Rare;
-                race = Race.Undead;
+                baseRace = Race.Undead;
                 subtype = Subtype.Wizard;
 
                 baseMovement = 2;
@@ -201,7 +201,7 @@ namespace stonerkart
             case CardTemplate.Temple_sHealer:
             {
                 cardType = CardType.Creature;
-                race = Race.Human;
+                baseRace = Race.Human;
                 subtype = Subtype.Cleric;
                 rarity = Rarity.Uncommon;
 
@@ -236,7 +236,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Legendary;
-                race = Race.Human;
+                baseRace = Race.Human;
                 subtype = Subtype.Warrior;
                 isHeroic = true;
 
@@ -264,7 +264,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Common;
-                race = Race.Zombie;
+                baseRace = Race.Zombie;
 
                 basePower = 2;
                 baseToughness = 2;
@@ -280,7 +280,7 @@ namespace stonerkart
             case CardTemplate.Shibby_sShtank:
             {
                 cardType = CardType.Creature;
-                race = Race.Human;
+                baseRace = Race.Human;
                 subtype = Subtype.Wizard;
                 rarity = Rarity.Legendary;
                 isHeroic = true;
@@ -331,7 +331,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Uncommon;
-                race = Race.Giant;
+                baseRace = Race.Giant;
 
                 baseMovement = 3;
                 basePower = 2;
@@ -347,7 +347,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Common;
-                race = Race.Beast;
+                baseRace = Race.Beast;
 
                 baseMovement = 3;
                 basePower = 3;
@@ -450,7 +450,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Legendary;
-                race = Race.Human;
+                baseRace = Race.Human;
                 subtype = Subtype.Rogue;
 
                 baseMovement = 3;
@@ -503,7 +503,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Uncommon;
-                race = Race.Beast;
+                baseRace = Race.Beast;
 
                 baseToughness = 2;
                 basePower = 2;
@@ -562,7 +562,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Common;
-                race = Race.Dragon;
+                baseRace = Race.Dragon;
 
                 basePower = 2;
                 baseToughness = 1;
@@ -592,7 +592,7 @@ namespace stonerkart
             case CardTemplate.Huntress_sOf_sNibemem:
             {
                 cardType = CardType.Creature;
-                race = Race.Human;
+                baseRace = Race.Human;
                 subtype = Subtype.Hunter;
                 rarity = Rarity.Common;
 
@@ -658,7 +658,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Legendary;
-                race = Race.Undead;
+                baseRace = Race.Undead;
                 subtype = Subtype.Rogue;
                 isHeroic = true;
                 forceColour = ManaColour.Death;
@@ -685,7 +685,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Rare;
-                race = Race.Beast;
+                baseRace = Race.Beast;
 
                 baseMovement = 2;
                 basePower = 0;
@@ -710,7 +710,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Uncommon;
-                race = Race.Undead;
+                baseRace = Race.Undead;
 
                 baseMovement = 3;
                 basePower = 0;
@@ -735,7 +735,7 @@ namespace stonerkart
             {
                 cardType = CardType.Creature;
                 rarity = Rarity.Common;
-                race = Race.Beast;
+                baseRace = Race.Beast;
 
                 baseMovement = 3;
                 baseToughness = 1;
@@ -769,7 +769,7 @@ namespace stonerkart
             case CardTemplate.Ilatian_sHaunter:
             {
                 cardType = CardType.Creature;
-                race = Race.Zombie;
+                baseRace = Race.Zombie;
                 rarity = Rarity.Common;
 
                 baseMovement = 2;
@@ -1097,7 +1097,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
-                    race = Race.Elf;
+                    baseRace = Race.Elf;
                     subtype = Subtype.Cleric;
 
                     natureCost = 1;
@@ -1201,7 +1201,7 @@ namespace stonerkart
                 case CardTemplate.Sanguine_sArtisan:
                     {
                         cardType = CardType.Creature;
-                        race = Race.Vampire;
+                        baseRace = Race.Vampire;
                         rarity = Rarity.Common;
 
                         basePower = 0;
@@ -1232,7 +1232,7 @@ namespace stonerkart
                 case CardTemplate.Houndmaster:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Human;
+                    baseRace = Race.Human;
                     rarity = Rarity.Common;
 
                     natureCost = 2;
@@ -1259,7 +1259,7 @@ namespace stonerkart
                 case CardTemplate.Shotty_sContruct:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Mecha;
+                    baseRace = Race.Mecha;
                     subtype = Subtype.Warrior;
                     rarity = Rarity.Common;
 
@@ -1275,7 +1275,7 @@ namespace stonerkart
                 case CardTemplate.Feral_sImp:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Demon;
+                    baseRace = Race.Demon;
                     rarity = Rarity.Common;
 
                     mightCost = 1;
@@ -1523,7 +1523,7 @@ namespace stonerkart
                 case CardTemplate.Primal_sChopter:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Mecha;
+                    baseRace = Race.Mecha;
                     rarity = Rarity.Common;
 
                     greyCost = 2;
@@ -1539,7 +1539,7 @@ namespace stonerkart
                 case CardTemplate.Famished_sTarantula:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Beast;
+                    baseRace = Race.Beast;
                     rarity = Rarity.Uncommon;
 
                     basePower = 1;
@@ -1559,7 +1559,7 @@ namespace stonerkart
                 case CardTemplate.Morenian_sMedic:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Human;
+                    baseRace = Race.Human;
                     subtype = Subtype.Warrior;
                     rarity = Rarity.Uncommon;
 
@@ -1579,7 +1579,7 @@ namespace stonerkart
                 case CardTemplate.Bubastis:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Beast;
+                    baseRace = Race.Beast;
                     rarity = Rarity.Legendary;
 
                     basePower = 4;
@@ -1601,7 +1601,7 @@ namespace stonerkart
                 case CardTemplate.Unyeilding_sStalwart:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Human;
+                    baseRace = Race.Human;
                     subtype = Subtype.Warrior;
                     rarity = Rarity.Common;
 
@@ -1644,7 +1644,7 @@ namespace stonerkart
                 case CardTemplate.Enraged_sDragon:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Dragon;
+                    baseRace = Race.Dragon;
                     rarity = Rarity.Common;
 
                     basePower = 1;
@@ -1671,7 +1671,7 @@ namespace stonerkart
                 case CardTemplate.Chromatic_sUnicorn:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Beast;
+                    baseRace = Race.Beast;
                     rarity = Rarity.Uncommon;
 
                     natureCost = 2;
@@ -1702,7 +1702,7 @@ namespace stonerkart
                 case CardTemplate.Seraph:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Angel;
+                    baseRace = Race.Angel;
                     subtype = Subtype.Guardian;
                     rarity = Rarity.Common;
 
@@ -1765,7 +1765,7 @@ namespace stonerkart
                 case CardTemplate.Flamekindler:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Human;
+                    baseRace = Race.Human;
                     subtype = Subtype.Wizard;
                     rarity = Rarity.Rare;
 
@@ -1794,7 +1794,7 @@ namespace stonerkart
                 case CardTemplate.Commander_sSparryz:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Demon;
+                    baseRace = Race.Demon;
                     subtype = Subtype.Wizard;
                     rarity = Rarity.Legendary;
                     isHeroic = true;
@@ -1823,7 +1823,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
-                    race = Race.Beast;
+                    baseRace = Race.Beast;
 
                     baseToughness = 4;
                     basePower = 4;
@@ -1840,7 +1840,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Rare;
-                    race = Race.Zombie;
+                    baseRace = Race.Zombie;
 
                     basePower = 2;
                     baseToughness = 4;
@@ -1868,7 +1868,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
-                    race = Race.Human;
+                    baseRace = Race.Human;
                     subtype = Subtype.Warrior;
 
                     lifeCost = 2;
@@ -1912,7 +1912,7 @@ namespace stonerkart
                 case CardTemplate.Spirit_sof_sSalvation:
                 {
                     cardType = CardType.Creature;
-                    race = Race.Spirit;
+                    baseRace = Race.Spirit;
                     subtype = Subtype.Cleric;
                     rarity = Rarity.Uncommon;
 
@@ -1947,7 +1947,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
-                    race = Race.Human;
+                    baseRace = Race.Human;
                     subtype = Subtype.Guardian;
 
                     lifeCost = 2;
@@ -1983,7 +1983,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
-                    race = Race.Elf;
+                    baseRace = Race.Elf;
 
                     basePower = 3;
                     baseToughness = 2;
@@ -2005,7 +2005,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Rare;
-                    race = Race.Beast;
+                    baseRace = Race.Beast;
                     subtype = Subtype.Guardian;
 
                     basePower = 5;
@@ -2033,7 +2033,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
-                    race = Race.Beast;
+                    baseRace = Race.Beast;
 
                     chaosCost = 2;
 
@@ -2090,7 +2090,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Uncommon;
-                    race = Race.Human;
+                    baseRace = Race.Human;
                     subtype = Subtype.Rogue;
 
                     orderCost = 2;
@@ -2143,7 +2143,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
-                    race = Race.Spirit;
+                    baseRace = Race.Spirit;
 
                     deathCost = 2;
                     greyCost = 2;
@@ -2168,7 +2168,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Common;
-                    race = Race.Beast;
+                    baseRace = Race.Beast;
 
                     mightCost = 2;
                     greyCost = 2;
@@ -2185,7 +2185,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Rare;
-                    race = Race.Elemental;
+                    baseRace = Race.Elemental;
                     subtype = Subtype.Guardian;
 
                     chaosCost = 2;
@@ -2214,7 +2214,7 @@ namespace stonerkart
                     rarity = Rarity.Legendary;
                     isHeroic = true;
                     forceColour = ManaColour.Might;
-                    race = Race.Human;
+                    baseRace = Race.Human;
                     subtype = Subtype.Warrior;
 
                     basePower = 2;
@@ -2237,7 +2237,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Uncommon;
-                    race = Race.Human;
+                    baseRace = Race.Human;
 
                     basePower = 3;
                     baseToughness = 3;
@@ -2294,7 +2294,7 @@ namespace stonerkart
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Uncommon;
-                    race = Race.Human;
+                    baseRace = Race.Human;
                     subtype = Subtype.Hunter;
 
                     natureCost = 2;
@@ -2331,7 +2331,7 @@ namespace stonerkart
                         basePower = 1;
                         baseToughness = 1;
                         baseMovement = 2;
-                        race = Race.Spirit;
+                        baseRace = Race.Spirit;
                         isToken = true;
                         keywordAbilities.Add(KeywordAbility.Flying);
                     }
@@ -2344,7 +2344,7 @@ namespace stonerkart
                         basePower = 2;
                         baseToughness = 2;
                         baseMovement = 3;
-                        race = Race.Beast;
+                        baseRace = Race.Beast;
                         isToken = true;
                         keywordAbilities.Add(KeywordAbility.Flying);
                     }
@@ -2357,7 +2357,7 @@ namespace stonerkart
                         basePower = 1;
                         baseToughness = 1;
                         baseMovement = 2;
-                        race = Race.Human;
+                        baseRace = Race.Human;
                         subtype = Subtype.Warrior;
                         isToken = true;
                     }
@@ -2370,7 +2370,7 @@ namespace stonerkart
                         basePower = 2;
                         baseToughness = 2;
                         baseMovement = 3;
-                        race = Race.Beast;
+                        baseRace = Race.Beast;
                         isToken = true;
                     }
                     break;
@@ -2382,7 +2382,7 @@ namespace stonerkart
                     basePower = 1;
                     baseToughness = 1;
                     baseMovement = 2;
-                    race = Race.Zombie;
+                    baseRace = Race.Zombie;
                     isToken = true;
                 } break;
                 #endregion
@@ -2392,7 +2392,7 @@ namespace stonerkart
                     basePower = 0;
                     baseToughness = 4;
                     baseMovement = 0;
-                    race = Race.Elemental;
+                    baseRace = Race.Elemental;
                     isToken = true;
                 } break;
                 #endregion
