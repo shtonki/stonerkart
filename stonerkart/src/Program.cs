@@ -12,6 +12,8 @@ namespace stonerkart
 {
     class Program
     {
+        public static bool design;
+
         static void Main(string[] args)
         {
             //System.AppDomain.CurrentDomain.UnhandledException += G.clapTrap;

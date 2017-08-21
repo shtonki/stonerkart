@@ -58,6 +58,8 @@ namespace stonerkart
 
         public static void chooseDeck(Action<Deck> cb)
         {
+            throw new Exception();
+            /*
             Panel p = new Panel();
             p.BackColor = Color.Tomato;
             Deck[] decks = getDecks().ToArray();
@@ -79,6 +81,7 @@ namespace stonerkart
             }
 
             dp = UIController.showControl(p, true, false);
+            */
         }
 
     }

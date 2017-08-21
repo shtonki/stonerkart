@@ -13,20 +13,22 @@ namespace stonerkart
     class GameController
     {
         private Game game;
-        private GamePanel gamePanel;
+        private GameScreen gameScreen;
 
         private Dictionary<Pile, DraggablePanel> cachex = new Dictionary<Pile, DraggablePanel>();
 
-        private HexPanel hexPanel => gamePanel.hexPanel;
+        private HexPanel hexPanel => null;//gameScreen.hexPanel;
 
-        public GameController(Game game, GamePanel gamePanel)
+        public GameController(Game game, GameScreen gameScreen)
         {
             this.game = game;
-            this.gamePanel = gamePanel;
+            this.gameScreen = gameScreen;
         }
 
         public void toggleShowPile(Player p, PileLocation pl)
         {
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            /*
             Pile pile = p.pileFrom(pl);
             if (cachex.ContainsKey(pile))
             {
@@ -40,6 +42,7 @@ namespace stonerkart
             }
             DraggablePanel dp = showPile(pile, true, c => { game.clicked(c); });
             cachex[pile] = dp;
+            */
         }
 
         public DraggablePanel showPile(Pile p, bool closeable, Action<Clickable> clicked)
@@ -59,7 +62,7 @@ namespace stonerkart
 
         public void setHeroActive(bool b)
         {
-            gamePanel.setHeroActive(b);
+            gameScreen.setHeroActive(b);
         }
 
         public void addArrow(Path l)
@@ -80,14 +83,14 @@ namespace stonerkart
 
         public void setPrompt(string message, params ButtonOption[] buttons)
         {
-            gamePanel.memeout(() =>
+            gameScreen.memeout(() =>
             {
-                gamePanel.promtText.Text = message;
+                gameScreen.promtText.Text = message;
                 Shibbutton[] bs = new[] {
-                    gamePanel.shibbutton2,
-                    gamePanel.shibbutton3,
-                    gamePanel.shibbutton4,
-                    gamePanel.shibbutton5,
+                    gameScreen.shibbutton2,
+                    gameScreen.shibbutton3,
+                    gameScreen.shibbutton4,
+                    gameScreen.shibbutton5,
                 };
                 for (int i = 0; i < bs.Length; i++)
                 {
@@ -101,7 +104,7 @@ namespace stonerkart
                         bs[i].Visible = false;
                     }
                 }
-                gamePanel.Invalidate();
+                gameScreen.Invalidate();
             });
         }
 
@@ -141,9 +144,9 @@ namespace stonerkart
 
         public void redraw()
         {
-            Control v = gamePanel;
+            Control v = gameScreen;
             //v.memeout(v.Refresh);
-            v = gamePanel.hexPanel;
+            v = gameScreen.hexPanel;
             v.memeout(v.Invalidate);
         }
     }

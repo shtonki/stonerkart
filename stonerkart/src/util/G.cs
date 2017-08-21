@@ -234,23 +234,6 @@ namespace stonerkart
 
             return r;
         }
-
-        public static void clapTrap(object sender, UnhandledExceptionEventArgs e)
-        {
-            Form2 f = new Form2();
-            AutoFontTextBox b = new AutoFontTextBox();
-            b.Text = e.ExceptionObject.ToString();
-            f.Controls.Add(b);
-            f.Closed += (_, __) => Environment.Exit(2);
-            f.Resize += (_, __) => b.Size = f.ClientSize;
-            f.Size = new Size(600, 600);
-            Application.Run(f);
-        }
-
-        private class Form2 : Form
-        {
-            
-        }
     }
 
     static class LL

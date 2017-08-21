@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
+    /*
     static class ScreenController
     {
         public static Game transitionToGamePanel(NewGameStruct ngs, bool local)
@@ -50,4 +51,5 @@ namespace stonerkart
             UIController.gameFrame.transitionTo(new PostGameScreen(g, ges));
         }
     }
+    */
 }

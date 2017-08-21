@@ -139,24 +139,6 @@
   <data name="orbOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\order.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="lifeFrame" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\white3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameChaos" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\red3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameDeath" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\black3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameGrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\grey3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameMulti" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\multi3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameNature" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\green3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="artAbolish" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Abolish.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -366,12 +348,6 @@
   </data>
   <data name="orbColourless" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Namnlös.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameMight" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\frameMight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\frameOrder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="setFirstedition" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\firstedition.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -588,5 +564,41 @@
   </data>
   <data name="artWaterBolt" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artWaterBolt.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameChaos" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\red3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameDeath" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\black3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameGrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\grey3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameMight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\frameMight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameMulti" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\multi3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameNature" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\green3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\frameOrder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lifeFrame" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\white3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="background3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\background3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="border0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\border0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="buttonbg2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\buttonbg2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="font0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\font0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
