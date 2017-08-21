@@ -57,18 +57,7 @@ namespace stonerkart
 
         public static void chooseDeck(Action<Deck> cb)
         {
-            Deck d = new Deck(
-                CardTemplate.Shibby_sShtank,
-                new []
-                {
-                    CardTemplate.Commander_sSparryz,
-                    CardTemplate.Moratian_sBattle_sStandard,
-                    CardTemplate.Chromatic_sUnicorn,
-                    CardTemplate.Sanguine_sArtisan, 
-                    CardTemplate.Rider_sof_sWar, 
-                    CardTemplate.Kraken, 
-                }
-                );
+            Deck d = DeckController.loadDeck("nigra");
             cb(d);
             return;
             throw new Exception();

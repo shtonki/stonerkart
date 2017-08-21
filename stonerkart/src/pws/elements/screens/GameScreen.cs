@@ -12,7 +12,7 @@ namespace stonerkart
 
         public GameScreen() : base(new Imege(Textures.table0))
         {
-            //
+            /*/
             int xp = 0;
             for (int i = 0; i < 5; i++)
             {

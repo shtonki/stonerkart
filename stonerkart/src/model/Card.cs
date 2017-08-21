@@ -459,7 +459,7 @@ namespace stonerkart
     enum ModifiableStats { Power, Toughness, Movement };
 
 
-    enum CardTemplate
+    public enum CardTemplate
     {
         Commander_sSparryz,
         Flamekindler,

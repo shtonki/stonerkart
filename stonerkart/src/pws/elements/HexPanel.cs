@@ -96,7 +96,7 @@ namespace stonerkart
 
                     if (i%2 == 0)
                     {
-                        dm.fillHexagon(hexX, hexY, hexsize, Color.Black, Textures.A);
+                        dm.fillHexagon(hexX, hexY, hexsize, Color.Black, Textures.artDaringPoppy);
 
                     }
                     else

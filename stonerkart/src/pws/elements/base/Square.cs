@@ -128,7 +128,7 @@ namespace stonerkart
 
         private void layoutText()
         {
-            laidText = TextLayout.layout(Text, Width - textPaddingX, Height, FontFamily);
+            laidText = TextLayout.layout(Text, Width - textPaddingX - 2, Height, FontFamily);
         }
 
         protected LaidText laidText;

@@ -116,7 +116,7 @@ namespace stonerkart
             movementbox.Text = c.movement.ToString();
             ptbox.Text = c.power + "/" + c.toughness;
             typebox.Text = c.typeText;
-            artbox.Backimege = new Imege(Textures.A);
+            artbox.Backimege = new Imege(TextureLoader.cardArt(c.template));
 
             orbs = c.castManaCost.orbs;
 

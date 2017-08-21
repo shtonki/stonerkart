@@ -44,6 +44,6 @@ namespace stonerkart
             characters[" "] = new glyphxd(lst.startx + lst.width, 32);
         }
 
-        public static FontFamille font1 = new FontFamille(Textures.fontovich, Properties.Resources.font1);
+        public static FontFamille font1 = new FontFamille(Textures.font0, Properties.Resources.font1);
     }
 }
