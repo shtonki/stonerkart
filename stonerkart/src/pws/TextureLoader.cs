@@ -176,7 +176,7 @@ namespace stonerkart
     public static class TextureLoader
     {
         public static Dictionary<Textures, Image> images { get; }
-
+        public static Dictionary<Textures, Size> sizes { get; }
 
         static TextureLoader()
         {
@@ -336,6 +336,11 @@ namespace stonerkart
             images[Textures.artZap] = Resources.artZap;
             images[Textures.artZombieToken] = Resources.artZombieToken;
 
+            sizes = new Dictionary<Textures, Size>();
+            foreach (var i in images)
+            {
+                sizes[i.Key] = i.Value.Size;
+            }
         }
 
         public static Textures orbTexture(ManaColour mc)
@@ -468,7 +473,7 @@ namespace stonerkart
 
         public static Size sizeOf(Textures t)
         {
-            return images[t].Size;
+            return sizes[t];
         }
     }
 }

@@ -2103,7 +2103,7 @@ namespace stonerkart
                     keywordAbilities.Add(KeywordAbility.Reinforcement);
 
                     etbLambda(
-                        "When Shibby's Saboteur you may set target non-heroic creature's power to 1.",
+                        "When Shibby's Saboteur enters the battlefield you may set target non-heroic creature's power to 1.",
                         new Effect(new PryCardRule(c => !c.isHeroic), new ModifyDoer(LL.set(1), LL.never, ModifiableStats.Power)),
                         4, 
                         true

@@ -30,10 +30,10 @@ namespace stonerkart
 
         public override void draw(DrawerMaym dm, int x, int y, int width, int height)
         {
-            dm.fillRectange(borderColor, 0, 0, width, 4); //top
-            dm.fillRectange(borderColor, 0, 0, 4, height); //left
-            dm.fillRectange(borderColor, 0, 0 + height - 4, width, 4); //bottom
-            dm.fillRectange(borderColor, 0 + width - 4, 0, 4, height); //right
+            dm.fillRectange(borderColor, 0, 0, width, thickness); //top
+            dm.fillRectange(borderColor, 0, 0, thickness, height); //left
+            dm.fillRectange(borderColor, 0, 0 + height - thickness, width, thickness); //bottom
+            dm.fillRectange(borderColor, 0 + width - thickness, 0, thickness, height); //right
         }
 
     }

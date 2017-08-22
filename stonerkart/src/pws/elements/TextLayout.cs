@@ -18,10 +18,8 @@ namespace stonerkart
             this.charHeight = charHeight;
         }
 
-        public void draw(DrawerMaym dm, int yoffset, int xoffset, int maxWidth, Color textColor, LaidText fk, int cksm)
+        public void draw(DrawerMaym dm, int xoffset, int yoffset, int maxWidth, Color textColor)
         {
-            int b = fk.xs.Sum(x => x.width);
-            if (b != cksm) throw new Exception();
             foreach (var xdd in xs)
             {
                 var xp = xdd.xpos + xoffset;
@@ -37,7 +35,7 @@ namespace stonerkart
                 }
                 else
                 {
-                    throw new Exception();
+                    //throw new Exception();
                 }
             }
         }

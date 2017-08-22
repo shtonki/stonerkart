@@ -21,15 +21,14 @@ namespace stonerkart
 
             var gsc = new GameScreen();
 
-            GUI.setScreen(gsc);
+            //GUI.setScreen(gsc);
+            GUI.setScreen(new LoginScreen());
 
             Game g = new Game(new NewGameStruct(0, 0, new []{"a", "b"}, 0), true);
 
             g.game.hero.deck.addObserver(gsc.pw);
 
             g.startGame();
-
-
 
             //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             //UIController.launchUI();

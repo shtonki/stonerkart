@@ -184,8 +184,8 @@ namespace stonerkart
             if (colourlessCount > 0)
             {
                 Square orbsquare = new Square(orbsize, orbsize);
-                orbsquare.textPaddingX = 1;
-                orbsquare.textPaddingY = 1;
+                orbsquare.TextPaddingLeft = 1;
+                orbsquare.TextPaddingTop = 1;
                 orbbox.addChild(orbsquare);
                 orbsquare.X = i * (orbsize + pad);
                 orbsquare.Backimege = new Imege(TextureLoader.orbTexture(ManaColour.Colourless));

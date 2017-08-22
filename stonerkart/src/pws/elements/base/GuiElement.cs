@@ -57,13 +57,13 @@ namespace stonerkart
         public virtual int Width
         {
             get { return width; }
-            set { lock (this) width = value; }
+            set { setSize(value, height); }
         }
 
         public virtual int Height
         {
             get { return height; }
-            set { lock (this) height = value; }
+            set { setSize(width, value); }
         }
 
         public GuiElement(int x, int y, int width, int height)
@@ -89,8 +89,12 @@ namespace stonerkart
         public void setSize(int newwidth, int newheight)
         {
             resizeEventStruct args = new resizeEventStruct(newwidth, newheight, width, height);
-            width = newwidth;
-            height = newheight;
+            lock (this)
+            {
+
+                width = newwidth;
+                height = newheight;
+            }
             onResize(args);
         }
 

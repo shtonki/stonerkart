@@ -9,8 +9,12 @@ namespace stonerkart
 {
     class Square : GuiElement
     {
-        public int textPaddingX { get; set; }= 0;
-        public int textPaddingY { get; set; }= 0;
+        private int textPaddingLeft = 0;
+        private int textPaddingTop = 0;
+        private int textPaddingRight = 0;
+        private int textPaddingBottom = 0;
+
+        private Border border = new SolidBorder(0, Color.Fuchsia);
 
         private Color bclr = Color.Transparent;
         private Imege backimege;
@@ -76,7 +80,6 @@ namespace stonerkart
             set { fontFamily = value; }
         }
 
-        public Border Border { get; set; }
 
         public TextLayout TextLayout
         {
@@ -84,6 +87,40 @@ namespace stonerkart
             set
             {
                 textLayout = value;
+                layoutText();
+            }
+        }
+
+        public virtual int TextPaddingLeft
+        {
+            get { return textPaddingLeft; }
+            set { textPaddingLeft = value; }
+        }
+
+        public virtual int TextPaddingTop
+        {
+            get { return textPaddingTop; }
+            set { textPaddingTop = value; }
+        }
+
+        public virtual int TextPaddingRight
+        {
+            get { return textPaddingRight; }
+            set { textPaddingRight = value; }
+        }
+
+        public virtual int TextPaddingBottom
+        {
+            get { return textPaddingBottom; }
+            set { textPaddingBottom = value; }
+        }
+
+        public virtual Border Border
+        {
+            get { return border; }
+            set
+            {
+                border = value;
                 layoutText();
             }
         }
@@ -130,11 +167,16 @@ namespace stonerkart
         {
             lock (this)
             {
-                laidText = TextLayout.layout(Text, Width - textPaddingX, Height, FontFamily);
+                laidText = TextLayout.layout(
+                    Text, 
+                    Width - TextPaddingLeft - TextPaddingRight - border.thickness * 4,
+                    Height - TextPaddingTop - TextPaddingBottom - border.thickness * 4, 
+                    FontFamily
+                    );
             }
         }
 
-        protected LaidText laidText;
+        public LaidText laidText;
 
         protected override void draw(DrawerMaym dm)
         {
@@ -146,9 +188,8 @@ namespace stonerkart
             {
                 dm.drawImege(Backimege, 0, 0, Width, Height);
             }
-            var ck = laidText?.xs.Sum(x => x.width);
 
-            laidText?.draw(dm, textPaddingY, textPaddingX, Width, textColor, laidText, ck.Value);
+            laidText?.draw(dm, TextPaddingLeft + border.thickness*2, TextPaddingTop + border.thickness*2, Width, textColor);
             Border?.draw(dm, 0, 0, Width, Height);
         }
     }
