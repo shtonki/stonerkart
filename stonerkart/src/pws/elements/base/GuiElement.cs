@@ -18,6 +18,7 @@ namespace stonerkart
         public bool focused { get; private set; }
         public bool selectable { get; set; }
         public bool hoverable { get; set; } = true;
+        public bool visible { get; set; } = true;
 
         public List<GuiElement> children { get; private set; }= new List<GuiElement>();
         public GuiElement parent { get; private set; }

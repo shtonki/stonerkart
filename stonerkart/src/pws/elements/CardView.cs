@@ -11,6 +11,7 @@ namespace stonerkart
     {
         public const int framewidth = 500;
         public const int frameheight = 700;
+        Color frameColor;
 
         public Card card { get; }
 
@@ -104,7 +105,6 @@ namespace stonerkart
 
         #endregion
 
-        private Color frameColor;
         private IEnumerable<ManaOrb> orbs;
 
         public void notify(object o, CardChangedMessage t)
@@ -125,7 +125,7 @@ namespace stonerkart
             artbox.Backimege = new Imege(TextureLoader.cardArt(c.template));
 
             orbs = c.castManaCost.orbs;
-
+            
             if (c.colours.Count > 1)
             {
                 frameColor = Color.Gold;
@@ -143,6 +143,7 @@ namespace stonerkart
                     case ManaColour.Nature: frameColor = Color.LightGreen; break;
                     case ManaColour.Order: frameColor = Color.LightSkyBlue; break;
                     case ManaColour.Colourless: frameColor = Color.Silver; break;
+                    default: throw new Exception();
                 }
             }
         }
@@ -265,13 +266,13 @@ namespace stonerkart
 
         private const double imgxo = 26.0/framewidth;
         private const double imgxw = 96.0/framewidth;
-
+        private Imege frameImage = new Imege(Textures.cardframegrey);
 
         protected override void draw(DrawerMaym dm)
         {
             //base.draw(dm);
 
-            dm.drawTexture(Textures.cardframegrey, 0, 0, width, height, null, frameColor);
+            dm.drawImege(frameImage, 0, 0, width, height, frameColor);
         }
     }
 }

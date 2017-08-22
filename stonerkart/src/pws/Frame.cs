@@ -60,10 +60,38 @@ namespace stonerkart
             base.OnUpdateFrame(e);
         }
 
+        class fpscounter
+        {
+            private double[] buf;
+            private int ctr;
+
+            public fpscounter(int bufsize)
+            {
+                buf = new double[bufsize];
+            }
+
+            public void addVal(double v)
+            {
+                ctr = (ctr + 1)%buf.Length;
+                buf[ctr] = v;
+            }
+
+            public double getVal()
+            {
+                return buf.Sum()/buf.Count();
+            }
+        }
+
+        fpscounter ctr = new fpscounter(30);
+
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
-            
+
+            ctr.addVal(RenderFrequency);
+
+            Title = ctr.getVal().ToString();
+               
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.ClearColor(Color.CornflowerBlue);
             GL.PushMatrix();
@@ -87,6 +115,8 @@ namespace stonerkart
 
         private void drawElement(GuiElement ge, DrawerMaym dm)
         {
+            if (!ge.visible) return;
+
             dm.translate(ge.X, ge.Y);
 
             ge.Draw(dm);

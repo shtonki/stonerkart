@@ -89,6 +89,7 @@ namespace stonerkart
                 cardViews.Add(cv);
                 addChild(cv);
                 cv.hoverable = false;
+                cv.visible = false;
             }
         }
 
@@ -126,6 +127,7 @@ namespace stonerkart
                     CardView cv = cardViews[i];
                     cv.X = (int)Math.Round(i*pad);
                     cv.Height = Height;
+                    cv.visible = true;
                 }
             }
         }
@@ -135,7 +137,7 @@ namespace stonerkart
         public override void onMouseMove(MouseMoveEventArgs args)
         {
             base.onMouseMove(args);
-            var cv = viewAt(args.X, args.Y);
+            var cv = viewAt(args.X - X, args.Y - Y);
             if (cv != lastBroughtToFront && lastBroughtToFront != null)
             {
                 int ix = cardViews.IndexOf(lastBroughtToFront);

@@ -26,7 +26,7 @@ namespace stonerkart
 
             Game g = new Game(new NewGameStruct(0, 0, new []{"a", "b"}, 0), true);
 
-            g.game.hero.deck.addObserver(gsc.pw);
+            g.game.hero.deck.addObserver(gsc.pw1);
 
             g.startGame();
 

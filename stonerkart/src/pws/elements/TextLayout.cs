@@ -80,10 +80,19 @@ namespace stonerkart
 
         protected abstract LaidText layout(string[] text, int width, int height, FontFamille ff);
 
-        protected charLayout makeCharLayout(string glyph, int xpos, int ypos, int width, int height, Box crop, FontFamille ff)
+        protected charLayout makeCharLayout(string glyph, int xpos, int ypos, int width, int height, FontFamille ff)
         {
+            if (glyph.Length == 1)
+            {
+                return new charLayout(ff[glyph], glyph, xpos, ypos, width, height);
+            }
+            else
+            {
+                return new charLayout(ff[glyph], glyph, xpos, ypos, height, height);
+            }
+            throw new Exception();/*
             return new fontGlyphLayout(glyph, xpos, ypos, width, height, crop, ff);
-            throw new Exception();
+            throw new Exception();*/
         }
     }
 
@@ -112,23 +121,17 @@ namespace stonerkart
 
             List<charLayout> xs = new List<charLayout>();
 
-            var sz = TextureLoader.sizeOf(ff.fontImage);
-            double w = (double)sz.Width;
-            double h = (double)sz.Height;
+            double h = ff.Height;
 
             var yscale = height/h;
-            var scaledTextWidth = text.Sum(c => yscale*ff.characters[c].width);
+            var scaledTextWidth = text.Sum(c => yscale*ff.widthOf(c));
             int xpos = jstfy(width, scaledTextWidth);
             double ws = Math.Min((width - 1)/scaledTextWidth, 1);
 
             foreach (string c in text)
             {
-                var v = ff.characters[c];
-
-                int rw = (int)(v.width*ws*yscale);
-                //int rw = (int)Math.Min((v.width * (width-1) / tw), height);
-
-                xs.Add(makeCharLayout(c, xpos, 0, rw, height, new Box(v.startx / w, 0, v.width / w, 1), ff));
+                int rw = (int)(ff.widthOf(c)*ws*yscale);
+                xs.Add(makeCharLayout(c, xpos, 0, rw, height, ff));
                 xpos += rw;
             }
             if (xpos >= width) throw new Exception();
@@ -168,17 +171,14 @@ namespace stonerkart
         {
             int xpos = 0;
             List<charLayout> xlist = new List<charLayout>();
-            var sz = TextureLoader.sizeOf(ff.fontImage);
-            double w = (double)sz.Width;
-            double h = (double)sz.Height;
+            double h = (double)ff.Height;
 
             double scale = ((double)height) / h;
 
             foreach (string c in text)
             {
-                glyphxd v = ff.characters[c];
-                var charwidth = v.width * scale;
-                xlist.Add(makeCharLayout(c, xpos, 0, (int)charwidth, height, new Box(v.startx/w, 0, v.width/w, 1), ff));
+                var charwidth = ff.widthOf(c) * scale;
+                xlist.Add(makeCharLayout(c, xpos, 0, (int)charwidth, height, ff));
                 xpos += (int)charwidth;
             }
 
@@ -258,8 +258,7 @@ namespace stonerkart
 
                     foreach (string c in wrd)
                     {
-                        glyphxd v = ff.characters[c];
-                        var charwidth = v.width * scale;
+                        var charwidth = ff.widthOf(c) * scale;
                         wordwidth += (int)charwidth;
                     }
 
@@ -276,15 +275,13 @@ namespace stonerkart
 
                     foreach (string c in wrd)
                     {
-                        glyphxd v = ff.characters[c];
-                        var charwidth = v.width * scale;
-                        xlist.Add(makeCharLayout(c, xpos, ypos, (int)charwidth, fontheight, new Box(v.startx / w, 0, v.width / w, 1), ff));
+                        var v = ff[c];
+                        var charwidth = ff.widthOf(c) * scale;
+                        xlist.Add(makeCharLayout(c, xpos, ypos, (int)charwidth, fontheight, ff));
                         xpos += (int)charwidth;
                     }
 
-                    glyphxd vx = ff.characters[" "];
-                    var charwidthx = vx.width * scale;
-                    xpos += (int)charwidthx;
+                    xpos += (int)(ff.widthOf(" ")*scale);
                 }
 
                 candidate = xlist;
@@ -294,7 +291,7 @@ namespace stonerkart
         }
     }
 
-    abstract class charLayout
+    class charLayout
     {
         public string glyph { get; }
         public int xpos { get; }
@@ -312,26 +309,17 @@ namespace stonerkart
             this.width = width;
             this.height = height;
         }
+
         public void draw(DrawerMaym dm, int xoffset, int yoffset, Color textColor)
         {
-            dm.drawTexture(
-                imege.texture,
+            dm.drawImege(
+                imege,
                 xpos + xoffset,
                 ypos + yoffset,
                 width,
                 height,
-                imege.crop,
-                textColor);
+                glyph.Length > 1 ? Color.White : textColor
+                );
         }
-    }
-
-    class fontGlyphLayout : charLayout
-    {
-        
-        public fontGlyphLayout(string glyph, int xpos, int ypos, int width, int height, Box crop, FontFamille ff) : base(new Imege(ff.fontImage, crop), glyph, xpos, ypos, width, height)
-        {
-        }
-        
-        
     }
 }

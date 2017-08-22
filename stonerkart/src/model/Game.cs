@@ -45,10 +45,16 @@ namespace stonerkart
             return r;
         }
 
-        private Card createCard(CardTemplate ct, Pile pile, Player owner)
+        private Card createCard(CardTemplate ct, Player owner)
         {
             Card r = new Card(ct, owner);
             game.cards.Add(r);
+            return r;
+        }
+
+        private Card createCard(CardTemplate ct, Pile pile, Player owner)
+        {
+            Card r = createCard(ct, owner);
             r.moveTo(pile);
             return r;
         }
@@ -89,10 +95,15 @@ namespace stonerkart
                 Card heroCard = createCard(deck.hero, p.field, p);
                 p.setHeroCard(heroCard);
 
+                var c = deck.templates.Select(ct => createCard(ct, p));
+
+                p.deck.addRange(c);
+                /*
                 foreach (var ct in deck.templates)
                 {
                     createCard(ct, p.deck, p);
                 }
+                */
                 game.shuffle(p.deck);
             }
 
@@ -938,7 +949,6 @@ namespace stonerkart
 
         private ButtonOption waitForButton(string prompt, params ButtonOption[] options)
         {
-            Thread.Sleep(10000000);
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             gameController.setPrompt(prompt, options);
             ShibbuttonStuff s = (ShibbuttonStuff)waitFor(new InputEventFilter((c, o) => c is Shibbutton));

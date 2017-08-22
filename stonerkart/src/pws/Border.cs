@@ -84,17 +84,15 @@ namespace stonerkart
             }
             ypos += animationspeed;
 
-            dm.drawTexture(texture, 0, 0, width, thickness, 
-                new Box(offset, ypos, cropskip, cropthickness)); //top
+            Imege top =    new Imege(texture, new Box(offset, ypos, cropskip, cropthickness));
+            Imege left =   new Imege(texture, new Box(offset, ypos, cropskip, cropthickness));
+            Imege bottom = new Imege(texture, new Box(offset, ypos + cropthickness, cropskip, -cropthickness));
+            Imege right =  new Imege(texture, new Box(offset + cropskip - cropthickness, ypos, cropthickness, cropskip));
 
-            dm.drawTexture(texture, 0, 0, thickness, height,
-                new Box(offset, ypos, cropthickness, cropskip)); //left
-
-            dm.drawTexture(texture, 0, height - thickness, width, thickness,
-                new Box(offset, ypos + cropthickness, cropskip, -cropthickness)); //bottom
-
-            dm.drawTexture(texture, width - thickness, 0, thickness, height,
-                new Box(offset + cropskip - cropthickness, ypos, cropthickness, cropskip)); //right
+            dm.drawImege(top, 0, 0, width, thickness); 
+            dm.drawImege(left, 0, 0, thickness, height); 
+            dm.drawImege(bottom, 0, height - thickness, width, thickness); 
+            dm.drawImege(right, width - thickness, 0, thickness, height); 
         }
 
         /*

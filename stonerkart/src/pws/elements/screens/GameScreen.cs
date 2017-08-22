@@ -8,7 +8,7 @@ namespace stonerkart
 {
     class GameScreen : Screen
     {
-        public PileView pw;
+        public PileView pw1;
 
         public GameScreen() : base(new Imege(Textures.table0))
         {
@@ -23,9 +23,11 @@ namespace stonerkart
                 addElement(cv);
             }
             /*/
-            pw = new PileView();
-            addElement(pw);
-            pw.setSize(1700, 300);
+            pw1 = new PileView();
+            addElement(pw1);
+            pw1.setSize(1700, 300);
+            pw1.Y = 300;
+
             //*/
         }
     }

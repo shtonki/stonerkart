@@ -130,36 +130,29 @@ namespace stonerkart
 
         }
 
-        public void drawImege(Imege i, int x, int y, int width, int height)
+        public void drawImege(Imege i, int x, int y, int width, int height, Color? brushColor = null)
         {
-            drawTexture(i.texture, x, y, width, height, i.crop);
+            drawTextureR(i.texture, new Box(x, y, width, height), i.crop, brushColor ?? Color.White);
         }
 
-        public void drawTexture(Textures t, int x, int y, int width, int height, Box? cropbox = null, Color? c = null)
+        private void drawTextureR(Textures tx, Box imageLocation, Box crop, Color color)
         {
-            drawTextureR(t, new Box(x, y, width, height), cropbox, c);
-        }
-
-        private void drawTextureR(Textures tx, Box imageLocation, Box? crop = null, Color? c = null)
-        {
-            Color clr = c ?? Color.White;
-            Box cropx = crop ?? new Box(0.0, 0.0, 1.0, 1.0);
 
             GL.Enable(EnableCap.Texture2D);
-            GL.Color4(clr);
+            GL.Color4(color);
             GL.BindTexture(TextureTarget.Texture2D, textures[tx]);
             GL.Begin(PrimitiveType.Quads);
             
-            GL.TexCoord2(cropx.x, cropx.y);
+            GL.TexCoord2(crop.x, crop.y);
             GL.Vertex2(imageLocation.x, -imageLocation.y);
 
-            GL.TexCoord2(cropx.r, cropx.y);
+            GL.TexCoord2(crop.r, crop.y);
             GL.Vertex2(imageLocation.r, -imageLocation.y);
 
-            GL.TexCoord2(cropx.r, cropx.b);
+            GL.TexCoord2(crop.r, crop.b);
             GL.Vertex2(imageLocation.r, -imageLocation.b);
 
-            GL.TexCoord2(cropx.x, cropx.b);
+            GL.TexCoord2(crop.x, crop.b);
             GL.Vertex2(imageLocation.x, -imageLocation.b);
             
             GL.End();
