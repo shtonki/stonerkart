@@ -38,7 +38,7 @@ namespace stonerkart
                 }
                 else
                 {
-                    //throw new Exception();
+                    throw new Exception();
                 }
             }
         }
@@ -222,6 +222,7 @@ namespace stonerkart
                     word.Add(v);
                 }
             }
+            if (word.Count > 0) words.Add(word.ToArray());
             return words.ToArray();
         }
 

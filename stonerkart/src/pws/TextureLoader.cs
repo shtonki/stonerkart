@@ -34,6 +34,19 @@ namespace stonerkart
         orbDeath,
         orbColourless,
         orbMight,
+        orbColourless0,
+        orbColourless1,
+        orbColourless2,
+        orbColourless3,
+        orbColourless4,
+        orbColourless5,
+        orbColourless6,
+        orbColourless7,
+        orbColourless8,
+        orbColourless9,
+        orbColourless10,
+        orbColourless11,
+        orbColourless12,
 
         artAberrantSacrifice,
         artAbolish,
@@ -198,6 +211,19 @@ namespace stonerkart
             images[Textures.orbDeath] = Resources.orbDeath;
             images[Textures.orbColourless] = Resources.orbColourless;
             images[Textures.orbMight] = Resources.orbMight;
+            images[Textures.orbColourless0] = Resources.cl0;
+            images[Textures.orbColourless1] = Resources.cl1;
+            images[Textures.orbColourless2] = Resources.cl2;
+            images[Textures.orbColourless3] = Resources.cl3;
+            images[Textures.orbColourless4] = Resources.cl4;
+            images[Textures.orbColourless5] = Resources.cl5;
+            images[Textures.orbColourless6] = Resources.cl6;
+            images[Textures.orbColourless7] = Resources.cl7;
+            images[Textures.orbColourless8] = Resources.cl8;
+            images[Textures.orbColourless9] = Resources.cl9;
+            images[Textures.orbColourless10] = Resources.cl10;
+            images[Textures.orbColourless11] = Resources.cl11;
+            images[Textures.orbColourless12] = Resources.cl12;
 
             images[Textures.artAberrantSacrifice] = Resources.artAberrantSacrifice;
             images[Textures.artAbolish] = Resources.artAbolish;
@@ -356,6 +382,27 @@ namespace stonerkart
                 case ManaColour.Order: return Textures.orbOrder;
                 default:
                     throw new Exception();
+            }
+        }
+
+        public static Textures colourlessTexture(int c)
+        {
+            switch (c)
+            {
+                case 0: return Textures.orbColourless0;
+                case 1: return Textures.orbColourless1;
+                case 2: return Textures.orbColourless2;
+                case 3: return Textures.orbColourless3;
+                case 4: return Textures.orbColourless4;
+                case 5: return Textures.orbColourless5;
+                case 6: return Textures.orbColourless6;
+                case 7: return Textures.orbColourless7;
+                case 8: return Textures.orbColourless8;
+                case 9: return Textures.orbColourless9;
+                case 10: return Textures.orbColourless10;
+                case 11: return Textures.orbColourless11;
+                case 12: return Textures.orbColourless12;
+                default: throw new Exception();
             }
         }
 

@@ -23,11 +23,11 @@ namespace stonerkart
                 addElement(cv);
             }
             /*/
+            
             pw1 = new PileView();
             addElement(pw1);
             pw1.setSize(1700, 300);
             pw1.Y = 300;
-
             //*/
         }
     }

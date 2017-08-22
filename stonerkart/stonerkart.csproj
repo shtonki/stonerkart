@@ -101,6 +101,7 @@
     <Compile Include="src\pws\elements\HexPanel.cs" />
     <Compile Include="src\pws\elements\MemeButton.cs" />
     <Compile Include="src\pws\elements\PileView.cs" />
+    <Compile Include="src\pws\elements\PromptPanel.cs" />
     <Compile Include="src\pws\elements\screens\GameScreen.cs" />
     <Compile Include="src\pws\elements\screens\LoginScreen.cs" />
     <Compile Include="src\pws\elements\screens\Screen.cs" />
@@ -169,6 +170,19 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\cl1.png" />
+    <None Include="Resources\cl0.png" />
+    <None Include="Resources\cl2.png" />
+    <None Include="Resources\cl3.png" />
+    <None Include="Resources\cl4.png" />
+    <None Include="Resources\cl5.png" />
+    <None Include="Resources\cl6.png" />
+    <None Include="Resources\cl7.png" />
+    <None Include="Resources\cl8.png" />
+    <None Include="Resources\cl9.png" />
+    <None Include="Resources\cl10.png" />
+    <None Include="Resources\cl11.png" />
+    <None Include="Resources\cl12.png" />
     <None Include="Resources\font0.png" />
     <None Include="Resources\nature1.png" />
     <None Include="Resources\table0.png" />

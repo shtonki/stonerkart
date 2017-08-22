@@ -24,7 +24,7 @@ namespace stonerkart
 
             for (int i = 0; i <= 12; i++)
             {
-                hacktionary[G.colourlessGlyph(i)] = new Imege(Textures.orbColourless);
+                hacktionary[G.colourlessGlyph(i)] = new Imege(TextureLoader.colourlessTexture(i));
             }
         }
 
