@@ -13,7 +13,7 @@ namespace stonerkart
 
         static Screen()
         {
-            menu = new Square(Frame.BACKSCREENWIDTH, 50);
+            menu = new Square(Frame.BACKSCREENWIDTH, Frame.MENUHEIGHT);
             menu.Backimege = new MemeImege(Textures.buttonbg2, 1);
             menu.Y = Frame.BACKSCREENHEIGHT - menu.Height;
         }

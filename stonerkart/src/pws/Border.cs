@@ -85,7 +85,7 @@ namespace stonerkart
             ypos += animationspeed;
 
             Imege top =    new Imege(texture, new Box(offset, ypos, cropskip, cropthickness));
-            Imege left =   new Imege(texture, new Box(offset, ypos, cropskip, cropthickness));
+            Imege left =   new Imege(texture, new Box(offset, ypos, cropthickness, -cropskip));
             Imege bottom = new Imege(texture, new Box(offset, ypos + cropthickness, cropskip, -cropthickness));
             Imege right =  new Imege(texture, new Box(offset + cropskip - cropthickness, ypos, cropthickness, cropskip));
 

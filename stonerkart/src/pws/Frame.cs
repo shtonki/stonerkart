@@ -246,6 +246,8 @@ namespace stonerkart
         public const int BACKSCREENHEIGHT = 1080;
         public const int BACKSCREENWIDTHd2 = BACKSCREENWIDTH/2;
         public const int BACKSCREENHEIGHTd2 = BACKSCREENHEIGHT/2;
+        public const int MENUHEIGHT = 50;
+        public const int AVAILABLEHEIGHT = BACKSCREENHEIGHT - MENUHEIGHT;
 
         protected override void OnResize(EventArgs e)
         {

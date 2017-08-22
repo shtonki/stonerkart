@@ -170,6 +170,7 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\buttonbg0.png" />
     <None Include="Resources\cl1.png" />
     <None Include="Resources\cl0.png" />
     <None Include="Resources\cl2.png" />

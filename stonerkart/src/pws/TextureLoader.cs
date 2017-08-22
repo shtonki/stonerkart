@@ -19,6 +19,7 @@ namespace stonerkart
 
         bg3,
 
+        buttonbg0,
         buttonbg2,
 
         border0,
@@ -196,8 +197,12 @@ namespace stonerkart
             images = new Dictionary<Textures, Image>();
 
             images[Textures.font0] = Resources.font0;
+
             images[Textures.bg3] = Resources.background3;
+
+            images[Textures.buttonbg0] = Resources.buttonbg0;
             images[Textures.buttonbg2] = Resources.buttonbg2;
+
             images[Textures.border0] = Resources.border0;
 
             images[Textures.table0] = Resources.table0;

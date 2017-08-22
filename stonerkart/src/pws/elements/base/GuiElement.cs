@@ -35,6 +35,8 @@ namespace stonerkart
             set { setLocation(x, value); }
         }
 
+        public int Bottom => Y + Height;
+        public int Right => X + Width;
 
         /// <summary>
         /// The order within the parent which the element is drawn, 0 being first;

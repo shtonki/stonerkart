@@ -949,7 +949,7 @@ namespace stonerkart
 
         private ButtonOption waitForButton(string prompt, params ButtonOption[] options)
         {
-            Thread.Sleep(100000);
+            Thread.Sleep(1000000);
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             gameController.setPrompt(prompt, options);
             ShibbuttonStuff s = (ShibbuttonStuff)waitFor(new InputEventFilter((c, o) => c is Shibbutton));
