@@ -85,7 +85,7 @@ namespace stonerkart
             }
 
 
-            int textWidth = textBox.laidText.xs.Sum(cl => cl.width);
+            int textWidth = textBox.laidText.characters.Sum(cl => cl.width);
             if (textWidth > Width)
             {
                 textShift = Width - textWidth - 8;
