@@ -19,7 +19,7 @@ namespace stonerkart
         }
     }
 
-    class FontFamille
+    class  FontFamille
     {
         public Textures fontImage;
         public Dictionary<string, glyphxd> characters;
@@ -29,6 +29,7 @@ namespace stonerkart
             this.fontImage = fontImage;
 
             characters = new Dictionary<string, glyphxd>();
+            characters[G.newlineGlyph] = new glyphxd(0, 0);
 
             var lines = fontstring.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             glyphxd lst = new glyphxd();

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Text;
 
 namespace stonerkart
 {
@@ -31,7 +32,8 @@ namespace stonerkart
                         xdd.ypos + yoffset,
                         xdd.width,
                         charHeight,
-                        xdd.crop, textColor);
+                        xdd.crop,
+                        xdd.glyph[0] == '\\' ? Color.White : textColor);
                 }
                 else
                 {
@@ -48,7 +50,39 @@ namespace stonerkart
         private double tw;
         private int charHeight;
 
-        public abstract LaidText layout(string text, int width, int height, FontFamille ff);
+        public LaidText Layout(string text, int width, int height, FontFamille ff)
+        {
+            return layout(chop(text), width, height, ff);
+        }
+
+        private string[] chop(string text)
+        {
+            List<string> glyphs = new List<string>();
+            int i = 0;
+            while (i < text.Length)
+            {
+                char c = text[i++];
+
+                if (c == '\\')
+                {
+                    StringBuilder sb = new StringBuilder();
+                    char ch;
+                    do
+                    {
+                        ch = text[i++];
+                        sb.Append(ch.ToString());
+                    } while (ch != '\\');
+                    glyphs.Add("\\" + sb.ToString());
+                }
+                else
+                {
+                    glyphs.Add(c.ToString());
+                }
+            }
+            return glyphs.ToArray();
+        }
+
+        protected abstract LaidText layout(string[] text, int width, int height, FontFamille ff);
     }
 
     public enum Justify
@@ -70,9 +104,9 @@ namespace stonerkart
             this.justify = justify;
         }
 
-        public override LaidText layout(string text, int width, int height, FontFamille ff)
+        protected override LaidText layout(string[] text, int width, int height, FontFamille ff)
         {
-            if (text == "") return new LaidText(new List<characterLayout>(), ff, height);
+            if (text.Length == 0) return new LaidText(new List<characterLayout>(), ff, height);
 
             List<characterLayout> xs = new List<characterLayout>();
 
@@ -81,18 +115,18 @@ namespace stonerkart
             double h = (double)sz.Height;
 
             var yscale = height/h;
-            var scaledTextWidth = text.Sum(c => yscale*ff.characters[c.ToString()].width);
+            var scaledTextWidth = text.Sum(c => yscale*ff.characters[c].width);
             int xpos = jstfy(width, scaledTextWidth);
             double ws = Math.Min((width - 1)/scaledTextWidth, 1);
 
-            foreach (char c in text)
+            foreach (string c in text)
             {
-                var v = ff.characters[c.ToString()];
+                var v = ff.characters[c];
 
                 int rw = (int)(v.width*ws*yscale);
                 //int rw = (int)Math.Min((v.width * (width-1) / tw), height);
 
-                xs.Add(new characterLayout(xpos, 0, rw, new Box(v.startx / w, 0, v.width / w, 1)));
+                xs.Add(new characterLayout(c, xpos, 0, rw, new Box(v.startx / w, 0, v.width / w, 1)));
                 xpos += rw;
             }
             if (xpos >= width) throw new Exception();
@@ -128,7 +162,7 @@ namespace stonerkart
 
     class SingleLineLayout : TextLayout
     {
-        public override LaidText layout(string text, int width, int height, FontFamille ff)
+        protected override LaidText layout(string[] text, int width, int height, FontFamille ff)
         {
             int xpos = 0;
             List<characterLayout> xlist = new List<characterLayout>();
@@ -138,11 +172,11 @@ namespace stonerkart
 
             double scale = ((double)height) / h;
 
-            foreach (char c in text)
+            foreach (string c in text)
             {
-                glyphxd v = ff.characters[c.ToString()];
+                glyphxd v = ff.characters[c];
                 var charwidth = v.width * scale;
-                xlist.Add(new characterLayout(xpos, 0, (int)charwidth, new Box(v.startx/w, 0, v.width/w, 1)));
+                xlist.Add(new characterLayout(c, xpos, 0, (int)charwidth, new Box(v.startx/w, 0, v.width/w, 1)));
                 xpos += (int)charwidth;
             }
 
@@ -165,9 +199,33 @@ namespace stonerkart
             this.maxsize = maxsize;
         }
 
-        public override LaidText layout(string text, int width, int height, FontFamille ff)
+        private string[][] wordify(string[] text)
         {
-            var words = text.Split(' ');
+            List<string[]> words = new List<string[]>();
+
+            List<string> word = new List<string>();
+            foreach (var v in text)
+            {
+                if (v == " " || v == G.newlineGlyph)
+                {
+                    words.Add(word.ToArray());
+                    word = new List<string>();
+                    if (v == G.newlineGlyph)
+                    {
+                        words.Add(new []{G.newlineGlyph});
+                    }
+                }
+                else
+                {
+                    word.Add(v);
+                }
+            }
+            return words.ToArray();
+        }
+
+        protected override LaidText layout(string[] text, int width, int height, FontFamille ff)
+        {
+            var words = wordify(text);
 
             var sz = TextureLoader.sizeOf(ff.fontImage);
             double w = sz.Width;
@@ -183,13 +241,22 @@ namespace stonerkart
                 List<characterLayout> xlist = new List<characterLayout>();
                 double scale = ((double)fontheight) / h;
 
-                foreach (string wrd in words)
+                foreach (string[] wrd in words)
                 {
+                    if (wrd.Length == 0) continue;
+                    if (wrd[0] == G.newlineGlyph)
+                    {
+                        if (wrd.Length != 1) throw new Exception();
+                        ypos += fontheight;
+                        xpos = 0;
+                        continue;
+                    }
+
                     int wordwidth = 0;
 
-                    foreach (char c in wrd)
+                    foreach (string c in wrd)
                     {
-                        glyphxd v = ff.characters[c.ToString()];
+                        glyphxd v = ff.characters[c];
                         var charwidth = v.width * scale;
                         wordwidth += (int)charwidth;
                     }
@@ -205,11 +272,11 @@ namespace stonerkart
                         return new LaidText(candidate, ff, fontheight - 1);
                     }
 
-                    foreach (char c in wrd)
+                    foreach (string c in wrd)
                     {
-                        glyphxd v = ff.characters[c.ToString()];
+                        glyphxd v = ff.characters[c];
                         var charwidth = v.width * scale;
-                        xlist.Add(new characterLayout(xpos, ypos, (int)charwidth, new Box(v.startx / w, 0, v.width / w, 1)));
+                        xlist.Add(new characterLayout(c, xpos, ypos, (int)charwidth, new Box(v.startx / w, 0, v.width / w, 1)));
                         xpos += (int)charwidth;
                     }
 
@@ -227,13 +294,15 @@ namespace stonerkart
 
     public struct characterLayout
     {
+        public string glyph { get; }
         public int xpos { get; }
         public int ypos { get; }
         public int width { get; }
         public Box crop { get;}
 
-        public characterLayout(int xpos, int ypos, int width, Box crop)
+        public characterLayout(string glyph, int xpos, int ypos, int width, Box crop)
         {
+            this.glyph = glyph;
             this.xpos = xpos;
             this.ypos = ypos;
             this.width = width;

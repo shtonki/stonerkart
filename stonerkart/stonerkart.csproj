@@ -170,6 +170,7 @@
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
     <None Include="Resources\font0.png" />
+    <None Include="Resources\nature1.png" />
     <None Include="Resources\table0.png" />
     <None Include="Resources\whiteframe4.png" />
     <None Include="Resources\buttonbg2.png" />

@@ -212,13 +212,15 @@ namespace stonerkart
 
         public static string colourlessGlyph(int i)
         {
-            return "/" + i + "/";
+            return "\\cl" + i + "\\";
         }
 
         public static string colouredGlyph(ManaColour c)
         {
-            return "/" + c + "/";
+            return "\\" + c + "\\";
         }
+
+        public static string newlineGlyph => "\\n\\";
 
         public static string exhaustGhyph => "Exhaust";
 

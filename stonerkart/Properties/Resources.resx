@@ -674,7 +674,25 @@ z 2661 39
 &amp; 3466 70
 ( 3536 26
 ) 3562 27
-: 3589 17</value>
+: 3589 17
+\Chaos\ 3612 80
+\Death\ 3688 80
+\Life\ 3768 80
+\Might\ 3850 80
+\Nature\ 3930 80
+\Order\ 4010 80
+\cl1\ 4088 80
+\cl2\ 4168 80
+\cl3\ 4248 80
+\cl4\ 4328 80
+\cl5\ 4408 80
+\cl6\ 4488 80
+\cl7\ 4568 80
+\cl8\ 4648 80
+\cl9\ 4728 80
+\cl10\ 4808 80
+\cl11\ 4888 80
+\cl12\ 4968 80</value>
   </data>
   <data name="whiteframe4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\whiteframe4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -254,7 +254,7 @@ namespace stonerkart
                 if (s.Length > 0)
                 {
                     sb.Append(a.description);
-                    //sb.Append("\r\n");
+                    sb.Append(G.newlineGlyph);
                 }
             }
 
@@ -264,13 +264,15 @@ namespace stonerkart
                 sb.Append(" -- (");
                 sb.Append(kaExplainer(a));
                 sb.Append(')');
-                //sb.Append("\r\n");
+                sb.Append(G.newlineGlyph);
+
             }
 
             foreach (var a in auras)
             {
                 sb.Append(a.description);
-                //sb.Append("\r\n");
+                sb.Append(G.newlineGlyph);
+
             }
 
             return sb.ToString();

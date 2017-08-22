@@ -21,8 +21,8 @@ namespace stonerkart
 
             var gsc = new GameScreen();
 
-            //GUI.setScreen(gsc);
-            GUI.setScreen(new LoginScreen());
+            GUI.setScreen(gsc);
+            //GUI.setScreen(new LoginScreen());
 
             Game g = new Game(new NewGameStruct(0, 0, new []{"a", "b"}, 0), true);
 

@@ -167,7 +167,7 @@ namespace stonerkart
         {
             lock (this)
             {
-                laidText = TextLayout.layout(
+                laidText = TextLayout.Layout(
                     Text, 
                     Width - TextPaddingLeft - TextPaddingRight - border.thickness * 4,
                     Height - TextPaddingTop - TextPaddingBottom - border.thickness * 4, 
