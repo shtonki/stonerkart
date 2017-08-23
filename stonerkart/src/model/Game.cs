@@ -20,8 +20,12 @@ namespace stonerkart
 
         private bool skipFirstDraw = true;
 
-        public Game(NewGameStruct ngs, bool local)
+        private GameScreen screen;
+
+        public Game(NewGameStruct ngs, bool local, GameScreen gameScreen)
         {
+            screen = gameScreen;
+
             gameid = ngs.gameid;
             
             gameController = new GameController(null, null);
@@ -36,6 +40,13 @@ namespace stonerkart
             {
                 connection = new MultiplayerConnection(game, ngs);
             }
+
+            observe(screen);
+        }
+
+        private void observe(GameScreen gamescreen)
+        {
+            game.hero.hand.addObserver(screen.handView);
         }
 
         public Card createToken(CardTemplate ct, Player owner)
@@ -95,15 +106,15 @@ namespace stonerkart
                 Card heroCard = createCard(deck.hero, p.field, p);
                 p.setHeroCard(heroCard);
 
-                var c = deck.templates.Select(ct => createCard(ct, p));
-
-                p.deck.addRange(c);
-                /*
+                //var cards = deck.templates.Select(ct => createCard(ct, p.deck, p));
+                //foreach (var card in cards) card.moveTo(p.deck);
+                //p.deck.addRange(cards);
+                
                 foreach (var ct in deck.templates)
                 {
                     createCard(ct, p.deck, p);
                 }
-                */
+                
                 game.shuffle(p.deck);
             }
 
@@ -949,11 +960,10 @@ namespace stonerkart
 
         private ButtonOption waitForButton(string prompt, params ButtonOption[] options)
         {
-            Thread.Sleep(1000000);
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            gameController.setPrompt(prompt, options);
-            ShibbuttonStuff s = (ShibbuttonStuff)waitFor(new InputEventFilter((c, o) => c is Shibbutton));
-            return s.option;*/
+            PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption);
+            screen.promptPanel.prompt(sax, prompt, options);
+            var v = (ButtonOption)sax.call();
+            return v;
         }
 
         private HackStruct makeHackStruct(Player castingPlayer)

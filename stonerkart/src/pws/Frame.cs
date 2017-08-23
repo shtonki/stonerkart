@@ -115,6 +115,7 @@ namespace stonerkart
 
         private void drawElement(GuiElement ge, DrawerMaym dm)
         {
+            if (ge == null) return;
             if (!ge.visible) return;
 
             dm.translate(ge.X, ge.Y);

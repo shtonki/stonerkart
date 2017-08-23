@@ -15,7 +15,7 @@ namespace stonerkart
     {
         public static void launchGame()
         {
-            if (!Network.connectToServer()) throw new Exception("Serber offline");
+            //if (!Network.connectToServer()) throw new Exception("Serber offline");
 
             GUI.launch();
 
@@ -24,9 +24,7 @@ namespace stonerkart
             GUI.setScreen(gsc);
             //GUI.setScreen(new LoginScreen());
 
-            Game g = new Game(new NewGameStruct(0, 0, new []{"a", "b"}, 0), true);
-
-            g.game.hero.deck.addObserver(gsc.pw1);
+            Game g = new Game(new NewGameStruct(0, 420, new []{"a", "b"}, 0), true, gsc);
 
             g.startGame();
 

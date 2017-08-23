@@ -14,15 +14,9 @@ namespace stonerkart
 
         public PileView()
         {
-            Backcolor = Color.Aqua;
+            Backcolor = Color.Crimson;
         }
 
-        public PileView(CardList cl) : this()
-        {
-            cl.addObserver(this);
-            populate(cl);
-            layoutCards();
-        }
 
         public override int Height
         {

@@ -134,6 +134,7 @@
     <Compile Include="src\network\Message.cs" />
     <Compile Include="src\network\Network.cs" />
     <Compile Include="src\network\ServerConnection.cs" />
+    <Compile Include="src\pws\PublicSaxophone.cs" />
     <Compile Include="src\pws\TextureLoader.cs" />
     <Compile Include="src\util\ImageLoaderx.cs" />
     <Compile Include="src\util\Observable.cs" />

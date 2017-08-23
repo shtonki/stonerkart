@@ -10,8 +10,8 @@ namespace stonerkart
     class PromptPanel : Square
     {
 
-        public Square promptText;
-        public Button[] buttons;
+        public Square promptText { get; }
+        public Button[] buttons { get; }
 
         public PromptPanel(int width, int height) : base(width, height)
         {
@@ -68,6 +68,29 @@ namespace stonerkart
                         );
                 }
                 row++;
+            }
+        }
+
+        public void prompt(PublicSaxophone sax, string text, params ButtonOption[] labels)
+        {
+            promptText.Text = text;
+
+            int i = 0;
+            while (i < buttons.Length)
+            {
+                Button b = buttons[i];
+                if (i < labels.Length)
+                {
+                    var l = labels[i];
+                    b.Text = l.ToString();
+                    b.visible = true;
+                    sax.sub(b, g => l);
+                }
+                else
+                {
+                    b.visible = false;
+                }
+                i++;
             }
         }
     }
