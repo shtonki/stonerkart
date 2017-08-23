@@ -82,8 +82,8 @@ namespace stonerkart
                 CardView cv = new CardView(c);
                 cardViews.Add(cv);
                 addChild(cv);
-                cv.hoverable = false;
-                cv.visible = false;
+                cv.Hoverable = false;
+                cv.Visible = false;
             }
         }
 
@@ -121,7 +121,7 @@ namespace stonerkart
                     CardView cv = cardViews[i];
                     cv.X = (int)Math.Round(i*pad);
                     cv.Height = Height;
-                    cv.visible = true;
+                    cv.Visible = true;
                 }
             }
         }

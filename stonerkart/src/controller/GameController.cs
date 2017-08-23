@@ -69,7 +69,7 @@ namespace stonerkart
 
         public void setHeroActive(bool b)
         {
-
+            return;
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             gameScreen.setHeroActive(b);
             */

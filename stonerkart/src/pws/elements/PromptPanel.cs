@@ -12,6 +12,7 @@ namespace stonerkart
 
         public Square promptText { get; }
         public Button[] buttons { get; }
+        public Button[] manaButtons { get; }
 
         public PromptPanel(int width, int height) : base(width, height)
         {
@@ -32,11 +33,21 @@ namespace stonerkart
                 addChild(b);
             }
 
+            manaButtons = new Button[manaButtonCount];
+            for (int i = 0; i < manaButtonCount; i++)
+            {
+                Button b = new Button(0, 0);
+                b.Backimege = new Imege(TextureLoader.orbTexture(orbOrder[i]));
+                manaButtons[i] = b;
+                addChild(b);
+            }
+
             layoutStuff();
         }
 
         private const int buttonCount = 4;
         private const int buttonColumns = 2;
+        private const int manaButtonCount = 7;
 
 
         private void layoutStuff()
@@ -66,13 +77,38 @@ namespace stonerkart
                         padding + j*(buttonWidth + padding), 
                         buttonOrigY + row*(buttonHeight + padding)
                         );
+                    b.Visible = false;
                 }
                 row++;
             }
+
+            int manaButtonPadding = padding/2;
+            int manaButtonWidth = (Width - padding*2 - manaButtonCount*manaButtonPadding + manaButtonPadding)/manaButtonCount;
+
+            for (int i = 0; i < manaButtonCount; i++)
+            {
+                Button b = manaButtons[i];
+                b.X = padding + i*(manaButtonWidth + manaButtonPadding);
+                b.Y = buttonOrigY;
+                b.setSize(manaButtonWidth, manaButtonWidth);
+            }
         }
+
+        private List<ManaColour> orbOrder = new List<ManaColour>(new[]
+        {
+            ManaColour.Chaos,
+            ManaColour.Death,
+            ManaColour.Might,
+            ManaColour.Order,
+            ManaColour.Life,
+            ManaColour.Nature,
+            ManaColour.Colourless,
+        });
 
         public void prompt(PublicSaxophone sax, string text, params ButtonOption[] labels)
         {
+            foreach (var b in manaButtons) b.Visible = false;
+
             promptText.Text = text;
 
             int i = 0;
@@ -83,14 +119,29 @@ namespace stonerkart
                 {
                     var l = labels[i];
                     b.Text = l.ToString();
-                    b.visible = true;
+                    b.Visible = true;
                     sax.sub(b, g => l);
                 }
                 else
                 {
-                    b.visible = false;
+                    b.Visible = false;
                 }
                 i++;
+            }
+        }
+
+        public void prompt(PublicSaxophone sax, string text, params ManaColour[] colours)
+        {
+            foreach (var b in buttons) b.Visible = false;
+            foreach (var b in manaButtons) b.Visible = false;
+
+            foreach (var c in colours)
+            {
+                int ix = orbOrder.IndexOf(c);
+                Button b = manaButtons[ix];
+                b.Visible = true;
+                var clr = c;
+                sax.sub(b, g => clr);
             }
         }
     }

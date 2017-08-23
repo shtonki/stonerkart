@@ -116,7 +116,7 @@ namespace stonerkart
         private void drawElement(GuiElement ge, DrawerMaym dm)
         {
             if (ge == null) return;
-            if (!ge.visible) return;
+            if (!ge.Visible) return;
 
             dm.translate(ge.X, ge.Y);
 
@@ -211,7 +211,7 @@ namespace stonerkart
 
                 foreach (var v in l)
                 {
-                    if (v.hoverable &&
+                    if (v.Hoverable &&
                         v.X < x &&
                         v.X + v.Width > x &&
                         v.Y < y &&

@@ -139,7 +139,7 @@ namespace stonerkart
             ButtonOption bopt;
             if (flipwinner == game.hero)
             {
-                bopt = waitForButton("Do you wish to go first?", ButtonOption.Yes, ButtonOption.No);
+                bopt = chooseButton("Do you wish to go first?", ButtonOption.Yes, ButtonOption.No);
                 connection.sendAction(new ChoiceSelection((int)bopt));
             }
             else
@@ -166,7 +166,7 @@ namespace stonerkart
 
                     if (p == game.hero)
                     {
-                        ButtonOption b = waitForButton(String.Format("Redraw to {0}?", draws[j + 1]), ButtonOption.Yes, ButtonOption.No);
+                        ButtonOption b = chooseButton(String.Format("Redraw to {0}?", draws[j + 1]), ButtonOption.Yes, ButtonOption.No);
                         cs = new ChoiceSelection((int)b);
                         connection.sendAction(cs);
                     }
@@ -931,9 +931,20 @@ namespace stonerkart
             }
         }
 
+        private ManaColour chooseManaColour()
+        {
+            ManaColour[] cs = new[]
+            {
+                ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
+            };
+            PublicSaxophone sax = new PublicSaxophone(c => true);
+            screen.promptPanel.prompt(sax, "Choose a Mana Colour", cs);
+            return (ManaColour)sax.call();
+        }
+
         private Stuff waitForButtonOr<T>(Func<T, bool> fn) where T : Stuff
         {
-
+            screen.promptPanel.prompt(new PublicSaxophone(o => false), "walla", new ButtonOption[0]);
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || (o is T && fn((T)o)));
             return waitFor(f);*/
@@ -958,7 +969,7 @@ namespace stonerkart
             return r;
         }
 
-        private ButtonOption waitForButton(string prompt, params ButtonOption[] options)
+        private ButtonOption chooseButton(string prompt, params ButtonOption[] options)
         {
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption);
             screen.promptPanel.prompt(sax, prompt, options);
@@ -989,11 +1000,11 @@ namespace stonerkart
                 game.hero.stuntMana();
 
                 gameController.setPrompt("Gain mana nerd");
-                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(f);
+                var v = chooseManaColour();
 
                 game.hero.unstuntMana();
 
-                selection = new ManaOrbSelection(v.colour);
+                selection = new ManaOrbSelection(v);
                 connection.sendAction(selection);
             }
             else
@@ -1018,7 +1029,7 @@ namespace stonerkart
             if (ca.Count(filter) == 0)
             {
                 var vv = showCards(ca, false);
-                var rr = waitForButton("No valid selections.", ButtonOption.Cancel);
+                var rr = chooseButton("No valid selections.", ButtonOption.Cancel);
                 vv.close();
                 return new Card[0];
             }

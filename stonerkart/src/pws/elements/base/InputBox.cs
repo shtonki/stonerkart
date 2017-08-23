@@ -19,10 +19,10 @@ namespace stonerkart
             textBox = new Square(width, height);
             addChild(textBox);
             textBox.TextLayout = new SingleLineLayout();
-            textBox.hoverable = false;
+            textBox.Hoverable = false;
             //textBox.Backcolor = Color.Yellow;
 
-            selectable = true;
+            Selectable = true;
             Backcolor = Color.FloralWhite;
         }
 
@@ -109,7 +109,7 @@ namespace stonerkart
             caretBlinkCounter++;
             if (caretBlinkCounter > 80) caretBlinkCounter = 0;
 
-            if (focused && caretBlinkCounter < 40)
+            if (Focused && caretBlinkCounter < 40)
             {
                 dm.fillRectange(Color.Black, caretPosition + textBox.X, 5, 5, Height - 10);
             }
