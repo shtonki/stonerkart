@@ -101,6 +101,7 @@
     <Compile Include="src\pws\elements\HexPanel.cs" />
     <Compile Include="src\pws\elements\MemeButton.cs" />
     <Compile Include="src\pws\elements\PileView.cs" />
+    <Compile Include="src\pws\elements\PlayerPanel.cs" />
     <Compile Include="src\pws\elements\PromptPanel.cs" />
     <Compile Include="src\pws\elements\screens\GameScreen.cs" />
     <Compile Include="src\pws\elements\screens\LoginScreen.cs" />

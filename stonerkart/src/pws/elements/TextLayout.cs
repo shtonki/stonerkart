@@ -313,7 +313,7 @@ namespace stonerkart
 
         public void draw(DrawerMaym dm, int xoffset, int yoffset, Color textColor)
         {
-            dm.drawImege(
+            dm.drawImegeForceColour(
                 imege,
                 xpos + xoffset,
                 ypos + yoffset,

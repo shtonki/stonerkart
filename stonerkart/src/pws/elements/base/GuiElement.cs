@@ -206,6 +206,11 @@ namespace stonerkart
                     return thisLocation;
                 }
 
+                case MoveTo.Bottom:
+                {
+                    return parentSize - thisSize;
+                }
+
                 default:
                     throw new Exception();
             }
@@ -305,5 +310,6 @@ namespace stonerkart
     {
         Center,
         Nowhere,
+        Bottom,
     }
 }

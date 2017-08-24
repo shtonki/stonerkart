@@ -37,7 +37,7 @@ namespace stonerkart
             for (int i = 0; i < manaButtonCount; i++)
             {
                 Button b = new Button(0, 0);
-                b.Backimege = new Imege(TextureLoader.orbTexture(orbOrder[i]));
+                b.Backimege = new Imege(TextureLoader.orbTexture(G.orbOrder[i]));
                 manaButtons[i] = b;
                 addChild(b);
             }
@@ -94,16 +94,7 @@ namespace stonerkart
             }
         }
 
-        private List<ManaColour> orbOrder = new List<ManaColour>(new[]
-        {
-            ManaColour.Chaos,
-            ManaColour.Death,
-            ManaColour.Might,
-            ManaColour.Order,
-            ManaColour.Life,
-            ManaColour.Nature,
-            ManaColour.Colourless,
-        });
+        
 
         public void prompt(PublicSaxophone sax, string text, params ButtonOption[] labels)
         {
@@ -137,7 +128,7 @@ namespace stonerkart
 
             foreach (var c in colours)
             {
-                int ix = orbOrder.IndexOf(c);
+                int ix = G.orbOrder.IndexOf(c);
                 Button b = manaButtons[ix];
                 b.Visible = true;
                 var clr = c;

@@ -130,9 +130,14 @@ namespace stonerkart
 
         }
 
-        public void drawImege(Imege i, int x, int y, int width, int height, Color? brushColor = null)
+        public void drawImegeForceColour(Imege i, int x, int y, int width, int height, Color c)
         {
-            drawTextureR(i.texture, new Box(x, y, width, height), i.crop, brushColor ?? Color.White);
+            drawTextureR(i.texture, new Box(x, y, width, height), i.crop, c);
+        }
+
+        public void drawImege(Imege i, int x, int y, int width, int height)
+        {
+            drawTextureR(i.texture, new Box(x, y, width, height), i.crop, i.brushColor);
         }
 
         private void drawTextureR(Textures tx, Box imageLocation, Box crop, Color color)

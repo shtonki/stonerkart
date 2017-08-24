@@ -47,6 +47,7 @@ namespace stonerkart
         private void observe(GameScreen gamescreen)
         {
             game.hero.hand.addObserver(screen.handView);
+            game.hero.manaPool.addObserver(screen.heroPanel);
         }
 
         public Card createToken(CardTemplate ct, Player owner)
@@ -260,7 +261,7 @@ namespace stonerkart
                 skipFirstDraw = false;
             }
 
-            if (game.activePlayer.manaPool.max.orbs.Count() < 12)
+            if (game.activePlayer.manaPool.maxCount < 12)
             {
                 var mc = selectManaColour(game.activePlayer, o => game.activePlayer.manaPool.currentMana(o.colour) != 6);
                 game.activePlayer.gainMana(mc);
@@ -672,8 +673,8 @@ namespace stonerkart
         
         private Card chooseCastCard(Player p)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            throw new Exception();
+            /*
             gameController.setPrompt("Cast a card.", ButtonOption.Pass);
             while (true)
             {

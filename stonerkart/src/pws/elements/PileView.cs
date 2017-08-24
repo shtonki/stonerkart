@@ -109,6 +109,7 @@ namespace stonerkart
 
         private void layoutCards()
         {
+            lastBroughtToFront = null;
             if (cardViews == null || cardViews.Count == 0) return;
             lock (this)
             {

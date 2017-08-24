@@ -35,6 +35,17 @@ namespace stonerkart
 
     static class G
     {
+        public static List<ManaColour> orbOrder = new List<ManaColour>(new[]
+        {
+            ManaColour.Chaos,
+            ManaColour.Death,
+            ManaColour.Might,
+            ManaColour.Order,
+            ManaColour.Life,
+            ManaColour.Nature,
+            ManaColour.Colourless,
+        });
+
         /*
         private static char[] hackish = G.range(0, 20).Select(v => (char)('\u2460' + v)).ToArray();
 

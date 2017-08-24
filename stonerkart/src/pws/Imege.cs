@@ -11,7 +11,7 @@ namespace stonerkart
     {
         public Textures texture { get; }
         public Box crop { get; }
-
+        public Color brushColor { get; set; }
 
         public int Width => (int)Math.Round(TextureLoader.sizes[texture].Width*crop.w);
         public int Height => (int)Math.Round(TextureLoader.sizes[texture].Height*crop.h);
@@ -20,10 +20,15 @@ namespace stonerkart
         {
         }
 
-        public Imege(Textures texture, Box crop)
+        public Imege(Textures texture, Box crop) : this(texture, crop, Color.White)
+        {
+        }
+
+        public Imege(Textures texture, Box crop, Color brushColor)
         {
             this.texture = texture;
             this.crop = crop;
+            this.brushColor = brushColor;
         }
     }
 }
