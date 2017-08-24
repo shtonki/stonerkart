@@ -116,12 +116,13 @@ namespace stonerkart
         {
             lastBroughtToFront = null;
             if (cardViews == null || cardViews.Count == 0) return;
+
             lock (this)
             {
                 cardViews[0].Height = Height;
                 var cvWidth = cardViews[0].Width;
                 var pad = cardViews.Count == 1 ? 0 : ((double)(Width-cvWidth))/(cardViews.Count - 1);
-
+                if (pad > cvWidth) pad = cvWidth;
                 for (int i = 0; i < cardViews.Count; i++)
                 {
                     CardView cv = cardViews[i];
@@ -130,6 +131,14 @@ namespace stonerkart
                     cv.Visible = true;
                 }
             }
+        }
+
+        private void layoutVertical()
+        {
+            cardViews[0].Width = Width;
+            var cvHeight = cardViews[0].Height;
+            var pad = cardViews.Count == 1 ? 0 : ((double)(Width - cvHeight)) / (cardViews.Count - 1);
+
         }
 
         private CardView lastBroughtToFront;

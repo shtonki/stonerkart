@@ -29,7 +29,7 @@ namespace stonerkart
             }
         }
         private Tile Tile;
-        public Tile lastSeenAt;
+        public Tile lastSeenAt { get; private set; }
         public int moveCount { get; private set; }
         public Player owner { get; }
         public Player controller { get; }

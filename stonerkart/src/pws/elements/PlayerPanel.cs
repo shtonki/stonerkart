@@ -31,7 +31,7 @@ namespace stonerkart
                 {
                     Square s = new Square();
                     s.Backimege = new Imege(TextureLoader.orbTexture(c));
-                    s.Backimege.brushColor = new Color();
+                    s.Backimege.Alpha = 0;
                     manaPoolOrbs[i][j] = s;
                     manaSquare.addChild(s);
                 }

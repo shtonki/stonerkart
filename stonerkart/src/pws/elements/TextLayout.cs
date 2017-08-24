@@ -17,14 +17,14 @@ namespace stonerkart
             this.charHeight = charHeight;
         }
 
-        public void draw(DrawerMaym dm, int xoffset, int yoffset, int maxWidth, Color textColor)
+        public void draw(DrawerMaym dm, int x, int y, int maxWidth, Color textColor, bool disableClipping = false)
         {
             foreach (var character in characters)
             {
-                var xp = character.xpos + xoffset;
-                if (xp >= 0 && xp + character.width < maxWidth)
+                var xp = character.xpos + x;
+                if (disableClipping || xp >= 0 && xp + character.width < maxWidth)
                 {
-                    character.draw(dm, xoffset, yoffset, textColor);
+                    character.draw(dm, x, y, textColor);
                     /*
                     dm.drawTexture(
                         ff.fontImage,

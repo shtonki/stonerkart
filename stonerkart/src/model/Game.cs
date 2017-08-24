@@ -48,6 +48,8 @@ namespace stonerkart
         {
             game.hero.hand.addObserver(screen.handView);
             game.hero.manaPool.addObserver(screen.heroPanel);
+
+            screen.hexPanel.hackmethefuckup = () => game.fieldCards;
         }
 
         public Card createToken(CardTemplate ct, Player owner)

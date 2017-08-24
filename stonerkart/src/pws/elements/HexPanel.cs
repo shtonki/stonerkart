@@ -18,7 +18,6 @@ namespace stonerkart
 
         public HexPanel(int xcount, int ycount, int hexsize) : base()
         {
-            Backcolor = Color.Aqua;
             width = hexsize+(int)((xcount-1)*hexsize*0.75);
             height = ycount*hexsize + hexsize/2;
 
@@ -87,6 +86,7 @@ namespace stonerkart
         {
             base.draw(dm);
 
+
             for (int i = 0; i < xcount; i++)
             {
                 int os = (i%2)*hexsize/2;
@@ -95,18 +95,69 @@ namespace stonerkart
                     int hexX = (int)(0.75*hexsize*i);
                     int hexY = j*hexsize + os;
 
-                    if (i%2 == 0)
-                    {
-                        dm.fillHexagon(hexX, hexY, hexsize, Color.Black, Textures.artDaringPoppy);
-
-                    }
-                    else
-                    {
-                        dm.fillHexagon(hexX, hexY, hexsize, Color.Black, Color.AntiqueWhite);
-                    }
+                    dm.fillHexagon(hexX, hexY, hexsize, Color.Black, Color.AntiqueWhite);
                 }
             }
 
+            if (hackmethefuckup != null)
+            {
+                Card[] list;
+                while (true)
+                {
+                    try
+                    {
+                        list = (Card[])hackmethefuckup().ToArray().Clone();
+                        break;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        
+                    }
+                }
+
+                foreach (var c in list)
+                {
+                    if (c.tile == null) continue;
+                    var i = c.tile.x;
+                    var j = c.tile.y;
+                    int os = (i%2)*hexsize/2;
+
+                    int hexX = (int)(0.75*hexsize*i);
+                    int hexY = j*hexsize + os;
+
+                    dm.fillHexagon(hexX, hexY, hexsize, Color.Black, TextureLoader.cardArt(c.template));
+
+                    int statTextSize = (int)(hexsize*0.20);
+                    TextLayout tl = new SingleLineFitLayout(Justify.Middle);
+                    Color clr = c.owner.isHero ? Color.DarkGreen : Color.DarkRed;
+
+                    var toughnessText = tl.Layout(c.toughness.ToString(), statTextSize, statTextSize, ff);
+                    var powerText = tl.Layout(c.power.ToString(), statTextSize, statTextSize, ff);
+                    var movementText = tl.Layout(c.movement.ToString(), statTextSize, statTextSize, ff);
+
+                    int toughnessX = hexX + ((int)(hexsize * 0.58));
+                    int toughnessY = hexY + ((int)(hexsize*0.765));
+                    int powerX = hexX + ((int)(hexsize * 0.22));
+                    int powerY = toughnessY;
+                    int movementX = hexX + (int)(hexsize*0.78);
+                    int movementY = hexY + (int)(hexsize*0.41);
+
+
+                    dm.fillHexagon(toughnessX, toughnessY, statTextSize, clr, clr);
+                    toughnessText.draw(dm, toughnessX, toughnessY, 0, Color.Black, true);
+
+                    dm.fillHexagon(powerX, powerY, statTextSize, clr, clr);
+                    powerText.draw(dm, powerX, powerY, 0, Color.Black, true);
+
+                    dm.fillHexagon(movementX, movementY, statTextSize, clr, clr);
+                    movementText.draw(dm, movementX, movementY, 0, Color.Black, true);
+                }
+            }
         }
+
+        FontFamille ff = FontFamille.font1;
+
+        public Func<IEnumerable<Card>> hackmethefuckup;
+
     }
 }

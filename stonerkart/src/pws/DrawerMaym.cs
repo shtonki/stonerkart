@@ -45,6 +45,33 @@ namespace stonerkart
             GL.End();
         }
 
+        public void fillCircle(int x, int y, double radius, Color c)
+        {
+            var p = Frame.pixToGL(x, y);
+            drawFilledCircleR(p.X, p.Y, radius, c);
+        }
+
+        private void drawFilledCircleR(double x,  double y, double radius, Color c)
+        {
+            int i;
+            int triangleAmount = 20; //# of triangles used to draw circle
+
+            //GLfloat radius = 0.8f; //radius
+            double twicePi = 2.0f * Math.PI;
+
+            GL.Color4(c);
+            GL.Begin(BeginMode.TriangleFan);
+            GL.Vertex2(x, y); // center of circle
+            for (i = 0; i <= triangleAmount; i++)
+            {
+                GL.Vertex2(
+                        x + (radius * Math.Cos(i * twicePi / triangleAmount)),
+                    y + (radius * Math.Sin(i * twicePi / triangleAmount))
+                );
+            }
+            GL.End();
+        }
+
         public void fillHexagon(int x, int y, int size, Color border, Textures texture)
         {
             fillHexagonR(x, y, size, border, null, texture);
