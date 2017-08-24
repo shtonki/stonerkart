@@ -44,6 +44,13 @@ namespace stonerkart
             fs.Add(new Tuple<GuiElement, GuiElement.mouseClickEventHandler>(g, v));
         }
 
+        public void sub<T>(T g, Func<MouseButtonEventArgs, T, object> f) where T : GuiElement
+        {
+            GuiElement.mouseClickEventHandler v = a => answer(f(a, g));
+            g.clicked += v;
+            fs.Add(new Tuple<GuiElement, GuiElement.mouseClickEventHandler>(g, v));
+        }
+
         private List<Tuple<GuiElement, GuiElement.mouseClickEventHandler>> fs = new List<Tuple<GuiElement, GuiElement.mouseClickEventHandler>>();
 
         private void unsubAll()

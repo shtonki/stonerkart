@@ -18,6 +18,7 @@ namespace stonerkart
 
         public HexPanel(int xcount, int ycount, int hexsize) : base()
         {
+            Backcolor = Color.Aqua;
             width = hexsize+(int)((xcount-1)*hexsize*0.75);
             height = ycount*hexsize + hexsize/2;
 

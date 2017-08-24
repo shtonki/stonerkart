@@ -96,7 +96,7 @@ namespace stonerkart
 
         
 
-        public void prompt(PublicSaxophone sax, string text, params ButtonOption[] labels)
+        public void promptButtons(PublicSaxophone sax, string text, params ButtonOption[] labels)
         {
             foreach (var b in manaButtons) b.Visible = false;
 
@@ -121,8 +121,10 @@ namespace stonerkart
             }
         }
 
-        public void prompt(PublicSaxophone sax, string text, params ManaColour[] colours)
+        public void promptManaChoice(PublicSaxophone sax, string text, params ManaColour[] colours)
         {
+            promptText.Text = text;
+
             foreach (var b in buttons) b.Visible = false;
             foreach (var b in manaButtons) b.Visible = false;
 

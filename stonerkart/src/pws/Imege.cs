@@ -16,6 +16,12 @@ namespace stonerkart
         public int Width => (int)Math.Round(TextureLoader.sizes[texture].Width*crop.w);
         public int Height => (int)Math.Round(TextureLoader.sizes[texture].Height*crop.h);
 
+        public int Alpha
+        {
+            get { return brushColor.A; }
+            set { brushColor = Color.FromArgb(value, brushColor.R, brushColor.G, brushColor.B); }
+        }
+
         public Imege(Textures texture) : this(texture, new Box(0.0, 0.0, 1.0, 1.0))
         {
         }

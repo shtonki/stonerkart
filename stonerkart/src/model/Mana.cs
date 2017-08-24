@@ -103,6 +103,8 @@ namespace stonerkart
             }
 
             current = current - costs;
+
+            notify(new ManaPoolChanged(this));
         }
 
         public void addBonusMana(ManaColour c)

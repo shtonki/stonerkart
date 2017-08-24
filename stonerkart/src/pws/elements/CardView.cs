@@ -270,8 +270,6 @@ namespace stonerkart
 
         protected override void draw(DrawerMaym dm)
         {
-            //base.draw(dm);
-
             dm.drawImege(frameImage, 0, 0, width, height);
         }
     }

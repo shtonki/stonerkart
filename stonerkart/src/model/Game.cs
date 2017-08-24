@@ -671,8 +671,33 @@ namespace stonerkart
             }
         }
         
-        private Card chooseCastCard(Player p)
+        private Card chooseCard(Player p)
         {
+            PublicSaxophone sax = new PublicSaxophone(o =>
+            {
+                if (o is ButtonOption) return true;
+
+                if (o is Card)
+                {
+                    Card card = (Card)o;
+                    return card.controller == p;
+                }
+                return false;
+            });
+
+            screen.promptPanel.promptButtons(sax, "Choose a Card to cast", ButtonOption.Pass);
+            screen.handView.sub(sax);
+
+            var v = sax.call();
+            if (v is ButtonOption)
+            {
+                return null;
+            }
+            else if (v is Card)
+            {
+                return (Card) v;
+            }
+
             throw new Exception();
             /*
             gameController.setPrompt("Cast a card.", ButtonOption.Pass);
@@ -777,7 +802,7 @@ namespace stonerkart
                     return null;    //auto pass
                 }
 
-                card = chooseCastCard(p);
+                card = chooseCard(p);
                 if (card == null) return null;
 
                 ability = chooseAbility(card);
@@ -939,13 +964,12 @@ namespace stonerkart
                 ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
             };
             PublicSaxophone sax = new PublicSaxophone(c => true);
-            screen.promptPanel.prompt(sax, "Choose a Mana Colour", cs);
+            screen.promptPanel.promptManaChoice(sax, "Choose a Mana Colour", cs);
             return (ManaColour)sax.call();
         }
 
         private Stuff waitForButtonOr<T>(Func<T, bool> fn) where T : Stuff
         {
-            screen.promptPanel.prompt(new PublicSaxophone(o => false), "walla", new ButtonOption[0]);
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || (o is T && fn((T)o)));
             return waitFor(f);*/
@@ -973,7 +997,7 @@ namespace stonerkart
         private ButtonOption chooseButton(string prompt, params ButtonOption[] options)
         {
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption);
-            screen.promptPanel.prompt(sax, prompt, options);
+            screen.promptPanel.promptButtons(sax, prompt, options);
             var v = (ButtonOption)sax.call();
             return v;
         }

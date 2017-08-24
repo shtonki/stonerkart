@@ -31,6 +31,7 @@ namespace stonerkart
                 {
                     Square s = new Square();
                     s.Backimege = new Imege(TextureLoader.orbTexture(c));
+                    s.Backimege.brushColor = new Color();
                     manaPoolOrbs[i][j] = s;
                     manaSquare.addChild(s);
                 }
@@ -73,7 +74,7 @@ namespace stonerkart
                     int alpha = 0;
                     if (j < max) alpha = 100;
                     if (j < cur) alpha = 255;
-                    s.Backimege.brushColor = Color.FromArgb(alpha, 255, 255, 255);
+                    s.Backimege.Alpha = alpha;
                 }
             }
         }

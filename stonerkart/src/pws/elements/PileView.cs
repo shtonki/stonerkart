@@ -42,6 +42,11 @@ namespace stonerkart
             layoutCards();
         }
 
+        public void sub(PublicSaxophone sax)
+        {
+            sax.sub(this, (a, p) => viewAt(a.X - AbsoluteX, a.Y - AbsoluteY)?.card);
+        }
+
         public void notify(object o, PileChangedMessage t)
         {
             if (cardViews == null)
@@ -153,6 +158,12 @@ namespace stonerkart
             }
         }
 
+        public override void onClick(MouseButtonEventArgs args)
+        {
+            base.onClick(args);
+            System.Console.WriteLine((X + Width) + " " + args.X);
+        }
+
         private CardView viewAt(int clickx, int clicky)
         {
             if (cardViews == null || cardViews.Count == 0) return null;
@@ -167,7 +178,7 @@ namespace stonerkart
             {
                 if (clickx > cv.X && clickx < cv.X + cv.Width &&
                     clicky > cv.Y && clicky < cv.Y + cv.Height)
-                { 
+                {
                     int dx = cv.X - clickxadj;
                     int dy = cv.Y - clickyadj;
                     int cd = (int)Math.Sqrt(dx*dx + dy*dy);

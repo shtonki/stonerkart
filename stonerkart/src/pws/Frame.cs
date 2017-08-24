@@ -136,7 +136,6 @@ namespace stonerkart
         {
             base.OnMouseDown(e);
             e.Position = scalePoint(e.Position);
-
             focus(hovered);
             hovered?.onMouseDown(e);
             designer?.setActive(hovered);
@@ -194,39 +193,34 @@ namespace stonerkart
             }
         }
 
+        private GuiElement elementAt(int x, int y, GuiElement[] l)
+        {
+            foreach (var v in l)
+            {
+                if (v.Hoverable &&
+                    v.X < x &&
+                    v.X + v.Width > x &&
+                    v.Y < y &&
+                    v.Y + v.Height > y)
+                {
+                    var nl = v.children.ToArray();
+                    var r = elementAt(x - v.X, y - v.Y, nl);
+                    return r ?? v;
+                }
+            }
+
+            return null;
+        }
+
         private GuiElement elementAt(Point sp)
         {
             if (activeScreen == null) return null;
 
-            //var sp = scalePoint(p);
-
             int x = sp.X;
             int y = sp.Y;
-            GuiElement r = null;
             var l = activeScreen.Elements.ToArray();
 
-            while (true)
-            {
-                bool c = false;
-
-                foreach (var v in l)
-                {
-                    if (v.Hoverable &&
-                        v.X < x &&
-                        v.X + v.Width > x &&
-                        v.Y < y &&
-                        v.Y + v.Height > y)
-                    {
-                        r = v;
-                        l = v.children.ToArray();
-                        c = true;
-                        x -= v.X;
-                        y -= v.Y;
-                    }
-                }
-
-                if (!c) return r;
-            }
+            return elementAt(x, y, l);
         }
 
 
