@@ -38,21 +38,29 @@ namespace stonerkart
             clearHighlights();
         }
 
+        public void subTile(PublicSaxophone sax, Func<int, int, Tile> tileFromXY)
+        {
+            sax.sub(this, (a, g) =>
+            {
+                var v = findHexagon(a.Position.X, a.Position.Y);
+                if (v == null) return null;
+                return tileFromXY(v.Item1, v.Item2);
+            });
+        }
+
         public override void onMouseDown(MouseButtonEventArgs args)
         {
             base.onMouseDown(args);
 
-            var v = findHexagon(args.Position);
+            var v = findHexagon(args.Position.X, args.Position.Y);
             if (v != null)
             {
                 System.Console.WriteLine("{0} {1}", v.Item1, v.Item2);
             }
         }
 
-        private Tuple<int, int> findHexagon(Point p)
+        private Tuple<int, int> findHexagon(int mousex, int mousey)
         {
-            var mousex = p.X;
-            var mousey = p.Y;
 
 
             int cx = 0;

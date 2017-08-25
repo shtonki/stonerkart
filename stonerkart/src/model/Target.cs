@@ -178,7 +178,7 @@ namespace stonerkart
             var selectingPlayers = playerRule.fillResolveTargets(hs, c).Value;
             return
                 new TargetColumn(
-                    selectingPlayers.targets.Cast<Player>().Select(p => new ManaOrb(hs.selectColour(p, clr => true))));
+                    selectingPlayers.targets.Cast<Player>().Select(p => new ManaOrb(hs.game.chooseManaColourSynced(p, clr => true))));
         }
 
         public override TargetColumn possible(HackStruct hs)
@@ -326,7 +326,7 @@ namespace stonerkart
             {
                 foreach (var t in tokens)
                 {
-                    ts.Add(hs.createToken(t, p));
+                    ts.Add(hs.game.createToken(t, p));
                 }
             }
             return new TargetColumn(ts);
@@ -421,7 +421,8 @@ namespace stonerkart
 
                 for (int i = 0; i < Math.Min(count, p.pileFrom(l).Count); i++)
                 {
-                    crd = sync ? hs.selectCardHalfSynchronized(p.pileFrom(l), seer, filter, cancelable) : hs.selectCardUnsynchronized(p.pileFrom(l), seer, filter, cancelable);
+                    crd = hs.game.chooseCardSynced();
+                    //crd = sync ? hs.game.chooseCardSynced() selectCardHalfSynchronized(p.pileFrom(l), seer, filter, cancelable) : hs.selectCardUnsynchronized(p.pileFrom(l), seer, filter, cancelable);
                     if (crd == null) break; //todo allow canceling or something
                     if (rt.Contains(crd))
                     {
@@ -627,13 +628,15 @@ namespace stonerkart
             {
                 if (diff < 0) // we have more total mana than the cost
                 {
+
+                    throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                     hs.setPrompt("Cast using what mana", ButtonOption.Cancel);
                     ManaSet colours = cost.clone();
                     colours[ManaColour.Colourless] = 0;
                     p.stuntLoss(colours);
                     while (cost[ManaColour.Colourless] > 0)
                     {
-                        var v = hs.getStuff();
+                        Stuff v = null;//hs.getStuff();
                         if (v is ManaOrb)
                         {
                             ManaOrb orb = (ManaOrb)v;
@@ -646,7 +649,7 @@ namespace stonerkart
                                 p.stuntLoss(colours);
                             }
                         }
-                        throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+
                         if (v is ShibbuttonStuff)
                         {
                             ShibbuttonStuff b = (ShibbuttonStuff)v;
@@ -656,8 +659,8 @@ namespace stonerkart
                                 return null;
                             }
                         }
-                        */
-                    }
+                        
+                    }*/
                     p.unstuntMana();
                 }
                 else
@@ -666,6 +669,7 @@ namespace stonerkart
                 }
             }
             return new TargetColumn(cost.orbs);
+            
         }
 
         public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
@@ -702,7 +706,7 @@ namespace stonerkart
 
         public override TargetColumn? fillCastTargets(HackStruct hs)
         {
-            return pryAtResolveTime ? playerGenerator.fillCastTargets(hs) : selectTiles(hs);
+            return pryAtResolveTime ? playerGenerator.fillCastTargets(hs) : selectTiles(hs, new TargetColumn(hs.resolveController));
         }
 
         public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
@@ -721,54 +725,17 @@ namespace stonerkart
 
         private TargetColumn? selectTiles(HackStruct hs, TargetColumn tc)
         {
+            
             var pc = tc.targets;
             if (pc.Length != 1 || !(pc[0] is Player)) throw new Exception();
             Player p = (Player)pc[0];
 
-            //List<Targetable> ts = new List<Targetable>();
-
-            if (p == hs.hero)
-            {
-                var v = selectTiles(hs);
-                if (!v.HasValue) throw new Exception();
-                var ts = v.Value.targets;
-                hs.sendChoices(ts.Select(t => TtoI(hs, t)).ToArray());
-                return v.Value;
-            }
-            else
-            {
-                hs.setPrompt("Opponent is making selections.");
-                return new TargetColumn(hs.receiveChoices().Select(i => ItoT(hs, i)));
-            }
-        }
-
-        protected abstract int TtoI(HackStruct hs, Targetable t);
-        protected abstract Targetable ItoT(HackStruct hs, int i);
-
-
-        private TargetColumn? selectTiles(HackStruct hs)
-        {
             List<Targetable> ts = new List<Targetable>();
-            hs.highlight(hs.tilesInRange.Where(t => pryx(t, hs) != null), Color.OrangeRed);
-            hs.setPrompt("Click on a tile", pryAtResolveTime ? ButtonOption.NOTHING : ButtonOption.Cancel);
+            hs.game.highlight(hs.tilesInRange.Where(t => pryx(t, hs) != null), Color.OrangeRed);
+
             while (ts.Count < count)
             {
-                Stuff v = hs.getStuff();
-
-                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-                if (v is ShibbuttonStuff)
-                {
-                    var b = (ShibbuttonStuff)v;
-                    if (b.option == ButtonOption.Cancel)
-                    {
-                        ts.Clear();
-                        break;
-                    }
-                }
-                */
-                if (!(v is Tile)) continue;
-
-                Tile t = (Tile)v;
+                Tile t = hs.game.chooseTileSynced(p, "1553451351", "8946513", false);
                 Card c = t.card;
                 Targetable target = pryx(t, hs);
 
@@ -777,21 +744,24 @@ namespace stonerkart
                     if (allowDuplicates || !ts.Contains(target))
                     {
                         ts.Add(target);
-                        hs.highlight(new Tile[] {t}, Color.ForestGreen);
+                        hs.game.highlight(new Tile[] { t }, Color.ForestGreen);
                     }
                     else
                     {
-                        hs.highlight(new Tile[] {t}, Color.OrangeRed);
+                        hs.game.highlight(new Tile[] { t }, Color.OrangeRed);
                         ts.Remove(target);
                     }
 
                 }
             }
-            hs.clearHighlights();
+            hs.game.clearHighlights();
             if (ts.Count < count) return null;
             return new TargetColumn(ts);
         }
-        
+
+        protected abstract int TtoI(HackStruct hs, Targetable t);
+        protected abstract Targetable ItoT(HackStruct hs, int i);
+
         public override TargetColumn possible(HackStruct hs)
         {
             return new TargetColumn(hs.tilesInRange.Select(t => pry(t)).Where(t => t != null));
@@ -828,12 +798,12 @@ namespace stonerkart
 
         protected override int TtoI(HackStruct hs, Targetable t)
         {
-            return hs.ordT((Tile)t);
+            return hs.gameState.ord((Tile)t);
         }
 
         protected override Targetable ItoT(HackStruct hs, int i)
         {
-            return hs.Tord(i);
+            return hs.gameState.tileFromOrd(i);
         }
     }
 
@@ -865,12 +835,12 @@ namespace stonerkart
 
         protected override int TtoI(HackStruct hs, Targetable t)
         {
-            return hs.ordC((Card)t);
+            return hs.gameState.ord((Card)t);
         }
 
         protected override Targetable ItoT(HackStruct hs, int i)
         {
-            return hs.Cord(i);
+            return hs.gameState.cardFromOrd(i);
         }
     }
 
@@ -897,12 +867,12 @@ namespace stonerkart
 
         protected override int TtoI(HackStruct hs, Targetable t)
         {
-            return hs.ordP((Player)t);
+            return hs.gameState.ord((Player)t);
         }
 
         protected override Targetable ItoT(HackStruct hs, int i)
         {
-            return hs.Pord(i);
+            return hs.gameState.playerFromOrd(i);
         }
     }
 

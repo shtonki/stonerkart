@@ -134,7 +134,7 @@ namespace stonerkart
             }
             else if (typeof (T) == typeof (ChoiceSelection))
             {
-                r = new ChoiceSelection();
+                r = new ChoiceSelection((int)ButtonOption.No);
             }
             else if (typeof (T) == typeof(TriggeredAbilitiesGluer))
             {

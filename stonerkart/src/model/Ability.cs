@@ -77,23 +77,10 @@ namespace stonerkart
         {
             if (isOptional)
             {
-                ButtonOption opt;
-                if (hs.heroIsResolver)
-                {
-                    hs.setPrompt("Do you want to use this ability?", ButtonOption.Yes, ButtonOption.No);
-
-                    throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-                    /*
-                    ShibbuttonStuff ss = hs.waitForStuff<ShibbuttonStuff>(b => true);
-                    opt = ss.option;
-                    */
-                    hs.sendChoices(new[] {(int)opt});
-                }
-                else
-                {
-                    hs.setPrompt("Opponent is deciding whether to use the optional ability.");
-                    opt = (ButtonOption)hs.receiveChoices()[0];
-                }
+                ButtonOption opt = hs.game.chooseButtonSynced(hs.resolveController,
+                    "Opponent is deciding whether to use optional ability.",
+                    "Do you want to use this ability?",
+                    ButtonOption.Yes, ButtonOption.No);
 
                 if (opt == ButtonOption.No) return new GameEvent[] {};
             }
