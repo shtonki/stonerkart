@@ -84,11 +84,13 @@ namespace stonerkart
 
         private void fillHexagonR(int x, int y, int size, Color border, Color? centre, Textures? t)
         {
+            int lt = (int)Math.Round(size/25.0);
+
             Box b = new Box(
-                x,
-                y + size,
-                size, 
-                size
+                x - lt/2,
+                y + size - lt/2,
+                size - lt,
+                size - lt
                 );
 
             if (t.HasValue)
@@ -141,7 +143,7 @@ namespace stonerkart
             }
             else throw new Exception();
 
-            GL.LineWidth(4);
+            GL.LineWidth(lt);
             GL.Color4(border);
             GL.Begin(BeginMode.LineLoop);
 

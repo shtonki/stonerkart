@@ -11,6 +11,8 @@ namespace stonerkart
     class PileView : Square, Observer<PileChangedMessage>
     {
         private List<CardView> cardViews;
+        private int? rows = 1;
+        private int? columns = null;
 
         public PileView()
         {
@@ -33,6 +35,26 @@ namespace stonerkart
             set
             {
                 setSize(value, Height);
+            }
+        }
+
+        public int? Rows
+        {
+            get { return rows; }
+            set
+            {
+                rows = value;
+                Columns = null;
+            }
+        }
+
+        public int? Columns
+        {
+            get { return columns; }
+            set
+            {
+                columns = value;
+                rows = null;
             }
         }
 
@@ -112,6 +134,8 @@ namespace stonerkart
             }
         }
 
+        
+
         private void layoutCards()
         {
             lastBroughtToFront = null;
@@ -119,26 +143,59 @@ namespace stonerkart
 
             lock (this)
             {
-                cardViews[0].Height = Height;
-                var cvWidth = cardViews[0].Width;
-                var pad = cardViews.Count == 1 ? 0 : ((double)(Width-cvWidth))/(cardViews.Count - 1);
-                if (pad > cvWidth) pad = cvWidth;
-                for (int i = 0; i < cardViews.Count; i++)
+                int cvWidth;
+                int cvHeight;
+                int xInc;
+                int yInc;
+                double xPad;
+                double yPad;
+                int count;
+
+
+                if (Rows.HasValue)
                 {
-                    CardView cv = cardViews[i];
-                    cv.X = (int)Math.Round(i*pad);
-                    cv.Height = Height;
-                    cv.Visible = true;
+                    cvHeight = cardViews[0].Height = Height/Rows.Value;
+                    cvWidth = cardViews[0].Width;
+
+                    xPad = cardViews.Count == 1 ? 0 : ((double)(Width - cvWidth)) / (cardViews.Count - 1);
+                    yPad = 0;
+                    xInc = 0;
+                    yInc = cvHeight;
+                    if (xPad > cvWidth) xPad = cvWidth;
+                    count = (1 + cardViews.Count)/Rows.Value;
+                }
+                else if (Columns.HasValue)
+                {
+                    cvWidth = cardViews[0].Width = Width/Columns.Value;
+                    cvHeight = cardViews[0].Height;
+                    yPad = cardViews.Count == 1 ? 0 : ((double)(Height - cvHeight))/(cardViews.Count - 1);
+                    xPad = 0;
+                    xInc = cvWidth;
+                    yInc = 0;
+                    if (yPad > cvHeight) yPad = cvHeight;
+                    count = (1 + cardViews.Count)/Columns.Value;
+                }
+                else throw new Exception();
+
+                int xorg = 0;
+                int yorg = 0;
+                int i = 0;
+                while (i < cardViews.Count)
+                {
+                    for (int j = 0; j < count; j++)
+                    {
+                        if (i >= cardViews.Count) break;
+                        CardView cv = cardViews[i];
+                        cv.X = (int)Math.Round(j*xPad + xorg);
+                        cv.Y = (int)Math.Round(j*yPad + yorg);
+                        cv.Height = cvHeight;
+                        cv.Visible = true;
+                        i++;
+                    }
+                    xorg += xInc;
+                    yorg += yInc;
                 }
             }
-        }
-
-        private void layoutVertical()
-        {
-            cardViews[0].Width = Width;
-            var cvHeight = cardViews[0].Height;
-            var pad = cardViews.Count == 1 ? 0 : ((double)(Width - cvHeight)) / (cardViews.Count - 1);
-
         }
 
         private CardView lastBroughtToFront;

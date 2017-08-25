@@ -15,10 +15,12 @@ namespace stonerkart
         private int xcount;
         private int ycount;
         private int hexsize;
+        private int hexsizethreequarters;
 
         public HexPanel(int xcount, int ycount, int hexsize) : base()
         {
-            width = hexsize+(int)((xcount-1)*hexsize*0.75);
+            hexsizethreequarters = (int)Math.Round(hexsize*0.75);
+            width = hexsize+(int)((xcount-1)* hexsizethreequarters);
             height = ycount*hexsize + hexsize/2;
 
             this.xcount = xcount;
@@ -86,16 +88,19 @@ namespace stonerkart
         {
             base.draw(dm);
 
+            //int hexdrawsize = (int)Math.Round(hexsize*0.95);
 
             for (int i = 0; i < xcount; i++)
             {
                 int os = (i%2)*hexsize/2;
                 for (int j = 0; j < ycount; j++)
                 {
-                    int hexX = (int)(0.75*hexsize*i);
+                    int hexX = (int)(hexsizethreequarters * i);
                     int hexY = j*hexsize + os;
 
-                    dm.fillHexagon(hexX, hexY, hexsize, Color.Black, Color.AntiqueWhite);
+                    Color hl = (i + j) % 2 == 0 ? Color.Tomato : Color.Black;
+
+                    dm.fillHexagon(hexX, hexY, hexsize, hl, Color.AntiqueWhite);
                 }
             }
 
@@ -122,10 +127,11 @@ namespace stonerkart
                     var j = c.tile.y;
                     int os = (i%2)*hexsize/2;
 
-                    int hexX = (int)(0.75*hexsize*i);
+                    int hexX = (int)(hexsizethreequarters * i);
                     int hexY = j*hexsize + os;
 
-                    dm.fillHexagon(hexX, hexY, hexsize, Color.Black, TextureLoader.cardArt(c.template));
+
+                    dm.fillHexagon(hexX, hexY, hexsize, Color.Transparent, TextureLoader.cardArt(c.template));
 
                     int statTextSize = (int)(hexsize*0.20);
                     TextLayout tl = new SingleLineFitLayout(Justify.Middle);
@@ -136,11 +142,11 @@ namespace stonerkart
                     var movementText = tl.Layout(c.movement.ToString(), statTextSize, statTextSize, ff);
 
                     int toughnessX = hexX + ((int)(hexsize * 0.58));
-                    int toughnessY = hexY + ((int)(hexsize*0.765));
+                    int toughnessY = hexY + ((int)(hexsize * 0.765));
                     int powerX = hexX + ((int)(hexsize * 0.22));
                     int powerY = toughnessY;
-                    int movementX = hexX + (int)(hexsize*0.78);
-                    int movementY = hexY + (int)(hexsize*0.41);
+                    int movementX = hexX + (int)(hexsize * 0.76);
+                    int movementY = hexY + (int)(hexsize * 0.41);
 
 
                     dm.fillHexagon(toughnessX, toughnessY, statTextSize, clr, clr);
