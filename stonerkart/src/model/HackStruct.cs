@@ -69,8 +69,8 @@ namespace stonerkart
             getStuff = gg.waitForAnything;
             hero = g.hero;
             _setPrompt = gg.gameController.setPrompt;
-            clearHighlights = () => gg.gameController.clearHighlights(true);
-            highlight = gg.gameController.highlight;
+            clearHighlights = gg.clearHighlights;
+            highlight = gg.highlight;
             createToken = gg.createToken;
             selectColour = gg.selectManaColour;
         }

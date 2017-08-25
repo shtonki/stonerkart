@@ -131,46 +131,5 @@ namespace stonerkart
         }
 
         //private List<TileView> hled = new List<TileView>();
-
-        public void clearHighlights(bool rd = true)
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            foreach (var v in hled) v.colour = Color.Black;
-            hled.Clear();
-            if (rd) redraw();
-            */
-        }
-
-        private void highlight(/*TileView tv, */Color c)
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            tv.colour = c;
-            hled.Add(tv);
-            */
-        }
-
-        private void highlight(Color c, params Tile[] tvs)
-        {
-            highlight(tvs.Select(v => new Tuple<Color, Tile>(c, v)));
-        }
-
-        public void highlight(IEnumerable<Tile> tiles, Color color)
-        {
-            highlight(tiles.Select(t => new Tuple<Color, Tile>(color, t)));
-        }
-
-        private  void highlight(IEnumerable<Tuple<Color, Tile>> l, bool rd = true)
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            foreach (var v in l)
-            {
-                highlight(hexPanel.viewOf(v.Item2), v.Item1);
-            }
-            if (rd) redraw();
-            */
-        }
     }
 }

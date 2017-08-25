@@ -10,12 +10,14 @@ using OpenTK.Input;
 
 namespace stonerkart
 {
-    class HexPanel : Square
+    class HexPanel : Square, Observer<PileChangedMessage>
     {
         private int xcount;
         private int ycount;
         private int hexsize;
         private int hexsizethreequarters;
+
+        private Color[][] bordercolors;
 
         public HexPanel(int xcount, int ycount, int hexsize) : base()
         {
@@ -26,6 +28,14 @@ namespace stonerkart
             this.xcount = xcount;
             this.ycount = ycount;
             this.hexsize = hexsize;
+
+            bordercolors = new Color[xcount][];
+            for (int i = 0; i < xcount; i++)
+            {
+                bordercolors[i] = new Color[ycount];
+            }
+
+            clearHighlights();
         }
 
         public override void onMouseDown(MouseButtonEventArgs args)
@@ -88,48 +98,31 @@ namespace stonerkart
         {
             base.draw(dm);
 
-            //int hexdrawsize = (int)Math.Round(hexsize*0.95);
-
             for (int i = 0; i < xcount; i++)
             {
-                int os = (i%2)*hexsize/2;
+                int os = ((i+1)%2)*hexsize/2;
                 for (int j = 0; j < ycount; j++)
                 {
                     int hexX = (int)(hexsizethreequarters * i);
                     int hexY = j*hexsize + os;
 
-                    Color hl = (i + j) % 2 == 0 ? Color.Tomato : Color.Black;
+                    Color hl = bordercolors[i][j];
 
                     dm.fillHexagon(hexX, hexY, hexsize, hl, Color.AntiqueWhite);
                 }
             }
 
-            if (hackmethefuckup != null)
+            lock (drawme)
             {
-                Card[] list;
-                while (true)
-                {
-                    try
-                    {
-                        list = (Card[])hackmethefuckup().ToArray().Clone();
-                        break;
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        
-                    }
-                }
-
-                foreach (var c in list)
+                foreach (var c in drawme)
                 {
                     if (c.tile == null) continue;
                     var i = c.tile.x;
                     var j = c.tile.y;
-                    int os = (i%2)*hexsize/2;
+                    int os = ((i+1)%2)*hexsize/2;
 
-                    int hexX = (int)(hexsizethreequarters * i);
+                    int hexX = (int)(hexsizethreequarters*i);
                     int hexY = j*hexsize + os;
-
 
                     dm.fillHexagon(hexX, hexY, hexsize, Color.Transparent, TextureLoader.cardArt(c.template));
 
@@ -141,12 +134,12 @@ namespace stonerkart
                     var powerText = tl.Layout(c.power.ToString(), statTextSize, statTextSize, ff);
                     var movementText = tl.Layout(c.movement.ToString(), statTextSize, statTextSize, ff);
 
-                    int toughnessX = hexX + ((int)(hexsize * 0.58));
-                    int toughnessY = hexY + ((int)(hexsize * 0.765));
-                    int powerX = hexX + ((int)(hexsize * 0.22));
+                    int toughnessX = hexX + ((int)(hexsize*0.58));
+                    int toughnessY = hexY + ((int)(hexsize*0.765));
+                    int powerX = hexX + ((int)(hexsize*0.22));
                     int powerY = toughnessY;
-                    int movementX = hexX + (int)(hexsize * 0.76);
-                    int movementY = hexY + (int)(hexsize * 0.41);
+                    int movementX = hexX + (int)(hexsize*0.76);
+                    int movementY = hexY + (int)(hexsize*0.41);
 
 
                     dm.fillHexagon(toughnessX, toughnessY, statTextSize, clr, clr);
@@ -162,8 +155,41 @@ namespace stonerkart
         }
 
         FontFamille ff = FontFamille.font1;
+        private List<Card> drawme = new List<Card>();
 
-        public Func<IEnumerable<Card>> hackmethefuckup;
+        public void notify(object o, PileChangedMessage t)
+        {
+            lock (drawme)
+            {
+                switch (t.arg)
+                {
+                    case PileChangedArg.Add:
+                    {
+                        foreach (var c in t.cards) drawme.Add(c);
+                    } break;
 
+                    case PileChangedArg.Remove:
+                    {
+                        foreach (var c in t.cards) drawme.Remove(c);
+                    } break;
+                }
+            }
+        }
+
+        public void highlight(int x, int y, Color c)
+        {
+            bordercolors[x][y] = c;
+        }
+
+        public void clearHighlights()
+        {
+            for (int i = 0; i < xcount; i++)
+            {
+                for (int j = 0; j < ycount; j++)
+                {
+                    highlight(i, j, Color.Black);
+                }
+            }
+        }
     }
 }

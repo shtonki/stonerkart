@@ -51,7 +51,8 @@ namespace stonerkart
 
             game.stack.addObserver(screen.stackView);
 
-            screen.hexPanel.hackmethefuckup = () => game.fieldCards;
+            game.hero.field.addObserver(screen.hexPanel);
+            game.villain.field.addObserver(screen.hexPanel);
         }
 
         public Card createToken(CardTemplate ct, Player owner)
@@ -290,6 +291,16 @@ namespace stonerkart
             Color.PaleVioletRed, 
         };
 
+        public void highlight(IEnumerable<Tile> ts, Color c)
+        {
+            foreach (var t in ts) screen.hexPanel.highlight(t.x, t.y, c);
+        }
+
+        public void clearHighlights()
+        {
+            screen.hexPanel.clearHighlights();
+        }
+
         private void moveStep()
         {
             List<Tuple<Card, Path>> paths;
@@ -305,7 +316,7 @@ namespace stonerkart
 
                 while (true)
                 {
-                    gameController.highlight(unpathed.Select(c => c.tile), Color.DodgerBlue);
+                    highlight(unpathed.Select(c => c.tile), Color.DodgerBlue);
                     //gameController.highlight(pathed.Select(c => c.tile), Color.ForestGreen);
 
                     var from = getTile(
@@ -339,9 +350,9 @@ namespace stonerkart
                             ).ToList();
                         if (options.Count == 1) break;
                         var v = game.map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
-                        gameController.highlight(options.Select(p => p.to), Color.Green);
+                        highlight(options.Select(p => p.to), Color.Green);
                         var to = getTile(tile => options.Select(p => p.to).Contains(tile), "Move to where?");
-                        gameController.clearHighlights();
+                        clearHighlights();
                         if (to == null) continue;
                         if (to == from) break;
 
@@ -409,7 +420,7 @@ namespace stonerkart
 
             foreach (var c in game.cards) c.combatPath = null;
             gameController.clearArrows();
-            gameController.clearHighlights();
+            clearHighlights();
         }
 
         private void endStep()
@@ -883,7 +894,7 @@ namespace stonerkart
 
             TargetMatrix[] ms = a.effects.fillCast(box);
 
-            gameController.clearHighlights();
+            clearHighlights();
             return ms;
         }
 
@@ -1104,7 +1115,7 @@ namespace stonerkart
 
         public void clearTargetHighlight()
         {
-            gameController.clearHighlights();
+            clearHighlights();
         }
 
         public void setTargetHighlight(Card c)
@@ -1122,7 +1133,7 @@ namespace stonerkart
                     tiles.AddRange(tilesFromTargetables(cl.targets));
                 }
             }
-            gameController.highlight(tiles, Color.OrangeRed);
+            highlight(tiles, Color.OrangeRed);
         }
 
         private static IEnumerable<Tile> tilesFromTargetables(Targetable[] ts)
