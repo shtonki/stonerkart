@@ -26,7 +26,7 @@ namespace stonerkart
 
             Game g = new Game(new NewGameStruct(0, 420, new []{"a", "b"}, 0), true, gsc);
 
-            g.startGame();
+            g.startGameThread();
 
             //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             //UIController.launchUI();

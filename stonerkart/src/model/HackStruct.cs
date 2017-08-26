@@ -16,9 +16,8 @@ namespace stonerkart
         public bool heroIsResolver => hero == resolveController;
         public Card resolveCard => resolveAbility.card;
         public Ability resolveAbility { get; }
+        public TargetSet previousTargets { get; set; }
         public GameEvent triggeringEvent { get; set; }
-        public TargetMatrix previousTargets { get; set; }
-        public TargetColumn previousColumn { get; set; }
         public IEnumerable<Tile> tilesInRange => castFrom.withinDistance(castRange);
 
         public IEnumerable<Card> cards => gameState.cards;
@@ -37,15 +36,15 @@ namespace stonerkart
             castingPlayer = p;
         }
 
-        public HackStruct(Game g, Ability a) : this(g)
+        public HackStruct(Game g, Ability resolvingAbility) : this(g)
         {
-            resolveAbility = a;
+            resolveAbility = resolvingAbility;
         }
 
-        public HackStruct(Game g, Ability a, Player p) : this(g)
+        public HackStruct(Game g, Ability resolvingAbility, Player castingPlayer) : this(g)
         {
-            resolveAbility = a;
-            castingPlayer = p;
+            resolveAbility = resolvingAbility;
+            this.castingPlayer = castingPlayer;
         }
         
     }

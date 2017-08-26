@@ -10,9 +10,9 @@ namespace stonerkart
     class PromptPanel : Square
     {
 
-        public Square promptText { get; }
-        public Button[] buttons { get; }
-        public Button[] manaButtons { get; }
+        private Square promptText { get; }
+        private Button[] buttons { get; }
+        private Button[] manaButtons { get; }
 
         public PromptPanel(int width, int height) : base(width, height)
         {
@@ -94,47 +94,57 @@ namespace stonerkart
             }
         }
 
-        
-
-        public void promptButtons(PublicSaxophone sax, string text, params ButtonOption[] labels)
+        public void sub(PublicSaxophone sax)
         {
-            foreach (var b in manaButtons) b.Visible = false;
-
-            promptText.Text = text;
-
-            int i = 0;
-            while (i < buttons.Length)
+            foreach (var b in buttons)
             {
-                Button b = buttons[i];
-                if (i < labels.Length)
-                {
-                    var l = labels[i];
-                    b.Text = l.ToString();
-                    b.Visible = true;
-                    sax.sub(b, g => l);
-                }
-                else
-                {
-                    b.Visible = false;
-                }
-                i++;
+                sax.sub(b, g => Enum.Parse(typeof(ButtonOption), g.Text));
+            }
+
+            for (int i = 0; i < manaButtons.Length; i++)
+            {
+                int i0 = i;
+                sax.sub(manaButtons[i], g => G.orbOrder[i0]);
             }
         }
 
-        public void promptManaChoice(PublicSaxophone sax, string text, params ManaColour[] colours)
+        private void hideButtons()
         {
-            promptText.Text = text;
-
             foreach (var b in buttons) b.Visible = false;
             foreach (var b in manaButtons) b.Visible = false;
+        }
+
+        public void prompt(string text)
+        {
+            hideButtons();
+            promptText.Text = text;
+        }
+
+        public void promptButtons(string text, params ButtonOption[] labels)
+        {
+            hideButtons();
+            promptText.Text = text;
+
+            for (int i = 0; i < labels.Length; i++)
+            {
+                Button b = buttons[i];
+                var l = labels[i];
+                b.Text = l.ToString();
+                b.Visible = true;
+            }
+        }
+
+        public void promptManaChoice(string text, params ManaColour[] colours)
+        {
+            hideButtons();
+            promptText.Text = text;
+            
 
             foreach (var c in colours)
             {
                 int ix = G.orbOrder.IndexOf(c);
                 Button b = manaButtons[ix];
                 b.Visible = true;
-                var clr = c;
-                sax.sub(b, g => clr);
             }
         }
     }

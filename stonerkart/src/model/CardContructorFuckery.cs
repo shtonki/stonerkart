@@ -55,8 +55,9 @@ namespace stonerkart
 
                 addTriggeredAbility(
                     "At the end of your turn deal 1 damage to every enemy player.",
-                    new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                        new CardResolveRule(CardResolveRule.Rule.VillainHeroes)),
+                    new TargetRuleSet(
+                        new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                        new CardsRule(c => c.isHeroic && !c.owner.isHero)),
                     new ZepperDoer(1),
                     new Foo(),
                     new TypedGameEventFilter<StartOfStepEvent>(
@@ -415,9 +416,11 @@ namespace stonerkart
 
                 castRange = 5;
                 castEffect = new Effect(
-                    new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
-                        new PryTileRule(f => f.passable,
-                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer(true));
+                    new TargetRuleSet(
+                        new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
+                        new ClickTileRule(f => f.passable,
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), 
+                    new MoveToTileDoer(true));
                 castDescription = "Move your hero to target tile.";
             }
                 break;
@@ -526,7 +529,7 @@ namespace stonerkart
                 lifeCost = 1;
                 castRange = 4;
                 castEffect = new Effect(
-                    new TargetRuleSet(new PryCardRule()),
+                    new TargetRuleSet(new ClickCardRule()),
                     new ModifyDoer(LL.add(3), LL.never, ModifiableStats.Toughness));
                 castDescription = "Target creature gains 3 toughness.";
 
@@ -547,9 +550,9 @@ namespace stonerkart
 
                 castEffect =
                     new Effect(
-                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                        new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new ClickCardRule()),
                         new ZepperDoer(-2));
-                additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1),
+                additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(1, c => c),
                     new ModifyDoer(LL.add(2), LL.endOfTurn, ModifiableStats.Power)));
                 castDescription =
                     "Target creature is healed for 2 and gains 2 power until the end of this turn.";
@@ -574,7 +577,7 @@ namespace stonerkart
 
                 addTriggeredAbility(
                     "When Baby Dragon enters the battlefield you may have it deal 1 damage to target creature within 3 tiles.",
-                    new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new PryCardRule()),
+                    new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new ClickCardRule()),
                     new ZepperDoer(1),
                     new Foo(),
                     LL.thisEnters(this, PileLocation.Field),
@@ -782,7 +785,7 @@ namespace stonerkart
                 addActivatedAbility(
                     "You may cast Ilatian Haunter from the graveyard.",
                     new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                        new PryTileRule(t => t.card == null && !t.isEdgy,
+                        new ClickTileRule(t => t.card == null && !t.isEdgy,
                             new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
                     new SummonToTileDoer(),
                     new Foo(LL.manaCost(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
@@ -805,7 +808,7 @@ namespace stonerkart
                 natureCost = 1;
 
                 castDescription = "Return all movement to target creature.";
-                castEffect = new Effect(new PryCardRule(), new FatigueDoer(false));
+                castEffect = new Effect(new ClickCardRule(), new FatigueDoer(false));
                 castRange = 4;
             }
                 break;
@@ -877,7 +880,7 @@ namespace stonerkart
                     castDescription = "Destroy all non-heroic creatures";
                     castEffect =
                         new Effect(
-                            new AllCardsRule(c => !c.isHeroic), 
+                            new CardsRule(c => !c.isHeroic), 
                             new MoveToPileDoer(PileLocation.Graveyard));
                     } break;
 
@@ -1069,7 +1072,7 @@ namespace stonerkart
 
                     castDescription = "Deal 4 damage to target creature then exhaust it.";
                     castEffect = zepLambda(4);
-                    additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(1), new FatigueDoer(true)));
+                    additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(1, c => c), new FatigueDoer(true)));
                     castRange = 5;
 
                 } break;
@@ -1087,7 +1090,7 @@ namespace stonerkart
                     castDescription = "Return a creature from your graveyard to the battlefield under your control.";
                     castEffect = new Effect(new TargetRuleSet(
                         new SelectCardRule(PileLocation.Graveyard, c => c.cardType == CardType.Creature),
-                        new PryTileRule(t => t.card == null && !t.isEdgy,
+                        new ClickTileRule(t => t.card == null && !t.isEdgy,
                             new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
                         new SummonToTileDoer());
                 } break;
@@ -1128,7 +1131,7 @@ namespace stonerkart
                     
                     castRange = 5;
                     castDescription = "Place target non-heroic permanent on top of its owners deck.";
-                    castEffect = new Effect(new PryCardRule(c => !c.isHeroic), new MoveToPileDoer(PileLocation.Deck));
+                    castEffect = new Effect(new ClickCardRule(c => !c.isHeroic), new MoveToPileDoer(PileLocation.Deck));
                 } break;
 
                 #endregion
@@ -1144,7 +1147,7 @@ namespace stonerkart
                     castDescription = "Displace target exhausted non-heroic creature.";
                     castEffect =
                         new Effect(
-                            new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && c.isExhausted),
+                            new ClickCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && c.isExhausted),
                             new MoveToPileDoer(PileLocation.Displaced));
                     castRange = 4;
                 } break;

@@ -262,44 +262,65 @@ namespace stonerkart
             return v => i;
         }
 
-        public static TargetRule player => new PryCardRule(c => c.isHeroic);
-        public static TargetRule relic => new PryCardRule(c => c.cardType == CardType.Relic);
+        /*
+         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
+         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
+         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
+         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
+         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
+         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
+         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
+         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
+         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
+         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
+         */
+
+        public static TargetRule player => null;//new PryCardRule(c => c.isHeroic);
+        public static TargetRule relic => null;//new PryCardRule(c => c.cardType == CardType.Relic);
 
         public static TargetRule creature(Func<Card, bool> filter = null)
         {
-            filter = filter ?? (c => true);
-            return new PryCardRule(c => c.cardType == CardType.Creature && filter(c));
-        }
 
-        public static TargetRule nonheroicCreature(Func<Card, bool> filter = null)
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            filter = filter ?? (c => true);
+            return new PryCardRule(c => c.cardType == CardType.Creature && filter(c));*/
+    }
+
+    public static TargetRule nonheroicCreature(Func<Card, bool> filter = null)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             filter = filter ?? (c =>true);
-            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));
+            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));*/
         }
 
         public static TargetRule nonColouredCreature(ManaColour notAllowed)
         {
-            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));*/
         }
 
         //costs
         public static Effect manaCost(ManaSet castManaCost)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             return new Effect(
                 new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                    new ManaCostRule(castManaCost)), new PayManaDoer());
+                    new ManaCostRule(castManaCost)), new PayManaDoer());*/
         }
 
         public static Effect manaCost(params ManaColour[] ms)
         {
-            return manaCost(new ManaSet(ms));
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            return manaCost(new ManaSet(ms));*/
         }
 
         
 
-        public static Effect exhaustThis { get; } =
-            new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                new FatigueDoer(true));
+        public static Effect exhaustThis { get; } = null;//new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer(true));
 
 
         public static GameEventFilter never { get; } = new StaticGameEventFilter(() => false);

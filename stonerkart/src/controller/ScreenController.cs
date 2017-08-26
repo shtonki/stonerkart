@@ -16,7 +16,7 @@ namespace stonerkart
             GameController gc = new GameController(g, gp);
             g.gameController = gc;
             UIController.gameFrame.transitionTo(gp);
-            g.startGame();
+            g.startGameThread();
 
             return g;
         }

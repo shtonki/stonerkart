@@ -92,9 +92,9 @@ namespace stonerkart
             return map.path(c, t);*/
         }
 
-        public void startGame()
+        public void startGameThread()
         {
-            Thread t = new Thread(loopEx);
+            Thread t = new Thread(gameLoop);
             t.Start();
         }
 
@@ -181,8 +181,7 @@ namespace stonerkart
             }
         }
 
-
-        private void loopEx()
+        private void gameLoop()
         {
             gameController.setPrompt("Game starting");
             initGame();
@@ -283,6 +282,8 @@ namespace stonerkart
 
         private void moveStep()
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             List<Tuple<Card, Path>> paths;
 
             bool heroMoving = gameState.activePlayer == gameState.hero;
@@ -400,7 +401,7 @@ namespace stonerkart
 
             foreach (var c in gameState.cards) c.combatPath = null;
             gameController.clearArrows();
-            clearHighlights();
+            clearHighlights();*/
         }
 
         private void endStep()
@@ -472,6 +473,8 @@ namespace stonerkart
 
         private void handlePendingTrigs()
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             if (gameState.pendingTriggeredAbilities.Count > 0)
             {
                 List<TriggerGlueHack>[] abilityArrays =
@@ -499,7 +502,7 @@ namespace stonerkart
                 {
                     cast(w);
                 }
-            }
+            }*/
         }
 
         private List<StackWrapper> handlePendingTrigs(Player p, IEnumerable<TriggerGlueHack> abilities)
@@ -637,36 +640,41 @@ namespace stonerkart
             while (true)
             {
                 enforceRules();
-                Player fuckboy = gameState.players[(gameState.activePlayerIndex + c)% gameState.players.Count];
-                StackWrapper w = tryCast(fuckboy);
+                Player playerWithPriority = gameState.players[(gameState.activePlayerIndex + c)% gameState.players.Count];
 
-                if (w != null)
+                bool playerCastSomething = givePriority(playerWithPriority);
+
+                if (playerCastSomething)
                 {
-                    cast(w);
                     c = 0;
                 }
                 else //pass
                 {
                     c++;
-                    if (c == gameState.players.Count)
+                    if (c == gameState.players.Count) //if it was passed all the way around
                     {
                         if (gameState.wrapperStack.Count == 0)
                         {
-                            break;
+                            return;
                         }
-
-                        StackWrapper wrapper = gameState.wrapperStack.Pop();
-                        if (wrapper.castingCard != gameState.stack.peekTop() && wrapper.castingCard != gameState.stack.peekTop().dummyFor) throw new Exception();
-                        resolve(wrapper);
-                        c = 0;
-
-                        //Controller.redraw();
+                        else
+                        {
+                            resolveTopCardOnStack();
+                            c = 0;
+                        }
                     }
                 }
             }
         }
-        
-        private Card chooseCard(Player p)
+
+        private void resolveTopCardOnStack()
+        {
+            StackWrapper wrapper = gameState.wrapperStack.Pop();
+            if (wrapper.castingCard != gameState.stack.peekTop() && wrapper.castingCard != gameState.stack.peekTop().dummyFor) throw new Exception();
+            resolve(wrapper);
+        }
+
+        private Card chooseCardUnsynced(Func<Card, bool> filter)
         {
             PublicSaxophone sax = new PublicSaxophone(o =>
             {
@@ -675,12 +683,13 @@ namespace stonerkart
                 if (o is Card)
                 {
                     Card card = (Card)o;
-                    return card.controller == p;
+                    return filter(card);
                 }
                 return false;
             });
 
-            screen.promptPanel.promptButtons(sax, "Choose a Card to cast", ButtonOption.Pass);
+            screen.promptPanel.promptButtons("Choose a Card to cast", ButtonOption.Pass);
+            screen.promptPanel.sub(sax);
             screen.handView.sub(sax);
 
             var v = sax.call();
@@ -688,15 +697,14 @@ namespace stonerkart
             {
                 return null;
             }
-            else if (v is Card)
+            if (v is Card)
             {
                 return (Card) v;
             }
-
             throw new Exception();
         }
 
-        public Card chooseCardSynced()
+        public Card chooseCardSynced(Player p)
         {
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
@@ -720,100 +728,69 @@ namespace stonerkart
             */
         }
 
-        private void cast(StackWrapper w)
+        private void cast(StackWrapper w, IEnumerable<GameEvent> costEvents)
         {
             GameTransaction gt = new GameTransaction();
-            gt.addEvents(w.ability.cost.resolve(makeHackStruct(w.ability), w.costMatricies));
+            gt.addEvents(costEvents);
             handleTransaction(gt);
+
             gt = new GameTransaction();
             gt.addEvent(new CastEvent(w));
             handleTransaction(gt);
         }
 
-        private StackWrapper tryCast(Player p)
+        /// <summary>
+        /// Gives a player priority.
+        /// </summary>
+        /// <param name="playerWithPriority"></param>
+        /// <returns>True if the player cast a spell or used an ability, false if he passed. </returns>
+        private bool givePriority(Player playerWithPriority)
         { 
-            StackWrapper r;
+            //gameController.setHeroActive(b);
 
-            bool b = p == gameState.hero;
-            gameController.setHeroActive(b);
-            if (b)
-            {
-                if ((gameState.stack.Any() ||
-                     Settings.stopTurnSetting.getTurnStop(gameState.stepCounter.step, gameState.hero == gameState.activePlayer)))
-                {
-                    r = tryCastDx(gameState.hero);
-                }
-                else
-                {
-                    r = null;
-                }
-                connection.sendAction(new CastSelection(r));
-            }
-            else
-            {
-                gameController.setPrompt("Opponents turn to act.");
-                r = connection.receiveAction<CastSelection>().wrapper;
-            }
-
-            if (r != null && !r.ability.isCastAbility)
-            {
-                r = new StackWrapper(r.ability.createDummy(), r.ability, r.targetMatrices, r.costMatricies);
-            }
-            return r;
-        }
-
-        private StackWrapper tryCastDx(Player p)
-        {
             do
             {
-                Card card;
-                Ability ability;
-                TargetMatrix[] costmxs;
-                TargetMatrix[] targetmxs;
 
+                /*
                 if (!(gameState.stack.Any() ||
                         Settings.stopTurnSetting.getTurnStop(gameState.stepCounter.step, gameState.hero == gameState.activePlayer)))
                 {
                     return null;    //auto pass
                 }
+                */
 
-                card = chooseCard(p);
-                if (card == null) return null;
+                var card = chooseCardSynced(playerWithPriority);
+                if (card == null) return false;
 
-                ability = chooseAbility(card);
+                var ability = chooseAbilitySynced(card);
                 if (ability == null) continue;
 
-                targetmxs = ability.effects.fillCast(makeHackStruct(ability));
-                if (targetmxs == null) continue;
+                HackStruct hs = new HackStruct(this, ability, playerWithPriority);
 
-                costmxs = ability.cost.fillCast(makeHackStruct(p, ability));
-                if (costmxs == null) continue;
+                var payCostGameEvents = ability.payCosts(hs);
+                if (payCostGameEvents == null) continue;
 
-                return new StackWrapper(card, ability, targetmxs, costmxs);
+                var targets = ability.target(hs);
+                if (targets == null) continue;
+
+                if (!ability.isCastAbility) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+
+                StackWrapper wrapper = new StackWrapper(card, ability, targets);
+
+                cast(wrapper, payCostGameEvents);
+                return true;
             } while (true);
         }
 
         private StackWrapper tryCastDx(Player p, TriggeredAbility ability, Card dummyCard, GameEvent ge)
         {
-            TargetMatrix[] costmxs;
-            TargetMatrix[] targetmxs;
-
-            do
-            {
-                var v = makeHackStruct(ability);
-                v.triggeringEvent = ge;
-                targetmxs = ability.effects.fillCast(v);
-                if (targetmxs == null) return null;
-
-                costmxs = ability.cost.fillCast(makeHackStruct(p, ability));
-                if (costmxs == null) continue;
-
-                return new StackWrapper(dummyCard, ability, targetmxs, costmxs);
-            } while (true);
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
 
-        private ActivatedAbility chooseAbility(Card c)
+        private ActivatedAbility chooseAbilitySynced(Card c)
         {
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            /*
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere;
 
@@ -840,39 +817,21 @@ namespace stonerkart
             if (!r.possible(makeHackStruct(r))) return null;
 
             return r;
-        }
-
-        private TargetMatrix[] chooseTargets(Ability a)
-        {
-            /*
-            Card caster = a.isCastAbility ? a.card.controller.heroCard : a.card;
-            List<Tile> v = caster.tile.withinDistance(a.castRange);
             */
-            HackStruct box = makeHackStruct(a);
-
-            if (!a.possible(box)) return null;
-
-            TargetMatrix[] ms = a.effects.fillCast(box);
-
-            clearHighlights();
-            return ms;
         }
 
         private void resolve(StackWrapper wrapper)
         {
             Card stackpopped = gameState.stack.peekTop();
             Card card = wrapper.castingCard;
-            TargetMatrix[] ts = wrapper.targetMatrices;
             Ability ability = wrapper.ability;
-
             if (stackpopped.isDummy && stackpopped.dummyFor != card) throw new Exception();
 
-            List<GameEvent> events = new List<GameEvent>();
+            HackStruct hs = new HackStruct(this, ability, card.controller);
 
-            events.AddRange(ability.resolve(makeHackStruct(ability), ts));
-
-            GameTransaction gt = new GameTransaction(events);
-
+            var resolveEvents = ability.resolve(hs, wrapper.cachedTargets);
+            if (resolveEvents == null) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            GameTransaction gt = new GameTransaction(resolveEvents);
 
             if (stackpopped.isDummy)
             {
@@ -908,7 +867,7 @@ namespace stonerkart
                 ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
             };
             PublicSaxophone sax = new PublicSaxophone(c => true);
-            screen.promptPanel.promptManaChoice(sax, "Choose a Mana Colour", cs);
+            screen.promptPanel.sub(sax);
             return (ManaColour)sax.call();
         }
 
@@ -923,89 +882,74 @@ namespace stonerkart
             ButtonOption rt;
             if (chooser.isHero)
             {
-                rt = chooseButtonUnsynced(chooserPrompt, options);
-                connection.sendAction(new ChoiceSelection((int)rt));
+                screen.promptPanel.promptButtons(chooserPrompt, options);
+                rt = chooseButtonUnsynced(options);
+                connection.sendChoice((int)rt);
             }
             else
             {
-                var v = connection.receiveAction<ChoiceSelection>();
-                if (v.choices.Length != 1) throw new Exception();
-                rt = (ButtonOption)v.choices[0];
+                screen.promptPanel.prompt(waiterPrompt);
+                var choice = connection.receiveChoice();
+                rt = (ButtonOption)choice;
             }
 
             return rt;
         }
 
-        private ButtonOption chooseButtonUnsynced(string prompt, params ButtonOption[] options)
+        private ButtonOption chooseButtonUnsynced(params ButtonOption[] options)
         {
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption);
-            screen.promptPanel.promptButtons(sax, prompt, options);
+            screen.promptPanel.sub(sax);
             var v = (ButtonOption)sax.call();
             return v;
         }
 
-        public Tile chooseTileSynced(Player chooser, string waiterPrompt, string chooserPrompt, bool cancellable)
+        public Tile chooseTileSynced(Player chooser, Func<Tile, bool> filter, string waiterPrompt, string chooserPrompt, bool cancellable)
         {
             Tile rt;
             if (chooser.isHero)
             {
-                rt = chooseTileUnsynced();
-                connection.sendAction(new ChoiceSelection(gameState.ord(rt)));
+                screen.promptPanel.prompt(chooserPrompt);
+                rt = chooseTileUnsynced(filter);
+                connection.sendChoice(gameState.ord(rt));
             }
             else
             {
-                var v = connection.receiveAction<ChoiceSelection>();
-                if (v.choices.Length != 1) throw new Exception();
-                rt = gameState.tileFromOrd(v.choices[0]);
+                screen.promptPanel.prompt(waiterPrompt);
+                var choice = connection.receiveChoice();
+                rt = gameState.tileFromOrd(choice);
             }
             return rt;
         }
 
-
-        private Tile chooseTileUnsynced()
+        private Tile chooseTileUnsynced(Func<Tile, bool> filter)
         {
-            PublicSaxophone sax = new PublicSaxophone(o => true);
+            PublicSaxophone sax = new PublicSaxophone(o => o is Tile && filter((Tile)o));
             screen.hexPanel.subTile(sax, gameState.map.tileAt);
             var v = sax.call();
             return (Tile)v;
         }
 
-        private HackStruct makeHackStruct(Player castingPlayer)
-        {
-            return new HackStruct(this, castingPlayer);
-        }
-
-        private HackStruct makeHackStruct(Ability resolvingAbility)
-        {
-            return new HackStruct(this, resolvingAbility);
-        }
-
-        private HackStruct makeHackStruct(Player castingPlayer, Ability resolvingAbility)
-        {
-            return new HackStruct(this, resolvingAbility, castingPlayer);
-        }
-
         public ManaColour chooseManaColourSynced(Player chooser, Func<ManaOrb, bool> f)
         {
-            ManaOrbSelection selection;
+            ManaColour clr;
             if (chooser == gameState.hero)
             {
                 gameState.hero.stuntMana();
 
                 gameController.setPrompt("Gain mana nerd");
-                var v = chooseManaColourUnsynced().Value;
+                clr = chooseManaColourUnsynced().Value;
 
                 gameState.hero.unstuntMana();
-
-                selection = new ManaOrbSelection(v);
-                connection.sendAction(selection);
+                
+                connection.sendChoice((int)clr);
             }
             else
             {
                 gameController.setPrompt("Opponent is gaining mana");
-                selection = connection.receiveAction<ManaOrbSelection>();
+                clr = (ManaColour)connection.receiveChoice();
             }
-            return selection.orb;
+            return clr;
         }
 
         private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)
@@ -1056,16 +1000,6 @@ namespace stonerkart
 
         }
 
-        public void sendChoices(int[] cs)
-        {
-            connection.sendAction(new ChoiceSelection(cs));
-        }
-
-        public int[] receiveChoices()
-        {
-            return connection.receiveAction<ChoiceSelection>().choices;
-        }
-
         public void clearTargetHighlight()
         {
             clearHighlights();
@@ -1073,20 +1007,7 @@ namespace stonerkart
 
         public void setTargetHighlight(Card c)
         {
-            StackWrapper w = gameState.wrapperStack.FirstOrDefault(sw => sw.stackCard == c);
-
-            if (w == null) return;
-
-            List<Tile> tiles = new List<Tile>();
-            foreach (TargetMatrix tm in w.targetMatrices)
-            {
-                foreach (TargetColumn cl in tm.columns)
-                {
-                    if (cl.targets == null) continue;
-                    tiles.AddRange(tilesFromTargetables(cl.targets));
-                }
-            }
-            highlight(tiles, Color.OrangeRed);
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
 
         private static IEnumerable<Tile> tilesFromTargetables(Targetable[] ts)
@@ -1111,7 +1032,6 @@ namespace stonerkart
             return rt;
         }
 
-
         public void enqueueGameMessage(string gmb)
         {
             connection.enqueueGameMessage(gmb);
@@ -1123,19 +1043,17 @@ namespace stonerkart
     {
         public Card stackCard { get; }
         public Ability ability { get; }
-        public TargetMatrix[] targetMatrices { get; }
-        public TargetMatrix[] costMatricies { get; }
+        public TargetSet[][] cachedTargets { get; }
+
 
         public Card castingCard => stackCard.isDummy ? stackCard.dummyFor : stackCard;
         public bool isCastAbility => castingCard.isCastAbility(ability);
 
-
-        public StackWrapper(Card stackCard, Ability ability, TargetMatrix[] targetMatrices, TargetMatrix[] costMatricies)
+        public StackWrapper(Card stackCard, Ability ability, TargetSet[][] cachedTargets)
         {
             this.stackCard = stackCard;
             this.ability = ability;
-            this.targetMatrices = targetMatrices;
-            this.costMatricies = costMatricies;
+            this.cachedTargets = cachedTargets;
         }
     }
 
