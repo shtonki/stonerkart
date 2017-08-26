@@ -262,60 +262,37 @@ namespace stonerkart
             return v => i;
         }
 
-        /*
-         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
-         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
-         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
-         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
-         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
-         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
-         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
-         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
-         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
-         * MOVE THIS SHIT TO EFFECT.CS GENIOUSE
-         */
-
-        public static TargetRule player => null;//new PryCardRule(c => c.isHeroic);
-        public static TargetRule relic => null;//new PryCardRule(c => c.cardType == CardType.Relic);
+        public static TargetRule player => new ClickCardRule(c => c.isHeroic);
+        public static TargetRule relic => new ClickCardRule(c => c.cardType == CardType.Relic);
 
         public static TargetRule creature(Func<Card, bool> filter = null)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             filter = filter ?? (c => true);
-            return new PryCardRule(c => c.cardType == CardType.Creature && filter(c));*/
-    }
+            return new ClickCardRule(c => c.cardType == CardType.Creature && filter(c));
+        }
 
-    public static TargetRule nonheroicCreature(Func<Card, bool> filter = null)
+        public static TargetRule nonheroicCreature(Func<Card, bool> filter = null)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             filter = filter ?? (c =>true);
-            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));*/
+            return new ClickCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));
         }
 
         public static TargetRule nonColouredCreature(ManaColour notAllowed)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));*/
+            return new ClickCardRule(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));
         }
 
         //costs
         public static Effect manaCost(ManaSet castManaCost)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             return new Effect(
                 new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                    new ManaCostRule(castManaCost)), new PayManaDoer());*/
+                    new StaticManaRule(castManaCost.colours.ToArray())), new PayManaDoer());
         }
 
         public static Effect manaCost(params ManaColour[] ms)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            return manaCost(new ManaSet(ms));*/
+            return manaCost(new ManaSet(ms));
         }
 
         

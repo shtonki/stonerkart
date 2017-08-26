@@ -45,16 +45,19 @@ namespace stonerkart
 
         public static Effect summonTokensEffect(params CardTemplate[] templates)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            
             return new Effect(new TargetRuleSet(
                 new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                     templates),
-                new PryTileRule(t => t.card == null && !t.isEdgy,
-                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, templates.Length, false)),
+                new ClickTileRule(
+                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                    t => t.passable && !t.isEdgy,
+                    templates.Length, 
+                    false,
+                    InteractiveRule<Tile>.ChooseAt.Resolve)),
                 new SummonToTileDoer(),
                 true
-                );*/
+                );
         }
 
     }

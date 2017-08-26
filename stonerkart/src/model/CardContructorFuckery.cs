@@ -89,7 +89,7 @@ namespace stonerkart
                     String.Format("{2}{1}{1}, {0}: Your other white creatures get +1/+0 until end of turn. {3}",
                         G.exhaustGhyph, G.colouredGlyph(ManaColour.Life), G.colourlessGlyph(1), G.channelOnly),
                     new TargetRuleSet(
-                        new AllCardsRule(
+                        new CardsRule(
                             c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
                     new ModifyDoer(LL.add(1), LL.endOfTurn, ModifiableStats.Power),
                     new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
@@ -171,9 +171,12 @@ namespace stonerkart
                         new DrawCardsDoer(1));
                 additionalCastEffects.Add(
                     new Effect(
-                        new SelectCardRule(new PryPlayerRule(p => true,
-                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
-                            PileLocation.Hand, c => false, SelectCardRule.Mode.Resolver, true),
+                        new SelectCardRule(
+                            new ClickPlayerRule(),
+                            PileLocation.Hand, 
+                            c => false, 
+                            SelectCardRule.Mode.ResolverLooksAtTarget,
+                            InteractiveRule<Card>.ChooseAt.Resolve),
                         new ModifyDoer(LL.add(0), LL.clearAura, ModifiableStats.Movement))); //ugliest hack i've seen in a while
                 castDescription = "Look at target players hand. Draw a card.";
 
@@ -418,8 +421,7 @@ namespace stonerkart
                 castEffect = new Effect(
                     new TargetRuleSet(
                         new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
-                        new ClickTileRule(f => f.passable,
-                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), 
+                        new ClickTileRule(f => f.passable)), 
                     new MoveToTileDoer(true));
                 castDescription = "Move your hero to target tile.";
             }
@@ -466,7 +468,7 @@ namespace stonerkart
 
                 addTriggeredAbility(
                     "Whenever Graverobber Syrdin creature enters the battlefield under your control, you may return a card from your graveyard to your hand.",
-                    new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard)),
+                    new TargetRuleSet(new SelectCardRule(PileLocation.Graveyard, InteractiveRule<Card>.ChooseAt.Cast)),
                     new MoveToPileDoer(PileLocation.Hand),
                     new Foo(),
                     new TypedGameEventFilter<MoveToPileEvent>(
@@ -492,7 +494,7 @@ namespace stonerkart
 
                 castEffect =
                     new Effect(
-                        new TargetRuleSet(new SelectCardRule(PileLocation.Deck)),
+                        new TargetRuleSet(new SelectCardRule(PileLocation.Deck, InteractiveRule<Card>.ChooseAt.Resolve)),
                         new MoveToPileDoer(PileLocation.Deck));
                 castDescription =
                     "Search your deck for a card. Shuffle your deck then put the selected card on top.";
@@ -648,8 +650,12 @@ namespace stonerkart
                 castDescription = "Look at target players hand and select a creature. Selected card is discarded.";
                 castEffect =
                     new Effect(
-                        new SelectCardRule(new PryPlayerRule(),
-                            PileLocation.Hand, c => c.cardType == CardType.Creature, SelectCardRule.Mode.Resolver),
+                        new SelectCardRule(
+                            new ClickPlayerRule(), 
+                            PileLocation.Hand, 
+                            c => c.cardType == CardType.Creature, 
+                            SelectCardRule.Mode.ResolverLooksAtTarget,
+                            InteractiveRule<Card>.ChooseAt.Resolve),
                         new MoveToPileDoer(PileLocation.Graveyard));
             }
                 break;
@@ -672,7 +678,13 @@ namespace stonerkart
 
                 addActivatedAbility(
                     String.Format("{1}{1}, {0}: Each player discards a card. {2}", G.exhaustGhyph, G.colouredGlyph(ManaColour.Death), G.channelOnly),
-                    new TargetRuleSet(new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), PileLocation.Hand, c => true, SelectCardRule.Mode.Reflective)),
+                    new TargetRuleSet(
+                        new SelectCardRule(
+                            new PlayerResolveRule(PlayerResolveRule.Rule.AllPlayers), 
+                            PileLocation.Hand, 
+                            c => true, 
+                            SelectCardRule.Mode.TargetLooksAtTarget,
+                            InteractiveRule<Card>.ChooseAt.Resolve)), 
                     new MoveToPileDoer(PileLocation.Graveyard),
                     new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death, ManaColour.Death)),
                     0,
@@ -785,8 +797,9 @@ namespace stonerkart
                 addActivatedAbility(
                     "You may cast Ilatian Haunter from the graveyard.",
                     new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                        new ClickTileRule(t => t.card == null && !t.isEdgy,
-                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
+                        new ClickTileRule(
+                            InteractiveRule<Tile>.ChooseAt.Resolve,
+                            t => t.passable && !t.isEdgy)),
                     new SummonToTileDoer(),
                     new Foo(LL.manaCost(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
                     2,
@@ -951,7 +964,12 @@ namespace stonerkart
                         
                     addTriggeredAbility(
                         "Whenever Rider of Pestilence deals damage to a player that player discards a card.",
-                        new TargetRuleSet(new SelectCardRule(new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller), PileLocation.Hand, c => true)),
+                        new TargetRuleSet(new SelectCardRule(
+                            new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller),
+                            PileLocation.Hand, 
+                            c => true, 
+                            SelectCardRule.Mode.ResolverLooksAtTarget,
+                            InteractiveRule<Card>.ChooseAt.Resolve)),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(),
                         new TypedGameEventFilter<DamageEvent>(e => e.source == this && e.target.isHeroic),
@@ -976,7 +994,12 @@ namespace stonerkart
 
                         addTriggeredAbility(
                             "Whenever Rider of Famine deals damage to a player that player sacrifices a non-heroic creature.",
-                            new TargetRuleSet(new SelectCardRule(new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller), PileLocation.Field, c => !c.isHeroic && c.cardType == CardType.Creature)),
+                            new TargetRuleSet(new SelectCardRule(
+                                new TriggeredTargetRule<DamageEvent, Player>(e => e.target.controller),
+                                PileLocation.Field, 
+                                c => !c.isHeroic && c.cardType == CardType.Creature, 
+                                SelectCardRule.Mode.TargetLooksAtTarget,
+                                InteractiveRule<Card>.ChooseAt.Resolve)),
                             new MoveToPileDoer(PileLocation.Graveyard),
                             new Foo(),
                             new TypedGameEventFilter<DamageEvent>(e => e.source == this && e.target.isHeroic),
@@ -1089,9 +1112,14 @@ namespace stonerkart
 
                     castDescription = "Return a creature from your graveyard to the battlefield under your control.";
                     castEffect = new Effect(new TargetRuleSet(
-                        new SelectCardRule(PileLocation.Graveyard, c => c.cardType == CardType.Creature),
-                        new ClickTileRule(t => t.card == null && !t.isEdgy,
-                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
+                        new SelectCardRule(
+                            PileLocation.Graveyard, 
+                            c => c.cardType == CardType.Creature,
+                            InteractiveRule<Card>.ChooseAt.Cast),
+                        new ClickTileRule(
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                            t => t.passable && !t.isEdgy,
+                            InteractiveRule<Tile>.ChooseAt.Resolve)),
                         new SummonToTileDoer());
                 } break;
                 #endregion
@@ -1165,7 +1193,7 @@ namespace stonerkart
                         new Effect(
                             new TargetRuleSet(LL.creature()),
                             new FatigueDoer(false));
-                    additionalCastEffects.Add(new Effect(new CopyPreviousRule<Card>(0),
+                    additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(0, c => c),
                         new ModifyDoer(LL.add(2), LL.endOfTurn, ModifiableStats.Power)));
                     castRange = 3;
                 } break;
@@ -1305,7 +1333,7 @@ namespace stonerkart
                     castEffect = zepNonHeroicLambda(3);
                     additionalCastEffects.Add(new Effect(
                         new TargetRuleSet(
-                            new CopyPreviousRule<Card>(0),
+                            new ModifyPreviousRule<Card, Card>(0, c => c),
                             new ModifyPreviousRule<Card, Card>(1, c => c.controller.heroCard)),
                         new ZepperDoer(3)
                         ));
@@ -1337,7 +1365,7 @@ namespace stonerkart
                         
                     addActivatedAbility(
                         String.Format("{0}{0}, {1}, Sacrifice Solemn Lotus: Target player sacrifices a non-heroic creature.", G.colouredGlyph(ManaColour.Death), G.exhaustGhyph),
-                        playerSacLambda(new PryPlayerRule()),
+                        playerSacLambda(new ClickPlayerRule()),
                         new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death, ManaColour.Death), sacThisLambda),
                         -1,
                         PileLocation.Field, 
@@ -1507,7 +1535,7 @@ namespace stonerkart
 
                         Effect e1 = new Effect(LL.nonheroicCreature(),
                             new ModifyDoer(LL.add(2), LL.never, ModifiableStats.Power));
-                        Effect e2 = new Effect(new CopyPreviousRule<Card>(0),
+                        Effect e2 = new Effect(new ModifyPreviousRule<Card, Card>(0, c => c),
                             new ModifyDoer(LL.add(2), LL.never, ModifiableStats.Toughness));
 
                         addActivatedAbility(
@@ -1812,7 +1840,7 @@ namespace stonerkart
                             G.exhaustGhyph, G.colouredGlyph(ManaColour.Chaos)),
                         new TargetRuleSet(
                             new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                            new CardResolveRule(CardResolveRule.Rule.AllHeroes)),
+                            new CardsRule(c => c.isHeroic)),
                         new ZepperDoer(2),
                         new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Chaos, ManaColour.Chaos)),
                         0,
@@ -1906,7 +1934,7 @@ namespace stonerkart
                     castDescription = "Destroy target damaged non-heroic creature.";
                     castEffect =
                         new Effect(
-                            new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && c.damageTaken > 0),
+                            new ClickCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && c.damageTaken > 0),
                             new MoveToPileDoer(PileLocation.Graveyard));
                     castRange = 4;
                     } break;
@@ -1928,11 +1956,13 @@ namespace stonerkart
 
                     keywordAbilities.Add(KeywordAbility.Reinforcement);
 
-                    Effect e1 = new Effect(new PryCardRule(c => c.controller == this.controller && !c.isHeroic && c.race != Race.Spirit), new MoveToPileDoer(PileLocation.Displaced));
+                    Effect e1 = new Effect(new ClickCardRule(c => c.controller == this.controller && !c.isHeroic && c.race != Race.Spirit), new MoveToPileDoer(PileLocation.Displaced));
                         Effect e2 = new Effect(new TargetRuleSet(
-                    new CopyPreviousRule<Card>(0),
-                    new PryTileRule(t => t.card == null && !t.isEdgy,
-                        new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, 1, false)),
+                    new ModifyPreviousRule<Card, Card>(0, c => c),
+                    new ClickTileRule(
+                        new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                        t => t.passable && !t.isEdgy,
+                        InteractiveRule<Tile>.ChooseAt.Resolve)),
                     new SummonToTileDoer(),
                     true
                     );
@@ -1961,7 +1991,7 @@ namespace stonerkart
 
                     etbLambda(
                         "When Benedictor enters the battlefield dispace all cards in players graveyards.",
-                        new Effect(new AllCardsRule(c => c.location.pile == PileLocation.Graveyard), new MoveToPileDoer(PileLocation.Displaced))
+                        new Effect(new CardsRule(c => c.location.pile == PileLocation.Graveyard), new MoveToPileDoer(PileLocation.Displaced))
                         );
                 } break;
                 #endregion
@@ -1977,7 +2007,7 @@ namespace stonerkart
                     castEffect =
                         new Effect(
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                                new CardResolveRule(CardResolveRule.Rule.AllFieldCards)), new ZepperDoer(2));
+                                new CardsRule(c => c.location.pile == PileLocation.Field)), new ZepperDoer(2));
                     castDescription = "Deal 2 damage to all creatures.";
                 } break;
                 #endregion
@@ -1997,7 +2027,8 @@ namespace stonerkart
 
                     etbLambda(
                         "When Elven Cultivator enters the battlefield give another non-heroic creature you control +1/+1.",
-                        new Effect(new PryCardRule(c => c != this && !c.isHeroic && c.controller == this.controller), new ModifyDoer(LL.add(1), LL.never, ModifiableStats.Power, ModifiableStats.Toughness)),
+                        new Effect(new ClickCardRule(c => c != this && !c.isHeroic && c.controller == this.controller),
+                            new ModifyDoer(LL.add(1), LL.never, ModifiableStats.Power, ModifiableStats.Toughness)),
                         3
                         );
 
@@ -2060,7 +2091,7 @@ namespace stonerkart
                     castDescription = "Give target damaged non-heroic creature +2/+2.";
 
 
-                    castEffect = new Effect(new PryCardRule(c => c.damageTaken > 0 && !c.isHeroic), new ModifyDoer(LL.add(2), LL.never, ModifiableStats.Power, ModifiableStats.Toughness));
+                    castEffect = new Effect(new ClickCardRule(c => c.damageTaken > 0 && !c.isHeroic), new ModifyDoer(LL.add(2), LL.never, ModifiableStats.Power, ModifiableStats.Toughness));
 
                 } break;
                 #endregion
@@ -2107,7 +2138,7 @@ namespace stonerkart
 
                     etbLambda(
                         "When Shibby's Saboteur enters the battlefield you may set target non-heroic creature's power to 1.",
-                        new Effect(new PryCardRule(c => !c.isHeroic), new ModifyDoer(LL.set(1), LL.never, ModifiableStats.Power)),
+                        new Effect(new ClickCardRule(c => !c.isHeroic), new ModifyDoer(LL.set(1), LL.never, ModifiableStats.Power)),
                         4, 
                         true
                         );
@@ -2158,10 +2189,14 @@ namespace stonerkart
                     keywordAbilities.Add(KeywordAbility.Flying);
 
                     etbLambda(
-                        "When Malificent Spirit enters the battlefield you may look at target players hand and select a card from it. Discard the selected card.",
+                        "When Malificent Spirit enters the battlefield you may look at target players hand and select a card from it. The selected card is discarded.",
                         new Effect(
-                            new SelectCardRule(new PryPlayerRule(),
-                                PileLocation.Hand, c => true, SelectCardRule.Mode.Resolver),
+                            new SelectCardRule(
+                                new ClickPlayerRule(),
+                                PileLocation.Hand,
+                                c => true,
+                                SelectCardRule.Mode.ResolverLooksAtTarget, 
+                                InteractiveRule<Card>.ChooseAt.Resolve),
                             new MoveToPileDoer(PileLocation.Graveyard))
                         );
                 } break;
@@ -2269,8 +2304,14 @@ namespace stonerkart
                     castDescription = "Discard two cards then draw two cards.";
                     castEffect =
                         new Effect(
-                            new SelectCardRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                                PileLocation.Hand, c => true, SelectCardRule.Mode.Resolver, false, 2, false),
+                            new SelectCardRule(
+                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                                PileLocation.Hand, 
+                                c => true, 
+                                2, 
+                                false, 
+                                SelectCardRule.Mode.TargetLooksAtTarget, 
+                                InteractiveRule<Card>.ChooseAt.Resolve),
                             new MoveToPileDoer(PileLocation.Graveyard));
                     additionalCastEffects.Add(
                         new Effect(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new DrawCardsDoer(2)));
@@ -2453,7 +2494,7 @@ namespace stonerkart
                 castRange = 2;
                 castEffect = new Effect(new TargetRuleSet(
                     new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                    new PryTileRule(t => t.card == null && !t.isEdgy, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
+                    new ClickTileRule(InteractiveRule<Tile>.ChooseAt.Resolve,t => t.passable && !t.isEdgy)),
                     new SummonToTileDoer());
             }
             else throw new Exception();
@@ -2515,11 +2556,11 @@ namespace stonerkart
             if (alternateCast) alternateCasts.Add(aa);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] //yagni said no one ever
         private static Foo fooFromManaCost(params ManaColour[] cs)
         {
-            return new Foo(new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                new ManaCostRule(cs)), new PayManaDoer()));
+            return new Foo(
+                new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                new StaticManaRule(cs)), new PayManaDoer()));
         }
 
         public Effect zepLambda(int damage)
@@ -2602,19 +2643,24 @@ namespace stonerkart
         public Effect sacCostLambda
             =>
                 new Effect(
-                    new PryCardRule(
+                    new ClickCardRule(
                         c => !c.isHeroic && c.controller == this.controller && c.cardType == CardType.Creature),
                     new MoveToPileDoer(PileLocation.Graveyard));
 
         public static Effect displaceFromGraveyard(Func<Card, bool> filter = null)
         {
             filter = filter ?? (c => true);
-            return new Effect(new SelectCardRule(PileLocation.Graveyard, filter), new MoveToPileDoer(PileLocation.Displaced));
+            return new Effect(new SelectCardRule(PileLocation.Graveyard, filter, InteractiveRule<Card>.ChooseAt.Cast), new MoveToPileDoer(PileLocation.Displaced));
         }
 
         public Effect playerSacLambda(TargetRule sacrificer)
         {
-            return new Effect(new SelectCardRule(sacrificer, PileLocation.Field, c => c.cardType == CardType.Creature && !c.isHeroic, SelectCardRule.Mode.Reflective),
+            return new Effect(new SelectCardRule(
+                sacrificer,
+                PileLocation.Field,
+                c => c.cardType == CardType.Creature && !c.isHeroic,
+                SelectCardRule.Mode.TargetLooksAtTarget, 
+                InteractiveRule<Card>.ChooseAt.Resolve),
                 new MoveToPileDoer(PileLocation.Graveyard));
         }
         

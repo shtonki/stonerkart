@@ -111,7 +111,6 @@
     <Compile Include="src\pws\Frame.cs" />
     <Compile Include="src\pws\GUI.cs" />
     <Compile Include="src\pws\Imege.cs" />
-    <Compile Include="src\model\GameAction.cs" />
     <Compile Include="src\model\GameEvent.cs" />
     <Compile Include="src\model\GameEventFilter.cs" />
     <Compile Include="src\model\GameEventHandler.cs" />
@@ -119,7 +118,7 @@
     <Compile Include="src\model\Ability.cs" />
     <Compile Include="src\model\Card.cs" />
     <Compile Include="src\model\CardContructorFuckery.cs" />
-    <Compile Include="src\model\Cost.cs" />
+    <Compile Include="src\model\Foo.cs" />
     <Compile Include="src\model\Deck.cs" />
     <Compile Include="src\model\Effect.cs" />
     <Compile Include="src\model\Game.cs" />

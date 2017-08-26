@@ -33,7 +33,7 @@ namespace stonerkart
     {
         private TargetRule[] rules;
 
-        public TargetRuleSet(params TargetRule[] rules)
+        public TargetRuleSet(params TargetRule[] rules) : base(rules.Select(t => t.targetType))
         {
             this.rules = rules;
         }
@@ -124,20 +124,200 @@ namespace stonerkart
 
     abstract class InteractiveRule<T> : TargetRule where T : Targetable
     {
-        private TargetRule playerRule;
-        private int count;
-        private bool allowDuplicates;
-        private Func<T, bool> filter;
+        private TargetRule playerRule = new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController);
+        private int count = 1;
+        private bool allowDuplicates = false;
+        private ChooseAt chooseAt;
+        protected Func<T, bool> filter = t => true;
 
-        public InteractiveRule(Type targetType, TargetRule playerRule, int count, bool allowDuplicates, Func<T, bool> filter) : base(targetType)
+        public InteractiveRule(TargetRule playerRule, int count, bool allowDuplicates, ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
         {
             this.playerRule = playerRule;
             this.count = count;
             this.allowDuplicates = allowDuplicates;
+            this.chooseAt = chooseAt;
             this.filter = filter;
+        }
+
+        public InteractiveRule(TargetRule playerRule, ChooseAt chooseAt, Func<T, bool> filter) : base(typeof (T))
+        {
+            this.playerRule = playerRule;
+            this.chooseAt = chooseAt;
+            this.filter = filter;
+        }
+
+        public InteractiveRule(TargetRule playerRule, ChooseAt chooseAt) : base(typeof(T))
+        {
+            this.playerRule = playerRule;
+            this.chooseAt = chooseAt;
+        }
+
+        public InteractiveRule(ChooseAt chooseAt) : base(typeof(T))
+        {
+            this.chooseAt = chooseAt;
+        }
+
+        public InteractiveRule(ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
+        {
+            this.chooseAt = chooseAt;
+            this.filter = filter;
+        }
+
+        public InteractiveRule(ChooseAt chooseAt, Func<T, bool> filter, TargetRule playerRule) : base(typeof(T))
+        {
+            this.chooseAt = chooseAt;
+            this.filter = filter;
+            this.playerRule = playerRule;
+        }
+
+        public InteractiveRule(TargetRule playerRule, int count, bool allowDuplicates, ChooseAt chooseAt) : base(typeof(T))
+        {
+            this.playerRule = playerRule;
+            this.count = count;
+            this.allowDuplicates = allowDuplicates;
+            this.chooseAt = chooseAt;
+        }
+
+        public InteractiveRule(int count, bool allowDuplicates, ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
+        {
+            this.count = count;
+            this.allowDuplicates = allowDuplicates;
+            this.chooseAt = chooseAt;
+            this.filter = filter;
+        }
+
+
+        public override TargetSet fillCastTargets(HackStruct hs)
+        {
+            var choosers = playerRule.fillCastTargets(hs);
+            if (chooseAt == ChooseAt.Cast)
+            {
+                choosers = playerRule.fillResolveTargets(hs, choosers);
+                return interact(choosers.targets.Cast<Player>());
+            }
+            else return choosers;
+        }
+
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
+        {
+            if (chooseAt == ChooseAt.Cast) return ts;
+            var choosers = playerRule.fillResolveTargets(hs, ts);
+            return interact(choosers.targets.Cast<Player>());
+        }
+
+        private TargetSet interact(IEnumerable<Player> players)
+        {
+            if (count != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            if (players.Count() != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            foreach (var player in players)
+            {
+                return interact(player, filter);
+            }
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+        }
+
+        protected abstract TargetSet interact(Player p, Func<T, bool> filter);
+
+        public enum ChooseAt
+        {
+            Cast,
+            Resolve
         }
     }
 
+    class SelectCardRule : InteractiveRule<Card>
+    {
+        private Mode mode;
+        private PileLocation pile;
+
+        public SelectCardRule(TargetRule playerRule, PileLocation pile, Func<Card, bool> filter, Mode mode, ChooseAt chooseAt) : base(playerRule, chooseAt, filter)
+        {
+            this.mode = mode;
+            this.pile = pile;
+        }
+
+        public SelectCardRule(TargetRule playerRule, PileLocation pile, Func<Card, bool> filter, int count, bool allowDuplicates, Mode mode, ChooseAt chooseAt) : base(playerRule, count, allowDuplicates, chooseAt, filter)
+        {
+            this.mode = mode;
+            this.pile = pile;
+        }
+
+        public SelectCardRule(PileLocation pile, ChooseAt chooseAt) : this(pile, c => true, chooseAt)
+        {
+        }
+
+        public SelectCardRule(PileLocation pile, Func<Card, bool> filter, ChooseAt chooseAt) : base(chooseAt, filter)
+        {
+            this.pile = pile;
+            mode = Mode.ResolverLooksAtTarget;
+        }
+
+        protected override TargetSet interact(Player p, Func<Card, bool> filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public enum Mode
+        {
+            ResolverLooksAtTarget,
+            TargetLooksAtTarget,
+            TargetLooksAtResolver,
+        }
+    }
+
+
+    class ClickCardRule : InteractiveRule<Card>
+    {
+        public ClickCardRule(Func<Card, bool> filter) : base(ChooseAt.Cast, filter)
+        {
+        }
+
+        public ClickCardRule() : base(ChooseAt.Cast)
+        {
+        }
+
+        protected override TargetSet interact(Player p, Func<Card, bool> filter)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class ClickTileRule : InteractiveRule<Tile>
+    {
+        public ClickTileRule(Func<Tile, bool> filter) : base(ChooseAt.Cast, filter)
+        {
+        }
+
+        public ClickTileRule(ChooseAt chooseAt, Func<Tile, bool> filter) : base(chooseAt, filter)
+        {
+        }
+
+        public ClickTileRule(TargetRule playerRule, Func<Tile, bool> filter, ChooseAt chooseAt) : base(playerRule, chooseAt, filter)
+        {
+        }
+
+        public ClickTileRule(TargetRule playerRule, Func<Tile, bool> filter, int count, bool allowDuplicates, ChooseAt chooseAt) : base(playerRule, count, allowDuplicates, chooseAt, filter)
+        {
+        }
+
+        protected override TargetSet interact(Player p, Func<Tile, bool> filter)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class ClickPlayerRule : InteractiveRule<Player>
+    {
+        public ClickPlayerRule() : base(ChooseAt.Cast)
+        {
+            
+        }
+
+        protected override TargetSet interact(Player p, Func<Player, bool> filter)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     class SelectManaRule : TargetRule
     {
@@ -273,10 +453,9 @@ namespace stonerkart
 
         public AoeRule(Func<Tile, bool> filter, int radius, Func<Card, bool> cardFilter) : base(typeof(Card))
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            ruler = new PryTileRule(filter, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController));
+            ruler = new ClickTileRule(filter);
             this.radius = radius;
-            this.cardFilter = cardFilter;*/
+            this.cardFilter = cardFilter;
         }
 
         public override TargetSet fillCastTargets(HackStruct f)
@@ -396,57 +575,6 @@ namespace stonerkart
 
     }
 
-    class ClickCardRule : TargetRule
-    {
-        public ClickCardRule() : base(typeof(Card))
-        {
-        }
-
-        public override TargetSet fillCastTargets(HackStruct hs)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    class ClickTileRule : TargetRule
-    {
-        public ClickTileRule() : base(typeof(Tile))
-        {
-        }
-
-        public override TargetSet fillCastTargets(HackStruct hs)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    class ClickPlayerRule : TargetRule
-    {
-        public ClickPlayerRule() : base(typeof(Player))
-        {
-        }
-
-        public override TargetSet fillCastTargets(HackStruct hs)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
-        {
-            throw new NotImplementedException();
-        }
-    }
-    
 
     interface Targetable
     {
