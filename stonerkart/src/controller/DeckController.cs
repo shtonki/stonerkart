@@ -57,7 +57,26 @@ namespace stonerkart
 
         public static void chooseDeck(Action<Deck> cb)
         {
-            Deck d = new Deck(CardTemplate.Shibby_sShtank, Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().ToArray());
+            Deck d = new Deck(CardTemplate.Shibby_sShtank, 
+                new []
+                {
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                    CardTemplate.Primordial_sChimera, 
+                }
+                );
             cb(d);
             return;
             throw new Exception();

@@ -18,6 +18,13 @@ namespace stonerkart
         {
             card = c;
 
+            topbutton = new Square(0, 0);
+            topbutton.clicked += args =>
+            {
+                this.onClick(args);
+            };
+            addChild(topbutton);
+
             namebox = new Square();
             namebox.TextLayout = new SingleLineFitLayout(Justify.Left);
             addChild(namebox);
@@ -43,13 +50,6 @@ namespace stonerkart
             orbbox = new Square();
             addChild(orbbox);
 
-
-            topbutton = new Square(0, 0);
-            topbutton.clicked += args =>
-            {
-                this.onClick(args);
-            };
-            //addChild(topbutton);
 
             //layoutStuff();
             populate(c);

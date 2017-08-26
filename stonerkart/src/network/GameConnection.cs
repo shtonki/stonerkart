@@ -98,7 +98,7 @@ namespace stonerkart
 
         public override int[] receiveChoices()
         {
-            return new int[0];
+            return new [] { (int)ButtonOption.No };
         }
 
         public override Deck[] deckify(Deck myDeck, int myIndex)

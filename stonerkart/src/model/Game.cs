@@ -474,7 +474,6 @@ namespace stonerkart
         private void handlePendingTrigs()
         {
 
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             if (gameState.pendingTriggeredAbilities.Count > 0)
             {
                 List<TriggerGlueHack>[] abilityArrays =
@@ -500,9 +499,11 @@ namespace stonerkart
 
                 foreach (var w in wrappers)
                 {
-                    cast(w);
+
+                    throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+                    //cast(w);
                 }
-            }*/
+            }
         }
 
         private List<StackWrapper> handlePendingTrigs(Player p, IEnumerable<TriggerGlueHack> abilities)
@@ -689,6 +690,7 @@ namespace stonerkart
             });
 
             screen.promptPanel.promptButtons("Choose a Card to cast", ButtonOption.Pass);
+
             screen.promptPanel.sub(sax);
             screen.handView.sub(sax);
 
@@ -704,9 +706,20 @@ namespace stonerkart
             throw new Exception();
         }
 
-        public Card chooseCardSynced(Player p)
+        public Card chooseCardSynced(Player chooser, Func<Card, bool> filter)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            Card rt;
+            if (chooser.isHero)
+            {
+                rt = chooseCardUnsynced(filter);
+                connection.sendChoice(gameState.ord(rt));
+            }
+            else
+            {
+                int choice = connection.receiveChoice();
+                rt = gameState.cardFromOrd(choice);
+            }
+            return rt;
         }
 
         /// <summary>
@@ -759,7 +772,7 @@ namespace stonerkart
                 }
                 */
 
-                var card = chooseCardSynced(playerWithPriority);
+                var card = chooseCardSynced(playerWithPriority, c => c.controller == playerWithPriority);
                 if (card == null) return false;
 
                 var ability = chooseAbilitySynced(card);
@@ -789,12 +802,10 @@ namespace stonerkart
 
         private ActivatedAbility chooseAbilitySynced(Card c)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-            /*
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere;
 
-            bool canCastSlow = gameState.stack.Count == 0 && gameState.activePlayer == gameState.hero && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
+            bool canCastSlow = true || gameState.stack.Count == 0 && gameState.activePlayer == gameState.hero && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
             if (!canCastSlow)
             {
                 activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
@@ -814,10 +825,9 @@ namespace stonerkart
                 r = activatableAbilities[0];
             }
 
-            if (!r.possible(makeHackStruct(r))) return null;
+            //if (!r.possible(makeHackStruct(r))) return null;
 
             return r;
-            */
         }
 
         private void resolve(StackWrapper wrapper)
@@ -862,10 +872,6 @@ namespace stonerkart
 
         private ManaColour? chooseManaColourUnsynced()
         {
-            ManaColour[] cs = new[]
-            {
-                ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
-            };
             PublicSaxophone sax = new PublicSaxophone(c => true);
             screen.promptPanel.sub(sax);
             return (ManaColour)sax.call();
@@ -937,7 +943,11 @@ namespace stonerkart
             {
                 gameState.hero.stuntMana();
 
-                gameController.setPrompt("Gain mana nerd");
+                ManaColour[] cs = new[]
+                {
+                    ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
+                };
+                screen.promptPanel.promptManaChoice("Choose color", cs);
                 clr = chooseManaColourUnsynced().Value;
 
                 gameState.hero.unstuntMana();

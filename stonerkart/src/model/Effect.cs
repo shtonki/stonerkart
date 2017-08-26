@@ -39,7 +39,49 @@ namespace stonerkart
 
         private TargetRow[] rowsFromSet(TargetSet[] ts)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            if (ts.Length == 1) return rowsFrom1(ts);
+            if (ts.Length == 2) return rowsFrom2(ts);
+            if (ts.Length == 3) return rowsFrom3(ts);
+            throw new Exception();
+        }
+
+        private TargetRow[] rowsFrom1(TargetSet[] ts)
+        {
+            List<TargetRow> rt = new List<TargetRow>();
+            foreach (var a in ts[0].targets)
+            {
+                rt.Add(new TargetRow(a));
+            }
+            return rt.ToArray();
+        }
+
+        private TargetRow[] rowsFrom2(TargetSet[] ts)
+        {
+            List<TargetRow> rt = new List<TargetRow>();
+            foreach (var a in ts[0].targets)
+            {
+                foreach (var b in ts[1].targets)
+                {
+                    rt.Add(new TargetRow(a, b));
+                }
+            }
+            return rt.ToArray();
+        }
+
+        private TargetRow[] rowsFrom3(TargetSet[] ts)
+        {
+            List<TargetRow> rt = new List<TargetRow>();
+            foreach (var a in ts[0].targets)
+            {
+                foreach (var b in ts[1].targets)
+                {
+                    foreach (var c in ts[2].targets)
+                    {
+                        rt.Add(new TargetRow(a, b, c));
+                    }
+                }
+            }
+            return rt.ToArray();
         }
 
 
