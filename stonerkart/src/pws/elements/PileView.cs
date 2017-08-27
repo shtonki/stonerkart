@@ -134,8 +134,6 @@ namespace stonerkart
             }
         }
 
-        
-
         private void layoutCards()
         {
             lastBroughtToFront = null;

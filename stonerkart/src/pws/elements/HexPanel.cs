@@ -53,32 +53,23 @@ namespace stonerkart
             base.onMouseDown(args);
 
             var v = findHexagon(args.Position.X, args.Position.Y);
-            if (v != null)
-            {
-                System.Console.WriteLine("{0} {1}", v.Item1, v.Item2);
-            }
         }
 
         private Tuple<int, int> findHexagon(int mousex, int mousey)
         {
-
-
             int cx = 0;
             int cy = 0;
-            double cd = 2000;
 
             for (int i = 0; i < xcount; i++)
             {
-                int os = (i % 2) * hexsize / 2;
                 for (int j = 0; j < ycount; j++)
                 {
-                    int hexX = x + (int)(0.75 * hexsize * i) + hexsize / 2;
-                    int hexY = y + (j * hexsize + os) + hexsize / 2;
+                    var p = hexCoords(i, j);
+                    int hexX = x + p.X + hexsize/2;
+                    int hexY = y + p.Y + hexsize/2;
 
                     int dx = hexX - mousex;
                     int dy = hexY - mousey;
-
-
 
                     if (Math.Abs(dx) < hexsize / 2 && Math.Abs(dy) < hexsize / 2)
                     {
@@ -102,18 +93,27 @@ namespace stonerkart
             return null;
         }
 
+        private Point hexCoords(int column, int row)
+        {
+            int os = ((column + 1) % 2) * hexsize / 2;
+            int hexX = (int)(hexsizethreequarters * column);
+            int hexY = row * hexsize + os;
+            return new Point(hexX, hexY);
+        }
+
         protected override void draw(DrawerMaym dm)
         {
             base.draw(dm);
 
+
             for (int i = 0; i < xcount; i++)
             {
-                int os = ((i+1)%2)*hexsize/2;
                 for (int j = 0; j < ycount; j++)
                 {
-                    int hexX = (int)(hexsizethreequarters * i);
-                    int hexY = j*hexsize + os;
-
+                    var p = hexCoords(i, j);
+                    int hexX = p.X;
+                    int hexY = p.Y;
+                    
                     Color hl = bordercolors[i][j];
 
                     dm.fillHexagon(hexX, hexY, hexsize, hl, Color.AntiqueWhite);
@@ -127,10 +127,10 @@ namespace stonerkart
                     if (c.tile == null) continue;
                     var i = c.tile.x;
                     var j = c.tile.y;
-                    int os = ((i+1)%2)*hexsize/2;
 
-                    int hexX = (int)(hexsizethreequarters*i);
-                    int hexY = j*hexsize + os;
+                    var p = hexCoords(i, j);
+                    int hexX = p.X;
+                    int hexY = p.Y;
 
                     dm.fillHexagon(hexX, hexY, hexsize, Color.Transparent, TextureLoader.cardArt(c.template));
 

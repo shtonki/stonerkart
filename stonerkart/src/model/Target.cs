@@ -354,8 +354,6 @@ namespace stonerkart
 
         private TargetSet meme(Player p, HackStruct hs)
         {
-            //return base.interact(p, filter);
-
             ManaSet cost = cst.clone();
             for (int i = 0; i < ManaSet.size; i++)
             {

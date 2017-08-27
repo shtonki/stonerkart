@@ -76,8 +76,6 @@ namespace stonerkart
                     CardTemplate.Zap, 
                     CardTemplate.Zap, 
                     CardTemplate.Zap, 
-                    CardTemplate.Zap, 
-                    CardTemplate.Zap, 
                 }
                 );
             cb(d);
