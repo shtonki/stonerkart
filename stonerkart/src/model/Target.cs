@@ -232,15 +232,29 @@ namespace stonerkart
 
         private TargetSet choose(IEnumerable<Player> players, HackStruct hs)
         {
+            var v = chooser.candidates(hs).Where(filter);
+            hs.game.highlight(v.Cast<Targetable>(), Color.Green);
+
             if (count != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             if (players.Count() != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+
+            TargetSet rt = null;
             foreach (var player in players)
             {
                 var chosen = chooser.pickOne(player, filter, hs);
-                if (chosen == null) return null;
-                return new TargetSet(chosen);
+                if (chosen == null)
+                {
+                    rt = null;
+                }
+                else
+                {
+                    rt = new TargetSet(chosen);
+                }
+                break;
             }
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+
+            hs.game.clearHighlights();
+            return rt;
         }
 
         public enum ChooseAt
@@ -284,12 +298,13 @@ namespace stonerkart
     {
         public IEnumerable<Card> candidates(HackStruct hs)
         {
-            throw new NotImplementedException();
+            return hs.tilesInRange.Where(t => t.card != null).Select(t => t.card);
         }
 
         public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
         {
-            Tile tl = hs.game.chooseTileSynced(chooser, t => t.card != null && filter(t.card), "swroigjs", "ioerhjgohr", true);
+            Tile tl = hs.game.chooseTileSynced(chooser,
+                t => hs.tilesInRange.Contains(t) && t.card != null && filter(t.card), "swroigjs", "ioerhjgohr", true);
             if (tl == null) return null;
             return (tl.card);
         }
@@ -299,12 +314,12 @@ namespace stonerkart
     {
         public IEnumerable<Tile> candidates(HackStruct hs)
         {
-            throw new NotImplementedException();
+            return hs.tilesInRange;
         }
 
         public Tile pickOne(Player chooser, Func<Tile, bool> filter, HackStruct hs)
         {
-            return hs.game.chooseTileSynced(chooser, filter, "", "", true);
+            return hs.game.chooseTileSynced(chooser, t => hs.tilesInRange.Contains(t) && filter(t), "tehtehethsf", "aethadtgngf", true);
         }
     }
 

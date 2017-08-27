@@ -76,6 +76,9 @@ namespace stonerkart
                     CardTemplate.Rockhand_sEchion, 
                     CardTemplate.Rockhand_sEchion, 
                     CardTemplate.Rockhand_sEchion, 
+                    CardTemplate.Rockhand_sEchion, 
+                    CardTemplate.Rockhand_sEchion, 
+                    CardTemplate.Rockhand_sEchion, 
                 }
                 );
             cb(d);

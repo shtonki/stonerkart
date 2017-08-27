@@ -281,6 +281,23 @@ namespace stonerkart
             Color.PaleVioletRed, 
         };
 
+        public void highlight(IEnumerable<Targetable> ts, Color c)
+        {
+            List<Tile> tiles = new List<Tile>();
+            foreach (var t in ts)
+            {
+                if (t is Tile) tiles.Add((Tile)t);
+                if (t is Card)
+                {
+                    Card card = (Card)t;
+                    if (card.location.pile == PileLocation.Field) tiles.Add(card.tile);
+                }
+                if (t is Player) tiles.Add(((Player)t).heroCard.tile);
+            }
+
+            highlight(tiles, c);
+        }
+
         public void highlight(IEnumerable<Tile> ts, Color c)
         {
             foreach (var t in ts) screen.hexPanel.highlight(t.x, t.y, c);
@@ -293,7 +310,6 @@ namespace stonerkart
 
         private void moveStep()
         {
-
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             List<Tuple<Card, Path>> paths;
 
