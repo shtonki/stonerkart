@@ -225,7 +225,6 @@ namespace stonerkart
         public override void onClick(MouseButtonEventArgs args)
         {
             base.onClick(args);
-            System.Console.WriteLine((X + Width) + " " + args.X);
         }
 
         private CardView viewAt(int clickx, int clicky)

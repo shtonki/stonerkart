@@ -28,6 +28,11 @@ namespace stonerkart
 
         cardframegrey,
 
+        deckButton,
+        handButton,
+        displaceButton,
+        graveyardButton,
+
         orbChaos,
         orbNature,
         orbOrder,
@@ -206,6 +211,11 @@ namespace stonerkart
             images[Textures.border0] = Resources.border0;
 
             images[Textures.table0] = Resources.table0;
+
+            images[Textures.graveyardButton] = Resources.buttonGraveyard;
+            images[Textures.displaceButton] = Resources.buttonExile;
+            images[Textures.handButton] = Resources.buttonHand;
+            images[Textures.deckButton] = Resources.buttonDeck;
 
             images[Textures.cardframegrey] = Resources.whiteframe4;
 

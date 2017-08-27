@@ -53,6 +53,16 @@ namespace stonerkart
 
             gameState.hero.field.addObserver(screen.hexPanel);
             gameState.villain.field.addObserver(screen.hexPanel);
+
+            gameState.hero.hand.addObserver(screen.heroPanel);
+            gameState.hero.deck.addObserver(screen.heroPanel);
+            gameState.hero.graveyard.addObserver(screen.heroPanel);
+            gameState.hero.displaced.addObserver(screen.heroPanel);
+
+            gameState.villain.hand.addObserver(screen.villainPanel);
+            gameState.villain.deck.addObserver(screen.villainPanel);
+            gameState.villain.graveyard.addObserver(screen.villainPanel);
+            gameState.villain.displaced.addObserver(screen.villainPanel);
         }
 
         public Card createToken(CardTemplate ct, Player owner)
@@ -188,6 +198,7 @@ namespace stonerkart
 
             while (true)
             {
+                screen.turnIndicator.setActive(gameState.stepCounter.step, gameState.activePlayer.isHero);
                 doStep(gameState.stepCounter.step);
                 gameState.stepCounter.nextStep();
             }
@@ -806,7 +817,7 @@ namespace stonerkart
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere;
 
-            bool canCastSlow = true || gameState.stack.Count == 0 && gameState.activePlayer == gameState.hero && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
+            bool canCastSlow = gameState.stack.Count == 0 && gameState.activePlayer == gameState.hero && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
             if (!canCastSlow)
             {
                 activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
@@ -916,9 +927,10 @@ namespace stonerkart
             Tile rt;
             if (chooser.isHero)
             {
-                screen.promptPanel.prompt(chooserPrompt);
+                screen.promptPanel.promptButtons(chooserPrompt, cancellable ? new[] { ButtonOption.Cancel } : new ButtonOption[0]);
                 rt = chooseTileUnsynced(filter);
-                connection.sendChoice(gameState.ord(rt));
+                if (rt == null) connection.sendChoice(null);
+                else connection.sendChoice(gameState.ord(rt));
             }
             else
             {
@@ -932,9 +944,12 @@ namespace stonerkart
 
         private Tile chooseTileUnsynced(Func<Tile, bool> filter)
         {
-            PublicSaxophone sax = new PublicSaxophone(o => o is Tile && filter((Tile)o));
+            PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Tile && filter((Tile)o)));
             screen.hexPanel.subTile(sax, gameState.map.tileAt);
+            screen.promptPanel.sub(sax);
             var v = sax.call();
+
+            if (v is ButtonOption) return null;
             return (Tile)v;
         }
 

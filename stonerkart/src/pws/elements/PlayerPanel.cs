@@ -7,10 +7,19 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class PlayerPanel : Square, Observer<ManaPoolChanged>
+    class PlayerPanel : Square, Observer<ManaPoolChanged>, Observer<PileChangedMessage>
     {
         private Square manaSquare;
         private Square[][] manaPoolOrbs;
+
+        private Square[] locationButtons;
+        private Square buttonsSquare;
+
+        private PileLocation[] locations = new[]
+        {PileLocation.Deck, PileLocation.Displaced, PileLocation.Graveyard, PileLocation.Hand,};
+
+        private Textures[] locationTextures = new[]
+        {Textures.deckButton, Textures.displaceButton, Textures.graveyardButton, Textures.handButton,};
 
         private const int rows = 6;
         private const int columns = 6;
@@ -18,6 +27,7 @@ namespace stonerkart
 
         public PlayerPanel(int width, int height) : base(width, height)
         {
+            Backcolor = Color.FromArgb(120, 20, 20, 20);
             manaSquare = new Square();
             addChild(manaSquare);
 
@@ -36,16 +46,26 @@ namespace stonerkart
                     manaSquare.addChild(s);
                 }
             }
+            
+            buttonsSquare = new Square();
+            addChild(buttonsSquare);
+            locationButtons = new Square[locations.Length];
+            for (int i = 0; i < locationButtons.Length; i++)
+            {
+                Square s = locationButtons[i] = new Square();
+                s.Backimege = new Imege(locationTextures[i]);
+                buttonsSquare.addChild(s);
+            }
 
             layoutstuff();
         }
 
         private void layoutstuff()
         {
-            manaSquare.Width = Width - 20;
-            manaSquare.Height = Height - 20;
-            manaSquare.X = 10;
-            manaSquare.Y = 10;
+            int manaSquareSize = Width;
+            manaSquare.Height = manaSquareSize;
+            manaSquare.Width = manaSquareSize;
+            manaSquare.moveTo(MoveTo.Center, Height - manaSquareSize);
 
             int buttonWidth = (int)Math.Round(((double)manaSquare.Width) / columns);
             int buttonHeight = (int)Math.Round(((double)manaSquare.Height) / rows);
@@ -57,6 +77,24 @@ namespace stonerkart
                     Square s = manaPoolOrbs[i][j];
                     s.setSize(buttonWidth, buttonHeight);
                     s.setLocation(i*buttonWidth, j*buttonHeight);
+                }
+            }
+
+            int locationButtonPadding = 10;
+            int availableHeight = Height - manaSquareSize;
+            int locationButtonSize = (availableHeight - locationButtonPadding*3)/2;
+
+            int ctr = 0;
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    var btn = locationButtons[ctr++];
+                    btn.Border = new SolidBorder(2, Color.AliceBlue);
+                    btn.Text = "0";
+                    btn.setSize(locationButtonSize, locationButtonSize);
+                    btn.setLocation(locationButtonPadding + i*(locationButtonSize + locationButtonPadding),
+                        locationButtonPadding + j*(locationButtonSize + locationButtonPadding));
                 }
             }
         }
@@ -77,6 +115,18 @@ namespace stonerkart
                     s.Backimege.Alpha = alpha;
                 }
             }
+        }
+
+        public void notify(object o, PileChangedMessage t)
+        {
+            Pile pile = (Pile)o;
+            var location = pile.location.pile;
+            int ix = 0;
+            for (; ix < locations.Length; ix++)
+            {
+                if (locations[ix] == location) break;
+            }
+            locationButtons[ix].Text = pile.Count.ToString();
         }
     }
 }

@@ -237,6 +237,7 @@ namespace stonerkart
             foreach (var player in players)
             {
                 var chosen = chooser.pickOne(player, filter, hs);
+                if (chosen == null) return null;
                 return new TargetSet(chosen);
             }
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
@@ -289,8 +290,8 @@ namespace stonerkart
         public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
         {
             Tile tl = hs.game.chooseTileSynced(chooser, t => t.card != null && filter(t.card), "swroigjs", "ioerhjgohr", true);
+            if (tl == null) return null;
             return (tl.card);
-            return hs.game.chooseCardSynced(chooser, filter);
         }
     }
 
