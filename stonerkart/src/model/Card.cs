@@ -577,7 +577,7 @@ namespace stonerkart
         Relic
     }
 
-    internal enum Rarity
+    public enum Rarity
     {
         None,
         Common,

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    enum Format
+    public enum Format
     {
         Test,
         Standard,
     }
 
-    class Deck
+    public class Deck
     {
         public CardTemplate hero;
         public CardTemplate[] templates;
@@ -241,7 +241,7 @@ CardTemplate.Survival_sInstincts,
     }
 
 
-    class DeckContraints
+    public class DeckContraints
     {
         public int cardMin;
         public int this[Rarity r]
