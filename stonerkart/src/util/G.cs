@@ -262,24 +262,24 @@ namespace stonerkart
             return v => i;
         }
 
-        public static TargetRule player => new ClickCardRule(c => c.isHeroic);
-        public static TargetRule relic => new ClickCardRule(c => c.cardType == CardType.Relic);
+        public static TargetRule player => new ChooseRule<Card>(c => c.isHeroic);
+        public static TargetRule relic => new ChooseRule<Card>(c => c.cardType == CardType.Relic);
 
         public static TargetRule creature(Func<Card, bool> filter = null)
         {
             filter = filter ?? (c => true);
-            return new ClickCardRule(c => c.cardType == CardType.Creature && filter(c));
+            return new ChooseRule<Card>(c => c.cardType == CardType.Creature && filter(c));
         }
 
         public static TargetRule nonheroicCreature(Func<Card, bool> filter = null)
         {
             filter = filter ?? (c =>true);
-            return new ClickCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));
+            return new ChooseRule<Card>(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));
         }
 
         public static TargetRule nonColouredCreature(ManaColour notAllowed)
         {
-            return new ClickCardRule(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));
+            return new ChooseRule<Card>(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));
         }
 
         //costs
@@ -287,7 +287,7 @@ namespace stonerkart
         {
             return new Effect(
                 new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                    new StaticManaRule(castManaCost.colours.ToArray())), new PayManaDoer());
+                    new ManaCostRule(castManaCost)), new PayManaDoer());
         }
 
         public static Effect manaCost(params ManaColour[] ms)

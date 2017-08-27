@@ -91,12 +91,11 @@ namespace stonerkart
             return new Effect(new TargetRuleSet(
                 new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                     templates),
-                new ClickTileRule(
-                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                new ChooseRule<Tile>(
+                    ChooseRule<Tile>.ChooseAt.Resolve,
                     t => t.passable && !t.isEdgy,
                     templates.Length, 
-                    false,
-                    InteractiveRule<Tile>.ChooseAt.Resolve)),
+                    false)),
                 new SummonToTileDoer(),
                 true
                 );

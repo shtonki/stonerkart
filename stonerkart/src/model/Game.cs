@@ -248,7 +248,7 @@ namespace stonerkart
             if (gameState.activePlayer.manaPool.maxCount < 12)
             {
                 var mc = chooseManaColourSynced(gameState.activePlayer, o => gameState.activePlayer.manaPool.currentMana(o.colour) != 6);
-                gameState.activePlayer.gainMana(mc);
+                gameState.activePlayer.gainMana(mc.Value);
             }
 
             priority();
@@ -716,8 +716,9 @@ namespace stonerkart
             }
             else
             {
-                int choice = connection.receiveChoice();
-                rt = gameState.cardFromOrd(choice);
+                int? choice = connection.receiveChoice();
+                if (choice.HasValue) rt = gameState.cardFromOrd(choice.Value);
+                else rt = null;
             }
             return rt;
         }
@@ -923,7 +924,8 @@ namespace stonerkart
             {
                 screen.promptPanel.prompt(waiterPrompt);
                 var choice = connection.receiveChoice();
-                rt = gameState.tileFromOrd(choice);
+                if (choice.HasValue) rt = gameState.tileFromOrd(choice.Value);
+                else rt = null;
             }
             return rt;
         }
@@ -936,7 +938,7 @@ namespace stonerkart
             return (Tile)v;
         }
 
-        public ManaColour chooseManaColourSynced(Player chooser, Func<ManaOrb, bool> f)
+        public ManaColour? chooseManaColourSynced(Player chooser, Func<ManaOrb, bool> f)
         {
             ManaColour clr;
             if (chooser == gameState.hero)
