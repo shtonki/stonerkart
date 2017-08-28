@@ -29,7 +29,7 @@ namespace stonerkart
             }
         }
         private Tile Tile;
-        public Tile lastSeenAt;
+        public Tile lastSeenAt { get; private set; }
         public int moveCount { get; private set; }
         public Player owner { get; }
         public Player controller { get; }
@@ -94,7 +94,7 @@ namespace stonerkart
         private int damageTaken;
         public int fatigue { get; private set; }
 
-        private ManaColour? forceColour;
+        private ManaColour? forceColour { get; }
         private Modifiable[] modifiables;
 
         private List<KeywordAbility> keywordAbilities;
@@ -254,7 +254,7 @@ namespace stonerkart
                 if (s.Length > 0)
                 {
                     sb.Append(a.description);
-                    //sb.Append("\r\n");
+                    sb.Append(G.newlineGlyph);
                 }
             }
 
@@ -264,13 +264,15 @@ namespace stonerkart
                 sb.Append(" -- (");
                 sb.Append(kaExplainer(a));
                 sb.Append(')');
-                //sb.Append("\r\n");
+                sb.Append(G.newlineGlyph);
+
             }
 
             foreach (var a in auras)
             {
                 sb.Append(a.description);
-                //sb.Append("\r\n");
+                sb.Append(G.newlineGlyph);
+
             }
 
             return sb.ToString();
@@ -575,7 +577,7 @@ namespace stonerkart
         Relic
     }
 
-    internal enum Rarity
+    public enum Rarity
     {
         None,
         Common,

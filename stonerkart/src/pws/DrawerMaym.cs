@@ -26,6 +26,26 @@ namespace stonerkart
             GL.Translate(tx, -ty, 0);
         }
 
+        public void drawLine(Point org, Point end, Color c)
+        {
+            drawLine(org.X, org.Y, end.X, end.Y, c);
+        }
+
+        public void drawLine(int xorg, int yorg, int xend, int yend, Color c)
+        {
+            var org = Frame.pixToGL(xorg, yorg);
+            var end = Frame.pixToGL(xend, yend);
+
+            GL.LineWidth(4);
+            GL.Color4(c);
+            GL.Begin(BeginMode.Lines);
+
+            GL.Vertex2(org.X, -org.Y);
+            GL.Vertex2(end.X, -end.Y);
+
+            GL.End();
+        }
+
         public void fillRectange(Color c, int x, int y, int width, int height)
         {
             fillRectangeR(c, new Box(x, y, width, height));
@@ -45,6 +65,33 @@ namespace stonerkart
             GL.End();
         }
 
+        public void fillCircle(int x, int y, double radius, Color c)
+        {
+            var p = Frame.pixToGL(x, y);
+            drawFilledCircleR(p.X, p.Y, radius, c);
+        }
+
+        private void drawFilledCircleR(double x,  double y, double radius, Color c)
+        {
+            int i;
+            int triangleAmount = 20; //# of triangles used to draw circle
+
+            //GLfloat radius = 0.8f; //radius
+            double twicePi = 2.0f * Math.PI;
+
+            GL.Color4(c);
+            GL.Begin(BeginMode.TriangleFan);
+            GL.Vertex2(x, y); // center of circle
+            for (i = 0; i <= triangleAmount; i++)
+            {
+                GL.Vertex2(
+                        x + (radius * Math.Cos(i * twicePi / triangleAmount)),
+                    y + (radius * Math.Sin(i * twicePi / triangleAmount))
+                );
+            }
+            GL.End();
+        }
+
         public void fillHexagon(int x, int y, int size, Color border, Textures texture)
         {
             fillHexagonR(x, y, size, border, null, texture);
@@ -57,11 +104,13 @@ namespace stonerkart
 
         private void fillHexagonR(int x, int y, int size, Color border, Color? centre, Textures? t)
         {
+            int lt = (int)Math.Round(size/25.0);
+
             Box b = new Box(
-                x,
-                y + size,
-                size, 
-                size
+                x - lt/2,
+                y + size - lt/2,
+                size - lt,
+                size - lt
                 );
 
             if (t.HasValue)
@@ -114,7 +163,7 @@ namespace stonerkart
             }
             else throw new Exception();
 
-            GL.LineWidth(4);
+            GL.LineWidth(lt);
             GL.Color4(border);
             GL.Begin(BeginMode.LineLoop);
 
@@ -130,36 +179,34 @@ namespace stonerkart
 
         }
 
+        public void drawImegeForceColour(Imege i, int x, int y, int width, int height, Color c)
+        {
+            drawTextureR(i.texture, new Box(x, y, width, height), i.crop, c);
+        }
+
         public void drawImege(Imege i, int x, int y, int width, int height)
         {
-            drawTexture(i.texture, x, y, width, height, i.crop);
+            drawTextureR(i.texture, new Box(x, y, width, height), i.crop, i.brushColor);
         }
 
-        public void drawTexture(Textures t, int x, int y, int width, int height, Box? cropbox = null, Color? c = null)
+        private void drawTextureR(Textures tx, Box imageLocation, Box crop, Color color)
         {
-            drawTextureR(t, new Box(x, y, width, height), cropbox, c);
-        }
-
-        private void drawTextureR(Textures tx, Box imageLocation, Box? crop = null, Color? c = null)
-        {
-            Color clr = c ?? Color.White;
-            Box cropx = crop ?? new Box(0.0, 0.0, 1.0, 1.0);
 
             GL.Enable(EnableCap.Texture2D);
-            GL.Color4(clr);
+            GL.Color4(color);
             GL.BindTexture(TextureTarget.Texture2D, textures[tx]);
             GL.Begin(PrimitiveType.Quads);
             
-            GL.TexCoord2(cropx.x, cropx.y);
+            GL.TexCoord2(crop.x, crop.y);
             GL.Vertex2(imageLocation.x, -imageLocation.y);
 
-            GL.TexCoord2(cropx.r, cropx.y);
+            GL.TexCoord2(crop.r, crop.y);
             GL.Vertex2(imageLocation.r, -imageLocation.y);
 
-            GL.TexCoord2(cropx.r, cropx.b);
+            GL.TexCoord2(crop.r, crop.b);
             GL.Vertex2(imageLocation.r, -imageLocation.b);
 
-            GL.TexCoord2(cropx.x, cropx.b);
+            GL.TexCoord2(crop.x, crop.b);
             GL.Vertex2(imageLocation.x, -imageLocation.b);
             
             GL.End();

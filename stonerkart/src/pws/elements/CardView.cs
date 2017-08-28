@@ -9,11 +9,22 @@ namespace stonerkart
 {
     class CardView : Square, Observer<CardChangedMessage>
     {
-        private const int framewidth = 500;
-        private const int frameheight = 700;
+        public const int framewidth = 500;
+        public const int frameheight = 700;
+
+        public Card card { get; }
 
         public CardView(Card c) : base(framewidth, frameheight)
         {
+            card = c;
+
+            topbutton = new Square(0, 0);
+            topbutton.clicked += args =>
+            {
+                this.onClick(args);
+            };
+            addChild(topbutton);
+
             namebox = new Square();
             namebox.TextLayout = new SingleLineFitLayout(Justify.Left);
             addChild(namebox);
@@ -39,13 +50,6 @@ namespace stonerkart
             orbbox = new Square();
             addChild(orbbox);
 
-
-            topbutton = new Square(0, 0);
-            topbutton.clicked += args =>
-            {
-                this.onClick(args);
-            };
-            //addChild(topbutton);
 
             //layoutStuff();
             populate(c);
@@ -100,7 +104,6 @@ namespace stonerkart
 
         #endregion
 
-        private Color frameColor;
         private IEnumerable<ManaOrb> orbs;
 
         public void notify(object o, CardChangedMessage t)
@@ -111,6 +114,8 @@ namespace stonerkart
 
         private void populate(Card c)
         {
+            if (card != c) throw new Exception();
+
             namebox.Text = c.name;
             breadbox.Text = c.breadText;
             movementbox.Text = c.movement.ToString();
@@ -119,6 +124,8 @@ namespace stonerkart
             artbox.Backimege = new Imege(TextureLoader.cardArt(c.template));
 
             orbs = c.castManaCost.orbs;
+
+            Color frameColor;
 
             if (c.colours.Count > 1)
             {
@@ -137,8 +144,11 @@ namespace stonerkart
                     case ManaColour.Nature: frameColor = Color.LightGreen; break;
                     case ManaColour.Order: frameColor = Color.LightSkyBlue; break;
                     case ManaColour.Colourless: frameColor = Color.Silver; break;
+                    default: throw new Exception();
                 }
             }
+
+            frameImage.brushColor = frameColor;
         }
 
         public void layoutStuff()
@@ -178,12 +188,9 @@ namespace stonerkart
             if (colourlessCount > 0)
             {
                 Square orbsquare = new Square(orbsize, orbsize);
-                orbsquare.textPaddingX = 1;
-                orbsquare.textPaddingY = 1;
                 orbbox.addChild(orbsquare);
                 orbsquare.X = i * (orbsize + pad);
-                orbsquare.Backimege = new Imege(TextureLoader.orbTexture(ManaColour.Colourless));
-                orbsquare.Text = colourlessCount.ToString();
+                orbsquare.Backimege = new Imege(TextureLoader.colourlessTexture(colourlessCount));
             }
 
             namebox.X = (int)Math.Round((scale * nameboxOrigX));
@@ -257,15 +264,23 @@ namespace stonerkart
             }
         }
 
+        public static int heightFromWidth(int width)
+        {
+            return width * frameheight / framewidth;
+        }
+
+        public static int widthFromHeight(int height)
+        {
+            return height * framewidth / frameheight;
+        }
+
         private const double imgxo = 26.0/framewidth;
         private const double imgxw = 96.0/framewidth;
-
+        private Imege frameImage = new Imege(Textures.cardframegrey);
 
         protected override void draw(DrawerMaym dm)
         {
-            //base.draw(dm);
-
-            dm.drawTexture(Textures.cardframegrey, 0, 0, width, height, null, frameColor);
+            dm.drawImege(frameImage, 0, 0, width, height);
         }
     }
 }

@@ -27,17 +27,24 @@ namespace stonerkart
             this.card = card;
         }
 
-
-        public virtual IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] tms)
+        public IEnumerable<GameEvent> payCosts(HackStruct hs)
         {
-            return effects.resolve(hs, tms);
+            var costCache = cost.fillCast(hs);
+            if (costCache == null) return null;
+            return cost.resolve(hs, costCache);
         }
 
-        public bool possible(HackStruct hs)
+        public TargetSet[][] target(HackStruct hs)
         {
-            return effects.possibleTargets(hs) && cost.possibleAsCost(hs);
+            return effects.fillCast(hs);
         }
 
+        public virtual IEnumerable<GameEvent> resolve(HackStruct hs, TargetSet[][] cache)
+        {
+            return effects.resolve(hs, cache);
+        }
+
+        
         public Card createDummy()
         {
             return card.createDummy(this);
@@ -60,8 +67,8 @@ namespace stonerkart
     {
         public enum Timing { Pre, Post };
 
-        public Timing timing;
-        public bool isOptional;
+        public Timing timing { get; }
+        public bool isOptional { get; }
 
         private GameEventFilter filter;
 
@@ -73,31 +80,18 @@ namespace stonerkart
             this.isOptional = isOptional;
         }
 
-        public override IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] tms)
+        public override IEnumerable<GameEvent> resolve(HackStruct hs, TargetSet[][] cached)
         {
             if (isOptional)
             {
-                ButtonOption opt;
-                if (hs.heroIsResolver)
-                {
-                    hs.setPrompt("Do you want to use this ability?", ButtonOption.Yes, ButtonOption.No);
-
-                    throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-                    /*
-                    ShibbuttonStuff ss = hs.waitForStuff<ShibbuttonStuff>(b => true);
-                    opt = ss.option;
-                    */
-                    hs.sendChoices(new[] {(int)opt});
-                }
-                else
-                {
-                    hs.setPrompt("Opponent is deciding whether to use the optional ability.");
-                    opt = (ButtonOption)hs.receiveChoices()[0];
-                }
+                ButtonOption opt = hs.game.chooseButtonSynced(hs.resolveController,
+                    "Opponent is deciding whether to use optional ability.",
+                    "Do you want to use this ability?",
+                    ButtonOption.Yes, ButtonOption.No);
 
                 if (opt == ButtonOption.No) return new GameEvent[] {};
             }
-            return base.resolve(hs, tms);
+            return base.resolve(hs, cached);
         }
 
         public bool triggeredBy(GameEvent e)

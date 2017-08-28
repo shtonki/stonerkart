@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    internal class Player : Observable<PlayerChangedArgs>, Observer<PileChangedMessage>, Targetable
+    internal class Player : Observable<PlayerChangedArgs>, Targetable
     {
         public Card heroCard { get; private set; }
         public GameState game { get; }
@@ -34,12 +34,6 @@ namespace stonerkart
             hand = new Pile(new Location(this, PileLocation.Hand));
             graveyard = new Pile(new Location(this, PileLocation.Graveyard));
             displaced = new Pile(new Location(this, PileLocation.Displaced));
-
-            deck.addObserver(this);
-            field.addObserver(this);
-            hand.addObserver(this);
-            graveyard.addObserver(this);
-            displaced.addObserver(this);
 
             manaPool = new ManaPool();
         }
@@ -142,11 +136,6 @@ namespace stonerkart
 
         #endregion
 
-        public void notify(object o, PileChangedMessage t)
-        {
-            Pile p = (Pile)o;
-            notify(new PlayerChangedArgs(p.location.pile));
-        }
     }
 
     class PlayerChangedArgs

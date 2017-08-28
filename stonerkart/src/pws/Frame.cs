@@ -60,10 +60,38 @@ namespace stonerkart
             base.OnUpdateFrame(e);
         }
 
+        class fpscounter
+        {
+            private double[] buf;
+            private int ctr;
+
+            public fpscounter(int bufsize)
+            {
+                buf = new double[bufsize];
+            }
+
+            public void addVal(double v)
+            {
+                ctr = (ctr + 1)%buf.Length;
+                buf[ctr] = v;
+            }
+
+            public double getVal()
+            {
+                return buf.Sum()/buf.Count();
+            }
+        }
+
+        fpscounter ctr = new fpscounter(30);
+
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
-            
+
+            ctr.addVal(RenderFrequency);
+
+            Title = ctr.getVal().ToString();
+               
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.ClearColor(Color.CornflowerBlue);
             GL.PushMatrix();
@@ -87,6 +115,9 @@ namespace stonerkart
 
         private void drawElement(GuiElement ge, DrawerMaym dm)
         {
+            if (ge == null) return;
+            if (!ge.Visible) return;
+
             dm.translate(ge.X, ge.Y);
 
             ge.Draw(dm);
@@ -105,7 +136,6 @@ namespace stonerkart
         {
             base.OnMouseDown(e);
             e.Position = scalePoint(e.Position);
-
             focus(hovered);
             hovered?.onMouseDown(e);
             designer?.setActive(hovered);
@@ -163,39 +193,34 @@ namespace stonerkart
             }
         }
 
+        private GuiElement elementAt(int x, int y, GuiElement[] l)
+        {
+            foreach (var v in l)
+            {
+                if (v.Hoverable &&
+                    v.X < x &&
+                    v.X + v.Width > x &&
+                    v.Y < y &&
+                    v.Y + v.Height > y)
+                {
+                    var nl = v.children.ToArray();
+                    var r = elementAt(x - v.X, y - v.Y, nl);
+                    return r ?? v;
+                }
+            }
+
+            return null;
+        }
+
         private GuiElement elementAt(Point sp)
         {
             if (activeScreen == null) return null;
 
-            //var sp = scalePoint(p);
-
             int x = sp.X;
             int y = sp.Y;
-            GuiElement r = null;
-            var l = activeScreen.Elements;
+            var l = activeScreen.Elements.Reverse().ToArray();
 
-            while (true)
-            {
-                bool c = false;
-
-                foreach (var v in l)
-                {
-                    if (v.hoverable &&
-                        v.X < x &&
-                        v.X + v.Width > x &&
-                        v.Y < y &&
-                        v.Y + v.Height > y)
-                    {
-                        r = v;
-                        l = v.children;
-                        c = true;
-                        x -= v.X;
-                        y -= v.Y;
-                    }
-                }
-
-                if (!c) return r;
-            }
+            return elementAt(x, y, l);
         }
 
 
@@ -216,6 +241,8 @@ namespace stonerkart
         public const int BACKSCREENHEIGHT = 1080;
         public const int BACKSCREENWIDTHd2 = BACKSCREENWIDTH/2;
         public const int BACKSCREENHEIGHTd2 = BACKSCREENHEIGHT/2;
+        public const int MENUHEIGHT = 50;
+        public const int AVAILABLEHEIGHT = BACKSCREENHEIGHT - MENUHEIGHT;
 
         protected override void OnResize(EventArgs e)
         {

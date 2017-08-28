@@ -15,23 +15,23 @@ namespace stonerkart
     {
         public static void launchGame()
         {
-            if (!Network.connectToServer()) throw new Exception("Serber offline");
+            //if (!Network.connectToServer()) throw new Exception("Serber offline");
 
             GUI.launch();
 
             var gsc = new GameScreen();
+            //GUI.setScreen(gsc);
+            //GUI.setScreen(new LoginScreen());
+            GUI.setScreen(new DeckEditorScreen());
 
-            GUI.setScreen(gsc);
 
-            Game g = new Game(new NewGameStruct(0, 0, new []{"a", "b"}, 0), true);
+            Game g = new Game(new NewGameStruct(0, 420, new []{"Hero", "Villain"}, 0), true, gsc);
 
-            g.game.hero.deck.addObserver(gsc.pw);
-
-            g.startGame();
+            g.startGameThread();
 
             //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             //UIController.launchUI();
-            
+
             /*
 
             if (Network.connectToServer())

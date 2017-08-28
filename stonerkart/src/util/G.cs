@@ -35,6 +35,17 @@ namespace stonerkart
 
     static class G
     {
+        public static List<ManaColour> orbOrder = new List<ManaColour>(new[]
+        {
+            ManaColour.Chaos,
+            ManaColour.Death,
+            ManaColour.Might,
+            ManaColour.Order,
+            ManaColour.Life,
+            ManaColour.Nature,
+            ManaColour.Colourless,
+        });
+
         /*
         private static char[] hackish = G.range(0, 20).Select(v => (char)('\u2460' + v)).ToArray();
 
@@ -212,13 +223,15 @@ namespace stonerkart
 
         public static string colourlessGlyph(int i)
         {
-            return "/" + i + "/";
+            return "\\cl" + i + "\\";
         }
 
         public static string colouredGlyph(ManaColour c)
         {
-            return "/" + c + "/";
+            return "\\" + c + "\\";
         }
+
+        public static string newlineGlyph => "\\n\\";
 
         public static string exhaustGhyph => "Exhaust";
 
@@ -249,24 +262,24 @@ namespace stonerkart
             return v => i;
         }
 
-        public static TargetRule player => new PryCardRule(c => c.isHeroic);
-        public static TargetRule relic => new PryCardRule(c => c.cardType == CardType.Relic);
+        public static TargetRule player => new ChooseRule<Card>(c => c.isHeroic);
+        public static TargetRule relic => new ChooseRule<Card>(c => c.cardType == CardType.Relic);
 
         public static TargetRule creature(Func<Card, bool> filter = null)
         {
             filter = filter ?? (c => true);
-            return new PryCardRule(c => c.cardType == CardType.Creature && filter(c));
+            return new ChooseRule<Card>(c => c.cardType == CardType.Creature && filter(c));
         }
 
         public static TargetRule nonheroicCreature(Func<Card, bool> filter = null)
         {
             filter = filter ?? (c =>true);
-            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));
+            return new ChooseRule<Card>(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));
         }
 
         public static TargetRule nonColouredCreature(ManaColour notAllowed)
         {
-            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));
+            return new ChooseRule<Card>(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));
         }
 
         //costs
@@ -284,9 +297,7 @@ namespace stonerkart
 
         
 
-        public static Effect exhaustThis { get; } =
-            new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                new FatigueDoer(true));
+        public static Effect exhaustThis { get; } = null;//new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)), new FatigueDoer(true));
 
 
         public static GameEventFilter never { get; } = new StaticGameEventFilter(() => false);

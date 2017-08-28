@@ -48,7 +48,7 @@ namespace stonerkart
             if (!cardList.Contains(c))
             {
                 cardList.Add(c);
-                notify(new PileChangedMessage());
+                notify(new PileChangedMessage(PileChangedArg.Add, c));
             }
             else
             {
@@ -59,7 +59,7 @@ namespace stonerkart
 
         public void addRange(IEnumerable<Card> cs)
         {
-            PileChangedMessage m = new PileChangedMessage();
+            PileChangedMessage m = new PileChangedMessage(PileChangedArg.Add, cs);
             foreach (Card c in cs)
             {
                 cardList.Add(c);
@@ -83,20 +83,20 @@ namespace stonerkart
         {
             if (!cardList.Contains(c)) throw new Exception();
             cardList.Remove(c);
-            notify(new PileChangedMessage());
+            notify(new PileChangedMessage(PileChangedArg.Remove, c));
         }
 
         public Card removeTop()
         {
             Card r = cardList[cardList.Count - 1];
             cardList.RemoveAt(cardList.Count - 1);
-            notify(new PileChangedMessage());
+            notify(new PileChangedMessage(PileChangedArg.Remove, r));
             return r;
         }
 
         public void clear()
         {
-            PileChangedMessage m = new PileChangedMessage();
+            PileChangedMessage m = new PileChangedMessage(PileChangedArg.Remove, cards);
             cardList.Clear();
             notify(m);
         }
@@ -148,9 +148,22 @@ namespace stonerkart
         }
     }
 
-    struct PileChangedMessage
+    class PileChangedMessage
     {
+        public PileChangedArg arg;
+        public Card[] cards;
 
+        public PileChangedMessage(PileChangedArg arg, IEnumerable<Card> cards)
+        {
+            this.arg = arg;
+            this.cards = cards.ToArray();
+        }
+
+        public PileChangedMessage(PileChangedArg arg, Card card) : this (arg, new []{card})
+        {
+        }
     }
+
+    enum PileChangedArg { Add, Remove, }
 
 }

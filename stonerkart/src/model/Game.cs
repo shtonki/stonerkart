@@ -16,17 +16,21 @@ namespace stonerkart
         
         private GameConnection connection;
 
-        public GameState game;
+        public GameState gameState;
 
         private bool skipFirstDraw = true;
 
-        public Game(NewGameStruct ngs, bool local)
+        private GameScreen screen;
+
+        public Game(NewGameStruct ngs, bool local, GameScreen gameScreen)
         {
+            screen = gameScreen;
+
             gameid = ngs.gameid;
             
             gameController = new GameController(null, null);
 
-            game = new GameState(ngs);
+            gameState = new GameState(ngs);
 
             if (local)
             {
@@ -34,8 +38,34 @@ namespace stonerkart
             }
             else
             {
-                connection = new MultiplayerConnection(game, ngs);
+                connection = new MultiplayerConnection(gameState, ngs);
             }
+
+            observe(screen);
+        }
+
+        private void observe(GameScreen gamescreen)
+        {
+            gameState.hero.hand.addObserver(screen.handView);
+            gameState.hero.manaPool.addObserver(screen.heroPanel);
+
+            gameState.stack.addObserver(screen.stackWinduh);
+
+            gameState.hero.field.addObserver(screen.hexPanel);
+            gameState.villain.field.addObserver(screen.hexPanel);
+
+            gameState.hero.graveyard.addObserver(screen.heroGraveyard);
+            screen.heroGraveyardWinduh.Title = String.Format("{0}'s Graveyard", gameState.hero.name);
+
+            gameState.hero.hand.addObserver(screen.heroPanel);
+            gameState.hero.deck.addObserver(screen.heroPanel);
+            gameState.hero.graveyard.addObserver(screen.heroPanel);
+            gameState.hero.displaced.addObserver(screen.heroPanel);
+
+            gameState.villain.hand.addObserver(screen.villainPanel);
+            gameState.villain.deck.addObserver(screen.villainPanel);
+            gameState.villain.graveyard.addObserver(screen.villainPanel);
+            gameState.villain.displaced.addObserver(screen.villainPanel);
         }
 
         public Card createToken(CardTemplate ct, Player owner)
@@ -45,10 +75,16 @@ namespace stonerkart
             return r;
         }
 
-        private Card createCard(CardTemplate ct, Pile pile, Player owner)
+        private Card createCard(CardTemplate ct, Player owner)
         {
             Card r = new Card(ct, owner);
-            game.cards.Add(r);
+            gameState.cards.Add(r);
+            return r;
+        }
+
+        private Card createCard(CardTemplate ct, Pile pile, Player owner)
+        {
+            Card r = createCard(ct, owner);
             r.moveTo(pile);
             return r;
         }
@@ -58,7 +94,7 @@ namespace stonerkart
             Card r = a.createDummy();
 
             r.moveTo(pile);
-            game.cards.Add(r);
+            gameState.cards.Add(r);
             return r;
         }
 
@@ -69,9 +105,9 @@ namespace stonerkart
             return map.path(c, t);*/
         }
 
-        public void startGame()
+        public void startGameThread()
         {
-            Thread t = new Thread(loopEx);
+            Thread t = new Thread(gameLoop);
             t.Start();
         }
 
@@ -79,82 +115,67 @@ namespace stonerkart
         {
             Deck d = DeckController.chooseDeck();
 
-            Deck[] decks = connection.deckify(d, game.ord(game.hero));
+            Deck[] decks = connection.deckify(d, gameState.ord(gameState.hero));
 
-            for (int i = 0; i < game.players.Count; i++)
+            for (int i = 0; i < gameState.players.Count; i++)
             {
-                Player p = game.players[i];
+                Player p = gameState.players[i];
                 Deck deck = decks[i];
 
                 Card heroCard = createCard(deck.hero, p.field, p);
                 p.setHeroCard(heroCard);
 
+                //var cards = deck.templates.Select(ct => createCard(ct, p.deck, p));
+                //foreach (var card in cards) card.moveTo(p.deck);
+                //p.deck.addRange(cards);
+                
                 foreach (var ct in deck.templates)
                 {
                     createCard(ct, p.deck, p);
                 }
-                game.shuffle(p.deck);
+                
+                gameState.shuffle(p.deck);
             }
 
 
             Tile[] ts = new[]
             {
-                game.map.tileAt(2, 2),
-                game.map.tileAt(game.map.width - 3, game.map.height - 3),
+                gameState.map.tileAt(2, 2),
+                gameState.map.tileAt(gameState.map.width - 3, gameState.map.height - 3),
             };
             int ix = 0;
-            foreach (Player p in game.players)
+            foreach (Player p in gameState.players)
             {
                 if (ix >= ts.Length) throw new Exception();
 
                 ts[ix++].place(p.heroCard);
             }
 
-            int xi = game.random.Next();
+            int xi = gameState.random.Next();
 
-            if (connection is DummyConnection) xi = game.ord(game.hero);
-            Player flipwinner = game.players[xi % game.players.Count];
-            ButtonOption bopt;
-            if (flipwinner == game.hero)
-            {
-                bopt = waitForButton("Do you wish to go first?", ButtonOption.Yes, ButtonOption.No);
-                connection.sendAction(new ChoiceSelection((int)bopt));
-            }
-            else
-            {
-                gameController.setPrompt("Oppenent won the flip and is choosing whether to go first.");
-                ChoiceSelection v = connection.receiveAction<ChoiceSelection>();
-                bopt = (ButtonOption)v.choices[0];
-            }
-            game.activePlayerIndex = (xi + (bopt == ButtonOption.Yes ? 0 : 1)) % game.players.Count;
+            if (connection is DummyConnection) xi = gameState.ord(gameState.hero);
+            Player flipwinner = gameState.players[xi % gameState.players.Count];
+            ButtonOption bopt = chooseButtonSynced(flipwinner,
+                "Oppenent won the flip and is choosing whether to go first.",
+                "Do you wish to go first?", ButtonOption.Yes, ButtonOption.No);
+            
+            gameState.activePlayerIndex = (xi + (bopt == ButtonOption.Yes ? 0 : 1)) % gameState.players.Count;
 
             int[] draws = { 5, 5, 4, 3, 2, 1 };
 
-            for (int i = 0; i < game.players.Count; i++)
+            for (int i = 0; i < gameState.players.Count; i++)
             {
                 for (int j = 0; j < draws.Length; j++)
                 {
-                    Player p = game.players[(i + game.activePlayerIndex) % game.players.Count];
+                    Player p = gameState.players[(i + gameState.activePlayerIndex) % gameState.players.Count];
                     int cards = draws[j];
                     handleTransaction(new DrawEvent(p, cards));
 
                     if (j == draws.Length - 1) break;
 
-                    ChoiceSelection cs;
-
-                    if (p == game.hero)
-                    {
-                        ButtonOption b = waitForButton(String.Format("Redraw to {0}?", draws[j + 1]), ButtonOption.Yes, ButtonOption.No);
-                        cs = new ChoiceSelection((int)b);
-                        connection.sendAction(cs);
-                    }
-                    else
-                    {
-                        gameController.setPrompt("Opponent is redrawing.");
-                        cs = connection.receiveAction<ChoiceSelection>();
-                    }
-
-                    ButtonOption bo = cs.choices.Length > 0 ? (ButtonOption)cs.choices[0] : ButtonOption.No;
+                    var bo = chooseButtonSynced(p,
+                        "Opponent is redrawing.",
+                        String.Format("Redraw to {0}?", draws[j + 1]), ButtonOption.Yes, ButtonOption.No);
 
                     if (bo == ButtonOption.Yes)
                     {
@@ -163,7 +184,7 @@ namespace stonerkart
                             Card crd = p.hand.peek();
                             crd.moveTo(p.deck);
                         }
-                        game.shuffle(p.deck);
+                        gameState.shuffle(p.deck);
                     }
                     else
                     {
@@ -173,22 +194,22 @@ namespace stonerkart
             }
         }
 
-
-        private void loopEx()
+        private void gameLoop()
         {
             gameController.setPrompt("Game starting");
             initGame();
 
             while (true)
             {
-                doStep(game.stepCounter.step);
-                game.stepCounter.nextStep();
+                screen.turnIndicator.setActive(gameState.stepCounter.step, gameState.activePlayer.isHero);
+                doStep(gameState.stepCounter.step);
+                gameState.stepCounter.nextStep();
             }
         }
 
         private void doStep(Steps step)
         {
-            handleTransaction(new StartOfStepEvent(game.activePlayer, step));
+            handleTransaction(new StartOfStepEvent(gameState.activePlayer, step));
             switch (step)
             {
                 case Steps.Replenish:
@@ -217,9 +238,9 @@ namespace stonerkart
                 } break;
             }
 
-            handleTransaction(new EndOfStepEvent(game.activePlayer, step));
+            handleTransaction(new EndOfStepEvent(gameState.activePlayer, step));
 
-            foreach (Player p in game.players)
+            foreach (Player p in gameState.players)
             {
                 p.clearBonusMana();
             }
@@ -227,21 +248,21 @@ namespace stonerkart
 
         private void untapStep()
         {
-            game.activePlayer.resetMana();
+            gameState.activePlayer.resetMana();
 
             if (!skipFirstDraw)
             {
-                handleTransaction(new DrawEvent(game.activePlayer, 1));
+                handleTransaction(new DrawEvent(gameState.activePlayer, 1));
             }
             else
             {
                 skipFirstDraw = false;
             }
 
-            if (game.activePlayer.manaPool.max.orbs.Count() < 12)
+            if (gameState.activePlayer.manaPool.maxCount < 12)
             {
-                var mc = selectManaColour(game.activePlayer, o => game.activePlayer.manaPool.currentMana(o.colour) != 6);
-                game.activePlayer.gainMana(mc);
+                var mc = chooseManaColourSynced(gameState.activePlayer, o => gameState.activePlayer.manaPool.currentMana(o.colour) != 6);
+                gameState.activePlayer.gainMana(mc.Value);
             }
 
             priority();
@@ -263,93 +284,103 @@ namespace stonerkart
             Color.PaleVioletRed, 
         };
 
+        public void highlight(IEnumerable<Targetable> ts, Color c)
+        {
+            List<Tile> tiles = new List<Tile>();
+            foreach (var t in ts)
+            {
+                if (t is Tile) tiles.Add((Tile)t);
+                if (t is Card)
+                {
+                    Card card = (Card)t;
+                    if (card.location.pile == PileLocation.Field) tiles.Add(card.tile);
+                }
+                if (t is Player) tiles.Add(((Player)t).heroCard.tile);
+            }
+
+            highlight(tiles, c);
+        }
+
+        public void highlight(IEnumerable<Tile> ts, Color c)
+        {
+            foreach (var t in ts) screen.hexPanel.highlight(t.x, t.y, c);
+        }
+
+        public void clearHighlights()
+        {
+            screen.hexPanel.clearHighlights();
+        }
+
         private void moveStep()
         {
             List<Tuple<Card, Path>> paths;
 
-            bool heroMoving = game.activePlayer == game.hero;
-            gameController.setHeroActive(heroMoving);
-            var movers = game.activePlayer.field.Where(c => c.canMove);
+            Player movingPlayer = gameState.activePlayer;
+            var movers = gameState.activePlayer.field.Where(c => c.canMove);
 
-            if (heroMoving)
+            var unpathed = movers.ToList();
+            var occupado = gameState.activePlayer.field.Where(c => !c.canMove).Select(c => c.tile).ToList();
+
+            while (true)
             {
-                var unpathed = movers.ToList();
-                var occupado = game.activePlayer.field.Where(c => !c.canMove).Select(c => c.tile).ToList();
+                highlight(unpathed.Select(c => c.tile), Color.DodgerBlue);
+                //gameController.highlight(pathed.Select(c => c.tile), Color.ForestGreen);
+
+                Tile from = chooseTileSynced(movingPlayer, tile => tile.card != null && tile.card.canMove && tile.card.owner == gameState.activePlayer,
+                    "oweighjoe", "Oigjhosfgc", unpathed.Count == 0);
+                if (from == null) break;
+                Card mover = from.card;
+                if (mover.combatPath != null)
+                {
+                    removeArrow(mover.combatPath);
+                    occupado.Remove(mover.combatPath.last);
+                }
+                Path pth = new Path(from);
+                pth.colorHack = clrs[gameState.ord(mover)%clrs.Length];
+                addArrow(pth);
 
                 while (true)
                 {
-                    gameController.highlight(unpathed.Select(c => c.tile), Color.DodgerBlue);
-                    //gameController.highlight(pathed.Select(c => c.tile), Color.ForestGreen);
 
-                    var from = getTile(
-                        tile => tile.card != null && tile.card.canMove && tile.card.owner == game.activePlayer,
-                        "Move your cards nigra", unpathed.Count == 0 ? ButtonOption.Pass : ButtonOption.NOTHING);
-                    if (from == null) break;
-                    Card mover = from.card;
-                    if (mover.combatPath != null)
-                    {
-                        gameController.removeArrow(mover.combatPath);
-                        occupado.Remove(mover.combatPath.last);
-                    }
-                    Path pth = new Path(from);
-                    pth.colorHack = clrs[game.ord(mover)%clrs.Length];
-                    gameController.addArrow(pth);
+                    var options = gameState.map.pathCosts(mover, from).Where(path =>
+                        path.length <= mover.movement - pth.length //card can reach the tile
+                        &&
+                        (
+                            path.to.card == null || // tile is empty
+                            mover.canAttack(path.to.card) || //card can attack the card in the target tile
+                            (path.to.card.controller == mover.controller && !occupado.Contains(path.to))
+                            //we want to move to a tile occupied by a friendly creature that's moving somewhere else
+                            )
+                        &&
+                        !occupado.Any(p => p == path.last) //there isn't a card in the tile we want to move to
+                        ).ToList();
+                    if (options.Count == 1) break;
+                    var v = gameState.map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
+                    highlight(options.Select(p => p.to), Color.Green);
+                    Tile to = chooseTileSynced(movingPlayer, tile => options.Select(p => p.to).Contains(tile), "klgrnjlm", "dflgkbvxcvb", true);
+                    clearHighlights();
+                    if (to == null) continue;
+                    if (to == from) break;
 
-                    while (true)
-                    {
+                    var cp = options.First(p => p.to == to);
 
-                        var options = game.map.pathCosts(mover, from).Where(path =>
-                            path.length <= mover.movement - pth.length //card can reach the tile
-                            &&
-                            (
-                                path.to.card == null || // tile is empty
-                                mover.canAttack(path.to.card) || //card can attack the card in the target tile
-                                (path.to.card.controller == mover.controller && !occupado.Contains(path.to))
-                                //we want to move to a tile occupied by a friendly creature that's moving somewhere else
-                                )
-                            &&
-                            !occupado.Any(p => p == path.last) //there isn't a card in the tile we want to move to
-                            ).ToList();
-                        if (options.Count == 1) break;
-                        var v = game.map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
-                        gameController.highlight(options.Select(p => p.to), Color.Green);
-                        var to = getTile(tile => options.Select(p => p.to).Contains(tile), "Move to where?");
-                        gameController.clearHighlights();
-                        if (to == null) continue;
-                        if (to == from) break;
+                    removeArrow(pth);
+                    pth.concat(cp);
+                    addArrow(pth);
+                    from = pth.to;
 
-                        var cp = options.First(p => p.to == to);
-
-                        gameController.removeArrow(pth);
-                        pth.concat(cp);
-                        gameController.addArrow(pth);
-                        from = pth.to;
-
-                        if (pth.length == mover.movement) break;
-                    }
-
-                    if (mover.combatPath == null)
-                    {
-                        unpathed.Remove(mover);
-                    }
-
-                    occupado.Add(pth.last);
-                    mover.combatPath = pth;
+                    if (pth.length == mover.movement) break;
                 }
-                paths = movers.Select(c => new Tuple<Card, Path>(c, c.combatPath)).ToList();
-                connection.sendAction(new MoveSelection(paths));
-            }
-            else
-            {
-                gameController.setPrompt("Opponent is moving");
-                MoveSelection v = connection.receiveAction<MoveSelection>();
-                paths = v.moves;
-                foreach (var p in paths)
+
+                if (mover.combatPath == null)
                 {
-                    p.Item2.colorHack = clrs[game.ord(p.Item1) % clrs.Length];
-                    gameController.addArrow(p.Item2);
+                    unpathed.Remove(mover);
                 }
+
+                occupado.Add(pth.last);
+                mover.combatPath = pth;
             }
+            paths = movers.Select(c => new Tuple<Card, Path>(c, c.combatPath)).ToList();
 
             var x = paths.Select(p => p.Item1.moveCount).ToArray();
             //todo raise MoveDeclared events lmfao
@@ -380,16 +411,16 @@ namespace stonerkart
             foreach (var v in paths) v.Item1.tile.removeCard();
             handleTransaction(gt);
 
-            foreach (var c in game.cards) c.combatPath = null;
-            gameController.clearArrows();
-            gameController.clearHighlights();
+            foreach (var c in gameState.cards) c.combatPath = null;
+            clearArrows();
+            clearHighlights();
         }
 
         private void endStep()
         {
             priority();
 
-            game.activePlayerIndex = (game.activePlayerIndex + 1)% game.players.Count;
+            gameState.activePlayerIndex = (gameState.activePlayerIndex + 1)% gameState.players.Count;
         }
 
         private void handleTransaction(GameEvent e)
@@ -410,29 +441,29 @@ namespace stonerkart
         private void handleTransaction(GameTransaction t)
         {
             logTransaction(t);
-            game.handleTransaction(t);
+            gameState.handleTransaction(t);
         }
 
         private void enforceRules()
         {
-            foreach (Card c in game.cards)
+            foreach (Card c in gameState.cards)
             {
                 c.handleEvent(new ClearAurasEvent());
             }
             List<GameEvent> ae = new List<GameEvent>();
-            foreach (Card c in game.cards)
+            foreach (Card c in gameState.cards)
             {
                 foreach (Aura a in c.auras)
                 {
                     if (c.location.pile != a.activeIn) continue;
-                    foreach (Card affected in game.cards.Where(a.filter))
+                    foreach (Card affected in gameState.cards.Where(a.filter))
                     {
                         ae.Add(new ModifyEvent(affected, a.stat, a.modifer));
                     }
                 }
             }
 
-            foreach (Card c in game.cards)
+            foreach (Card c in gameState.cards)
             {
                 foreach (GameEvent e in ae)
                 {
@@ -440,7 +471,7 @@ namespace stonerkart
                 }
             }
 
-            foreach (Card c in game.cards)
+            foreach (Card c in gameState.cards)
             {
                 c.updateState();
             }
@@ -449,19 +480,20 @@ namespace stonerkart
             {
                 handlePendingTrigs();
                 trashcanDeadCreatures();
-            } while (game.pendingTriggeredAbilities.Count > 0);
+            } while (gameState.pendingTriggeredAbilities.Count > 0);
         }
 
         private void handlePendingTrigs()
         {
-            if (game.pendingTriggeredAbilities.Count > 0)
+
+            if (gameState.pendingTriggeredAbilities.Count > 0)
             {
                 List<TriggerGlueHack>[] abilityArrays =
-                    game.players.Select(p => new List<TriggerGlueHack>()).ToArray();
+                    gameState.players.Select(p => new List<TriggerGlueHack>()).ToArray();
 
-                foreach (TriggerGlueHack pending in game.pendingTriggeredAbilities)
+                foreach (TriggerGlueHack pending in gameState.pendingTriggeredAbilities)
                 {
-                    int ix = game.ord(pending.ta.card.controller);
+                    int ix = gameState.ord(pending.ta.card.controller);
                     abilityArrays[ix].Add(pending);
                 }
 
@@ -469,17 +501,19 @@ namespace stonerkart
 
                 for (int i = 0; i < abilityArrays.Length; i++)
                 {
-                    Player p = game.playerFromOrd(i);
+                    Player p = gameState.playerFromOrd(i);
                     List<TriggerGlueHack> abilityList = abilityArrays[i];
                     
                     wrappers.AddRange(handlePendingTrigs(p, abilityList));
                 }
 
-                game.pendingTriggeredAbilities.Clear();
+                gameState.pendingTriggeredAbilities.Clear();
 
                 foreach (var w in wrappers)
                 {
-                    cast(w);
+
+                    throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+                    //cast(w);
                 }
             }
         }
@@ -595,7 +629,7 @@ namespace stonerkart
         private void trashcanDeadCreatures()
         { 
             List<Card> trashcan = new List<Card>();
-            foreach (Card c in game.fieldCards)
+            foreach (Card c in gameState.fieldCards)
             {
                 if (c.toughness <= 0 && c.cardType == CardType.Creature)
                 {
@@ -619,182 +653,153 @@ namespace stonerkart
             while (true)
             {
                 enforceRules();
-                Player fuckboy = game.players[(game.activePlayerIndex + c)% game.players.Count];
-                StackWrapper w = tryCast(fuckboy);
+                Player playerWithPriority = gameState.players[(gameState.activePlayerIndex + c)% gameState.players.Count];
 
-                if (w != null)
+                bool playerCastSomething = givePriority(playerWithPriority);
+
+                if (playerCastSomething)
                 {
-                    cast(w);
                     c = 0;
                 }
                 else //pass
                 {
                     c++;
-                    if (c == game.players.Count)
+                    if (c == gameState.players.Count) //if it was passed all the way around
                     {
-                        if (game.wrapperStack.Count == 0)
+                        if (gameState.wrapperStack.Count == 0)
                         {
-                            break;
+                            return;
                         }
-
-                        StackWrapper wrapper = game.wrapperStack.Pop();
-                        if (wrapper.castingCard != game.stack.peekTop() && wrapper.castingCard != game.stack.peekTop().dummyFor) throw new Exception();
-                        resolve(wrapper);
-                        c = 0;
-
-                        //Controller.redraw();
+                        else
+                        {
+                            resolveTopCardOnStack();
+                            c = 0;
+                        }
                     }
                 }
             }
         }
-        
-        private Card chooseCastCard(Player p)
+
+        private void resolveTopCardOnStack()
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            gameController.setPrompt("Cast a card.", ButtonOption.Pass);
-            while (true)
-            {
-                var v = waitForAnything();
-                Card c = null;
-                if (v is ShibbuttonStuff)
-                {
-                    return null;
-                }
-                else if (v is Card)
-                {
-                    c = (Card)v;
-                }
-                else if (v is Tile)
-                {
-                    Tile t = (Tile)v;
-                    if (t.card != null) c = t.card;
-                }
-
-                if (c != null && c.controller == p) return c;
-
-            }
-            */
+            StackWrapper wrapper = gameState.wrapperStack.Pop();
+            if (wrapper.castingCard != gameState.stack.peekTop() && wrapper.castingCard != gameState.stack.peekTop().dummyFor) throw new Exception();
+            resolve(wrapper);
         }
 
-        /// <summary>
-        /// Returns null when the OK button is pressed else it returns a tile when it is clicked
-        /// </summary>
-        /// <param name="f">Filters allowable tiles</param>
-        /// <param name="prompt">The string to prompt to the user</param>
-        /// <returns></returns>
-        private Tile getTile(Func<Tile, bool> f, string prompt, params ButtonOption[] buttons)
+        private Card chooseCardUnsynced(Func<Card, bool> filter)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            gameController.setPrompt(prompt, buttons);
-            var v = waitForButtonOr<Tile>(f);
-            if (v is ShibbuttonStuff)
+            PublicSaxophone sax = new PublicSaxophone(o =>
+            {
+                if (o is ButtonOption) return true;
+
+                if (o is Card)
+                {
+                    Card card = (Card)o;
+                    return filter(card);
+                }
+                return false;
+            });
+
+            screen.promptPanel.promptButtons("Choose a Card to cast", ButtonOption.Pass);
+
+            screen.promptPanel.sub(sax);
+            screen.handView.sub(sax);
+
+            var v = sax.call();
+            if (v is ButtonOption)
             {
                 return null;
             }
-            return (Tile)v;
-            */
+            if (v is Card)
+            {
+                return (Card) v;
+            }
+            throw new Exception();
         }
 
-        private void cast(StackWrapper w)
+        public Card chooseCardSynced(Player chooser, Func<Card, bool> filter)
+        {
+            Card rt;
+            if (chooser.isHero)
+            {
+                rt = chooseCardUnsynced(filter);
+                connection.sendChoice(gameState.ord(rt));
+            }
+            else
+            {
+                int? choice = connection.receiveChoice();
+                if (choice.HasValue) rt = gameState.cardFromOrd(choice.Value);
+                else rt = null;
+            }
+            return rt;
+        }
+
+        private void cast(StackWrapper w, IEnumerable<GameEvent> costEvents)
         {
             GameTransaction gt = new GameTransaction();
-            gt.addEvents(w.ability.cost.resolve(makeHackStruct(w.ability), w.costMatricies));
+            gt.addEvents(costEvents);
             handleTransaction(gt);
+
             gt = new GameTransaction();
             gt.addEvent(new CastEvent(w));
             handleTransaction(gt);
         }
 
-        private StackWrapper tryCast(Player p)
+        /// <summary>
+        /// Gives a player priority.
+        /// </summary>
+        /// <param name="playerWithPriority"></param>
+        /// <returns>True if the player cast a spell or used an ability, false if he passed. </returns>
+        private bool givePriority(Player playerWithPriority)
         { 
-            StackWrapper r;
+            //gameController.setHeroActive(b);
 
-            bool b = p == game.hero;
-            gameController.setHeroActive(b);
-            if (b)
-            {
-                if ((game.stack.Any() ||
-                     Settings.stopTurnSetting.getTurnStop(game.stepCounter.step, game.hero == game.activePlayer)))
-                {
-                    r = tryCastDx(game.hero);
-                }
-                else
-                {
-                    r = null;
-                }
-                connection.sendAction(new CastSelection(r));
-            }
-            else
-            {
-                gameController.setPrompt("Opponents turn to act.");
-                r = connection.receiveAction<CastSelection>().wrapper;
-            }
-
-            if (r != null && !r.ability.isCastAbility)
-            {
-                r = new StackWrapper(r.ability.createDummy(), r.ability, r.targetMatrices, r.costMatricies);
-            }
-            return r;
-        }
-
-
-        private StackWrapper tryCastDx(Player p)
-        {
             do
             {
-                Card card;
-                Ability ability;
-                TargetMatrix[] costmxs;
-                TargetMatrix[] targetmxs;
 
-                if (!(game.stack.Any() ||
-                        Settings.stopTurnSetting.getTurnStop(game.stepCounter.step, game.hero == game.activePlayer)))
+                /*
+                if (!(gameState.stack.Any() ||
+                        Settings.stopTurnSetting.getTurnStop(gameState.stepCounter.step, gameState.hero == gameState.activePlayer)))
                 {
                     return null;    //auto pass
                 }
+                */
 
-                card = chooseCastCard(p);
-                if (card == null) return null;
+                var card = chooseCardSynced(playerWithPriority, c => c.controller == playerWithPriority);
+                if (card == null) return false;
 
-                ability = chooseAbility(card);
+                var ability = chooseAbilitySynced(card);
                 if (ability == null) continue;
 
-                targetmxs = ability.effects.fillCast(makeHackStruct(ability));
-                if (targetmxs == null) continue;
+                HackStruct hs = new HackStruct(this, ability, playerWithPriority);
 
-                costmxs = ability.cost.fillCast(makeHackStruct(p, ability));
-                if (costmxs == null) continue;
+                var payCostGameEvents = ability.payCosts(hs);
+                if (payCostGameEvents == null) continue;
 
-                return new StackWrapper(card, ability, targetmxs, costmxs);
+                var targets = ability.target(hs);
+                if (targets == null) continue;
+
+                if (!ability.isCastAbility) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+
+                StackWrapper wrapper = new StackWrapper(card, ability, targets);
+
+                cast(wrapper, payCostGameEvents);
+                return true;
             } while (true);
         }
 
         private StackWrapper tryCastDx(Player p, TriggeredAbility ability, Card dummyCard, GameEvent ge)
         {
-            TargetMatrix[] costmxs;
-            TargetMatrix[] targetmxs;
-
-            do
-            {
-                var v = makeHackStruct(ability);
-                v.triggeringEvent = ge;
-                targetmxs = ability.effects.fillCast(v);
-                if (targetmxs == null) return null;
-
-                costmxs = ability.cost.fillCast(makeHackStruct(p, ability));
-                if (costmxs == null) continue;
-
-                return new StackWrapper(dummyCard, ability, targetmxs, costmxs);
-            } while (true);
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
 
-        private ActivatedAbility chooseAbility(Card c)
+        private ActivatedAbility chooseAbilitySynced(Card c)
         {
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere;
 
-            bool canCastSlow = game.stack.Count == 0 && game.activePlayer == game.hero && (game.stepCounter.step == Steps.Main1 || game.stepCounter.step == Steps.Main2);
+            bool canCastSlow = gameState.stack.Count == 0 && gameState.activePlayer == gameState.hero && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
             if (!canCastSlow)
             {
                 activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
@@ -814,42 +819,23 @@ namespace stonerkart
                 r = activatableAbilities[0];
             }
 
-            if (!r.possible(makeHackStruct(r))) return null;
+            //if (!r.possible(makeHackStruct(r))) return null;
 
             return r;
         }
 
-        private TargetMatrix[] chooseTargets(Ability a)
-        {
-            /*
-            Card caster = a.isCastAbility ? a.card.controller.heroCard : a.card;
-            List<Tile> v = caster.tile.withinDistance(a.castRange);
-            */
-            HackStruct box = makeHackStruct(a);
-
-            if (!a.possible(box)) return null;
-
-            TargetMatrix[] ms = a.effects.fillCast(box);
-
-            gameController.clearHighlights();
-            return ms;
-        }
-
         private void resolve(StackWrapper wrapper)
         {
-            Card stackpopped = game.stack.peekTop();
+            Card stackpopped = gameState.stack.peekTop();
             Card card = wrapper.castingCard;
-            TargetMatrix[] ts = wrapper.targetMatrices;
             Ability ability = wrapper.ability;
-
             if (stackpopped.isDummy && stackpopped.dummyFor != card) throw new Exception();
 
-            List<GameEvent> events = new List<GameEvent>();
+            HackStruct hs = new HackStruct(this, ability, card.controller);
 
-            events.AddRange(ability.resolve(makeHackStruct(ability), ts));
-
-            GameTransaction gt = new GameTransaction(events);
-
+            var resolveEvents = ability.resolve(hs, wrapper.cachedTargets);
+            if (resolveEvents == null) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            GameTransaction gt = new GameTransaction(resolveEvents);
 
             if (stackpopped.isDummy)
             {
@@ -874,118 +860,126 @@ namespace stonerkart
 
         public void endGame(GameEndStruct ras)
         {
-
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             ScreenController.transtitionToPostGameScreen(this, ras);*/
         }
 
-        private ManualResetEventSlim callerBacker;
-        private InputEventFilter filter;
-        private Stuff waitedForStuff;
-        private Func<Stuff> generateStuff(IEnumerable<Tile> allowedTiles)
+        private ManaColour? chooseManaColourUnsynced()
         {
-            Tile[] allowed = allowedTiles.ToArray();
-            return () =>
-            {
-                while (true)
-                {
-                    Stuff v = waitForAnything();
-
-                    if (v is Tile) { if (!allowed.Contains(v)) continue; }
-
-                    return v;
-                }
-            };
+            PublicSaxophone sax = new PublicSaxophone(c => true);
+            screen.promptPanel.sub(sax);
+            return (ManaColour)sax.call();
         }
 
-        public void clicked(Clickable c)
+        private void setPrompt(string prompt)
         {
-            var stuff = c.getStuff();
-            InputEvent e = new InputEvent(c, stuff);
-            if (filter != null && filter.filter(e))
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+        }
+
+        public ButtonOption chooseButtonSynced(Player chooser, string waiterPrompt, string chooserPrompt,
+            params ButtonOption[] options)
+        {
+            ButtonOption rt;
+            if (chooser.isHero)
             {
-                waitedForStuff = stuff;
-                callerBacker.Set();
+                screen.promptPanel.promptButtons(chooserPrompt, options);
+                rt = chooseButtonUnsynced(options);
+                connection.sendChoice((int)rt);
             }
-        }
-
-        private Stuff waitForButtonOr<T>(Func<T, bool> fn) where T : Stuff
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            InputEventFilter f = new InputEventFilter((clickable, o) => clickable is Shibbutton || (o is T && fn((T)o)));
-            return waitFor(f);*/
-        }
-
-        public Stuff waitForAnything()
-        {
-            InputEventFilter f = new InputEventFilter((x, y) => true);
-            return waitFor(f);
-        }
-
-        private Stuff waitFor(InputEventFilter f)
-        {
-            if (callerBacker != null || filter != null) throw new Exception();
-            callerBacker = new ManualResetEventSlim();
-            filter = f;
-            callerBacker.Wait();
-            var r = waitedForStuff;
-            waitedForStuff = null;
-            callerBacker = null;
-            filter = null;
-            return r;
-        }
-
-        private ButtonOption waitForButton(string prompt, params ButtonOption[] options)
-        {
-            Thread.Sleep(10000000);
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            gameController.setPrompt(prompt, options);
-            ShibbuttonStuff s = (ShibbuttonStuff)waitFor(new InputEventFilter((c, o) => c is Shibbutton));
-            return s.option;*/
-        }
-
-        private HackStruct makeHackStruct(Player castingPlayer)
-        {
-            return new HackStruct(game, this, castingPlayer);
-        }
-
-        private HackStruct makeHackStruct(Ability resolvingAbility)
-        {
-            return new HackStruct(game, this, resolvingAbility);
-        }
-
-        private HackStruct makeHackStruct(Player castingPlayer, Ability resolvingAbility)
-        {
-            return new HackStruct(game, this, resolvingAbility, castingPlayer);
-        }
-
-        public ManaColour selectManaColour(Player chooser, Func<ManaOrb, bool> f)
-        {
-            ManaOrbSelection selection;
-            if (chooser == game.hero)
+            else
             {
-                game.hero.stuntMana();
+                screen.promptPanel.prompt(waiterPrompt);
+                var choice = connection.receiveChoice();
+                rt = (ButtonOption)choice;
+            }
 
-                gameController.setPrompt("Gain mana nerd");
-                ManaOrb v = (ManaOrb)waitForButtonOr<ManaOrb>(f);
+            return rt;
+        }
 
-                game.hero.unstuntMana();
+        private ButtonOption chooseButtonUnsynced(params ButtonOption[] options)
+        {
+            PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption);
+            screen.promptPanel.sub(sax);
+            var v = (ButtonOption)sax.call();
+            return v;
+        }
 
-                selection = new ManaOrbSelection(v.colour);
-                connection.sendAction(selection);
+        public Tile chooseTileSynced(Player chooser, Func<Tile, bool> filter, string waiterPrompt, string chooserPrompt, bool cancellable)
+        {
+            Tile rt;
+            if (chooser.isHero)
+            {
+                screen.promptPanel.promptButtons(chooserPrompt, cancellable ? new[] { ButtonOption.Cancel } : new ButtonOption[0]);
+                rt = chooseTileUnsynced(filter);
+                if (rt == null) connection.sendChoice(null);
+                else connection.sendChoice(gameState.ord(rt));
+            }
+            else
+            {
+                screen.promptPanel.prompt(waiterPrompt);
+                var choice = connection.receiveChoice();
+                if (choice.HasValue) rt = gameState.tileFromOrd(choice.Value);
+                else rt = null;
+            }
+            return rt;
+        }
+
+        private Tile chooseTileUnsynced(Func<Tile, bool> filter)
+        {
+            PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Tile && filter((Tile)o)));
+            screen.hexPanel.subTile(sax, gameState.map.tileAt);
+            screen.promptPanel.sub(sax);
+            var v = sax.call();
+
+            if (v is ButtonOption) return null;
+            return (Tile)v;
+        }
+
+        public ManaColour? chooseManaColourSynced(Player chooser, Func<ManaOrb, bool> f)
+        {
+            ManaColour clr;
+            if (chooser == gameState.hero)
+            {
+                gameState.hero.stuntMana();
+
+                ManaColour[] cs = new[]
+                {
+                    ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
+                };
+                screen.promptPanel.promptManaChoice("Choose color", cs);
+                clr = chooseManaColourUnsynced().Value;
+
+                gameState.hero.unstuntMana();
+                
+                connection.sendChoice((int)clr);
             }
             else
             {
                 gameController.setPrompt("Opponent is gaining mana");
-                selection = connection.receiveAction<ManaOrbSelection>();
+                clr = (ManaColour)connection.receiveChoice();
             }
-            return selection.orb;
+            return clr;
+        }
+
+
+        public void addArrow(Path l)
+        {
+            screen.hexPanel.addPath(l);
+        }
+
+        public void removeArrow(Path l)
+        {
+            screen.hexPanel.removeArrow(l);
+        }
+
+        public void clearArrows()
+        {
+            screen.hexPanel.clearPaths();
         }
 
         private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)
         {
-            return gameController.showCards(cards, closeable, clicked);
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
 
         public IEnumerable<Card> selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount, Func<Card, bool> filter)
@@ -997,7 +991,7 @@ namespace stonerkart
             if (ca.Count(filter) == 0)
             {
                 var vv = showCards(ca, false);
-                var rr = waitForButton("No valid selections.", ButtonOption.Cancel);
+                var rr = chooseButton("No valid selections.", ButtonOption.Cancel);
                 vv.close();
                 return new Card[0];
             }
@@ -1031,37 +1025,14 @@ namespace stonerkart
 
         }
 
-        public void sendChoices(int[] cs)
-        {
-            connection.sendAction(new ChoiceSelection(cs));
-        }
-
-        public int[] receiveChoices()
-        {
-            return connection.receiveAction<ChoiceSelection>().choices;
-        }
-
         public void clearTargetHighlight()
         {
-            gameController.clearHighlights();
+            clearHighlights();
         }
 
         public void setTargetHighlight(Card c)
         {
-            StackWrapper w = game.wrapperStack.FirstOrDefault(sw => sw.stackCard == c);
-
-            if (w == null) return;
-
-            List<Tile> tiles = new List<Tile>();
-            foreach (TargetMatrix tm in w.targetMatrices)
-            {
-                foreach (TargetColumn cl in tm.columns)
-                {
-                    if (cl.targets == null) continue;
-                    tiles.AddRange(tilesFromTargetables(cl.targets));
-                }
-            }
-            gameController.highlight(tiles, Color.OrangeRed);
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
 
         private static IEnumerable<Tile> tilesFromTargetables(Targetable[] ts)
@@ -1086,7 +1057,6 @@ namespace stonerkart
             return rt;
         }
 
-
         public void enqueueGameMessage(string gmb)
         {
             connection.enqueueGameMessage(gmb);
@@ -1098,19 +1068,17 @@ namespace stonerkart
     {
         public Card stackCard { get; }
         public Ability ability { get; }
-        public TargetMatrix[] targetMatrices { get; }
-        public TargetMatrix[] costMatricies { get; }
+        public TargetSet[][] cachedTargets { get; }
+
 
         public Card castingCard => stackCard.isDummy ? stackCard.dummyFor : stackCard;
         public bool isCastAbility => castingCard.isCastAbility(ability);
 
-
-        public StackWrapper(Card stackCard, Ability ability, TargetMatrix[] targetMatrices, TargetMatrix[] costMatricies)
+        public StackWrapper(Card stackCard, Ability ability, TargetSet[][] cachedTargets)
         {
             this.stackCard = stackCard;
             this.ability = ability;
-            this.targetMatrices = targetMatrices;
-            this.costMatricies = costMatricies;
+            this.cachedTargets = cachedTargets;
         }
     }
 

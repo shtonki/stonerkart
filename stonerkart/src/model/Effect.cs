@@ -25,37 +25,77 @@ namespace stonerkart
         {
         }
 
-        public TargetMatrix fillCast(HackStruct hs)
+        public TargetSet[] fillCast(HackStruct hs)
         {
             return ts.fillCast(hs);
         }
 
-        public TargetMatrix fillResolve(TargetMatrix tm, HackStruct hs)
+        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetSet[] cached)
         {
-            var r = ts.fillResolve(tm, hs);
-            return r;
+            var filled = ts.fillResolve(hs, cached);
+            var rows = rowsFromSet(filled);
+            return doer.act(hs, rows);
         }
 
-        public bool possibleAsCost(HackStruct hs)
+        private TargetRow[] rowsFromSet(TargetSet[] ts)
         {
-            var tm = ts.possible(hs);
-            var rs = tm.generateRows(straightRows);
-            var ps = doer.filterCostRows(rs);
-            return ps != null;
+            if (ts.Length == 1) return rowsFrom1(ts);
+            if (ts.Length == 2) return rowsFrom2(ts);
+            if (ts.Length == 3) return rowsFrom3(ts);
+            throw new Exception();
         }
 
-        public bool allowEmpty()
+        private TargetRow[] rowsFrom1(TargetSet[] ts)
         {
-            return ts.rules.Any(r => r.allowEmpty());
+            List<TargetRow> rt = new List<TargetRow>();
+            foreach (var a in ts[0].targets)
+            {
+                rt.Add(new TargetRow(a));
+            }
+            return rt.ToArray();
         }
+
+        private TargetRow[] rowsFrom2(TargetSet[] ts)
+        {
+            List<TargetRow> rt = new List<TargetRow>();
+            foreach (var a in ts[0].targets)
+            {
+                foreach (var b in ts[1].targets)
+                {
+                    rt.Add(new TargetRow(a, b));
+                }
+            }
+            return rt.ToArray();
+        }
+
+        private TargetRow[] rowsFrom3(TargetSet[] ts)
+        {
+            List<TargetRow> rt = new List<TargetRow>();
+            foreach (var a in ts[0].targets)
+            {
+                foreach (var b in ts[1].targets)
+                {
+                    foreach (var c in ts[2].targets)
+                    {
+                        rt.Add(new TargetRow(a, b, c));
+                    }
+                }
+            }
+            return rt.ToArray();
+        }
+
 
         public static Effect summonTokensEffect(params CardTemplate[] templates)
         {
+            
             return new Effect(new TargetRuleSet(
                 new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                     templates),
-                new PryTileRule(t => t.card == null && !t.isEdgy,
-                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, templates.Length, false)),
+                new ChooseRule<Tile>(
+                    ChooseRule<Tile>.ChooseAt.Resolve,
+                    t => t.passable && !t.isEdgy,
+                    templates.Length, 
+                    false)),
                 new SummonToTileDoer(),
                 true
                 );
@@ -70,8 +110,7 @@ namespace stonerkart
         }
 
         public abstract GameEvent[] act(HackStruct dkt, TargetRow[] ts);
-
-        public abstract IEnumerable<TargetRow> filterCostRows(IEnumerable<TargetRow> rs);
+        
     }
 
     abstract class SimpleDoer : Doer
@@ -91,18 +130,7 @@ namespace stonerkart
         }
 
         protected abstract GameEvent[] simpleAct(HackStruct dkt, TargetRow row);
-
-        public override IEnumerable<TargetRow> filterCostRows(IEnumerable<TargetRow> rs)
-        {
-            var v = rs.Where(validCostRow).ToArray();
-            if (v.Length == 0) return null;
-            else return v;
-        }
-
-        protected virtual bool validCostRow(TargetRow tr)
-        {
-            return true;
-        }
+        
     }
 
     class FatigueDoer : SimpleDoer
@@ -150,12 +178,7 @@ namespace stonerkart
             }
             return new GameEvent[] {new FatigueEvent(c, v)};
         }
-
-        protected override bool validCostRow(TargetRow tr)
-        {
-            Card c = (Card)tr[0];
-            return exhaust ? c.canExhaust : c.movement >= fatigueBy;
-        }
+        
     }
 
     class ModifyDoer : SimpleDoer
@@ -224,17 +247,6 @@ namespace stonerkart
             Player p = (Player)rows[0][0];
             var v = rows.Select(r => ((ManaOrb)r[1]).colour);
             return new GameEvent[] { new PayManaEvent(p, new ManaSet(v)) };
-        }
-
-        public override IEnumerable<TargetRow> filterCostRows(IEnumerable<TargetRow> rs)
-        {
-            var ra = rs.ToArray();
-            if (ra.Length == 0) return ra;
-            Player payer = (Player)ra[0][0];
-
-            var orbs = ra.Select(r => (ManaOrb)r[1]);
-
-            return payer.manaPool.covers(orbs) ? rs : null;
         }
     }
 

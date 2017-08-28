@@ -13,7 +13,7 @@ namespace stonerkart
 
         static Screen()
         {
-            menu = new Square(Frame.BACKSCREENWIDTH, 50);
+            menu = new Square(Frame.BACKSCREENWIDTH, Frame.MENUHEIGHT);
             menu.Backimege = new MemeImege(Textures.buttonbg2, 1);
             menu.Y = Frame.BACKSCREENHEIGHT - menu.Height;
         }
@@ -36,6 +36,18 @@ namespace stonerkart
         public void addElement(GuiElement element)
         {
             elements.Add(element);
+            element.screen = this;
+        }
+
+        public void removeElement(GuiElement element)
+        {
+            elements.Remove(element);
+        }
+
+        public void addWinduh(Winduh winduh)
+        {
+            addElement(winduh);
+            winduh.moveTo(MoveTo.Center, MoveTo.Center);
         }
     }
 }

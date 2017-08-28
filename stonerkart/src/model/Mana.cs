@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class ManaPool
+    class ManaPool : Observable<ManaPoolChanged>
     {
         public IEnumerable<ManaColour> orbs => current.colours.Concat(bonus);
 
-        public ManaSet max { get; private set; }
-        public ManaSet current { get; private set; }
+        private ManaSet max { get; set; }
+        private ManaSet current { get; set; }
 
         private List<ManaColour> bonus { get; set; }
+
+        public int maxCount => max.orbs.Count();
 
         public ManaPool()
         {
@@ -53,6 +55,7 @@ namespace stonerkart
         {
             max[c]++;
             current[c]++;
+            notify(new ManaPoolChanged(this));
         }
 
         public int currentMana(ManaColour c, bool withBonus = true)
@@ -100,6 +103,8 @@ namespace stonerkart
             }
 
             current = current - costs;
+
+            notify(new ManaPoolChanged(this));
         }
 
         public void addBonusMana(ManaColour c)
@@ -115,6 +120,16 @@ namespace stonerkart
         public ManaPool clone()
         {
             return new ManaPool(max.clone(), current.clone());
+        }
+    }
+
+    class ManaPoolChanged
+    {
+        public ManaPool manaPool { get; }
+
+        public ManaPoolChanged(ManaPool manaPool)
+        {
+            this.manaPool = manaPool;
         }
     }
 
@@ -239,4 +254,6 @@ namespace stonerkart
         Chaos,
         Multi,
     }
+
+
 }

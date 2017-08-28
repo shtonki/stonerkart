@@ -12,7 +12,7 @@ namespace stonerkart
 {
     class Program
     {
-        public static bool design = true;
+        public static bool design = false;
 
         static void Main(string[] args)
         {

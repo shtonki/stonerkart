@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CFC26B37-6090-4492-A003-E558D8324FDE}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>stonerkart</RootNamespace>
     <AssemblyName>stonerkart</AssemblyName>
@@ -96,20 +96,24 @@
     <Compile Include="src\pws\elements\base\GuiElement.cs" />
     <Compile Include="src\pws\elements\base\InputBox.cs" />
     <Compile Include="src\pws\elements\base\Square.cs" />
+    <Compile Include="src\pws\elements\base\Winduh.cs" />
     <Compile Include="src\pws\elements\CardView.cs" />
     <Compile Include="src\pws\elements\DraggablePanel.cs" />
     <Compile Include="src\pws\elements\HexPanel.cs" />
     <Compile Include="src\pws\elements\MemeButton.cs" />
     <Compile Include="src\pws\elements\PileView.cs" />
+    <Compile Include="src\pws\elements\PlayerPanel.cs" />
+    <Compile Include="src\pws\elements\PromptPanel.cs" />
+    <Compile Include="src\pws\elements\screens\DeckEditorScreen.cs" />
     <Compile Include="src\pws\elements\screens\GameScreen.cs" />
     <Compile Include="src\pws\elements\screens\LoginScreen.cs" />
     <Compile Include="src\pws\elements\screens\Screen.cs" />
     <Compile Include="src\pws\elements\TextLayout.cs" />
+    <Compile Include="src\pws\elements\TurnIndicator.cs" />
     <Compile Include="src\pws\Font.cs" />
     <Compile Include="src\pws\Frame.cs" />
     <Compile Include="src\pws\GUI.cs" />
     <Compile Include="src\pws\Imege.cs" />
-    <Compile Include="src\model\GameAction.cs" />
     <Compile Include="src\model\GameEvent.cs" />
     <Compile Include="src\model\GameEventFilter.cs" />
     <Compile Include="src\model\GameEventHandler.cs" />
@@ -117,7 +121,7 @@
     <Compile Include="src\model\Ability.cs" />
     <Compile Include="src\model\Card.cs" />
     <Compile Include="src\model\CardContructorFuckery.cs" />
-    <Compile Include="src\model\Cost.cs" />
+    <Compile Include="src\model\Foo.cs" />
     <Compile Include="src\model\Deck.cs" />
     <Compile Include="src\model\Effect.cs" />
     <Compile Include="src\model\Game.cs" />
@@ -133,6 +137,7 @@
     <Compile Include="src\network\Message.cs" />
     <Compile Include="src\network\Network.cs" />
     <Compile Include="src\network\ServerConnection.cs" />
+    <Compile Include="src\pws\PublicSaxophone.cs" />
     <Compile Include="src\pws\TextureLoader.cs" />
     <Compile Include="src\util\ImageLoaderx.cs" />
     <Compile Include="src\util\Observable.cs" />
@@ -169,7 +174,22 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\buttonbg0.png" />
+    <None Include="Resources\cl1.png" />
+    <None Include="Resources\cl0.png" />
+    <None Include="Resources\cl2.png" />
+    <None Include="Resources\cl3.png" />
+    <None Include="Resources\cl4.png" />
+    <None Include="Resources\cl5.png" />
+    <None Include="Resources\cl6.png" />
+    <None Include="Resources\cl7.png" />
+    <None Include="Resources\cl8.png" />
+    <None Include="Resources\cl9.png" />
+    <None Include="Resources\cl10.png" />
+    <None Include="Resources\cl11.png" />
+    <None Include="Resources\cl12.png" />
     <None Include="Resources\font0.png" />
+    <None Include="Resources\nature1.png" />
     <None Include="Resources\table0.png" />
     <None Include="Resources\whiteframe4.png" />
     <None Include="Resources\buttonbg2.png" />

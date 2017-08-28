@@ -14,10 +14,13 @@ namespace stonerkart
         protected int y;
         protected int width;
         protected int height;
-        
-        public bool focused { get; private set; }
-        public bool selectable { get; set; }
-        public bool hoverable { get; set; } = true;
+
+        private bool focused;
+        private bool selectable;
+        private bool hoverable = true;
+        private bool visible = true;
+
+        public Screen screen { get; set; }
 
         public List<GuiElement> children { get; private set; }= new List<GuiElement>();
         public GuiElement parent { get; private set; }
@@ -34,6 +37,10 @@ namespace stonerkart
             set { setLocation(x, value); }
         }
 
+        public int AbsoluteX => parent == null ? X : X - parent.AbsoluteX;
+        public int AbsoluteY => parent == null ? Y : X - parent.AbsoluteY;
+        public int Bottom => Y + Height;
+        public int Right => X + Width;
 
         /// <summary>
         /// The order within the parent which the element is drawn, 0 being first;
@@ -57,13 +64,37 @@ namespace stonerkart
         public virtual int Width
         {
             get { return width; }
-            set { lock (this) width = value; }
+            set { setSize(value, height); }
         }
 
         public virtual int Height
         {
             get { return height; }
-            set { lock (this) height = value; }
+            set { setSize(width, value); }
+        }
+
+        public bool Visible
+        {
+            get { return visible; }
+            set { visible = value; }
+        }
+
+        public bool Hoverable
+        {
+            get { return hoverable && visible; }
+            set { hoverable = value; }
+        }
+
+        public bool Selectable
+        {
+            get { return selectable && Hoverable; }
+            set { selectable = value; }
+        }
+
+        public bool Focused
+        {
+            get { return focused; }
+            set { focused = value; }
         }
 
         public GuiElement(int x, int y, int width, int height)
@@ -89,8 +120,12 @@ namespace stonerkart
         public void setSize(int newwidth, int newheight)
         {
             resizeEventStruct args = new resizeEventStruct(newwidth, newheight, width, height);
-            width = newwidth;
-            height = newheight;
+            lock (this)
+            {
+
+                width = newwidth;
+                height = newheight;
+            }
             onResize(args);
         }
 
@@ -119,13 +154,13 @@ namespace stonerkart
 
         public bool focus()
         {
-            if (selectable) focused = true;
-            return selectable;
+            if (Selectable) Focused = true;
+            return Selectable;
         }
 
         public void unfocus()
         {
-            focused = false;
+            Focused = false;
         }
 
         public void moveTo(MoveTo xPlacement, int yVal)
@@ -173,6 +208,11 @@ namespace stonerkart
                 case MoveTo.Nowhere:
                 {
                     return thisLocation;
+                }
+
+                case MoveTo.Bottom:
+                {
+                    return parentSize - thisSize;
                 }
 
                 default:
@@ -274,5 +314,6 @@ namespace stonerkart
     {
         Center,
         Nowhere,
+        Bottom,
     }
 }
