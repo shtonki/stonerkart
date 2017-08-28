@@ -24,7 +24,7 @@ namespace stonerkart
             GUI.setScreen(gsc);
             //GUI.setScreen(new LoginScreen());
 
-            Game g = new Game(new NewGameStruct(0, 420, new []{"a", "b"}, 0), true, gsc);
+            Game g = new Game(new NewGameStruct(0, 420, new []{"Hero", "Villain"}, 0), true, gsc);
 
             g.startGameThread();
 

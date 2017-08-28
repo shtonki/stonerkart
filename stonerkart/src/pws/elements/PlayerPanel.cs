@@ -15,11 +15,16 @@ namespace stonerkart
         private Square[] locationButtons;
         private Square buttonsSquare;
 
+        public Square handButton => locationButtons[0];
+        public Square graveyardButton => locationButtons[1];
+        public Square deckButton => locationButtons[2];
+        public Square displacedButton => locationButtons[3];
+
         private PileLocation[] locations = new[]
-        {PileLocation.Deck, PileLocation.Displaced, PileLocation.Graveyard, PileLocation.Hand,};
+        {PileLocation.Hand, PileLocation.Graveyard, PileLocation.Deck, PileLocation.Displaced,};
 
         private Textures[] locationTextures = new[]
-        {Textures.handButton, Textures.deckButton, Textures.graveyardButton, Textures.displaceButton, };
+        {Textures.handButton, Textures.graveyardButton, Textures.deckButton, Textures.displaceButton, };
 
         private const int rows = 6;
         private const int columns = 6;
@@ -29,6 +34,7 @@ namespace stonerkart
         {
             Backcolor = Color.FromArgb(120, 20, 20, 20);
             manaSquare = new Square();
+            manaSquare.Backcolor = Color.Silver;
             addChild(manaSquare);
 
             manaPoolOrbs = new Square[columns][];

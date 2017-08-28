@@ -49,10 +49,13 @@ namespace stonerkart
             gameState.hero.hand.addObserver(screen.handView);
             gameState.hero.manaPool.addObserver(screen.heroPanel);
 
-            gameState.stack.addObserver(screen.stackView);
+            gameState.stack.addObserver(screen.stackWinduh);
 
             gameState.hero.field.addObserver(screen.hexPanel);
             gameState.villain.field.addObserver(screen.hexPanel);
+
+            gameState.hero.graveyard.addObserver(screen.heroGraveyard);
+            screen.heroGraveyardWinduh.Title = String.Format("{0}'s Graveyard", gameState.hero.name);
 
             gameState.hero.hand.addObserver(screen.heroPanel);
             gameState.hero.deck.addObserver(screen.heroPanel);

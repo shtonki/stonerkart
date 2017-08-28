@@ -14,6 +14,8 @@ namespace stonerkart
         private int? rows = 1;
         private int? columns = null;
 
+        public int maxPadding { get; set; } = 0;
+
         public PileView()
         {
             Backcolor = Color.Crimson;
@@ -174,6 +176,12 @@ namespace stonerkart
                     count = (1 + cardViews.Count)/Columns.Value;
                 }
                 else throw new Exception();
+
+                if (maxPadding > 0)
+                {
+                    xPad = xPad > maxPadding ? maxPadding : xPad;
+                    yPad = yPad > maxPadding ? maxPadding : yPad;
+                }
 
                 int xorg = 0;
                 int yorg = 0;
