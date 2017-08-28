@@ -68,7 +68,7 @@ namespace stonerkart
 
         public void sub(PublicSaxophone sax)
         {
-            sax.sub(this, (a, p) => viewAt(a.X - AbsoluteX, a.Y - AbsoluteY)?.card);
+            sax.sub(this, (a, p) => viewAtClick(a)?.card);
         }
 
         public void notify(object o, PileChangedMessage t)
@@ -154,8 +154,8 @@ namespace stonerkart
 
                 if (Rows.HasValue)
                 {
-                    cvHeight = cardViews[0].Height = Height/Rows.Value;
-                    cvWidth = cardViews[0].Width;
+                    cvHeight =  Height/Rows.Value;
+                    cvWidth = CardView.widthFromHeight(cvHeight);
 
                     xPad = cardViews.Count == 1 ? 0 : ((double)(Width - cvWidth)) / (cardViews.Count - 1);
                     yPad = 0;
@@ -166,8 +166,8 @@ namespace stonerkart
                 }
                 else if (Columns.HasValue)
                 {
-                    cvWidth = cardViews[0].Width = Width/Columns.Value;
-                    cvHeight = cardViews[0].Height;
+                    cvWidth = Width/Columns.Value;
+                    cvHeight = CardView.heightFromWidth(cvWidth);
                     yPad = cardViews.Count == 1 ? 0 : ((double)(Height - cvHeight))/(cardViews.Count - 1);
                     xPad = 0;
                     xInc = cvWidth;
@@ -209,7 +209,7 @@ namespace stonerkart
         public override void onMouseMove(MouseMoveEventArgs args)
         {
             base.onMouseMove(args);
-            var cv = viewAt(args.X - X, args.Y - Y);
+            var cv = viewAtClick(args);
             if (cv != lastBroughtToFront && lastBroughtToFront != null)
             {
                 int ix = cardViews.IndexOf(lastBroughtToFront);
@@ -235,9 +235,13 @@ namespace stonerkart
             base.onClick(args);
         }
 
-        private CardView viewAt(int clickx, int clicky)
+        public CardView viewAtClick(MouseEventArgs p)
         {
             if (cardViews == null || cardViews.Count == 0) return null;
+
+            int clickx = p.X - AbsoluteX;
+            int clicky = p.Y - AbsoluteY;
+
 
             int clickxadj = clickx + cardViews[0].Width/2;
             int clickyadj = clicky + cardViews[0].Height/2;

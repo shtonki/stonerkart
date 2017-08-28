@@ -264,6 +264,16 @@ namespace stonerkart
             }
         }
 
+        public static int heightFromWidth(int width)
+        {
+            return width * frameheight / framewidth;
+        }
+
+        public static int widthFromHeight(int height)
+        {
+            return height * framewidth / frameheight;
+        }
+
         private const double imgxo = 26.0/framewidth;
         private const double imgxw = 96.0/framewidth;
         private Imege frameImage = new Imege(Textures.cardframegrey);

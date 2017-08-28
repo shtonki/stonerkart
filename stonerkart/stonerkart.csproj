@@ -104,6 +104,7 @@
     <Compile Include="src\pws\elements\PileView.cs" />
     <Compile Include="src\pws\elements\PlayerPanel.cs" />
     <Compile Include="src\pws\elements\PromptPanel.cs" />
+    <Compile Include="src\pws\elements\screens\DeckEditorScreen.cs" />
     <Compile Include="src\pws\elements\screens\GameScreen.cs" />
     <Compile Include="src\pws\elements\screens\LoginScreen.cs" />
     <Compile Include="src\pws\elements\screens\Screen.cs" />
