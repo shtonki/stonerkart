@@ -49,10 +49,23 @@ namespace stonerkart
             gameState.hero.hand.addObserver(screen.handView);
             gameState.hero.manaPool.addObserver(screen.heroPanel);
 
-            gameState.stack.addObserver(screen.stackView);
+            gameState.stack.addObserver(screen.stackWinduh);
 
             gameState.hero.field.addObserver(screen.hexPanel);
             gameState.villain.field.addObserver(screen.hexPanel);
+
+            gameState.hero.graveyard.addObserver(screen.heroGraveyard);
+            screen.heroGraveyardWinduh.Title = String.Format("{0}'s Graveyard", gameState.hero.name);
+
+            gameState.hero.hand.addObserver(screen.heroPanel);
+            gameState.hero.deck.addObserver(screen.heroPanel);
+            gameState.hero.graveyard.addObserver(screen.heroPanel);
+            gameState.hero.displaced.addObserver(screen.heroPanel);
+
+            gameState.villain.hand.addObserver(screen.villainPanel);
+            gameState.villain.deck.addObserver(screen.villainPanel);
+            gameState.villain.graveyard.addObserver(screen.villainPanel);
+            gameState.villain.displaced.addObserver(screen.villainPanel);
         }
 
         public Card createToken(CardTemplate ct, Player owner)
@@ -188,6 +201,7 @@ namespace stonerkart
 
             while (true)
             {
+                screen.turnIndicator.setActive(gameState.stepCounter.step, gameState.activePlayer.isHero);
                 doStep(gameState.stepCounter.step);
                 gameState.stepCounter.nextStep();
             }
@@ -248,7 +262,7 @@ namespace stonerkart
             if (gameState.activePlayer.manaPool.maxCount < 12)
             {
                 var mc = chooseManaColourSynced(gameState.activePlayer, o => gameState.activePlayer.manaPool.currentMana(o.colour) != 6);
-                gameState.activePlayer.gainMana(mc);
+                gameState.activePlayer.gainMana(mc.Value);
             }
 
             priority();
@@ -270,6 +284,23 @@ namespace stonerkart
             Color.PaleVioletRed, 
         };
 
+        public void highlight(IEnumerable<Targetable> ts, Color c)
+        {
+            List<Tile> tiles = new List<Tile>();
+            foreach (var t in ts)
+            {
+                if (t is Tile) tiles.Add((Tile)t);
+                if (t is Card)
+                {
+                    Card card = (Card)t;
+                    if (card.location.pile == PileLocation.Field) tiles.Add(card.tile);
+                }
+                if (t is Player) tiles.Add(((Player)t).heroCard.tile);
+            }
+
+            highlight(tiles, c);
+        }
+
         public void highlight(IEnumerable<Tile> ts, Color c)
         {
             foreach (var t in ts) screen.hexPanel.highlight(t.x, t.y, c);
@@ -282,93 +313,74 @@ namespace stonerkart
 
         private void moveStep()
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             List<Tuple<Card, Path>> paths;
 
-            bool heroMoving = gameState.activePlayer == gameState.hero;
-            gameController.setHeroActive(heroMoving);
+            Player movingPlayer = gameState.activePlayer;
             var movers = gameState.activePlayer.field.Where(c => c.canMove);
 
-            if (heroMoving)
+            var unpathed = movers.ToList();
+            var occupado = gameState.activePlayer.field.Where(c => !c.canMove).Select(c => c.tile).ToList();
+
+            while (true)
             {
-                var unpathed = movers.ToList();
-                var occupado = gameState.activePlayer.field.Where(c => !c.canMove).Select(c => c.tile).ToList();
+                highlight(unpathed.Select(c => c.tile), Color.DodgerBlue);
+                //gameController.highlight(pathed.Select(c => c.tile), Color.ForestGreen);
+
+                Tile from = chooseTileSynced(movingPlayer, tile => tile.card != null && tile.card.canMove && tile.card.owner == gameState.activePlayer,
+                    "oweighjoe", "Oigjhosfgc", unpathed.Count == 0);
+                if (from == null) break;
+                Card mover = from.card;
+                if (mover.combatPath != null)
+                {
+                    removeArrow(mover.combatPath);
+                    occupado.Remove(mover.combatPath.last);
+                }
+                Path pth = new Path(from);
+                pth.colorHack = clrs[gameState.ord(mover)%clrs.Length];
+                addArrow(pth);
 
                 while (true)
                 {
-                    highlight(unpathed.Select(c => c.tile), Color.DodgerBlue);
-                    //gameController.highlight(pathed.Select(c => c.tile), Color.ForestGreen);
 
-                    var from = getTile(
-                        tile => tile.card != null && tile.card.canMove && tile.card.owner == gameState.activePlayer,
-                        "Move your cards nigra", unpathed.Count == 0 ? ButtonOption.Pass : ButtonOption.NOTHING);
-                    if (from == null) break;
-                    Card mover = from.card;
-                    if (mover.combatPath != null)
-                    {
-                        gameController.removeArrow(mover.combatPath);
-                        occupado.Remove(mover.combatPath.last);
-                    }
-                    Path pth = new Path(from);
-                    pth.colorHack = clrs[gameState.ord(mover)%clrs.Length];
-                    gameController.addArrow(pth);
+                    var options = gameState.map.pathCosts(mover, from).Where(path =>
+                        path.length <= mover.movement - pth.length //card can reach the tile
+                        &&
+                        (
+                            path.to.card == null || // tile is empty
+                            mover.canAttack(path.to.card) || //card can attack the card in the target tile
+                            (path.to.card.controller == mover.controller && !occupado.Contains(path.to))
+                            //we want to move to a tile occupied by a friendly creature that's moving somewhere else
+                            )
+                        &&
+                        !occupado.Any(p => p == path.last) //there isn't a card in the tile we want to move to
+                        ).ToList();
+                    if (options.Count == 1) break;
+                    var v = gameState.map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
+                    highlight(options.Select(p => p.to), Color.Green);
+                    Tile to = chooseTileSynced(movingPlayer, tile => options.Select(p => p.to).Contains(tile), "klgrnjlm", "dflgkbvxcvb", true);
+                    clearHighlights();
+                    if (to == null) continue;
+                    if (to == from) break;
 
-                    while (true)
-                    {
+                    var cp = options.First(p => p.to == to);
 
-                        var options = gameState.map.pathCosts(mover, from).Where(path =>
-                            path.length <= mover.movement - pth.length //card can reach the tile
-                            &&
-                            (
-                                path.to.card == null || // tile is empty
-                                mover.canAttack(path.to.card) || //card can attack the card in the target tile
-                                (path.to.card.controller == mover.controller && !occupado.Contains(path.to))
-                                //we want to move to a tile occupied by a friendly creature that's moving somewhere else
-                                )
-                            &&
-                            !occupado.Any(p => p == path.last) //there isn't a card in the tile we want to move to
-                            ).ToList();
-                        if (options.Count == 1) break;
-                        var v = gameState.map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
-                        highlight(options.Select(p => p.to), Color.Green);
-                        var to = getTile(tile => options.Select(p => p.to).Contains(tile), "Move to where?");
-                        clearHighlights();
-                        if (to == null) continue;
-                        if (to == from) break;
+                    removeArrow(pth);
+                    pth.concat(cp);
+                    addArrow(pth);
+                    from = pth.to;
 
-                        var cp = options.First(p => p.to == to);
-
-                        gameController.removeArrow(pth);
-                        pth.concat(cp);
-                        gameController.addArrow(pth);
-                        from = pth.to;
-
-                        if (pth.length == mover.movement) break;
-                    }
-
-                    if (mover.combatPath == null)
-                    {
-                        unpathed.Remove(mover);
-                    }
-
-                    occupado.Add(pth.last);
-                    mover.combatPath = pth;
+                    if (pth.length == mover.movement) break;
                 }
-                paths = movers.Select(c => new Tuple<Card, Path>(c, c.combatPath)).ToList();
-                connection.sendAction(new MoveSelection(paths));
-            }
-            else
-            {
-                gameController.setPrompt("Opponent is moving");
-                MoveSelection v = connection.receiveAction<MoveSelection>();
-                paths = v.moves;
-                foreach (var p in paths)
+
+                if (mover.combatPath == null)
                 {
-                    p.Item2.colorHack = clrs[gameState.ord(p.Item1) % clrs.Length];
-                    gameController.addArrow(p.Item2);
+                    unpathed.Remove(mover);
                 }
+
+                occupado.Add(pth.last);
+                mover.combatPath = pth;
             }
+            paths = movers.Select(c => new Tuple<Card, Path>(c, c.combatPath)).ToList();
 
             var x = paths.Select(p => p.Item1.moveCount).ToArray();
             //todo raise MoveDeclared events lmfao
@@ -400,8 +412,8 @@ namespace stonerkart
             handleTransaction(gt);
 
             foreach (var c in gameState.cards) c.combatPath = null;
-            gameController.clearArrows();
-            clearHighlights();*/
+            clearArrows();
+            clearHighlights();
         }
 
         private void endStep()
@@ -716,29 +728,11 @@ namespace stonerkart
             }
             else
             {
-                int choice = connection.receiveChoice();
-                rt = gameState.cardFromOrd(choice);
+                int? choice = connection.receiveChoice();
+                if (choice.HasValue) rt = gameState.cardFromOrd(choice.Value);
+                else rt = null;
             }
             return rt;
-        }
-
-        /// <summary>
-        /// Returns null when the OK button is pressed else it returns a tile when it is clicked
-        /// </summary>
-        /// <param name="f">Filters allowable tiles</param>
-        /// <param name="prompt">The string to prompt to the user</param>
-        /// <returns></returns>
-        private Tile getTile(Func<Tile, bool> f, string prompt, params ButtonOption[] buttons)
-        {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            gameController.setPrompt(prompt, buttons);
-            var v = waitForButtonOr<Tile>(f);
-            if (v is ShibbuttonStuff)
-            {
-                return null;
-            }
-            return (Tile)v;
-            */
         }
 
         private void cast(StackWrapper w, IEnumerable<GameEvent> costEvents)
@@ -805,7 +799,7 @@ namespace stonerkart
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere;
 
-            bool canCastSlow = true || gameState.stack.Count == 0 && gameState.activePlayer == gameState.hero && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
+            bool canCastSlow = gameState.stack.Count == 0 && gameState.activePlayer == gameState.hero && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
             if (!canCastSlow)
             {
                 activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
@@ -915,28 +909,33 @@ namespace stonerkart
             Tile rt;
             if (chooser.isHero)
             {
-                screen.promptPanel.prompt(chooserPrompt);
+                screen.promptPanel.promptButtons(chooserPrompt, cancellable ? new[] { ButtonOption.Cancel } : new ButtonOption[0]);
                 rt = chooseTileUnsynced(filter);
-                connection.sendChoice(gameState.ord(rt));
+                if (rt == null) connection.sendChoice(null);
+                else connection.sendChoice(gameState.ord(rt));
             }
             else
             {
                 screen.promptPanel.prompt(waiterPrompt);
                 var choice = connection.receiveChoice();
-                rt = gameState.tileFromOrd(choice);
+                if (choice.HasValue) rt = gameState.tileFromOrd(choice.Value);
+                else rt = null;
             }
             return rt;
         }
 
         private Tile chooseTileUnsynced(Func<Tile, bool> filter)
         {
-            PublicSaxophone sax = new PublicSaxophone(o => o is Tile && filter((Tile)o));
+            PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Tile && filter((Tile)o)));
             screen.hexPanel.subTile(sax, gameState.map.tileAt);
+            screen.promptPanel.sub(sax);
             var v = sax.call();
+
+            if (v is ButtonOption) return null;
             return (Tile)v;
         }
 
-        public ManaColour chooseManaColourSynced(Player chooser, Func<ManaOrb, bool> f)
+        public ManaColour? chooseManaColourSynced(Player chooser, Func<ManaOrb, bool> f)
         {
             ManaColour clr;
             if (chooser == gameState.hero)
@@ -960,6 +959,22 @@ namespace stonerkart
                 clr = (ManaColour)connection.receiveChoice();
             }
             return clr;
+        }
+
+
+        public void addArrow(Path l)
+        {
+            screen.hexPanel.addPath(l);
+        }
+
+        public void removeArrow(Path l)
+        {
+            screen.hexPanel.removeArrow(l);
+        }
+
+        public void clearArrows()
+        {
+            screen.hexPanel.clearPaths();
         }
 
         private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)

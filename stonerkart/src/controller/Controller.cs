@@ -19,14 +19,15 @@ namespace stonerkart
 
             GUI.launch();
 
-            //var gsc = new GameScreen();
-            //var desc = new DeckEditorScreen();
+            var gsc = new GameScreen();
             //GUI.setScreen(gsc);
+            //GUI.setScreen(new LoginScreen());
             GUI.setScreen(new DeckEditorScreen());
 
-            //Game g = new Game(new NewGameStruct(0, 420, new []{"a", "b"}, 0), true, gsc);
 
-            //g.startGameThread();
+            Game g = new Game(new NewGameStruct(0, 420, new []{"Hero", "Villain"}, 0), true, gsc);
+
+            g.startGameThread();
 
             //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             //UIController.launchUI();

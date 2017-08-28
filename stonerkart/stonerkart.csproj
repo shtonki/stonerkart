@@ -96,6 +96,7 @@
     <Compile Include="src\pws\elements\base\GuiElement.cs" />
     <Compile Include="src\pws\elements\base\InputBox.cs" />
     <Compile Include="src\pws\elements\base\Square.cs" />
+    <Compile Include="src\pws\elements\base\Winduh.cs" />
     <Compile Include="src\pws\elements\CardView.cs" />
     <Compile Include="src\pws\elements\DraggablePanel.cs" />
     <Compile Include="src\pws\elements\HexPanel.cs" />
@@ -103,10 +104,12 @@
     <Compile Include="src\pws\elements\PileView.cs" />
     <Compile Include="src\pws\elements\PlayerPanel.cs" />
     <Compile Include="src\pws\elements\PromptPanel.cs" />
+    <Compile Include="src\pws\elements\screens\DeckEditorScreen.cs" />
     <Compile Include="src\pws\elements\screens\GameScreen.cs" />
     <Compile Include="src\pws\elements\screens\LoginScreen.cs" />
     <Compile Include="src\pws\elements\screens\Screen.cs" />
     <Compile Include="src\pws\elements\TextLayout.cs" />
+    <Compile Include="src\pws\elements\TurnIndicator.cs" />
     <Compile Include="src\pws\Font.cs" />
     <Compile Include="src\pws\Frame.cs" />
     <Compile Include="src\pws\GUI.cs" />

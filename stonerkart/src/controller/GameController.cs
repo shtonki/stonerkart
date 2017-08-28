@@ -75,29 +75,6 @@ namespace stonerkart
             */
         }
 
-        public void addArrow(Path l)
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-            //hexPanel.paths.Add(l);
-        }
-
-        public void removeArrow(Path l)
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-            //hexPanel.paths.Remove(l);
-        }
-
-        public void clearArrows()
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-            /*
-            hexPanel.paths.Clear();
-            redraw();
-            */
-        }
 
         public void setPrompt(string message, params ButtonOption[] buttons)
         {

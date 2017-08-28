@@ -26,6 +26,26 @@ namespace stonerkart
             GL.Translate(tx, -ty, 0);
         }
 
+        public void drawLine(Point org, Point end, Color c)
+        {
+            drawLine(org.X, org.Y, end.X, end.Y, c);
+        }
+
+        public void drawLine(int xorg, int yorg, int xend, int yend, Color c)
+        {
+            var org = Frame.pixToGL(xorg, yorg);
+            var end = Frame.pixToGL(xend, yend);
+
+            GL.LineWidth(4);
+            GL.Color4(c);
+            GL.Begin(BeginMode.Lines);
+
+            GL.Vertex2(org.X, -org.Y);
+            GL.Vertex2(end.X, -end.Y);
+
+            GL.End();
+        }
+
         public void fillRectange(Color c, int x, int y, int width, int height)
         {
             fillRectangeR(c, new Box(x, y, width, height));

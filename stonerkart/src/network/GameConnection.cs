@@ -96,9 +96,16 @@ namespace stonerkart
             
         }
 
+        private bool sendno = true;
+
         public override int[] receiveChoices()
         {
-            return new [] { (int)ButtonOption.No };
+            if (sendno)
+            {
+                sendno = false;
+                return new [] { (int)ButtonOption.No };
+            }
+            return new int[0];
         }
 
         public override Deck[] deckify(Deck myDeck, int myIndex)
@@ -163,16 +170,24 @@ namespace stonerkart
         public abstract Deck[] deckify(Deck myDeck, int myIndex);
         public abstract void surrender(GameEndStateReason r);
 
-        public void sendChoice(int choice)
+        public void sendChoice(int? choice)
         {
-            sendChoices(new[] {choice});
+            if (choice.HasValue)
+            {
+                sendChoices(new[] {choice.Value});
+            }
+            else
+            {
+                sendChoices(new int[0]);
+            }
         }
 
-        public int receiveChoice()
+        public int? receiveChoice()
         {
             var received = receiveChoices();
-            if (received.Length != 1) throw new Exception();
-            return received[0];
+            if (received.Length == 0) return null;
+            if (received.Length == 1) return received[0];
+            throw new Exception();
         }
     }
 }

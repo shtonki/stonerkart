@@ -20,6 +20,8 @@ namespace stonerkart
         private bool hoverable = true;
         private bool visible = true;
 
+        public Screen screen { get; set; }
+
         public List<GuiElement> children { get; private set; }= new List<GuiElement>();
         public GuiElement parent { get; private set; }
 

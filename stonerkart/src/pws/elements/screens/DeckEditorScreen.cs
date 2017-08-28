@@ -1,104 +1,112 @@
 ﻿using System;
 using System.Collections.Generic;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    
     class DeckEditorScreen : Screen
     {
-        private const int NR_OF_CARD_VIEWS = 10;
-        private const int CARD_VIEW_WIDTH = Frame.BACKSCREENWIDTH / 8;
-        private const int CARD_VIEW_WIDTHd2 = CARD_VIEW_WIDTH / 2;
+        private CardView[] cards;
+        private Square cardSquare;
 
-        public DeckEditorScreen() : base(new Imege(Textures.artAbolish))
-        {
-            PileView pileView = setupPileView();
-            CardList cardList = setupCardList(pileView);
-            CardView[] cardViews = setupCardViews(cardList);
-            DeckContraints deckConstraints = new DeckContraints(Format.Standard);
-            setupMouseListeners(pileView, cardList, cardViews, deckConstraints);
-        }
+        private CardList deck;
+        private PileView deckView;
 
-        #region setups
-        private void setupMouseListeners(PileView pv, CardList cl, CardView[] cvs, DeckContraints dcs)
+        private const int deckViewHeight = 800;
+        private const int deckViewWidth = 300;
+        private const int deckViewX = 1000;
+        private const int deckViewY = 100;
+        private const int deckViewMaxPadding = 50;
+
+        private const int cardRows = 3;
+        private const int cardCols = 4;
+        private const int cardCount = cardRows * cardCols;
+        private const int cardSquareWidth = 800;
+        private const int cardPadding = 20;
+
+        public DeckEditorScreen()
         {
-            pv.mouseDown += (a) =>
+            deckView = new PileView();
+            deckView.setSize(deckViewWidth, deckViewHeight);
+            addElement(deckView);
+            deckView.Columns = 1;
+            deckView.maxPadding = deckViewMaxPadding;
+            deckView.setLocation(deckViewX, deckViewY);
+            deckView.Backimege = new MemeImege(Textures.buttonbg2);
+            deckView.clicked += a =>
             {
-                var cardView = pv.viewAt(a.X - pv.AbsoluteX, a.Y - pv.AbsoluteY);
-                if(cardView != null) cl.remove(cardView.card);
+                CardView v = deckView.viewAtClick(a);
+                if (v != null)
+                {
+                    removeCardFromDeck(v.card);
+                }
             };
 
-            for (int i = 0; i < NR_OF_CARD_VIEWS; i++)
+            deck = new CardList();
+            deck.addObserver(deckView);
+
+            cardSquare = new Square();
+            cardSquare.Backcolor = Color.FloralWhite;
+            addElement(cardSquare);
+
+            populate(new[]
             {
-                int i1 = i;
-                cvs[i].clicked += (__) =>
-                {
-                    addToDeck(cvs[i1].card.template, cl, dcs);
-                };
-            }
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+                CardTemplate.Zap,
+            });
         }
 
-        private CardList setupCardList(PileView pv)
+        private void populate(CardTemplate[] templates)
         {
-            CardList cardList = new CardList();
-            cardList.addObserver(pv);
-            return cardList;
-        }
+            if (templates.Length > cardCount) throw new Exception();
 
-        private PileView setupPileView()
-        {
-            PileView pv = new PileView();
-            pv.Height = (int)(Frame.BACKSCREENHEIGHT*0.8);
-            pv.Width = CARD_VIEW_WIDTH;
-            pv.setLocation(Frame.BACKSCREENWIDTH - pv.Width, 0);
-            pv.Columns = 1;
-            addElement(pv);
-            
-            return pv;
-        }
+            int cvHeight = (cardSquareWidth - cardPadding) / cardRows - cardPadding;
+            int cvWidth = CardView.widthFromHeight(cvHeight);
+            int cardSquareHeight = cardRows * (cvHeight + cardPadding) + cardPadding;
+            cardSquare.clearChildren();
+            cardSquare.setSize(cardSquareWidth, cardSquareHeight);
 
-        private CardView[] setupCardViews(CardList cl)
-        {
-            CardView[] cvs = new CardView[NR_OF_CARD_VIEWS];
-            //int spacing = 20;
-            const int originX = 000; 
-            const int originY = 300;
-            const int strideX = 250;
-            const int strideY = 350;
-            int x = originX;
-            int y = originY;
-            for (int i = 0; i < NR_OF_CARD_VIEWS; i++)
+            cards = new CardView[cardRows * cardCols];
+            for (int i = 0; i < cardRows; i++)
             {
-                int i1 = i;
-                cvs[i] = new CardView(new Card((CardTemplate)i));
-                cvs[i].Width = CARD_VIEW_WIDTH;
-                
-                if (i == NR_OF_CARD_VIEWS / 2)
+                for (int j = 0; j < cardCols; j++)
                 {
-                    y += strideY;
-                    x = originX;
+                    int c = i * cardCols + j;
+                    if (c > templates.Length) break;
+
+                    CardTemplate ct = templates[c];
+
+                    CardView cv = cards[i * cardCols + j] = new CardView(new Card(templates[c]));
+                    cv.Height = cvHeight;
+                    cv.X = cardPadding + j * (cardPadding + cvWidth);
+                    cv.Y = cardPadding + i * (cardPadding + cvHeight);
+                    cardSquare.addChild(cv);
+                    cv.clicked += a => addCardToDeck(ct);
                 }
-                x += strideX;
-                cvs[i].setLocation(x, y);
-
-                addElement(cvs[i]);
             }
-            return cvs;
         }
-        #endregion
 
-        private void addToDeck(CardTemplate ct, CardList cardList, DeckContraints dcs)
+        private void addCardToDeck(CardTemplate t)
         {
-            if(dcs.willBeLegal(CardTemplate.Shibby_sShtank, cardList.Select(c => c.template).ToArray(), ct))
-            {
-                cardList.addTop(new Card(ct));
-            }
+            deck.addTop(new Card(t));
+        }
+
+        private void removeCardFromDeck(Card c)
+        {
+            deck.remove(c);
         }
     }
 }

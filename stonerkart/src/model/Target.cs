@@ -122,68 +122,93 @@ namespace stonerkart
         public abstract TargetSet fillResolveTargets(HackStruct hs, TargetSet ts);
     }
 
-    abstract class InteractiveRule<T> : TargetRule where T : Targetable
+    interface chooserface<T> where T : Targetable
     {
+        IEnumerable<T> candidates(HackStruct hs);
+        T pickOne(Player chooser, Func<T, bool> filter, HackStruct hs);
+    }
+
+    class ChooseRule<T> : TargetRule where T : Targetable
+    {
+        private chooserface<T> chooser = dflt();
         private TargetRule playerRule = new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController);
+        private ChooseAt chooseAt = ChooseAt.Cast;
+        protected Func<T, bool> filter = t => true;
         private int count = 1;
         private bool allowDuplicates = false;
-        private ChooseAt chooseAt;
-        protected Func<T, bool> filter = t => true;
 
-        public InteractiveRule(TargetRule playerRule, int count, bool allowDuplicates, ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
+        private static chooserface<T> dflt()
+        {
+            Type t = typeof (T);
+            if (t == typeof (Card)) return (chooserface<T>)new ClickCardRule();
+            if (t == typeof (Tile)) return (chooserface<T>)new ClickTileRule();
+            if (t == typeof (Player)) return (chooserface<T>)new ClickPlayerRule();
+            if (t == typeof (ManaOrb)) return (chooserface<T>)new ClickManaRule();
+            throw new Exception();
+        }
+
+        public ChooseRule(chooserface<T> chooser, TargetRule playerRule, ChooseAt chooseAt, Func<T, bool> filter, int count, bool allowDuplicates) : base(typeof(T))
         {
             this.playerRule = playerRule;
             this.count = count;
             this.allowDuplicates = allowDuplicates;
             this.chooseAt = chooseAt;
             this.filter = filter;
+            this.chooser = chooser;
         }
 
-        public InteractiveRule(TargetRule playerRule, ChooseAt chooseAt, Func<T, bool> filter) : base(typeof (T))
+        public ChooseRule(Func<T, bool> filter) : base(typeof(T))
+        {
+            this.filter = filter;
+        }
+
+        public ChooseRule(chooserface<T> chooser, TargetRule playerRule, ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
         {
             this.playerRule = playerRule;
             this.chooseAt = chooseAt;
             this.filter = filter;
+            this.chooser = chooser;
         }
 
-        public InteractiveRule(TargetRule playerRule, ChooseAt chooseAt) : base(typeof(T))
-        {
-            this.playerRule = playerRule;
-            this.chooseAt = chooseAt;
-        }
-
-        public InteractiveRule(ChooseAt chooseAt) : base(typeof(T))
-        {
-            this.chooseAt = chooseAt;
-        }
-
-        public InteractiveRule(ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
+        public ChooseRule(ChooseAt chooseAt, Func<T, bool> filter, int count, bool allowDuplicates) : base(typeof(T))
         {
             this.chooseAt = chooseAt;
             this.filter = filter;
-        }
-
-        public InteractiveRule(ChooseAt chooseAt, Func<T, bool> filter, TargetRule playerRule) : base(typeof(T))
-        {
-            this.chooseAt = chooseAt;
-            this.filter = filter;
-            this.playerRule = playerRule;
-        }
-
-        public InteractiveRule(TargetRule playerRule, int count, bool allowDuplicates, ChooseAt chooseAt) : base(typeof(T))
-        {
-            this.playerRule = playerRule;
             this.count = count;
             this.allowDuplicates = allowDuplicates;
+        }
+
+        public ChooseRule(ChooseAt chooseAt) : base(typeof(T))
+        {
             this.chooseAt = chooseAt;
         }
 
-        public InteractiveRule(int count, bool allowDuplicates, ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
+        public ChooseRule(chooserface<T> chooser, ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
         {
-            this.count = count;
-            this.allowDuplicates = allowDuplicates;
+            this.chooser = chooser;
             this.chooseAt = chooseAt;
             this.filter = filter;
+        }
+
+        public ChooseRule(chooserface<T> chooser) : base(typeof(T))
+        {
+            this.chooser = chooser;
+        }
+
+        public ChooseRule(ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
+        {
+            this.filter = filter;
+            this.chooseAt = chooseAt;
+        }
+
+        public ChooseRule() : base(typeof(T))
+        {
+        }
+
+        public ChooseRule(chooserface<T> chooser, ChooseAt chooseAt) : base(typeof(T))
+        {
+            this.chooser = chooser;
+            this.chooseAt = chooseAt;
         }
 
 
@@ -193,7 +218,7 @@ namespace stonerkart
             if (chooseAt == ChooseAt.Cast)
             {
                 choosers = playerRule.fillResolveTargets(hs, choosers);
-                return interact(choosers.targets.Cast<Player>());
+                return choose(choosers.targets.Cast<Player>(), hs);
             }
             else return choosers;
         }
@@ -202,21 +227,35 @@ namespace stonerkart
         {
             if (chooseAt == ChooseAt.Cast) return ts;
             var choosers = playerRule.fillResolveTargets(hs, ts);
-            return interact(choosers.targets.Cast<Player>());
+            return choose(choosers.targets.Cast<Player>(), hs);
         }
 
-        private TargetSet interact(IEnumerable<Player> players)
+        private TargetSet choose(IEnumerable<Player> players, HackStruct hs)
         {
+            var v = chooser.candidates(hs).Where(filter);
+            hs.game.highlight(v.Cast<Targetable>(), Color.Green);
+
             if (count != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             if (players.Count() != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+
+            TargetSet rt = null;
             foreach (var player in players)
             {
-                return interact(player, filter);
+                var chosen = chooser.pickOne(player, filter, hs);
+                if (chosen == null)
+                {
+                    rt = null;
+                }
+                else
+                {
+                    rt = new TargetSet(chosen);
+                }
+                break;
             }
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-        }
 
-        protected abstract TargetSet interact(Player p, Func<T, bool> filter);
+            hs.game.clearHighlights();
+            return rt;
+        }
 
         public enum ChooseAt
         {
@@ -225,120 +264,164 @@ namespace stonerkart
         }
     }
 
-    class SelectCardRule : InteractiveRule<Card>
+    class SelectCardRule : chooserface<Card>
     {
         private Mode mode;
         private PileLocation pile;
 
-        public SelectCardRule(TargetRule playerRule, PileLocation pile, Func<Card, bool> filter, Mode mode, ChooseAt chooseAt) : base(playerRule, chooseAt, filter)
+        public SelectCardRule(PileLocation pile, Mode mode)
         {
             this.mode = mode;
             this.pile = pile;
         }
 
-        public SelectCardRule(TargetRule playerRule, PileLocation pile, Func<Card, bool> filter, int count, bool allowDuplicates, Mode mode, ChooseAt chooseAt) : base(playerRule, count, allowDuplicates, chooseAt, filter)
+        public IEnumerable<Card> candidates(HackStruct hs)
         {
-            this.mode = mode;
-            this.pile = pile;
+            throw new NotImplementedException();
         }
 
-        public SelectCardRule(PileLocation pile, ChooseAt chooseAt) : this(pile, c => true, chooseAt)
-        {
-        }
-
-        public SelectCardRule(PileLocation pile, Func<Card, bool> filter, ChooseAt chooseAt) : base(chooseAt, filter)
-        {
-            this.pile = pile;
-            mode = Mode.ResolverLooksAtTarget;
-        }
-
-        protected override TargetSet interact(Player p, Func<Card, bool> filter)
+        public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
         {
             throw new NotImplementedException();
         }
 
         public enum Mode
         {
-            ResolverLooksAtTarget,
-            TargetLooksAtTarget,
-            TargetLooksAtResolver,
+            ResolverLooksAtPlayer,
+            PlayerLooksAtPlayer,
+            PlayerLooksAtResolver,
         }
     }
 
 
-    class ClickCardRule : InteractiveRule<Card>
+    class ClickCardRule : chooserface<Card>
     {
-        public ClickCardRule(Func<Card, bool> filter) : base(ChooseAt.Cast, filter)
+        public IEnumerable<Card> candidates(HackStruct hs)
         {
+            return hs.tilesInRange.Where(t => t.card != null).Select(t => t.card);
         }
 
-        public ClickCardRule() : base(ChooseAt.Cast)
+        public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
         {
+            Tile tl = hs.game.chooseTileSynced(chooser,
+                t => hs.tilesInRange.Contains(t) && t.card != null && filter(t.card), "swroigjs", "ioerhjgohr", true);
+            if (tl == null) return null;
+            return (tl.card);
+        }
+    }
+
+    class ClickTileRule : chooserface<Tile>
+    {
+        public IEnumerable<Tile> candidates(HackStruct hs)
+        {
+            return hs.tilesInRange;
         }
 
-        protected override TargetSet interact(Player p, Func<Card, bool> filter)
+        public Tile pickOne(Player chooser, Func<Tile, bool> filter, HackStruct hs)
+        {
+            return hs.game.chooseTileSynced(chooser, t => hs.tilesInRange.Contains(t) && filter(t), "tehtehethsf", "aethadtgngf", true);
+        }
+    }
+
+    class ClickPlayerRule : chooserface<Player>
+    {
+        public IEnumerable<Player> candidates(HackStruct hs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Player pickOne(Player chooser, Func<Player, bool> filter, HackStruct hs)
         {
             throw new NotImplementedException();
         }
     }
 
-    class ClickTileRule : InteractiveRule<Tile>
+    class ClickManaRule : chooserface<ManaOrb>
     {
-        public ClickTileRule(Func<Tile, bool> filter) : base(ChooseAt.Cast, filter)
+        public IEnumerable<ManaOrb> candidates(HackStruct hs)
         {
+            throw new NotImplementedException();
         }
 
-        public ClickTileRule(ChooseAt chooseAt, Func<Tile, bool> filter) : base(chooseAt, filter)
-        {
-        }
-
-        public ClickTileRule(TargetRule playerRule, Func<Tile, bool> filter, ChooseAt chooseAt) : base(playerRule, chooseAt, filter)
-        {
-        }
-
-        public ClickTileRule(TargetRule playerRule, Func<Tile, bool> filter, int count, bool allowDuplicates, ChooseAt chooseAt) : base(playerRule, count, allowDuplicates, chooseAt, filter)
-        {
-        }
-
-        protected override TargetSet interact(Player p, Func<Tile, bool> filter)
+        public ManaOrb pickOne(Player chooser, Func<ManaOrb, bool> filter, HackStruct hs)
         {
             throw new NotImplementedException();
         }
     }
 
-    class ClickPlayerRule : InteractiveRule<Player>
+    class ManaCostRule : TargetRule
     {
-        public ClickPlayerRule() : base(ChooseAt.Cast)
+        private ManaSet cst;
+
+        public ManaCostRule(ManaSet cst) : base(typeof(ManaOrb))
         {
-            
+            this.cst = cst;
         }
 
-        protected override TargetSet interact(Player p, Func<Player, bool> filter)
+        public override TargetSet fillCastTargets(HackStruct hs)
         {
-            throw new NotImplementedException();
-        }
-    }
-
-    class SelectManaRule : TargetRule
-    {
-        private TargetRule playerRule;
-
-        public SelectManaRule(TargetRule playerRule) : base(typeof(ManaOrb))
-        {
-            this.playerRule = playerRule;
-        }
-
-        public override TargetSet fillCastTargets(HackStruct f)
-        {
-            return playerRule.fillCastTargets(f);
+            return meme(hs.castingPlayer, hs);
         }
 
         public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
         {
-            var selectingPlayers = playerRule.fillResolveTargets(hs, ts);
-            return
-                new TargetSet(
-                    selectingPlayers.targets.Cast<Player>().Select(p => new ManaOrb(hs.game.chooseManaColourSynced(p, clr => true))));
+            return ts;
+        }
+
+        private TargetSet meme(Player p, HackStruct hs)
+        {
+            ManaSet cost = cst.clone();
+            for (int i = 0; i < ManaSet.size; i++)
+            {
+                if ((ManaColour)i == ManaColour.Colourless) continue;
+                if (p.manaPool.currentMana((ManaColour)i) < cost[i]) return null;
+            }
+
+            IEnumerable<ManaColour> poolOrbs = p.manaPool.orbs;
+            IEnumerable<ManaColour> costOrbs = cost.orbs.Select(o => o.colour);
+
+            int diff = costOrbs.Count() - poolOrbs.Count();
+
+            if (diff > 0) return null;
+
+            if (cost[ManaColour.Colourless] > 0)
+            {
+                if (diff < 0) // we have more total mana than the cost
+                {
+
+                    throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+                    ManaSet colours = cost.clone();
+                    colours[ManaColour.Colourless] = 0;
+                    p.stuntLoss(colours);
+                    while (cost[ManaColour.Colourless] > 0)
+                    {
+                        var clr = hs.game.chooseManaColourSynced(p, c => true).Value;
+                        if (bc.targets.Length == 1)
+                        {
+                            var orb = (ManaOrb)bc.targets[0];
+                            var colour = orb.colour;
+                            if (p.manaPool.currentMana(colour) - cost[colour] > 0)
+                            {
+                                cost[colour]++;
+                                cost[ManaColour.Colourless]--;
+                                colours[colour]++;
+                                p.stuntLoss(colours);
+                            }
+                        }
+                        else
+                        {
+                                p.unstuntMana();
+                                return null;
+                        }
+                    }
+                    p.unstuntMana();*/
+                }
+                else
+                {
+                    cost = new ManaSet(hs.castingPlayer.manaPool.orbs);
+                }
+            }
+            return new TargetSet(cost.orbs);
         }
     }
 
@@ -446,14 +529,14 @@ namespace stonerkart
 
     class AoeRule : TargetRule
     {
-        private ClickTileRule ruler;
+        private ChooseRule<Tile> ruler;
         private int radius;
         private Func<Card, bool> cardFilter;
 
 
         public AoeRule(Func<Tile, bool> filter, int radius, Func<Card, bool> cardFilter) : base(typeof(Card))
         {
-            ruler = new ClickTileRule(filter);
+            ruler = new ChooseRule<Tile>(filter);
             this.radius = radius;
             this.cardFilter = cardFilter;
         }

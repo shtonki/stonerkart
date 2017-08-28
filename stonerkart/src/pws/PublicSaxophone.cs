@@ -32,9 +32,8 @@ namespace stonerkart
             {
                 saved = o;
                 re.Set();
+                unsubAll();
             }
-
-            unsubAll();
         }
 
         public void sub<T>(T g, Func<T, object> f) where T : GuiElement

@@ -172,8 +172,7 @@ namespace stonerkart
 
         public Color colorHack { get; set; } = Color.ForestGreen;
 
-        private List<Tile> tiles;
-        public IEnumerable<Tile> tyles => tiles;
+        public List<Tile> tiles { get; private set; }
 
         public Path(Tile toAndFrom) : this(new Tile[] { toAndFrom }.ToList(), 0)
         {

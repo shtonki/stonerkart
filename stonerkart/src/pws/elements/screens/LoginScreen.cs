@@ -20,11 +20,6 @@ namespace stonerkart
 
         public LoginScreen() : base(new Imege(Textures.bg3))
         {
-            CardView cv = new CardView(new Card(CardTemplate.Scroll_sof_sEarth));
-            cv.Width = 300;
-            cv.clicked += _ => System.Console.WriteLine("xddd");
-            addElement(cv);
-
             username = new InputBox(1000, 100);
             addElement(username);
             username.moveTo(MoveTo.Center, 200);

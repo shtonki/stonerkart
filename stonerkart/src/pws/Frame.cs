@@ -218,7 +218,7 @@ namespace stonerkart
 
             int x = sp.X;
             int y = sp.Y;
-            var l = activeScreen.Elements.ToArray();
+            var l = activeScreen.Elements.Reverse().ToArray();
 
             return elementAt(x, y, l);
         }

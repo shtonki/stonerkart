@@ -36,6 +36,18 @@ namespace stonerkart
         public void addElement(GuiElement element)
         {
             elements.Add(element);
+            element.screen = this;
+        }
+
+        public void removeElement(GuiElement element)
+        {
+            elements.Remove(element);
+        }
+
+        public void addWinduh(Winduh winduh)
+        {
+            addElement(winduh);
+            winduh.moveTo(MoveTo.Center, MoveTo.Center);
         }
     }
 }
