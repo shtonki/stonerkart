@@ -18,7 +18,16 @@ namespace stonerkart
 
         public PileView()
         {
-            Backcolor = Color.Crimson;
+        }
+
+        public PileView(int width, int height, IEnumerable<Card> cards)
+        {
+            Height = height;
+            Width = width;
+            CardList cl = new CardList();
+            cl.addRange(cards);
+            populate(cl);
+            layoutCards();
         }
 
 

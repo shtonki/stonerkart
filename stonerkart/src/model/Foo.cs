@@ -30,9 +30,16 @@ namespace stonerkart
             {
                 var effect = effects[i];
                 var cache = cached[i];
-                var events = effect.resolve(hs, cache);
-                if (events == null) return null;
-                rt.AddRange(events);
+                var events = effect.
+                resolve(hs, cache);
+                if (events == null) //targeting was cancelled
+                {
+                    i = -1;
+                }
+                else
+                {
+                    rt.AddRange(events);
+                }
             }
 
             return rt;

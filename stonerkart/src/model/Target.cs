@@ -124,7 +124,7 @@ namespace stonerkart
 
     interface chooserface<T> where T : Targetable
     {
-        IEnumerable<T> candidates(HackStruct hs);
+        IEnumerable<T> candidates(HackStruct hs, Player p);
         T pickOne(Player chooser, Func<T, bool> filter, HackStruct hs);
     }
 
@@ -232,8 +232,6 @@ namespace stonerkart
 
         private TargetSet choose(IEnumerable<Player> players, HackStruct hs)
         {
-            var v = chooser.candidates(hs).Where(filter);
-            hs.game.highlight(v.Cast<Targetable>(), Color.Green);
 
             if (count != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             if (players.Count() != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
@@ -241,10 +239,20 @@ namespace stonerkart
             TargetSet rt = null;
             foreach (var player in players)
             {
+                var v = chooser.candidates(hs, player).Where(filter);
+                hs.game.highlight(v.Cast<Targetable>(), Color.Green);
                 var chosen = chooser.pickOne(player, filter, hs);
+
                 if (chosen == null)
                 {
-                    rt = null;
+                    if (v.Count() == 0)
+                    {
+                        rt = new TargetSet();
+                    }
+                    else
+                    {
+                        rt = null;
+                    }
                 }
                 else
                 {
@@ -275,14 +283,51 @@ namespace stonerkart
             this.pile = pile;
         }
 
-        public IEnumerable<Card> candidates(HackStruct hs)
+        public IEnumerable<Card> candidates(HackStruct hs, Player p)
         {
-            throw new NotImplementedException();
+            Player lookedAt;
+            switch (mode)
+            {
+                case Mode.PlayerLooksAtPlayer:
+                case Mode.ResolverLooksAtPlayer:
+                {
+                    lookedAt = p;
+                } break;
+
+                case Mode.PlayerLooksAtResolver:
+                {
+                    lookedAt = hs.resolveController;
+                } break;
+
+                default: throw new Exception();
+            }
+
+            return p.pileFrom(pile);
         }
 
-        public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
+        private Player chooser(Player player, HackStruct hs)
         {
-            throw new NotImplementedException();
+            switch (mode)
+            {
+                case Mode.PlayerLooksAtPlayer:
+                case Mode.PlayerLooksAtResolver:
+                {
+                    return player;
+                }
+                case Mode.ResolverLooksAtPlayer:
+                {
+                    return hs.resolveController;
+                }
+                default:
+                    throw new Exception();
+            }
+        }
+
+        public Card pickOne(Player player, Func<Card, bool> filter, HackStruct hs)
+        {
+            var chsr = chooser(player, hs);
+            var cs = candidates(hs, player);
+            return hs.game.chooseCardsFromCardsSynced(chsr, cs, filter, true);
         }
 
         public enum Mode
@@ -296,7 +341,7 @@ namespace stonerkart
 
     class ClickCardRule : chooserface<Card>
     {
-        public IEnumerable<Card> candidates(HackStruct hs)
+        public IEnumerable<Card> candidates(HackStruct hs, Player p)
         {
             return hs.tilesInRange.Where(t => t.card != null).Select(t => t.card);
         }
@@ -312,7 +357,7 @@ namespace stonerkart
 
     class ClickTileRule : chooserface<Tile>
     {
-        public IEnumerable<Tile> candidates(HackStruct hs)
+        public IEnumerable<Tile> candidates(HackStruct hs, Player p)
         {
             return hs.tilesInRange;
         }
@@ -325,20 +370,21 @@ namespace stonerkart
 
     class ClickPlayerRule : chooserface<Player>
     {
-        public IEnumerable<Player> candidates(HackStruct hs)
+        public IEnumerable<Player> candidates(HackStruct hs, Player p)
         {
-            throw new NotImplementedException();
+            return hs.gameState.players;
         }
 
         public Player pickOne(Player chooser, Func<Player, bool> filter, HackStruct hs)
         {
-            throw new NotImplementedException();
+            Tile tl = hs.game.chooseTileSynced(chooser, t => t.card != null && t.card.isHeroic && filter(t.card.owner), "oirggf", "sfoigfx", true);
+            return tl.card.owner;
         }
     }
 
     class ClickManaRule : chooserface<ManaOrb>
     {
-        public IEnumerable<ManaOrb> candidates(HackStruct hs)
+        public IEnumerable<ManaOrb> candidates(HackStruct hs, Player p)
         {
             throw new NotImplementedException();
         }

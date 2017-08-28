@@ -21,9 +21,9 @@ namespace stonerkart
 
             var gsc = new GameScreen();
 
-            //GUI.setScreen(gsc);
+            GUI.setScreen(gsc);
             //GUI.setScreen(new LoginScreen());
-            GUI.setScreen(new DeckEditorScreen());
+            //GUI.setScreen(new DeckEditorScreen());
 
 
             Game g = new Game(new NewGameStruct(0, 420, new []{"Hero", "Villain"}, 0), true, gsc);

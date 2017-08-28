@@ -50,7 +50,17 @@ namespace stonerkart
                 }
                 else
                 {
-                    throw new Exception();
+                    closeButton.clicked += a =>
+                    {
+                        if (parent != null)
+                        {
+                            parent.removeChild(this);
+                        }
+                        else
+                        {
+                            screen.removeElement(this);
+                        }
+                    };
                 }
             }
 

@@ -103,9 +103,12 @@ namespace stonerkart
 
                 if (activeScreen.background != null) dm.drawImege(activeScreen.background, 0, 0, BACKSCREENWIDTH, BACKSCREENHEIGHT);
 
-                foreach (var elem in activeScreen.Elements)
+                lock (activeScreen.elements)
                 {
-                    drawElement(elem, dm);
+                    foreach (var elem in activeScreen.Elements)
+                    {
+                        drawElement(elem, dm);
+                    }
                 }
             }
 

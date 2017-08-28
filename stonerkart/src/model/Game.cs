@@ -701,8 +701,6 @@ namespace stonerkart
                 return false;
             });
 
-            screen.promptPanel.promptButtons("Choose a Card to cast", ButtonOption.Pass);
-
             screen.promptPanel.sub(sax);
             screen.handView.sub(sax);
 
@@ -718,11 +716,13 @@ namespace stonerkart
             throw new Exception();
         }
 
-        public Card chooseCardSynced(Player chooser, Func<Card, bool> filter)
+        public Card chooseCardSynced(Player chooser, Func<Card, bool> filter, string chooserPrompt, string waiterPrompt, ButtonOption? button = null)
         {
             Card rt;
             if (chooser.isHero)
             {
+                screen.promptPanel.prompt(chooserPrompt);
+                if (button.HasValue) screen.promptPanel.promptButtons(button.Value);
                 rt = chooseCardUnsynced(filter);
                 connection.sendChoice(gameState.ord(rt));
             }
@@ -766,7 +766,7 @@ namespace stonerkart
                 }
                 */
 
-                var card = chooseCardSynced(playerWithPriority, c => c.controller == playerWithPriority);
+                var card = chooseCardSynced(playerWithPriority, c => c.controller == playerWithPriority, "dsifj", "sjdspvos", ButtonOption.Pass);
                 if (card == null) return false;
 
                 var ability = chooseAbilitySynced(card);
@@ -871,18 +871,14 @@ namespace stonerkart
             return (ManaColour)sax.call();
         }
 
-        private void setPrompt(string prompt)
-        {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-        }
-
         public ButtonOption chooseButtonSynced(Player chooser, string waiterPrompt, string chooserPrompt,
             params ButtonOption[] options)
         {
             ButtonOption rt;
             if (chooser.isHero)
             {
-                screen.promptPanel.promptButtons(chooserPrompt, options);
+                screen.promptPanel.prompt(chooserPrompt);
+                screen.promptPanel.promptButtons(options);
                 rt = chooseButtonUnsynced(options);
                 connection.sendChoice((int)rt);
             }
@@ -909,7 +905,8 @@ namespace stonerkart
             Tile rt;
             if (chooser.isHero)
             {
-                screen.promptPanel.promptButtons(chooserPrompt, cancellable ? new[] { ButtonOption.Cancel } : new ButtonOption[0]);
+                screen.promptPanel.prompt(chooserPrompt);
+                if (cancellable) screen.promptPanel.promptButtons(ButtonOption.Cancel);
                 rt = chooseTileUnsynced(filter);
                 if (rt == null) connection.sendChoice(null);
                 else connection.sendChoice(gameState.ord(rt));
@@ -946,7 +943,8 @@ namespace stonerkart
                 {
                     ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
                 };
-                screen.promptPanel.promptManaChoice("Choose color", cs);
+                screen.promptPanel.prompt("Choose color");
+                screen.promptPanel.promptManaChoice(cs);
                 clr = chooseManaColourUnsynced().Value;
 
                 gameState.hero.unstuntMana();
@@ -977,9 +975,49 @@ namespace stonerkart
             screen.hexPanel.clearPaths();
         }
 
-        private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)
+        public Card chooseCardsFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter, bool cancellable)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            Card rt;
+            if (chooser.isHero)
+            {
+                screen.promptPanel.prompt("isjgoisfj");
+                if (cancellable) screen.promptPanel.promptButtons(ButtonOption.Cancel);
+                rt = chooseCardsFromCardsUnsynced(cards, filter);
+                if (rt == null) connection.sendChoice(null);
+                else connection.sendChoice(gameState.ord(rt));
+            }
+            else
+            {
+                var cs = connection.receiveChoice();
+                if (cs.HasValue)
+                {
+                    rt = gameState.cardFromOrd(cs.Value);
+                }
+                else
+                {
+                    rt = null;
+                }
+            }
+            return rt;
+        }
+
+        private Card chooseCardsFromCardsUnsynced(IEnumerable<Card> cards, Func<Card, bool> filter)
+        {
+            PileView pv = new PileView(600, 300, cards);
+            Winduh window = new Winduh(pv);
+            screen.addWinduh(window);
+
+            PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Card) && filter((Card)o));
+            pv.sub(sax);
+            screen.promptPanel.sub(sax);
+
+            var v = sax.call();
+
+            screen.removeElement(window);
+
+            if (v is ButtonOption) return null;
+            if (v is Card) return (Card)v;
+            throw new Exception();
         }
 
         public IEnumerable<Card> selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount, Func<Card, bool> filter)

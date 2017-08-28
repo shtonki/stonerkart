@@ -120,10 +120,9 @@ namespace stonerkart
             promptText.Text = text;
         }
 
-        public void promptButtons(string text, params ButtonOption[] labels)
+        public void promptButtons(params ButtonOption[] labels)
         {
             hideButtons();
-            promptText.Text = text;
 
             for (int i = 0; i < labels.Length; i++)
             {
@@ -134,11 +133,9 @@ namespace stonerkart
             }
         }
 
-        public void promptManaChoice(string text, params ManaColour[] colours)
+        public void promptManaChoice(params ManaColour[] colours)
         {
             hideButtons();
-            promptText.Text = text;
-            
 
             foreach (var c in colours)
             {

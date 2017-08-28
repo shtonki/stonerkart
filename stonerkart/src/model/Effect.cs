@@ -33,6 +33,7 @@ namespace stonerkart
         public IEnumerable<GameEvent> resolve(HackStruct hs, TargetSet[] cached)
         {
             var filled = ts.fillResolve(hs, cached);
+            if (filled == null) return null;
             var rows = rowsFromSet(filled);
             return doer.act(hs, rows);
         }
