@@ -329,12 +329,12 @@ namespace stonerkart
                 Card mover = from.card;
                 if (mover.combatPath != null)
                 {
-                    gameController.removeArrow(mover.combatPath);
+                    removeArrow(mover.combatPath);
                     occupado.Remove(mover.combatPath.last);
                 }
                 Path pth = new Path(from);
                 pth.colorHack = clrs[gameState.ord(mover)%clrs.Length];
-                gameController.addArrow(pth);
+                addArrow(pth);
 
                 while (true)
                 {
@@ -361,9 +361,9 @@ namespace stonerkart
 
                     var cp = options.First(p => p.to == to);
 
-                    gameController.removeArrow(pth);
+                    removeArrow(pth);
                     pth.concat(cp);
-                    gameController.addArrow(pth);
+                    addArrow(pth);
                     from = pth.to;
 
                     if (pth.length == mover.movement) break;
@@ -409,7 +409,7 @@ namespace stonerkart
             handleTransaction(gt);
 
             foreach (var c in gameState.cards) c.combatPath = null;
-            gameController.clearArrows();
+            clearArrows();
             clearHighlights();
         }
 
@@ -956,6 +956,22 @@ namespace stonerkart
                 clr = (ManaColour)connection.receiveChoice();
             }
             return clr;
+        }
+
+
+        public void addArrow(Path l)
+        {
+            screen.hexPanel.addPath(l);
+        }
+
+        public void removeArrow(Path l)
+        {
+            screen.hexPanel.removeArrow(l);
+        }
+
+        public void clearArrows()
+        {
+            screen.hexPanel.clearPaths();
         }
 
         private DraggablePanel showCards(IEnumerable<Card> cards, bool closeable)

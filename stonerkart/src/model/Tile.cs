@@ -79,7 +79,7 @@ namespace stonerkart
                 int da = Math.Abs(a - t.a);
                 int db = Math.Abs(b - t.b);
                 int dc = Math.Abs(c - t.c);
-                if (da + db + dc == distance)
+                if (da + db + dc == distance*2)
                 {
                     ta.Add(t);
                 }
@@ -106,6 +106,7 @@ namespace stonerkart
 
             public XYCoord(int a, int b, int c)
             {
+                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
                 y = c;
                 x = a + y/2;
             }
@@ -127,9 +128,9 @@ namespace stonerkart
 
             public ABCCoord(int x, int y)
             {
-                a = -y / 2 + x;
-                b = -((y + 1) / 2 + x);
-                c = y;
+                a = y + x/2;
+                b = -x;
+                c = -(a + b);
             }
             
         }

@@ -160,6 +160,58 @@ namespace stonerkart
                     movementText.draw(dm, movementX, movementY, 0, Color.Black, true);
                 }
             }
+
+            lock (paths)
+            {
+                foreach (var path in paths)
+                {
+                    var tiles = path.tiles;
+                    var from = tiles[0];
+
+
+                    for (int i = 1; i < tiles.Count; i++)
+                    {
+                        var to = tiles[i];
+                        arrow(from.x, from.y, to.x, to.y, Color.Aqua, dm);
+                        from = to;
+                    }
+                }
+            }
+
+        }
+
+        private void arrow(int xorg, int yorg, int xend, int yend, Color c, DrawerMaym dm)
+        {
+            var p1 = hexCoords(xorg, yorg);
+            var p2 = hexCoords(xend, yend);
+            int hsd2 = hexsize/2;
+            dm.drawLine(p1.X + hsd2, p1.Y + hsd2, p2.X + hsd2, p2.Y + hsd2, c);
+        }
+
+        private List<Path> paths = new List<Path>();
+
+        public void addPath(Path p)
+        {
+            lock (paths)
+            {
+                paths.Add(p);
+            }
+        }
+
+        public void clearPaths()
+        {
+            lock (paths)
+            {
+                paths.Clear();
+            }
+        }
+
+        public void removeArrow(Path p)
+        {
+            lock (paths)
+            {
+                paths.Remove(p);
+            }
         }
 
         FontFamille ff = FontFamille.font1;

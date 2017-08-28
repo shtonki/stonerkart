@@ -19,7 +19,7 @@ namespace stonerkart
         {PileLocation.Deck, PileLocation.Displaced, PileLocation.Graveyard, PileLocation.Hand,};
 
         private Textures[] locationTextures = new[]
-        {Textures.deckButton, Textures.displaceButton, Textures.graveyardButton, Textures.handButton,};
+        {Textures.handButton, Textures.deckButton, Textures.graveyardButton, Textures.displaceButton, };
 
         private const int rows = 6;
         private const int columns = 6;
