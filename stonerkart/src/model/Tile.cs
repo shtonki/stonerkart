@@ -74,40 +74,14 @@ namespace stonerkart
         public List<Tile> atDistance(int distance)
         {
             List<Tile> ta = new List<Tile>();
-            if (distance == 0)
+            foreach (var t in map.tyles)
             {
-                ta.Add(this);
-                return ta;
-            }
-            unsafe
-            {
-                int ba;
-                int bb;
-                int bc;
-                var ps = new []
+                int da = Math.Abs(a - t.a);
+                int db = Math.Abs(b - t.b);
+                int dc = Math.Abs(c - t.c);
+                if (da + db + dc == distance)
                 {
-                    new [] {&ba, &bb, &bc}, 
-                    new [] {&bb, &bc, &ba}, 
-                    new [] {&bc, &ba, &bb}, 
-                };
-                foreach (var v in ps)
-                {
-                    foreach (int r in new [] { -1, 1})
-                    {
-                        ba = a;
-                        bb = b;
-                        bc = c;
-                        *v[0] += r*distance;
-                        *v[1] -= r*distance;
-
-                        for (int i = 0; i < distance; i++)
-                        {
-                            Tile t = map.tileAt(ba, bb, bc);
-                            if (t != null) ta.Add(t);
-                            *v[0] -= r*1;
-                            *v[2] += r*1;
-                        }
-                    }
+                    ta.Add(t);
                 }
             }
             return ta;
