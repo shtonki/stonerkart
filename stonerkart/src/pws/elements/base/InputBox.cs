@@ -26,6 +26,11 @@ namespace stonerkart
             Backcolor = Color.FloralWhite;
         }
 
+        public void setText(string text)
+        {
+            textBox.Text = text;
+        }
+
         public override Border Border
         {
             get { return textBox.Border; }
