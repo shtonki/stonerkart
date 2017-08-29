@@ -216,7 +216,7 @@ namespace stonerkart
                 greyCost = 2;
 
                 addTriggeredAbility(
-                    "Whenever a creature enters the battlefield under your control, you may restore 1 toughness to your hero.",
+                    "Whenever a creature enters the battlefield under your control, restore 1 toughness to your hero.",
                     new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                         new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
                     new ZepperDoer(-1),
@@ -226,7 +226,7 @@ namespace stonerkart
                         moveEvent.to.location.pile == PileLocation.Field),
                     0,
                     PileLocation.Field,
-                    true,
+                    false,
                     TriggeredAbility.Timing.Post
                     );
             }

@@ -60,12 +60,6 @@ namespace stonerkart
             Deck d = new Deck(CardTemplate.Shibby_sShtank, 
                 new []
                 {
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
                     CardTemplate.Kappa, 
                     CardTemplate.Kappa, 
                     CardTemplate.Kappa, 
@@ -73,6 +67,13 @@ namespace stonerkart
                     CardTemplate.Kappa, 
                     CardTemplate.Kappa, 
                     CardTemplate.Kappa, 
+                    CardTemplate.Temple_sHealer, 
+                    CardTemplate.Temple_sHealer, 
+                    CardTemplate.Temple_sHealer, 
+                    CardTemplate.Temple_sHealer, 
+                    CardTemplate.Temple_sHealer, 
+                    CardTemplate.Temple_sHealer, 
+                    CardTemplate.Temple_sHealer, 
                 });
             cb(d);
             return;

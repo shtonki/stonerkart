@@ -483,7 +483,6 @@ namespace stonerkart
 
         private void handlePendingTrigs()
         {
-
             if (gameState.pendingTriggeredAbilities.Count > 0)
             {
                 List<TriggerGlueHack>[] abilityArrays =
@@ -495,8 +494,6 @@ namespace stonerkart
                     abilityArrays[ix].Add(pending);
                 }
 
-                List<StackWrapper> wrappers = new List<StackWrapper>();
-
                 for (int i = 0; i < abilityArrays.Length; i++)
                 {
                     Player p = gameState.playerFromOrd(i);
@@ -506,43 +503,48 @@ namespace stonerkart
                 }
 
                 gameState.pendingTriggeredAbilities.Clear();
-
-                foreach (var w in wrappers)
-                {
-
-                    throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-                    //cast(w);
-                }
             }
         }
 
-        private List<StackWrapper> handlePendingTrigs(Player triggerOwner, IEnumerable<TriggerGlueHack> abilities)
+        private void handlePendingTrigs(Player triggerOwner, IEnumerable<TriggerGlueHack> abilities)
         {
-            List<StackWrapper> r = new List<StackWrapper>();
-            TriggerGlueHack[] orig = abilities.ToArray();//.Where(a => a.ta.possible(makeHackStruct(a.ta))).ToArray();
+            TriggerGlueHack[] orig = abilities.ToArray();
 
-            CardList pl = new CardList();
+            CardList dummyCards = new CardList();
 
             for (int i = 0; i < orig.Length; i++)
             {
                 Card c = createDummy(orig[i].ta);
-                pl.addTop(c);
+                dummyCards.addTop(c);
                 c.tghack = orig[i];
             }
 
-            List<ptas> triggd = new List<ptas>();
-                
-            while (triggd.Count < orig.Length)
+            List<ptas> triggd;
+
+            do
             {
-                Card dummyCard = chooseCardsFromCardsSynced(triggerOwner, pl, _ => true, true,
+                triggd = xd(dummyCards, triggerOwner, orig);
+            } while (triggd == null);
+            
+
+            foreach (ptas pt in triggd)
+            {
+                cast(pt.wrapper, pt.costEvents);
+            }
+        }
+
+        private List<ptas> xd(CardList cards, Player triggerOwner, TriggerGlueHack[] orig)
+        {
+            List<ptas> triggd = new List<ptas>();
+
+            var handled = new CardList();
+
+            while (handled.Count < cards.Count)
+            {
+                Card dummyCard = chooseCardsFromCardsSynced(triggerOwner, cards.Except(handled), _ => true, true,
                     String.Format("{0}'s Triggered Abilities", triggerOwner.name));
 
-                ptas prevadd = triggd.FirstOrDefault(s => s.dummyCard == dummyCard);
-                if (prevadd != null)
-                {
-                    triggd.Remove(prevadd);
-                    continue;
-                }
+                if (dummyCard == null) return null;
 
                 int i = Array.IndexOf(orig.Select(g => g.ta).ToArray(), dummyCard.dummiedAbility);
 
@@ -553,26 +555,24 @@ namespace stonerkart
                 hs.triggeringEvent = triggeringEvent;
 
                 var costTargets = ability.targetCosts(hs);
-                if (costTargets.Fizzled || costTargets.Cancelled) throw new Exception();
+                if (costTargets.Fizzled) { handled.addTop(dummyCard); continue; }
+                if (costTargets.Cancelled) return null;
                 var payCostGameEvents = ability.payCosts(hs, costTargets);
 
                 var castTargets = ability.targetCast(hs);
-                if (castTargets.Cancelled || castTargets.Fizzled) throw new Exception();
-
+                if (castTargets.Fizzled) { handled.addTop(dummyCard); continue; }
+                if (castTargets.Cancelled) return null;
 
                 StackWrapper wrapper = new StackWrapper(dummyCard, ability, castTargets);
 
                 ptas ptas = new ptas(ability, dummyCard, wrapper, payCostGameEvents);
                 triggd.Add(ptas);
+                handled.addTop(dummyCard);
             }
 
-            foreach (ptas pt in triggd)
-            {
-                cast(pt.wrapper, pt.costEvents);
-            }
-
-            return r;
+            return triggd;
         }
+
         #region hack
         private class ptas
         {
