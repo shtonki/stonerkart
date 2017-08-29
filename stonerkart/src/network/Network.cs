@@ -57,12 +57,10 @@ namespace stonerkart
 
                 case Message.MessageType.NEWGAME:
                 {
-
-                        throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                     NewGameBody b = new NewGameBody(m.body);
-                    Game g = ScreenController.transitionToGamePanel(b.newGameStruct, false);
+                    Game g = Controller.startGame(b.newGameStruct);
                     activeGames.Add(g);
-                    */
+                    
                 } break;
 
                 case Message.MessageType.GAMEMESSAGE:
@@ -84,14 +82,11 @@ namespace stonerkart
             }
         }
 
-        public static void sendGameMessage(GameState g, string message)
+        public static void sendGameMessage(int gameid, string message)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            GameMessageBody b = new GameMessageBody(g.gameid, message);
+            GameMessageBody b = new GameMessageBody(gameid, message);
             Message m = new Message(servername, Message.MessageType.GAMEMESSAGE, b);
             serverConnection.send(m);
-            */
         }
 
         private static Message awaitResponseMessage()

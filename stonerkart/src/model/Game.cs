@@ -38,16 +38,18 @@ namespace stonerkart
             }
             else
             {
-                connection = new MultiplayerConnection(gameState, ngs);
+                connection = new MultiplayerConnection(this, ngs);
             }
 
-            observe(screen);
+            observe();
         }
 
-        private void observe(GameScreen gamescreen)
+        private void observe()
         {
             gameState.hero.hand.addObserver(screen.handView);
             gameState.hero.manaPool.addObserver(screen.heroPanel);
+
+            gameState.villain.manaPool.addObserver(screen.villainPanel);
 
             gameState.stack.addObserver(screen.stackWinduh);
 
@@ -319,18 +321,18 @@ namespace stonerkart
             List<Tuple<Card, Path>> paths;
 
             Player movingPlayer = gameState.activePlayer;
-            var movers = gameState.activePlayer.field.Where(c => c.canMove);
+            var movers = movingPlayer.field.Where(c => c.canMove);
 
             var unpathed = movers.ToList();
-            var occupado = gameState.activePlayer.field.Where(c => !c.canMove).Select(c => c.tile).ToList();
+            var occupado = movingPlayer.field.Where(c => !c.canMove).Select(c => c.tile).ToList();
 
             while (true)
             {
                 highlight(unpathed.Select(c => c.tile), Color.DodgerBlue);
                 //gameController.highlight(pathed.Select(c => c.tile), Color.ForestGreen);
 
-                Tile from = chooseTileSynced(movingPlayer, tile => tile.card != null && tile.card.canMove && tile.card.owner == gameState.activePlayer,
-                    "oweighjoe", "Oigjhosfgc", unpathed.Count == 0);
+                Tile from = chooseTileSynced(movingPlayer, tile => tile.card != null && tile.card.canMove && tile.card.owner == movingPlayer,
+                    "Choose what to move.", String.Format("{0} is choosing what to move.", movingPlayer.name), unpathed.Count == 0);
                 if (from == null) break;
                 Card mover = from.card;
                 if (mover.combatPath != null)
@@ -360,7 +362,8 @@ namespace stonerkart
                     if (options.Count == 1) break;
                     var v = gameState.map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
                     highlight(options.Select(p => p.to), Color.Green);
-                    Tile to = chooseTileSynced(movingPlayer, tile => options.Select(p => p.to).Contains(tile), "klgrnjlm", "dflgkbvxcvb", true);
+                    Tile to = chooseTileSynced(movingPlayer, tile => options.Select(p => p.to).Contains(tile),
+                        "Choose where to move.", String.Format("{0} is choosing where to move.", movingPlayer.name), true);
                     clearHighlights();
                     if (to == null) continue;
                     if (to == from) break;
@@ -730,7 +733,7 @@ namespace stonerkart
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere;
 
-            bool canCastSlow = gameState.stack.Count == 0 && gameState.activePlayer == gameState.hero && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
+            bool canCastSlow = gameState.stack.Count == 0 && gameState.activePlayer == c.controller && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
             if (!canCastSlow)
             {
                 activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
@@ -865,7 +868,8 @@ namespace stonerkart
                 screen.promptPanel.prompt(chooserPrompt);
                 if (button.HasValue) screen.promptPanel.promptButtons(button.Value);
                 rt = chooseCardUnsynced(filter);
-                connection.sendChoice(gameState.ord(rt));
+                if (rt == null) connection.sendChoice(null);
+                else connection.sendChoice(gameState.ord(rt));
             }
             else
             {
@@ -955,7 +959,7 @@ namespace stonerkart
             }
             else
             {
-                gameController.setPrompt(waiterPrompt);
+                screen.promptPanel.prompt(waiterPrompt);
                 clr = (ManaColour)connection.receiveChoice();
             }
             return clr;

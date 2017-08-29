@@ -38,7 +38,7 @@ namespace stonerkart
                 }
                 else
                 {
-                    throw new Exception();
+                    //throw new Exception();
                 }
             }
         }

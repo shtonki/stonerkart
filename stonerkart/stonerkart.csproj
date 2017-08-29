@@ -107,6 +107,7 @@
     <Compile Include="src\pws\elements\screens\DeckEditorScreen.cs" />
     <Compile Include="src\pws\elements\screens\GameScreen.cs" />
     <Compile Include="src\pws\elements\screens\LoginScreen.cs" />
+    <Compile Include="src\pws\elements\screens\MainMenuScreen.cs" />
     <Compile Include="src\pws\elements\screens\Screen.cs" />
     <Compile Include="src\pws\elements\TextLayout.cs" />
     <Compile Include="src\pws\elements\TurnIndicator.cs" />

@@ -64,7 +64,7 @@ namespace stonerkart
             set { backimege = value; }
         }
 
-        public string Text
+        public virtual string Text
         {
             get { return text; }
             set

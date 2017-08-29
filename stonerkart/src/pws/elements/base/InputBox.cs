@@ -14,6 +14,12 @@ namespace stonerkart
         private Square textBox;
         private int textMargin;
 
+        public override string Text
+        {
+            get { return textBox.Text; }
+            set { textBox.Text = value; }
+        }
+
         public InputBox(int width, int height) : base(width, height)
         {
             textBox = new Square(width, height);

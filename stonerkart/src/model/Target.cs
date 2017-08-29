@@ -372,7 +372,7 @@ namespace stonerkart
 
             TargetSet? ts = null;
             List<Targetable> chosenList = new List<Targetable>();
-            hs.game.highlight(v.Cast<Targetable>(), Color.Green);
+            if (player.isHero) hs.game.highlight(v.Cast<Targetable>(), Color.Green);
 
             while (chosenList.Count < count)
             {
