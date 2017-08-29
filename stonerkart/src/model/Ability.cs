@@ -54,7 +54,18 @@ namespace stonerkart
 
         public TargetMatrix targetResolve(HackStruct hs, TargetMatrix cached)
         {
-            return effects.fillResolve(hs, cached);
+            TargetMatrix tm;
+            while (true)
+            {
+                tm = effects.fillResolve(hs, cached);
+
+                if (tm.Cancelled)
+                {
+                    continue;
+                }
+
+                return tm;
+            }
         }
 
         public virtual IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix cache)

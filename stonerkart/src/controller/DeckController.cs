@@ -66,16 +66,14 @@ namespace stonerkart
                     CardTemplate.Bubastis, 
                     CardTemplate.Bubastis, 
                     CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                    CardTemplate.Bubastis, 
-                }
-                );
+                    CardTemplate.Kappa, 
+                    CardTemplate.Kappa, 
+                    CardTemplate.Kappa, 
+                    CardTemplate.Kappa, 
+                    CardTemplate.Kappa, 
+                    CardTemplate.Kappa, 
+                    CardTemplate.Kappa, 
+                });
             cb(d);
             return;
             throw new Exception();

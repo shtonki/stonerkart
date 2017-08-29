@@ -516,7 +516,7 @@ namespace stonerkart
             }
         }
 
-        private List<StackWrapper> handlePendingTrigs(Player p, IEnumerable<TriggerGlueHack> abilities)
+        private List<StackWrapper> handlePendingTrigs(Player triggerOwner, IEnumerable<TriggerGlueHack> abilities)
         {
             List<StackWrapper> r = new List<StackWrapper>();
             TriggerGlueHack[] orig = abilities.ToArray();//.Where(a => a.ta.possible(makeHackStruct(a.ta))).ToArray();
@@ -534,30 +534,36 @@ namespace stonerkart
                 
             while (triggd.Count < orig.Length)
             {
-                Card c = chooseCardsFromCardsSynced(p, pl, _ => true, true);
+                Card dummyCard = chooseCardsFromCardsSynced(triggerOwner, pl, _ => true, true,
+                    String.Format("{0}'s Triggered Abilities", triggerOwner.name));
 
-                ptas prevadd = triggd.FirstOrDefault(s => s.dummyCard == c);
+                ptas prevadd = triggd.FirstOrDefault(s => s.dummyCard == dummyCard);
                 if (prevadd != null)
                 {
                     triggd.Remove(prevadd);
-                    //cv.glowColour();
                     continue;
                 }
 
-                int i = Array.IndexOf(orig.Select(g => g.ta).ToArray(), c.dummiedAbility);
-                TriggeredAbility tab = orig[i].ta;
+                int i = Array.IndexOf(orig.Select(g => g.ta).ToArray(), dummyCard.dummiedAbility);
 
-                //dp.hide();
-                Tuple<StackWrapper, IEnumerable<GameEvent>> wrapperAndCostEvents = tryCastTriggeredAbility(p, tab, c, orig[i].ge);
-                //dp.show();
+                TriggeredAbility ability = orig[i].ta;
+                var triggeringEvent = orig[i].ge;
 
-                if (wrapperAndCostEvents == null) continue;
+                var hs = new HackStruct(this, ability);
+                hs.triggeringEvent = triggeringEvent;
 
-                ptas ptas = new ptas(tab, c, wrapperAndCostEvents.Item1, wrapperAndCostEvents.Item2);
+                var costTargets = ability.targetCosts(hs);
+                if (costTargets.Fizzled || costTargets.Cancelled) throw new Exception();
+                var payCostGameEvents = ability.payCosts(hs, costTargets);
+
+                var castTargets = ability.targetCast(hs);
+                if (castTargets.Cancelled || castTargets.Fizzled) throw new Exception();
+
+
+                StackWrapper wrapper = new StackWrapper(dummyCard, ability, castTargets);
+
+                ptas ptas = new ptas(ability, dummyCard, wrapper, payCostGameEvents);
                 triggd.Add(ptas);
-                //cv.glowColour(Color.Green);
-
-                //dp.close();
             }
 
             foreach (ptas pt in triggd)
@@ -742,8 +748,7 @@ namespace stonerkart
                 if (payCostGameEvents == null) continue;
 
                 var targets = ability.targetCast(hs);
-                if (targets.Fizzled) throw new Exception();
-                if (targets.Cancelled) continue;
+                if (targets.Cancelled || targets.Fizzled) continue;
 
                 if (!ability.isCastAbility) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
 
@@ -752,27 +757,6 @@ namespace stonerkart
                 cast(wrapper, payCostGameEvents);
                 return true;
             } while (true);
-        }
-
-        private Tuple<StackWrapper, IEnumerable<GameEvent>> tryCastTriggeredAbility(Player p, TriggeredAbility ability, Card dummyCard, GameEvent ge)
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            do
-            {
-                var hs = new HackStruct(this, ability);
-                hs.triggeringEvent = ge;
-                var payCostGameEvents = ability.payCosts(hs);
-                if (payCostGameEvents == null) return null;
-
-                var targets = ability.target(hs);
-                if (targets == null) continue;
-
-                StackWrapper wrapper = new StackWrapper(dummyCard, ability, targets);
-
-                return new Tuple<StackWrapper, IEnumerable<GameEvent>>(wrapper, payCostGameEvents);
-            } while (true);
-            */
         }
 
         private ActivatedAbility chooseAbilitySynced(Card c)
@@ -815,9 +799,12 @@ namespace stonerkart
             HackStruct hs = new HackStruct(this, ability, card.controller);
 
             //fill resolve targets first
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-            
-            var resolveEvents = ability.resolve(hs, wrapper.cachedTargets);
+            //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+
+            var finalTargets = ability.targetResolve(hs, wrapper.cachedTargets);
+            if (finalTargets.Cancelled || finalTargets.Fizzled) throw new Exception();
+
+            var resolveEvents = ability.resolve(hs, finalTargets);
             if (resolveEvents == null) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             GameTransaction gt = new GameTransaction(resolveEvents);
 
@@ -959,14 +946,14 @@ namespace stonerkart
             screen.hexPanel.clearPaths();
         }
 
-        public Card chooseCardsFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter, bool cancellable)
+        public Card chooseCardsFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter, bool cancellable, string title = "")
         {
             Card rt;
             if (chooser.isHero)
             {
                 screen.promptPanel.prompt("isjgoisfj");
                 if (cancellable) screen.promptPanel.promptButtons(ButtonOption.Cancel);
-                rt = chooseCardsFromCardsUnsynced(cards, filter);
+                rt = chooseCardsFromCardsUnsynced(cards, filter, title);
                 if (rt == null) connection.sendChoice(null);
                 else connection.sendChoice(gameState.ord(rt));
             }
@@ -985,10 +972,11 @@ namespace stonerkart
             return rt;
         }
 
-        private Card chooseCardsFromCardsUnsynced(IEnumerable<Card> cards, Func<Card, bool> filter)
+        private Card chooseCardsFromCardsUnsynced(IEnumerable<Card> cards, Func<Card, bool> filter, string title)
         {
             PileView pv = new PileView(600, 300, cards);
             Winduh window = new Winduh(pv);
+            window.Title = title;
             screen.addWinduh(window);
 
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Card) && filter((Card)o));

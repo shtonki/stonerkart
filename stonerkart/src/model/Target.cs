@@ -152,7 +152,7 @@ namespace stonerkart
         public TargetVector[] targetVectors { get; }
 
         public bool Cancelled => targetVectors.Any(tv => tv.Cancelled);
-        public bool Fizzled => targetVectors.Any(tv => tv.Cancelled);
+        public bool Fizzled => targetVectors.Any(tv => tv.Fizzled);
 
         public TargetMatrix(TargetVector[] targetVectors)
         {
@@ -160,14 +160,19 @@ namespace stonerkart
             if (Cancelled || Fizzled) throw new Exception();
         }
 
+        private TargetMatrix(TargetVector vector)
+        {
+            targetVectors = new[] {vector};
+        }
+
         public static TargetMatrix CreateCancelled()
         {
-            return new TargetMatrix(new[] {TargetVector.CreateCancelled()});
+            return new TargetMatrix(TargetVector.CreateCancelled());
         }
 
         public static TargetMatrix CreateFizzled()
         {
-            return new TargetMatrix(new[] { TargetVector.CreateFizzled() });
+            return new TargetMatrix(TargetVector.CreateFizzled());
         }
     }
 
@@ -338,9 +343,9 @@ namespace stonerkart
 
                 if (chosen == null)
                 {
-                    if (v.Count() == 0 && chooseAt == ChooseAt.Resolve)
+                    if (v.Count() == 0)
                     {
-                        ts = TargetSet.CreateEmpty();
+                        ts = TargetSet.CreateFizzled();
                         break;
                     }
                     else
