@@ -154,8 +154,9 @@ namespace stonerkart
             if (connection is DummyConnection) xi = gameState.ord(gameState.hero);
             Player flipwinner = gameState.players[xi % gameState.players.Count];
             ButtonOption bopt = chooseButtonSynced(flipwinner,
+                "Do you wish to go first?",
                 "Oppenent won the flip and is choosing whether to go first.",
-                "Do you wish to go first?", ButtonOption.Yes, ButtonOption.No);
+                ButtonOption.Yes, ButtonOption.No);
             
             gameState.activePlayerIndex = (xi + (bopt == ButtonOption.Yes ? 0 : 1)) % gameState.players.Count;
 
@@ -172,8 +173,9 @@ namespace stonerkart
                     if (j == draws.Length - 1) break;
 
                     var bo = chooseButtonSynced(p,
+                        String.Format("Redraw to {0}?", draws[j + 1]),
                         "Opponent is redrawing.",
-                        String.Format("Redraw to {0}?", draws[j + 1]), ButtonOption.Yes, ButtonOption.No);
+                        ButtonOption.Yes, ButtonOption.No);
 
                     if (bo == ButtonOption.Yes)
                     {
@@ -259,7 +261,10 @@ namespace stonerkart
 
             if (gameState.activePlayer.manaPool.maxCount < 12)
             {
-                var mc = chooseManaColourSynced(gameState.activePlayer, o => gameState.activePlayer.manaPool.currentMana(o.colour) != 6);
+                Player addingPlayer = gameState.activePlayer;
+                var mc = chooseManaColourSynced(addingPlayer, o => addingPlayer.manaPool.currentMana(o.colour) != 6,
+                    "Choose which mana colour to add to your mana pool.",
+                    String.Format("{0} is choosing which mana colour to add to their mana pool.", addingPlayer.name));
                 gameState.activePlayer.gainMana(mc.Value);
             }
 
@@ -523,7 +528,7 @@ namespace stonerkart
 
             do
             {
-                triggd = xd(dummyCards, triggerOwner, orig);
+                triggd = orderTriggers(dummyCards, triggerOwner, orig);
             } while (triggd == null);
             
 
@@ -533,7 +538,7 @@ namespace stonerkart
             }
         }
 
-        private List<ptas> xd(CardList cards, Player triggerOwner, TriggerGlueHack[] orig)
+        private List<ptas> orderTriggers(CardList cards, Player triggerOwner, TriggerGlueHack[] orig)
         {
             List<ptas> triggd = new List<ptas>();
 
@@ -541,7 +546,10 @@ namespace stonerkart
 
             while (handled.Count < cards.Count)
             {
-                Card dummyCard = chooseCardsFromCardsSynced(triggerOwner, cards.Except(handled), _ => true, true,
+                Card dummyCard = chooseCardsFromCardsSynced(triggerOwner, cards.Except(handled), _ => true,
+                    "Choose which ability to place on the stack next.",
+                    String.Format("{0} is placing triggered abilities on the stack.", triggerOwner.name),
+                    true,
                     String.Format("{0}'s Triggered Abilities", triggerOwner.name));
 
                 if (dummyCard == null) return null;
@@ -651,56 +659,7 @@ namespace stonerkart
             if (wrapper.castingCard != gameState.stack.peekTop() && wrapper.castingCard != gameState.stack.peekTop().dummyFor) throw new Exception();
             resolve(wrapper);
         }
-
-        private Card chooseCardUnsynced(Func<Card, bool> filter)
-        {
-            PublicSaxophone sax = new PublicSaxophone(o =>
-            {
-                if (o is ButtonOption) return true;
-
-                if (o is Card)
-                {
-                    Card card = (Card)o;
-                    return filter(card);
-                }
-                return false;
-            });
-
-            screen.promptPanel.sub(sax);
-            screen.handView.sub(sax);
-            screen.stackView.sub(sax);
-
-            var v = sax.call();
-            if (v is ButtonOption)
-            {
-                return null;
-            }
-            if (v is Card)
-            {
-                return (Card) v;
-            }
-            throw new Exception();
-        }
-
-        public Card chooseCardSynced(Player chooser, Func<Card, bool> filter, string chooserPrompt, string waiterPrompt, ButtonOption? button = null)
-        {
-            Card rt;
-            if (chooser.isHero)
-            {
-                screen.promptPanel.prompt(chooserPrompt);
-                if (button.HasValue) screen.promptPanel.promptButtons(button.Value);
-                rt = chooseCardUnsynced(filter);
-                connection.sendChoice(gameState.ord(rt));
-            }
-            else
-            {
-                int? choice = connection.receiveChoice();
-                if (choice.HasValue) rt = gameState.cardFromOrd(choice.Value);
-                else rt = null;
-            }
-            return rt;
-        }
-
+        
         private void cast(StackWrapper w, IEnumerable<GameEvent> costEvents)
         {
             GameTransaction gt = new GameTransaction();
@@ -732,7 +691,10 @@ namespace stonerkart
                 }
                 */
 
-                var card = chooseCardSynced(playerWithPriority, c => c.controller == playerWithPriority, "dsifj", "sjdspvos", ButtonOption.Pass);
+                var card = chooseCardSynced(playerWithPriority, c => c.controller == playerWithPriority,
+                    "It is your turn to cast a spell.",
+                    String.Format("{0}'s turn to cast a spell.", playerWithPriority.name), 
+                    ButtonOption.Pass);
                 if (card == null) return false;
 
                 var ability = chooseAbilitySynced(card);
@@ -773,11 +735,13 @@ namespace stonerkart
             if (activatableAbilities.Length == 0) return null;
             if (activatableAbilities.Length > 1)
             {
+                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                 var v = activatableAbilities.Select(a => a.createDummy()).ToList();
                 var sl = selectCardFromCards(v, true, 1, crd => true).ToArray();
                 if (sl.Length == 0) return null;
                 int i = v.IndexOf(sl[0]);
                 r = activatableAbilities[i];
+                */
             }
             else
             {
@@ -835,14 +799,57 @@ namespace stonerkart
             ScreenController.transtitionToPostGameScreen(this, ras);*/
         }
 
-        private ManaColour? chooseManaColourUnsynced()
+        private Card chooseCardUnsynced(Func<Card, bool> filter)
         {
-            PublicSaxophone sax = new PublicSaxophone(c => true);
+            PublicSaxophone sax = new PublicSaxophone(o =>
+            {
+                if (o is ButtonOption) return true;
+
+                if (o is Card)
+                {
+                    Card card = (Card)o;
+                    return filter(card);
+                }
+                return false;
+            });
+
             screen.promptPanel.sub(sax);
-            return (ManaColour)sax.call();
+            screen.handView.sub(sax);
+            screen.stackView.sub(sax);
+
+            var v = sax.call();
+            if (v is ButtonOption)
+            {
+                return null;
+            }
+            if (v is Card)
+            {
+                return (Card)v;
+            }
+            throw new Exception();
         }
 
-        public ButtonOption chooseButtonSynced(Player chooser, string waiterPrompt, string chooserPrompt,
+        public Card chooseCardSynced(Player chooser, Func<Card, bool> filter, string chooserPrompt, string waiterPrompt, ButtonOption? button = null)
+        {
+            Card rt;
+            if (chooser.isHero)
+            {
+                screen.promptPanel.prompt(chooserPrompt);
+                if (button.HasValue) screen.promptPanel.promptButtons(button.Value);
+                rt = chooseCardUnsynced(filter);
+                connection.sendChoice(gameState.ord(rt));
+            }
+            else
+            {
+                screen.promptPanel.prompt(waiterPrompt);
+                int? choice = connection.receiveChoice();
+                if (choice.HasValue) rt = gameState.cardFromOrd(choice.Value);
+                else rt = null;
+            }
+            return rt;
+        }
+
+        public ButtonOption chooseButtonSynced(Player chooser, string chooserPrompt, string waiterPrompt,
             params ButtonOption[] options)
         {
             ButtonOption rt;
@@ -871,7 +878,7 @@ namespace stonerkart
             return v;
         }
 
-        public Tile chooseTileSynced(Player chooser, Func<Tile, bool> filter, string waiterPrompt, string chooserPrompt, bool cancellable)
+        public Tile chooseTileSynced(Player chooser, Func<Tile, bool> filter, string chooserPrompt, string waiterPrompt, bool cancellable)
         {
             Tile rt;
             if (chooser.isHero)
@@ -903,7 +910,7 @@ namespace stonerkart
             return (Tile)v;
         }
 
-        public ManaColour? chooseManaColourSynced(Player chooser, Func<ManaOrb, bool> f)
+        public ManaColour? chooseManaColourSynced(Player chooser, Func<ManaOrb, bool> f, string chooserPrompt, string waiterPrompt)
         {
             ManaColour clr;
             if (chooser == gameState.hero)
@@ -914,7 +921,7 @@ namespace stonerkart
                 {
                     ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
                 };
-                screen.promptPanel.prompt("Choose color");
+                screen.promptPanel.prompt(chooserPrompt);
                 screen.promptPanel.promptManaChoice(cs);
                 clr = chooseManaColourUnsynced().Value;
 
@@ -924,34 +931,26 @@ namespace stonerkart
             }
             else
             {
-                gameController.setPrompt("Opponent is gaining mana");
+                gameController.setPrompt(waiterPrompt);
                 clr = (ManaColour)connection.receiveChoice();
             }
             return clr;
         }
 
-
-        public void addArrow(Path l)
+        private ManaColour? chooseManaColourUnsynced()
         {
-            screen.hexPanel.addPath(l);
+            PublicSaxophone sax = new PublicSaxophone(c => true);
+            screen.promptPanel.sub(sax);
+            return (ManaColour)sax.call();
         }
 
-        public void removeArrow(Path l)
-        {
-            screen.hexPanel.removeArrow(l);
-        }
-
-        public void clearArrows()
-        {
-            screen.hexPanel.clearPaths();
-        }
-
-        public Card chooseCardsFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter, bool cancellable, string title = "")
+        public Card chooseCardsFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter,
+            string chooserPrompt, string waiterPrompt, bool cancellable, string title = "")
         {
             Card rt;
             if (chooser.isHero)
             {
-                screen.promptPanel.prompt("isjgoisfj");
+                screen.promptPanel.prompt(chooserPrompt);
                 if (cancellable) screen.promptPanel.promptButtons(ButtonOption.Cancel);
                 rt = chooseCardsFromCardsUnsynced(cards, filter, title);
                 if (rt == null) connection.sendChoice(null);
@@ -959,6 +958,7 @@ namespace stonerkart
             }
             else
             {
+                screen.promptPanel.prompt(waiterPrompt);
                 var cs = connection.receiveChoice();
                 if (cs.HasValue)
                 {
@@ -975,6 +975,7 @@ namespace stonerkart
         private Card chooseCardsFromCardsUnsynced(IEnumerable<Card> cards, Func<Card, bool> filter, string title)
         {
             PileView pv = new PileView(600, 300, cards);
+            pv.Backcolor = Color.Silver;
             Winduh window = new Winduh(pv);
             window.Title = title;
             screen.addWinduh(window);
@@ -992,47 +993,20 @@ namespace stonerkart
             throw new Exception();
         }
 
-        public IEnumerable<Card> selectCardFromCards(IEnumerable<Card> cards, bool cancelable, int cardCount, Func<Card, bool> filter)
+
+        public void addArrow(Path l)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            List<Card> rt = new List<Card>(cardCount);
-            var ca = cards.ToArray();
+            screen.hexPanel.addPath(l);
+        }
 
-            if (ca.Count(filter) == 0)
-            {
-                var vv = showCards(ca, false);
-                var rr = chooseButton("No valid selections.", ButtonOption.Cancel);
-                vv.close();
-                return new Card[0];
-            }
-            gameController.setPrompt("Select card", cancelable ? new ButtonOption[]{ButtonOption.Cancel, } : new ButtonOption[]{ButtonOption.NOTHING});
-            var v = showCards(ca, false);
+        public void removeArrow(Path l)
+        {
+            screen.hexPanel.removeArrow(l);
+        }
 
-            while (rt.Count < cardCount)
-            {
-                Stuff r = waitForButtonOr<Card>(c => ca.Contains(c) && filter(c));
-                if (r is Card)
-                {
-                    Card card = (Card)r;
-                    if (rt.Contains(card))
-                    {
-                        rt.Remove(card);
-                    }
-                    else
-                    {
-                        rt.Add(card);
-                    }
-                }
-                if (r is ShibbuttonStuff)
-                {
-                    rt.Clear();
-                    break;
-                }
-            }
-            v.close();
-            return rt;
-            */
-
+        public void clearArrows()
+        {
+            screen.hexPanel.clearPaths();
         }
 
         public void clearTargetHighlight()

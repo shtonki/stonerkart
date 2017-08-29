@@ -439,7 +439,12 @@ namespace stonerkart
         {
             var chsr = chooser(player, hs);
             var cs = candidates(hs, player);
-            return hs.game.chooseCardsFromCardsSynced(chsr, cs, filter, true);
+            return hs.game.chooseCardsFromCardsSynced(
+                chsr, cs, filter,
+                String.Format("Choose target for {0}", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}", player.name, hs.resolveCard),
+                true,
+                String.Format("{0}'s {1}", player.name, pile.ToString()));
         }
 
         public enum Mode
@@ -473,7 +478,10 @@ namespace stonerkart
         public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
         {
             Tile tl = hs.game.chooseTileSynced(chooser,
-                t => hs.tilesInRange.Contains(t) && t.card != null && filter(t.card), "swroigjs", "ioerhjgohr", true);
+                t => hs.tilesInRange.Contains(t) && t.card != null && filter(t.card),
+                String.Format("Choose target for {0}", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}", chooser.name, hs.resolveCard), 
+                true);
             if (tl == null) return null;
             return (tl.card);
         }
@@ -488,7 +496,10 @@ namespace stonerkart
 
         public Tile pickOne(Player chooser, Func<Tile, bool> filter, HackStruct hs)
         {
-            return hs.game.chooseTileSynced(chooser, t => hs.tilesInRange.Contains(t) && filter(t), "tehtehethsf", "aethadtgngf", true);
+            return hs.game.chooseTileSynced(chooser, t => hs.tilesInRange.Contains(t) && filter(t),
+                String.Format("Choose target for {0}", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}", chooser.name, hs.resolveCard), 
+                true);
         }
     }
 
@@ -501,7 +512,10 @@ namespace stonerkart
 
         public Player pickOne(Player chooser, Func<Player, bool> filter, HackStruct hs)
         {
-            Tile tl = hs.game.chooseTileSynced(chooser, t => t.card != null && t.card.isHeroic && filter(t.card.owner), "oirggf", "sfoigfx", true);
+            Tile tl = hs.game.chooseTileSynced(chooser, t => t.card != null && t.card.isHeroic && filter(t.card.owner),
+                String.Format("Choose target for {0}", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}", chooser.name, hs.resolveCard), 
+                true);
             if (tl == null) return null;
             return tl.card.owner;
         }
