@@ -8,12 +8,12 @@ namespace stonerkart
 {
     abstract class Ability
     {
-        public Card card;
-        public PileLocation activeIn;
-        public Foo effects;
-        public Foo cost;
-        public int castRange;
-        public string description;
+        private Foo effects;
+        private Foo cost;
+        public Card card { get; protected set; }
+        public PileLocation activeIn { get; }
+        public int castRange { get; }
+        public string description { get; }
 
         public bool isCastAbility => card.isCastAbility(this);
 

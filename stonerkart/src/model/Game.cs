@@ -771,9 +771,18 @@ namespace stonerkart
             //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
 
             var finalTargets = ability.targetResolve(hs, wrapper.cachedTargets);
-            if (finalTargets.Cancelled || finalTargets.Fizzled) throw new Exception();
+            if (finalTargets.Cancelled) throw new Exception();
 
-            var resolveEvents = ability.resolve(hs, finalTargets);
+            IEnumerable<GameEvent> resolveEvents;
+            if (finalTargets.Fizzled)
+            {
+                resolveEvents = new List<GameEvent>();
+            }
+            else
+            {
+                resolveEvents = ability.resolve(hs, finalTargets);
+            }
+
             if (resolveEvents == null) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             GameTransaction gt = new GameTransaction(resolveEvents);
 

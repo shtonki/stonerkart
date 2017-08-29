@@ -320,7 +320,7 @@ namespace stonerkart
         }
     }
 
-    class ZepperDoer : SimpleDoer
+    class PingDoer : SimpleDoer
     {
         public int damage;
 
@@ -328,7 +328,7 @@ namespace stonerkart
         /// Card source, Card victim
         /// </summary>
         /// <param name="damage"></param>
-        public ZepperDoer(int damage) : base(typeof(Card), typeof(Card))
+        public PingDoer(int damage) : base(typeof(Card), typeof(Card))
         {
             this.damage = damage;
         }

@@ -123,6 +123,16 @@ namespace stonerkart
             typebox.Text = c.typeText;
             artbox.Backimege = new Imege(TextureLoader.cardArt(c.template));
 
+            ptbox.Visible = c.hasPT;
+
+            
+            if (c.isDummy)
+            {
+                ptbox.Visible = movementbox.Visible = orbbox.Visible = false;
+                typebox.Text = "Ability";
+                breadbox.textColor = Color.Teal;
+            }
+
             orbs = c.castManaCost.orbs;
 
             Color frameColor;

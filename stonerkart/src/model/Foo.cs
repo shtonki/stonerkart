@@ -48,6 +48,7 @@ namespace stonerkart
                 if (newcache.Cancelled) return TargetMatrix.CreateCancelled();
                 if (newcache.Fizzled) return TargetMatrix.CreateFizzled();
                 vectors[i] = newcache;
+                hs.previousTargets = newcache;
             }
 
             return new TargetMatrix(vectors);

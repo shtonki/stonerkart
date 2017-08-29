@@ -57,20 +57,19 @@ namespace stonerkart
 
         public static void chooseDeck(Action<Deck> cb)
         {
-            Deck d = new Deck(CardTemplate.Shibby_sShtank, 
+            Deck d = new Deck(CardTemplate.Bhewas, 
                 new []
                 {
-                    CardTemplate.Daring_sPoppy, 
-                    CardTemplate.Daring_sPoppy, 
-                    CardTemplate.Daring_sPoppy, 
-                    CardTemplate.Daring_sPoppy, 
-                    CardTemplate.Daring_sPoppy, 
-                    CardTemplate.Daring_sPoppy, 
-                    CardTemplate.Daring_sPoppy, 
-                    CardTemplate.Daring_sPoppy, 
-                    CardTemplate.Daring_sPoppy, 
-                    CardTemplate.Daring_sPoppy, 
-                    CardTemplate.Daring_sPoppy, 
+                    CardTemplate.Spirit_sof_sSalvation, 
+                    CardTemplate.Spirit_sof_sSalvation, 
+                    CardTemplate.Spirit_sof_sSalvation, 
+                    CardTemplate.Spirit_sof_sSalvation, 
+                    CardTemplate.Spirit_sof_sSalvation, 
+                    CardTemplate.Rockhand_sEchion, 
+                    CardTemplate.Rockhand_sEchion, 
+                    CardTemplate.Rockhand_sEchion, 
+                    CardTemplate.Rockhand_sEchion, 
+                    CardTemplate.Rockhand_sEchion, 
                 });
             cb(d);
             return;

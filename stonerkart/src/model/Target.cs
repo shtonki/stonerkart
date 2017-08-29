@@ -65,19 +65,20 @@ namespace stonerkart
 
             for (int i = 0; i < rules.Length; i++)
             {
+                var rule = rules[i];
                 var cachedTargetSet = cached.targetSets[i];
-                //if (cachedTargetSet == null) throw new Exception();
-                var newTargetSet = rules[i].fillResolveTargets(hs, cachedTargetSet);
+                var newTargetSet = rule.fillResolveTargets(hs, cachedTargetSet);
+                var validated = rule.validate(hs, newTargetSet);
 
-                if (newTargetSet.Cancelled)
+                if (validated.Cancelled)
                 {
                     return TargetVector.CreateCancelled();
                 }
-                if (newTargetSet.Fizzled)
+                if (validated.Fizzled)
                 {
                     return TargetVector.CreateFizzled();
                 }
-                newSets[i] = newTargetSet;
+                newSets[i] = validated;
             }
 
             return new TargetVector(newSets);
@@ -87,6 +88,7 @@ namespace stonerkart
 
     struct TargetSet
     {
+        private int[] stateCtrs { get; }
         public Targetable[] targets { get; }
         public bool Cancelled { get; private set; }
         public bool Fizzled { get; private set; }
@@ -95,6 +97,8 @@ namespace stonerkart
         public TargetSet(params Targetable[] targets)
         {
             this.targets = targets;
+            if (targets != null) stateCtrs = targets.Select(t => t.stateCtr()).ToArray();
+            else stateCtrs = null;
             Cancelled = false;
             Fizzled = false;
         }
@@ -104,6 +108,13 @@ namespace stonerkart
 
         }
 
+        public TargetSet clearInvalids(Func<Targetable, bool> filter)
+        {
+            if (Cancelled || Fizzled) return this;
+            var nicelanguage = stateCtrs;
+            var ts = targets.Where((t, i) => filter(t) && t.stateCtr() == nicelanguage[i]);
+            return new TargetSet(ts);
+        }
 
         public static TargetSet CreateCancelled()
         {
@@ -208,6 +219,17 @@ namespace stonerkart
         
         public abstract TargetSet fillCastTargets(HackStruct hs);
         public abstract TargetSet fillResolveTargets(HackStruct hs, TargetSet ts);
+
+        public virtual TargetSet validate(HackStruct hs, TargetSet ts)
+        {
+            var newset = ts.clearInvalids(filterfunc);
+            if (newset.Cancelled || newset.Fizzled) return newset;
+            if (newset.targets.Length < mincount()) return TargetSet.CreateFizzled();
+            return newset;
+        }
+
+        protected virtual bool filterfunc(Targetable t) { return true; }
+        protected virtual int mincount() { return 0; }
     }
 
     interface chooserface<T> where T : Targetable
@@ -390,6 +412,16 @@ namespace stonerkart
             hs.game.clearHighlights();
 
             return ts.Value;
+        }
+
+        protected override bool filterfunc(Targetable t)
+        {
+            return t is T && filter((T)t);
+        }
+
+        protected override int mincount()
+        {
+            return count;
         }
 
         public enum ChooseAt
@@ -770,10 +802,7 @@ namespace stonerkart
 
         public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            return new TargetSet(hs.previousTargets.columns[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
-            //return hs.previousTargets.columns[column];*/
+            return new TargetSet(hs.previousTargets.targetSets[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
         }
 
     }
@@ -811,10 +840,16 @@ namespace stonerkart
     class CardResolveRule : TargetRule
     {
         private Rule rule;
+        private Func<Card, bool> filter = _ => true;
 
         public CardResolveRule(Rule rule) : base(typeof(Card))
         {
             this.rule = rule;
+        }
+
+        public CardResolveRule(Rule rule, Func<Card, bool> filter) : this(rule)
+        {
+            this.filter = filter;
         }
 
         public override TargetSet fillCastTargets(HackStruct hs)
@@ -825,19 +860,23 @@ namespace stonerkart
         public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
             if (c.targets.Length != 0) throw new Exception();
+            Card card;
             switch (rule)
             {
                 case Rule.ResolveCard:
                 {
-                    return new TargetSet(hs.resolveCard);
-                }
+                    card = hs.resolveCard;
+                } break;
 
                 case Rule.ResolveControllerCard:
                 {
-                    return new TargetSet(hs.resolveCard.controller.heroCard);
-                }
+                    card = hs.resolveCard.controller.heroCard;
+                } break;
+                default: throw new Exception();
             }
-            throw new Exception();
+
+            if (filter(card)) return new TargetSet(card);
+            else return TargetSet.CreateFizzled();
         }
         
 

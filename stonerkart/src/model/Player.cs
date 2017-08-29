@@ -105,7 +105,6 @@ namespace stonerkart
         {
             manaPool.addBonusMana(c);
             notify(new PlayerChangedArgs(this));
-            System.Console.WriteLine("xd");
         }
 
         public void clearBonusMana()

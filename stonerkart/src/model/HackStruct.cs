@@ -16,7 +16,7 @@ namespace stonerkart
         public bool heroIsResolver => hero == resolveController;
         public Card resolveCard => resolveAbility.card;
         public Ability resolveAbility { get; }
-        public TargetSet previousTargets { get; set; }
+        public TargetVector previousTargets { get; set; }
         public GameEvent triggeringEvent { get; set; }
         public IEnumerable<Tile> tilesInRange => castFrom.withinDistance(castRange);
 
