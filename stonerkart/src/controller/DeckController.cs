@@ -60,17 +60,20 @@ namespace stonerkart
             Deck d = new Deck(CardTemplate.Shibby_sShtank, 
                 new []
                 {
-                    CardTemplate.Brute_sForce, 
-                    CardTemplate.Brute_sForce, 
-                    CardTemplate.Brute_sForce, 
-                    CardTemplate.Brute_sForce, 
-                    CardTemplate.Brute_sForce, 
-                    CardTemplate.Brute_sForce, 
-                    CardTemplate.Brute_sForce, 
-                    CardTemplate.Brute_sForce, 
-                    CardTemplate.Brute_sForce, 
-                    CardTemplate.Brute_sForce, 
-                    CardTemplate.Brute_sForce, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
+                    CardTemplate.Bubastis, 
                 }
                 );
             cb(d);

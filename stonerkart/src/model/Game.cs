@@ -89,11 +89,9 @@ namespace stonerkart
             return r;
         }
 
-        private Card createDummy(Ability a, Pile pile)
+        private Card createDummy(Ability a)
         {
             Card r = a.createDummy();
-
-            r.moveTo(pile);
             gameState.cards.Add(r);
             return r;
         }
@@ -504,7 +502,7 @@ namespace stonerkart
                     Player p = gameState.playerFromOrd(i);
                     List<TriggerGlueHack> abilityList = abilityArrays[i];
                     
-                    wrappers.AddRange(handlePendingTrigs(p, abilityList));
+                    handlePendingTrigs(p, abilityList);
                 }
 
                 gameState.pendingTriggeredAbilities.Clear();
@@ -520,108 +518,69 @@ namespace stonerkart
 
         private List<StackWrapper> handlePendingTrigs(Player p, IEnumerable<TriggerGlueHack> abilities)
         {
-            throw new Exception();/*
             List<StackWrapper> r = new List<StackWrapper>();
-            TriggerGlueHack[] orig = abilities.Where(a => a.ta.possible(makeHackStruct(a.ta))).ToArray();
+            TriggerGlueHack[] orig = abilities.ToArray();//.Where(a => a.ta.possible(makeHackStruct(a.ta))).ToArray();
 
-            Pile pl = new Pile();
+            CardList pl = new CardList();
 
             for (int i = 0; i < orig.Length; i++)
             {
-                Card c = createDummy(orig[i].ta, pl);
+                Card c = createDummy(orig[i].ta);
+                pl.addTop(c);
                 c.tghack = orig[i];
             }
 
-            if (p == game.hero)
-            {
-                ManualResetEventSlim re = new ManualResetEventSlim();
-                Clickable clkd = null;
-                DraggablePanel dp = gameController.showPile(pl, false, c =>
-                {
-                    clkd = c;
-                    re.Set();
-                });
-
-                List<ptas> triggd = new List<ptas>();
+            List<ptas> triggd = new List<ptas>();
                 
-                while (triggd.Count < orig.Length)
-                {
-                    gameController.setPrompt("Select which ability to place on the stack next.");
-                    re.Wait();
-                    re.Reset();
-                    Clickable cp = clkd;
-                    if (!(cp is CardView)) continue;
-
-                    CardView cv = (CardView)cp;
-                    Card c = (Card)cv.getStuff();
-
-                    ptas prevadd = triggd.FirstOrDefault(s => s.dummyCard == c);
-                    if (prevadd != null)
-                    {
-                        triggd.Remove(prevadd);
-                        cv.glowColour();
-                        continue;
-                    }
-                    int i = Array.IndexOf(orig.Select(g => g.ta).ToArray(), c.dummiedAbility);
-                    TriggeredAbility tab = orig[i].ta;
-
-                    dp.hide();
-                    StackWrapper v = tryCastDx(p, tab, c, orig[i].ge);
-                    dp.show();
-
-                    if (v == null) continue;
-
-                    ptas ptas = new ptas(tab,i,c,v);
-                    triggd.Add(ptas);
-                    cv.glowColour(Color.Green);
-                }
-
-                dp.close();
-                
-                foreach (ptas pt in triggd)
-                {
-                    r.Add(pt.wrapper);
-                }
-
-                connection.sendAction(new TriggeredAbilitiesGluer(
-                    new ChoiceSelection(triggd.Select(t => pl.indexOf(t.dummyCard))),
-                    triggd.Select(t => new CastSelection(t.wrapper)).ToArray()
-                    ));
-            }
-            else
+            while (triggd.Count < orig.Length)
             {
-                gameController.setPrompt("Opponent is handling triggered abilities.");
+                Card c = chooseCardsFromCardsSynced(p, pl, _ => true, true);
 
-                TriggeredAbilitiesGluer glue = connection.receiveAction<TriggeredAbilitiesGluer>();
-
-                var cs = glue.choices;
-                var css = glue.castSelections;
-
-                for (int i = 0; i < orig.Count(); i++)
+                ptas prevadd = triggd.FirstOrDefault(s => s.dummyCard == c);
+                if (prevadd != null)
                 {
-                    StackWrapper w = css[i].wrapper;
-                    
-                    Card dummy = pl[cs.choices[i]];
-                    r.Add(new StackWrapper(dummy, w.ability, w.targetMatrices, w.costMatricies));
+                    triggd.Remove(prevadd);
+                    //cv.glowColour();
+                    continue;
                 }
+
+                int i = Array.IndexOf(orig.Select(g => g.ta).ToArray(), c.dummiedAbility);
+                TriggeredAbility tab = orig[i].ta;
+
+                //dp.hide();
+                Tuple<StackWrapper, IEnumerable<GameEvent>> wrapperAndCostEvents = tryCastTriggeredAbility(p, tab, c, orig[i].ge);
+                //dp.show();
+
+                if (wrapperAndCostEvents == null) continue;
+
+                ptas ptas = new ptas(tab, c, wrapperAndCostEvents.Item1, wrapperAndCostEvents.Item2);
+                triggd.Add(ptas);
+                //cv.glowColour(Color.Green);
+
+                //dp.close();
             }
+
+            foreach (ptas pt in triggd)
+            {
+                cast(pt.wrapper, pt.costEvents);
+            }
+
             return r;
-            */
         }
         #region hack
         private class ptas
         {
             public TriggeredAbility ability { get; }
-            public int originalIndex { get; }
             public Card dummyCard { get; }
             public StackWrapper wrapper { get; }
+            public IEnumerable<GameEvent> costEvents { get; }
 
-            public ptas(TriggeredAbility ability, int originalIndex, Card dummyCard, StackWrapper wrapper)
+            public ptas(TriggeredAbility ability, Card dummyCard, StackWrapper wrapper, IEnumerable<GameEvent> costEvents)
             {
                 this.ability = ability;
-                this.originalIndex = originalIndex;
                 this.dummyCard = dummyCard;
                 this.wrapper = wrapper;
+                this.costEvents = costEvents;
             }
         }
         #endregion 
@@ -703,6 +662,7 @@ namespace stonerkart
 
             screen.promptPanel.sub(sax);
             screen.handView.sub(sax);
+            screen.stackView.sub(sax);
 
             var v = sax.call();
             if (v is ButtonOption)
@@ -774,11 +734,16 @@ namespace stonerkart
 
                 HackStruct hs = new HackStruct(this, ability, playerWithPriority);
 
-                var payCostGameEvents = ability.payCosts(hs);
+                var costTargets = ability.targetCosts(hs);
+                if (costTargets.Fizzled) throw new Exception();
+                if (costTargets.Cancelled) continue;
+
+                var payCostGameEvents = ability.payCosts(hs, costTargets);
                 if (payCostGameEvents == null) continue;
 
-                var targets = ability.target(hs);
-                if (targets == null) continue;
+                var targets = ability.targetCast(hs);
+                if (targets.Fizzled) throw new Exception();
+                if (targets.Cancelled) continue;
 
                 if (!ability.isCastAbility) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
 
@@ -789,9 +754,25 @@ namespace stonerkart
             } while (true);
         }
 
-        private StackWrapper tryCastDx(Player p, TriggeredAbility ability, Card dummyCard, GameEvent ge)
+        private Tuple<StackWrapper, IEnumerable<GameEvent>> tryCastTriggeredAbility(Player p, TriggeredAbility ability, Card dummyCard, GameEvent ge)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            do
+            {
+                var hs = new HackStruct(this, ability);
+                hs.triggeringEvent = ge;
+                var payCostGameEvents = ability.payCosts(hs);
+                if (payCostGameEvents == null) return null;
+
+                var targets = ability.target(hs);
+                if (targets == null) continue;
+
+                StackWrapper wrapper = new StackWrapper(dummyCard, ability, targets);
+
+                return new Tuple<StackWrapper, IEnumerable<GameEvent>>(wrapper, payCostGameEvents);
+            } while (true);
+            */
         }
 
         private ActivatedAbility chooseAbilitySynced(Card c)
@@ -833,6 +814,9 @@ namespace stonerkart
 
             HackStruct hs = new HackStruct(this, ability, card.controller);
 
+            //fill resolve targets first
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            
             var resolveEvents = ability.resolve(hs, wrapper.cachedTargets);
             if (resolveEvents == null) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             GameTransaction gt = new GameTransaction(resolveEvents);
@@ -1106,13 +1090,13 @@ namespace stonerkart
     {
         public Card stackCard { get; }
         public Ability ability { get; }
-        public TargetSet[][] cachedTargets { get; }
+        public TargetMatrix cachedTargets { get; }
 
 
         public Card castingCard => stackCard.isDummy ? stackCard.dummyFor : stackCard;
         public bool isCastAbility => castingCard.isCastAbility(ability);
 
-        public StackWrapper(Card stackCard, Ability ability, TargetSet[][] cachedTargets)
+        public StackWrapper(Card stackCard, Ability ability, TargetMatrix cachedTargets)
         {
             this.stackCard = stackCard;
             this.ability = ability;

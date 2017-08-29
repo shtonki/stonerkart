@@ -25,25 +25,46 @@ namespace stonerkart
         {
         }
 
-        public TargetSet[] fillCast(HackStruct hs)
+        public TargetVector fillCast(HackStruct hs)
         {
             return ts.fillCast(hs);
         }
 
-        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetSet[] cached)
+        public TargetVector fillResolve(HackStruct hs, TargetVector cached)
         {
-            var filled = ts.fillResolve(hs, cached);
-            if (filled == null) return null;
-            var rows = rowsFromSet(filled);
+            return ts.fillResolve(hs, cached);
+        }
+
+        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetVector cached)
+        {
+            var rows = rowsFromSets(cached.targetSets);
             return doer.act(hs, rows);
         }
 
-        private TargetRow[] rowsFromSet(TargetSet[] ts)
+        private TargetRow[] rowsFromSets(TargetSet[] ts)
         {
+            if (straightRows) return straightRowsx(ts);
             if (ts.Length == 1) return rowsFrom1(ts);
             if (ts.Length == 2) return rowsFrom2(ts);
             if (ts.Length == 3) return rowsFrom3(ts);
             throw new Exception();
+        }
+
+        private TargetRow[] straightRowsx(TargetSet[] ts)
+        {
+            if (ts.Length == 0) throw new Exception();
+            int l = ts[0].targets.Length;
+            if (ts.Any(s => s.targets.Length != l)) throw new Exception();
+
+            var rt = new TargetRow[l];
+
+            for (int i = 0; i < l; i++)
+            {
+                int i1 = i;
+                rt[i] = new TargetRow(ts.Select(s => s.targets[i1]));
+            }
+
+            return rt;
         }
 
         private TargetRow[] rowsFrom1(TargetSet[] ts)

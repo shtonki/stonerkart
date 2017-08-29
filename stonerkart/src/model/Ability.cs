@@ -26,20 +26,38 @@ namespace stonerkart
             this.description = description;
             this.card = card;
         }
-
+        /*
         public IEnumerable<GameEvent> payCosts(HackStruct hs)
         {
             var costCache = cost.fillCast(hs);
             if (costCache == null) return null;
             return cost.resolve(hs, costCache);
         }
+        */
 
-        public TargetSet[][] target(HackStruct hs)
+        public TargetMatrix targetCosts(HackStruct hs)
+        {
+            var castTargets = cost.fillCast(hs);
+            var resolveTargets = cost.fillResolve(hs, castTargets);
+            return resolveTargets;
+        }
+
+        public virtual IEnumerable<GameEvent> payCosts(HackStruct hs, TargetMatrix cache)
+        {
+            return cost.resolve(hs, cache);
+        }
+
+        public TargetMatrix targetCast(HackStruct hs)
         {
             return effects.fillCast(hs);
         }
 
-        public virtual IEnumerable<GameEvent> resolve(HackStruct hs, TargetSet[][] cache)
+        public TargetMatrix targetResolve(HackStruct hs, TargetMatrix cached)
+        {
+            return effects.fillResolve(hs, cached);
+        }
+
+        public virtual IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix cache)
         {
             return effects.resolve(hs, cache);
         }
@@ -50,6 +68,7 @@ namespace stonerkart
             return card.createDummy(this);
         }
     }
+
 
     class ActivatedAbility : Ability
     {
@@ -80,7 +99,7 @@ namespace stonerkart
             this.isOptional = isOptional;
         }
 
-        public override IEnumerable<GameEvent> resolve(HackStruct hs, TargetSet[][] cached)
+        public override IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix cached)
         {
             if (isOptional)
             {

@@ -842,7 +842,11 @@ namespace stonerkart
                 greyCost = 1;
 
                 castDescription = "Counter target spell.";
-                castEffect = new Effect(new ChooseRule<Card>(c => c.location.pile == PileLocation.Stack && !c.isDummy),
+                castEffect = new Effect(
+                    new ChooseRule<Card>(
+                        new ClickCardRule(), 
+                        ChooseRule<Card>.ChooseAt.Cast, 
+                        c => c.location.pile == PileLocation.Stack && !c.isDummy),
                     new MoveToPileDoer(PileLocation.Graveyard));
             }
                 break;
@@ -1622,9 +1626,9 @@ namespace stonerkart
                     greyCost = 3;
 
                     etbLambda(
-                        "When Bubastis enters the battlefield you may return another target non-heroic creature within 5 tiles to it's owners hand.",
+                        "When Bubastis enters the battlefield you may return another target non-heroic creature within 3 tiles to it's owners hand.",
                         new Effect(LL.nonheroicCreature(c => c != this), new MoveToPileDoer(PileLocation.Hand)),
-                        5,
+                        3,
                         true
                         );
                 } break;
@@ -2153,7 +2157,7 @@ namespace stonerkart
                     mightCost = 1;
                     greyCost = 1;
 
-                    castDescription = "Heroic creatures you control get +2/+0 until end of turn.";
+                    castDescription = "Heroic creatures you control get +3/+0 until end of turn.";
                     castEffect = new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
                         new ModifyDoer(LL.add(3), LL.endOfTurn, ModifiableStats.Power));
                 } break;
