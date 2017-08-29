@@ -108,7 +108,7 @@ namespace stonerkart
         public void notify(object o, ManaPoolChanged t)
         {
             ManaPool pool = t.manaPool;
-            for (int i = 0; i < columns; i++)
+            for (int i = 0; i < columns - 1; i++)
             {
                 var cur = pool.currentMana(G.orbOrder[i]);
                 var max = pool.maxMana(G.orbOrder[i]);

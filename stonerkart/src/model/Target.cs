@@ -214,6 +214,7 @@ namespace stonerkart
     {
         IEnumerable<T> candidates(HackStruct hs, Player p);
         T pickOne(Player chooser, Func<T, bool> filter, HackStruct hs);
+        void pickNone(Player chooser, HackStruct hs);
     }
 
     class ChooseRule<T> : TargetRule where T : Targetable
@@ -331,11 +332,25 @@ namespace stonerkart
 
         private TargetSet playerChooses(Player player, HackStruct hs)
         {
+            int requiredCandidates = count;
+
             var v = chooser.candidates(hs, player).Where(filter);
-            hs.game.highlight(v.Cast<Targetable>(), Color.Green);
+
+            if (requiredCandidates == 0)
+            {
+                chooser.pickNone(player, hs);
+                return TargetSet.CreateEmpty();
+            }
+
+            if (v.Count() < requiredCandidates)
+            {
+                chooser.pickNone(player, hs);
+                return TargetSet.CreateFizzled();
+            }
 
             TargetSet? ts = null;
             List<Targetable> chosenList = new List<Targetable>();
+            hs.game.highlight(v.Cast<Targetable>(), Color.Green);
 
             while (chosenList.Count < count)
             {
@@ -441,9 +456,21 @@ namespace stonerkart
             var cs = candidates(hs, player);
             return hs.game.chooseCardsFromCardsSynced(
                 chsr, cs, filter,
-                String.Format("Choose target for {0}", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}", player.name, hs.resolveCard),
-                true,
+                String.Format("Choose target for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", player.name, hs.resolveCard),
+                ButtonOption.Cancel,
+                String.Format("{0}'s {1}", player.name, pile.ToString()));
+        }
+
+        public void pickNone(Player player, HackStruct hs)
+        {
+            var chsr = chooser(player, hs);
+            var cs = candidates(hs, player);
+            var v = hs.game.chooseCardsFromCardsSynced(
+                chsr, cs, _ => false,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", player.name, hs.resolveCard),
+                ButtonOption.OK,
                 String.Format("{0}'s {1}", player.name, pile.ToString()));
         }
 
@@ -466,6 +493,14 @@ namespace stonerkart
         {
             return hs.game.chooseCardSynced(chooser, filter, "sfgjflk", "flvkxv", ButtonOption.Cancel);
         }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
+                ButtonOption.OK);
+        }
     }
 
     class PryCardRule : chooserface<Card>
@@ -485,6 +520,14 @@ namespace stonerkart
             if (tl == null) return null;
             return (tl.card);
         }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
+                ButtonOption.OK);
+        }
     }
 
     class PryTileRule : chooserface<Tile>
@@ -500,6 +543,14 @@ namespace stonerkart
                 String.Format("Choose target for {0}", hs.resolveCard),
                 String.Format("{0} is choosing a target for {1}", chooser.name, hs.resolveCard), 
                 true);
+        }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
+                ButtonOption.OK);
         }
     }
 
@@ -519,6 +570,13 @@ namespace stonerkart
             if (tl == null) return null;
             return tl.card.owner;
         }
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
+                ButtonOption.OK);
+        }
     }
 
     class ClickManaRule : chooserface<ManaOrb>
@@ -531,6 +589,14 @@ namespace stonerkart
         public ManaOrb pickOne(Player chooser, Func<ManaOrb, bool> filter, HackStruct hs)
         {
             throw new NotImplementedException();
+        }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
+                ButtonOption.OK);
         }
     }
 
@@ -559,7 +625,7 @@ namespace stonerkart
             for (int i = 0; i < ManaSet.size; i++)
             {
                 if ((ManaColour)i == ManaColour.Colourless) continue;
-                if (p.manaPool.currentMana((ManaColour)i) < cost[i]) return TargetSet.CreateCancelled();
+                if (p.manaPool.currentMana((ManaColour)i) < cost[i]) return TargetSet.CreateFizzled();
             }
 
             IEnumerable<ManaColour> poolOrbs = p.manaPool.orbs;
@@ -567,7 +633,7 @@ namespace stonerkart
 
             int diff = costOrbs.Count() - poolOrbs.Count();
 
-            if (diff > 0) return TargetSet.CreateCancelled();
+            if (diff > 0) return TargetSet.CreateFizzled();
 
             if (cost[ManaColour.Colourless] > 0)
             {

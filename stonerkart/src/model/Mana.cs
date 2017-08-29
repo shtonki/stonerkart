@@ -110,11 +110,13 @@ namespace stonerkart
         public void addBonusMana(ManaColour c)
         {
             bonus.Add(c);
+            notify(new ManaPoolChanged(this));
         }
 
         public void resetBonus()
         {
             bonus.Clear();
+            notify(new ManaPoolChanged(this));
         }
 
         public ManaPool clone()

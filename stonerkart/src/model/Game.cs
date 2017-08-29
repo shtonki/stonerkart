@@ -549,7 +549,7 @@ namespace stonerkart
                 Card dummyCard = chooseCardsFromCardsSynced(triggerOwner, cards.Except(handled), _ => true,
                     "Choose which ability to place on the stack next.",
                     String.Format("{0} is placing triggered abilities on the stack.", triggerOwner.name),
-                    true,
+                    ButtonOption.Cancel,
                     String.Format("{0}'s Triggered Abilities", triggerOwner.name));
 
                 if (dummyCard == null) return null;
@@ -662,6 +662,11 @@ namespace stonerkart
         
         private void cast(StackWrapper w, IEnumerable<GameEvent> costEvents)
         {
+            if (!w.isCastAbility)
+            {
+                w = new StackWrapper(w.ability.createDummy(), w.ability, w.cachedTargets);
+            }
+
             GameTransaction gt = new GameTransaction();
             gt.addEvents(costEvents);
             handleTransaction(gt);
@@ -703,8 +708,7 @@ namespace stonerkart
                 HackStruct hs = new HackStruct(this, ability, playerWithPriority);
 
                 var costTargets = ability.targetCosts(hs);
-                if (costTargets.Fizzled) throw new Exception();
-                if (costTargets.Cancelled) continue;
+                if (costTargets.Cancelled || costTargets.Fizzled) continue;
 
                 var payCostGameEvents = ability.payCosts(hs, costTargets);
                 if (payCostGameEvents == null) continue;
@@ -712,7 +716,7 @@ namespace stonerkart
                 var targets = ability.targetCast(hs);
                 if (targets.Cancelled || targets.Fizzled) continue;
 
-                if (!ability.isCastAbility) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+                //if (!ability.isCastAbility) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
 
                 StackWrapper wrapper = new StackWrapper(card, ability, targets);
 
@@ -735,13 +739,14 @@ namespace stonerkart
             if (activatableAbilities.Length == 0) return null;
             if (activatableAbilities.Length > 1)
             {
-                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-                var v = activatableAbilities.Select(a => a.createDummy()).ToList();
-                var sl = selectCardFromCards(v, true, 1, crd => true).ToArray();
-                if (sl.Length == 0) return null;
-                int i = v.IndexOf(sl[0]);
-                r = activatableAbilities[i];
-                */
+                var dummyCards = activatableAbilities.Select(a => a.createDummy()).ToList();
+                var selectedCard = chooseCardsFromCardsSynced(c.controller, dummyCards, _ => true, "", "", ButtonOption.Cancel);
+                //var sl = selectCardFromCards(v, true, 1, crd => true).ToArray();
+                //if (sl.Length == 0) return null;
+                //int i = v.IndexOf(sl[0]);
+                //r = activatableAbilities[i];
+                if (selectedCard == null) return null;
+                r = (ActivatedAbility)selectedCard.dummiedAbility;
             }
             else
             {
@@ -810,12 +815,21 @@ namespace stonerkart
                     Card card = (Card)o;
                     return filter(card);
                 }
+
+                if (o is Tile)
+                {
+                    Tile tile = (Tile)o;
+
+                    return tile.card != null && filter(tile.card);
+                }
+
                 return false;
             });
 
             screen.promptPanel.sub(sax);
             screen.handView.sub(sax);
             screen.stackView.sub(sax);
+            screen.hexPanel.subTile(sax, gameState.map.tileAt);
 
             var v = sax.call();
             if (v is ButtonOption)
@@ -826,6 +840,11 @@ namespace stonerkart
             {
                 return (Card)v;
             }
+            if (v is Tile)
+            {
+                return ((Tile)v).card;
+            }
+
             throw new Exception();
         }
 
@@ -915,8 +934,6 @@ namespace stonerkart
             ManaColour clr;
             if (chooser == gameState.hero)
             {
-                gameState.hero.stuntMana();
-
                 ManaColour[] cs = new[]
                 {
                     ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
@@ -925,8 +942,6 @@ namespace stonerkart
                 screen.promptPanel.promptManaChoice(cs);
                 clr = chooseManaColourUnsynced().Value;
 
-                gameState.hero.unstuntMana();
-                
                 connection.sendChoice((int)clr);
             }
             else
@@ -945,13 +960,13 @@ namespace stonerkart
         }
 
         public Card chooseCardsFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter,
-            string chooserPrompt, string waiterPrompt, bool cancellable, string title = "")
+            string chooserPrompt, string waiterPrompt, ButtonOption? button, string title = "")
         {
             Card rt;
             if (chooser.isHero)
             {
                 screen.promptPanel.prompt(chooserPrompt);
-                if (cancellable) screen.promptPanel.promptButtons(ButtonOption.Cancel);
+                if (button.HasValue) screen.promptPanel.promptButtons(button.Value);
                 rt = chooseCardsFromCardsUnsynced(cards, filter, title);
                 if (rt == null) connection.sendChoice(null);
                 else connection.sendChoice(gameState.ord(rt));

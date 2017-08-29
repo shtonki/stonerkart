@@ -144,5 +144,10 @@ namespace stonerkart
                 b.Visible = true;
             }
         }
+
+        public void clear()
+        {
+            prompt("");
+        }
     }
 }

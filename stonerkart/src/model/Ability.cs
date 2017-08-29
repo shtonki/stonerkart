@@ -38,6 +38,7 @@ namespace stonerkart
         public TargetMatrix targetCosts(HackStruct hs)
         {
             var castTargets = cost.fillCast(hs);
+            if (castTargets.Cancelled || castTargets.Fizzled) return castTargets;
             var resolveTargets = cost.fillResolve(hs, castTargets);
             return resolveTargets;
         }

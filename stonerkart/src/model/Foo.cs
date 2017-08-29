@@ -17,6 +17,7 @@ namespace stonerkart
 
         public Foo(params Effect[] effects)
         {
+            if (effects.Any(e => e == null)) throw new Exception();
             this.effects = effects;
         }
 

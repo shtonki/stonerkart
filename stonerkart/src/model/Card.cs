@@ -446,7 +446,7 @@ namespace stonerkart
 
         private Func<int, int> fn;
 
-        public ModifierStruct modifer => new ModifierStruct(fn, LL.clearAura);
+        public ModifierStruct modifer => new ModifierStruct(fn, Card.clearAura);
 
         public Aura(string description, Func<int, int> fn, ModifiableStats stat, Func<Card, bool> filter, PileLocation activeIn)
         {

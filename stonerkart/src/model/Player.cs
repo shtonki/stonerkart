@@ -105,6 +105,7 @@ namespace stonerkart
         {
             manaPool.addBonusMana(c);
             notify(new PlayerChangedArgs(this));
+            System.Console.WriteLine("xd");
         }
 
         public void clearBonusMana()
@@ -112,28 +113,6 @@ namespace stonerkart
             manaPool.resetBonus();
             notify(new PlayerChangedArgs(this));
         }
-
-        public bool stunthack;
-        public ManaSet stunthackset;
-        public void stuntMana()
-        {
-            stunthack = true;
-            notify(new PlayerChangedArgs(this));
-        }
-
-        public void unstuntMana()
-        {
-            stunthack = false;
-            stunthackset = null;
-            notify(new PlayerChangedArgs(this));
-        }
-
-        public void stuntLoss(ManaSet l)
-        {
-            stunthackset = l;
-            notify(new PlayerChangedArgs(this));
-        }
-
         #endregion
 
     }
