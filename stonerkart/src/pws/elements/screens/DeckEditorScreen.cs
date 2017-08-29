@@ -49,12 +49,15 @@ namespace stonerkart
         private List<Card> allCardsEver;
         private List<Card> filteredCards;
         private Func<Card, bool> currentFilter;
-        private int NR_CARDS_TO_DRAW => filteredCards.Count < NR_OF_CARD_VIEWS ? filteredCards.Count : NR_OF_CARD_VIEWS;
+        private int currentPageNr = 0;
+        //private int NR_CARDS_TO_DRAW => (filteredCards.Count < NR_OF_CARD_VIEWS ? filteredCards.Count : NR_OF_CARD_VIEWS);
+        private int NR_CARDS_TO_DRAW_MIN => filteredCards.Count < NR_OF_CARD_VIEWS ? filteredCards.Count : NR_OF_CARD_VIEWS;
+        private int NR_CARDS_TO_DRAW_MAX => NR_OF_CARD_VIEWS - 1 + NR_OF_CARD_VIEWS * currentPageNr > filteredCards.Count ? NR_OF_CARD_VIEWS - 2 + NR_OF_CARD_VIEWS * currentPageNr - filteredCards.Count : NR_OF_CARD_VIEWS;//REEEEEEE
         //todo fix hero saving/loading/ui
         public DeckEditorScreen() : base(new Imege(Textures.artAbolish))
         {
             setupCards();
-            cardViews = setupCardViews(filteredCards.GetRange(0, NR_CARDS_TO_DRAW));
+            cardViews = setupCardViews();
             pileView = setupPileView();
             cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
@@ -147,7 +150,8 @@ namespace stonerkart
             previousPageButton.Backcolor = System.Drawing.Color.AliceBlue;
             previousPageButton.clicked += (_) => 
             {
-
+                if (currentPageNr > 0) currentPageNr--;
+                setupCardViews();
             };
 
             Button nextPageButton = new Button();
@@ -157,7 +161,9 @@ namespace stonerkart
             nextPageButton.Backcolor = System.Drawing.Color.AliceBlue;
             nextPageButton.clicked += (_) =>
             {
-                //setupCardViews()
+                
+                if (currentPageNr * NR_OF_CARD_VIEWS + NR_OF_CARD_VIEWS < filteredCards.Count) currentPageNr++;
+                setupCardViews();
             };
 
 
@@ -194,16 +200,17 @@ namespace stonerkart
             return pv;
         }
 
-        private CardView[] setupCardViews(List<Card> cards)
+        private CardView[] setupCardViews()
         {
-            CardView[] cvs = new CardView[cards.Count];
+            CardView[] cvs = new CardView[NR_CARDS_TO_DRAW_MIN];
             
             int x = CARD_VIEW_X; 
             int y = CARD_VIEW_Y;
-            for (int i = 0; i < cards.Count; i++)
+            System.Console.WriteLine(NR_CARDS_TO_DRAW_MAX);
+            for (int i = 0; i < NR_CARDS_TO_DRAW_MAX; i++)
             {
                 int i1 = i;
-                cvs[i] = new CardView(cards.ElementAt(i));
+                cvs[i] = new CardView(filteredCards.ElementAt(i+NR_OF_CARD_VIEWS*currentPageNr));
                 cvs[i].Width = CARD_VIEW_WIDTH;
 
                 if (i == NR_OF_CARD_VIEWS / 2)
@@ -221,6 +228,7 @@ namespace stonerkart
                 addElement(cvs[i]);
                 x += CARD_VIEW_STRIDE_X;
             }
+            
             return cvs;
         }
         #endregion
