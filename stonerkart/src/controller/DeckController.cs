@@ -60,6 +60,23 @@ namespace stonerkart
             Deck d = new Deck(CardTemplate.Bhewas, 
                 new []
                 {
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    CardTemplate.Call_sTo_sArms, 
+                    /*
                     CardTemplate.Seraph,
                     CardTemplate.Seraph,
                     CardTemplate.Seraph,
@@ -98,6 +115,7 @@ namespace stonerkart
                     CardTemplate.Zap,
                     CardTemplate.Zap,
                     CardTemplate.Zap,
+                    */
                 });
             cb(d);
             return;

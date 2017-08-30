@@ -452,6 +452,11 @@ namespace stonerkart
 
         private void enforceRules()
         {
+            foreach (var player in gameState.players)
+            {
+                player.field.removeWhere(c => c.isToken && c.tile == null);
+            }
+
             foreach (Card c in gameState.cards)
             {
                 c.handleEvent(new ClearAurasEvent());

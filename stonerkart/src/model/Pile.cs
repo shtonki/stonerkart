@@ -86,6 +86,11 @@ namespace stonerkart
             notify(new PileChangedMessage(PileChangedArg.Remove, c));
         }
 
+        public void removeWhere(Predicate<Card> f)
+        {
+            cardList.RemoveAll(f);
+        }
+
         public Card removeTop()
         {
             Card r = cardList[cardList.Count - 1];

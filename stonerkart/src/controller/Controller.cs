@@ -25,7 +25,7 @@ namespace stonerkart
             Game g = new Game(new NewGameStruct(0, 420, new[] { "Hero", "Villain" }, 0), true, gsc);
             g.startGameThread();
             return;
-            */
+            */ 
 
             if (!Network.connectToServer()) throw new Exception("Serber offline");
 
