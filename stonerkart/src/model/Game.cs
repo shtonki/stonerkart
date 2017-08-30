@@ -261,7 +261,7 @@ namespace stonerkart
                 skipFirstDraw = false;
             }
 
-            while (gameState.activePlayer.manaPool.maxCount < 6)
+            if (gameState.activePlayer.manaPool.maxCount < 12)
             {
                 Player addingPlayer = gameState.activePlayer;
                 var mc = chooseManaColourSynced(addingPlayer, o => addingPlayer.manaPool.currentMana(o) != 6,
