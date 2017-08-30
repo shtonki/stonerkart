@@ -128,14 +128,15 @@ namespace stonerkart
             {
                 Button b = buttons[i];
                 var l = labels[i];
+                if (l == ButtonOption.NOTHING) continue;
                 b.Text = l.ToString();
                 b.Visible = true;
             }
         }
 
-        public void promptManaChoice(params ManaColour[] colours)
+        public void promptManaChoice(bool hideRegularButtons, params ManaColour[] colours)
         {
-            hideButtons();
+            if (hideRegularButtons) hideButtons();
 
             foreach (var c in colours)
             {

@@ -97,7 +97,7 @@ namespace stonerkart
 
         public void payMana(ManaSet iz)
         {
-            manaPool.subtractCurrent(iz);
+            manaPool.pay(iz);
             notify(new PlayerChangedArgs(this));
         }
 

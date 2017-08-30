@@ -634,11 +634,11 @@ namespace stonerkart
 
     class ManaCostRule : TargetRule
     {
-        private ManaSet cst;
+        private ManaSet cost;
 
-        public ManaCostRule(ManaSet cst) : base(typeof(ManaOrb))
+        public ManaCostRule(ManaSet cost) : base(typeof(ManaOrb))
         {
-            this.cst = cst;
+            this.cost = cost;
         }
 
         public override TargetSet fillCastTargets(HackStruct hs)
@@ -653,12 +653,43 @@ namespace stonerkart
 
         private TargetSet meme(Player p, HackStruct hs)
         {
-            ManaSet cost = cst.clone();
-            for (int i = 0; i < ManaSet.size; i++)
+            var playerMana = p.manaPool;
+            var costOrbs = cost.orbs.ToList();
+            var poolOrbs = playerMana.orbs.ToList();
+
+            foreach (var orb in costOrbs.Where(c => c.colour != ManaColour.Colourless))
             {
-                if ((ManaColour)i == ManaColour.Colourless) continue;
-                if (p.manaPool.currentMana((ManaColour)i) < cost[i]) return TargetSet.CreateFizzled();
+                if (!poolOrbs.Any(o => o.colour == orb.colour)) return TargetSet.CreateFizzled();
+                poolOrbs.Remove(poolOrbs.First(o => o.colour == orb.colour));
             }
+
+            var colourlessCost = costOrbs.Where(c => c.colour == ManaColour.Colourless);
+            var colouredCost = costOrbs.Where(c => c.colour != ManaColour.Colourless);
+            int colourlessToPay = colourlessCost.Count();
+
+            if (colourlessToPay == 0 || colourlessToPay == poolOrbs.Count()) return new TargetSet(p.manaPool.orbs);
+
+            var stateOfAffairs = playerMana.clone();
+            playerMana.pay(new ManaSet(colouredCost));
+            var paid = new List<ManaOrb>();
+            int diff;
+
+            while ((diff = colourlessToPay - paid.Count) > 0)
+            {
+                var chosen = hs.game.chooseManaColourSynced(p, c => playerMana.orbs.Any(o => o.colour == c),
+                    String.Format("Pay {0}", G.colourlessGlyph(diff)), String.Format("{0} is paying mana.", p.name), ButtonOption.Cancel);
+                if (chosen == null) break;
+                paid.Add(new ManaOrb(chosen.Value));
+                playerMana.pay(new ManaSet(chosen.Value));
+            }
+
+            p.manaPool.setTo(stateOfAffairs);
+            if (paid.Count == colourlessToPay) return new TargetSet(colouredCost.Concat(paid));
+            else return TargetSet.CreateCancelled();
+
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            var v = playerMana.orbs.Where(c => c != ManaColour.Colourless).
 
             IEnumerable<ManaColour> poolOrbs = p.manaPool.orbs;
             IEnumerable<ManaColour> costOrbs = cost.orbs.Select(o => o.colour);
@@ -671,14 +702,12 @@ namespace stonerkart
             {
                 if (diff < 0) // we have more total mana than the cost
                 {
-
-                    throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                     ManaSet colours = cost.clone();
                     colours[ManaColour.Colourless] = 0;
                     p.stuntLoss(colours);
                     while (cost[ManaColour.Colourless] > 0)
                     {
-                        var clr = hs.game.chooseManaColourSynced(p, c => true).Value;
+                        var clr = hs.game.chooseManaColourSynced(p, c => true, "1", "2").Value;
                         if (bc.targets.Length == 1)
                         {
                             var orb = (ManaOrb)bc.targets[0];
@@ -697,14 +726,14 @@ namespace stonerkart
                                 return null;
                         }
                     }
-                    p.unstuntMana();*/
+                    p.unstuntMana();
                 }
                 else
                 {
                     cost = new ManaSet(hs.castingPlayer.manaPool.orbs);
                 }
             }
-            return new TargetSet(cost.orbs);
+            return new TargetSet(cost.orbs);*/
         }
     }
 

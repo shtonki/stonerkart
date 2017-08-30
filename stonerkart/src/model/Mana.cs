@@ -9,11 +9,10 @@ namespace stonerkart
 {
     class ManaPool : Observable<ManaPoolChanged>
     {
-        public IEnumerable<ManaColour> orbs => current.colours.Concat(bonus);
+        public IEnumerable<ManaOrb> orbs => current.colours.Concat(bonus).Select(c => new ManaOrb(c));
 
         private ManaSet max { get; set; }
         private ManaSet current { get; set; }
-
         private List<ManaColour> bonus { get; set; }
 
         public int maxCount => max.orbs.Count();
@@ -86,7 +85,14 @@ namespace stonerkart
             }
         }
 
-        public void subtractCurrent(ManaSet costs)
+        public void setTo(ManaPool other)
+        {
+            max = other.max.clone();
+            current = other.current.clone();
+            bonus = other.bonus.Select(c => c).ToList();
+        }
+
+        public void pay(ManaSet costs)
         {
             List<ManaColour> r = new List<ManaColour>();
             foreach (ManaColour mc in bonus)
@@ -166,6 +172,11 @@ namespace stonerkart
         }
 
         public ManaSet(params ManaColour[] cs) : this((IEnumerable<ManaColour>)cs)
+        {
+            
+        }
+
+        public ManaSet(IEnumerable<ManaOrb> orbs) : this(orbs.Select(o => o.colour))
         {
             
         }

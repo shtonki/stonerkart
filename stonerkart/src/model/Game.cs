@@ -261,10 +261,10 @@ namespace stonerkart
                 skipFirstDraw = false;
             }
 
-            if (gameState.activePlayer.manaPool.maxCount < 12)
+            while (gameState.activePlayer.manaPool.maxCount < 6)
             {
                 Player addingPlayer = gameState.activePlayer;
-                var mc = chooseManaColourSynced(addingPlayer, o => addingPlayer.manaPool.currentMana(o.colour) != 6,
+                var mc = chooseManaColourSynced(addingPlayer, o => addingPlayer.manaPool.currentMana(o) != 6,
                     "Choose which mana colour to add to your mana pool.",
                     String.Format("{0} is choosing which mana colour to add to their mana pool.", addingPlayer.name));
                 gameState.activePlayer.gainMana(mc.Value);
@@ -942,9 +942,9 @@ namespace stonerkart
             return (Tile)v;
         }
 
-        public ManaColour? chooseManaColourSynced(Player chooser, Func<ManaOrb, bool> f, string chooserPrompt, string waiterPrompt)
+        public ManaColour? chooseManaColourSynced(Player chooser, Func<ManaColour, bool> filter, string chooserPrompt, string waiterPrompt, ButtonOption? button = null)
         {
-            ManaColour clr;
+            ManaColour? clr;
             if (chooser == gameState.hero)
             {
                 ManaColour[] cs = new[]
@@ -952,24 +952,30 @@ namespace stonerkart
                     ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
                 };
                 screen.promptPanel.prompt(chooserPrompt);
-                screen.promptPanel.promptManaChoice(cs);
-                clr = chooseManaColourUnsynced().Value;
-
-                connection.sendChoice((int)clr);
+                if (button.HasValue) screen.promptPanel.promptButtons(ButtonOption.NOTHING, ButtonOption.NOTHING, button.Value);
+                screen.promptPanel.promptManaChoice(!button.HasValue, cs.Where(filter).ToArray());
+                clr = chooseManaColourUnsynced(filter);
+                if (!clr.HasValue) connection.sendChoice(null);
+                else connection.sendChoice((int)clr.Value);
             }
             else
             {
                 screen.promptPanel.prompt(waiterPrompt);
-                clr = (ManaColour)connection.receiveChoice();
+                var received = connection.receiveChoice();
+                if (received.HasValue) clr = (ManaColour)received;
+                else clr = null;
             }
             return clr;
         }
 
-        private ManaColour? chooseManaColourUnsynced()
+        private ManaColour? chooseManaColourUnsynced(Func<ManaColour, bool> filter)
         {
-            PublicSaxophone sax = new PublicSaxophone(c => true);
+            PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is ManaColour && filter((ManaColour)o)));
             screen.promptPanel.sub(sax);
-            return (ManaColour)sax.call();
+            var v = sax.call();
+            if (v is ButtonOption) return null;
+            if (v is ManaColour) return (ManaColour)v;
+            throw new Exception();
         }
 
         public Card chooseCardsFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter,
