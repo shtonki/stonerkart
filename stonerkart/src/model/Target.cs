@@ -667,7 +667,8 @@ namespace stonerkart
             var colouredCost = costOrbs.Where(c => c.colour != ManaColour.Colourless);
             int colourlessToPay = colourlessCost.Count();
 
-            if (colourlessToPay == 0 || colourlessToPay == poolOrbs.Count()) return new TargetSet(p.manaPool.orbs);
+            if (colourlessToPay == 0) return new TargetSet(costOrbs);
+            if (colourlessToPay == poolOrbs.Count()) return new TargetSet(p.manaPool.orbs);
 
             var stateOfAffairs = playerMana.clone();
             playerMana.pay(new ManaSet(colouredCost));
