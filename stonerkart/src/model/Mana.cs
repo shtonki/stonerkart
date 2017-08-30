@@ -90,6 +90,7 @@ namespace stonerkart
             max = other.max.clone();
             current = other.current.clone();
             bonus = other.bonus.Select(c => c).ToList();
+            notify(new ManaPoolChanged(this));
         }
 
         public void pay(ManaSet costs)
