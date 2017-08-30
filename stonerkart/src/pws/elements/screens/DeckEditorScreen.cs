@@ -57,6 +57,7 @@ namespace stonerkart
         public DeckEditorScreen() : base(new Imege(Textures.artAbolish))
         {
             setupCards();
+            cardViews = new CardView[NR_OF_CARD_VIEWS];
             cardViews = setupCardViews();
             pileView = setupPileView();
             cardList = setupCardList(pileView);
@@ -202,34 +203,35 @@ namespace stonerkart
 
         private CardView[] setupCardViews()
         {
-            CardView[] cvs = new CardView[NR_CARDS_TO_DRAW_MIN];
-            
             int x = CARD_VIEW_X; 
             int y = CARD_VIEW_Y;
-            System.Console.WriteLine(NR_CARDS_TO_DRAW_MAX);
-            for (int i = 0; i < NR_CARDS_TO_DRAW_MAX; i++)
+            for (int i = 0; i < NR_OF_CARD_VIEWS; i++)
             {
                 int i1 = i;
-                cvs[i] = new CardView(filteredCards.ElementAt(i+NR_OF_CARD_VIEWS*currentPageNr));
-                cvs[i].Width = CARD_VIEW_WIDTH;
-
-                if (i == NR_OF_CARD_VIEWS / 2)
+                if ((i + NR_OF_CARD_VIEWS * currentPageNr) < filteredCards.Count)
                 {
-                    y += CARD_VIEW_STRIDE_Y;
-                    x = CARD_VIEW_X;
+                    var card = filteredCards.ElementAt(i + NR_OF_CARD_VIEWS * currentPageNr);
+                    cardViews[i] = new CardView(card);
+                    cardViews[i].Width = CARD_VIEW_WIDTH;
+
+                    if (i == NR_OF_CARD_VIEWS / 2)
+                    {
+                        y += CARD_VIEW_STRIDE_Y;
+                        x = CARD_VIEW_X;
+                    }
+
+
+                    cardViews[i].setLocation(x, y);
+                    cardViews[i].clicked += (__) =>
+                    {
+                        addToDeck(cardViews[i1].card.template);
+                    };
+                    addElement(cardViews[i]);
+                    x += CARD_VIEW_STRIDE_X;
                 }
-
-
-                cvs[i].setLocation(x, y);
-                cvs[i].clicked += (__) =>
-                {
-                    addToDeck(cvs[i1].card.template);
-                };
-                addElement(cvs[i]);
-                x += CARD_VIEW_STRIDE_X;
             }
             
-            return cvs;
+            return cardViews;
         }
         #endregion
 
