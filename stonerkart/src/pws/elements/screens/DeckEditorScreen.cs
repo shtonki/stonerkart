@@ -43,29 +43,27 @@ namespace stonerkart
 
         private CardList cardList;
         private Card hero;
-        private CardView[] cardViews;
         private PileView pileView;
         private DeckContraints deckConstraints;
+        private CardView[] cardViews;
         private List<Card> allCardsEver;
         private List<Card> filteredCards;
         private Func<Card, bool> currentFilter;
         private int currentPageNr = 0;
-        //private int NR_CARDS_TO_DRAW => (filteredCards.Count < NR_OF_CARD_VIEWS ? filteredCards.Count : NR_OF_CARD_VIEWS);
-        private int NR_CARDS_TO_DRAW_MIN => filteredCards.Count < NR_OF_CARD_VIEWS ? filteredCards.Count : NR_OF_CARD_VIEWS;
-        private int NR_CARDS_TO_DRAW_MAX => NR_OF_CARD_VIEWS - 1 + NR_OF_CARD_VIEWS * currentPageNr > filteredCards.Count ? NR_OF_CARD_VIEWS - 2 + NR_OF_CARD_VIEWS * currentPageNr - filteredCards.Count : NR_OF_CARD_VIEWS;//REEEEEEE
+
         //todo fix hero saving/loading/ui
         public DeckEditorScreen() : base(new Imege(Textures.artAbolish))
         {
+            
             setupCards();
-            cardViews = new CardView[NR_OF_CARD_VIEWS];
-            cardViews = setupCardViews();
+            setupCardViews(); 
             pileView = setupPileView();
             cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
             List<Button> buttons = setupButtons();
         }
         
-
+/*
         private void setCardViews(List<Card> cards)
         {
             for(int i = 0; i < NR_OF_CARD_VIEWS; i++)
@@ -73,7 +71,7 @@ namespace stonerkart
                 cardViews[i] = new CardView(cards[i]);
             }
         }
-
+        */
         private List<Card> filter(Func<Card, bool> filter)
         {
             List<Card> fCards = new List<Card>();
@@ -162,7 +160,6 @@ namespace stonerkart
             nextPageButton.Backcolor = System.Drawing.Color.AliceBlue;
             nextPageButton.clicked += (_) =>
             {
-                
                 if (currentPageNr * NR_OF_CARD_VIEWS + NR_OF_CARD_VIEWS < filteredCards.Count) currentPageNr++;
                 setupCardViews();
             };
@@ -201,38 +198,66 @@ namespace stonerkart
             return pv;
         }
 
-        private CardView[] setupCardViews()
+        private void theyShouldveBeenInAPanel()
         {
-            int x = CARD_VIEW_X; 
-            int y = CARD_VIEW_Y;
-            for (int i = 0; i < NR_OF_CARD_VIEWS; i++)
+            cardViews = elements.Where(g => g is CardView).Cast<CardView>().ToArray();
+            foreach (var cv in cardViews)
             {
-                int i1 = i;
-                if ((i + NR_OF_CARD_VIEWS * currentPageNr) < filteredCards.Count)
-                {
-                    var card = filteredCards.ElementAt(i + NR_OF_CARD_VIEWS * currentPageNr);
-                    cardViews[i] = new CardView(card);
-                    cardViews[i].Width = CARD_VIEW_WIDTH;
+                removeElement(cv);
+            }
+        }
 
+
+        private void setupCardViews()
+        {
+            theyShouldveBeenInAPanel();
+
+            filteredCards = allCardsEver.Where(currentFilter).ToList();
+
+            Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
+
+            for(int i = 0; i < NR_OF_CARD_VIEWS; i++)
+            {
+                int index = i + NR_OF_CARD_VIEWS * currentPageNr;
+                if (index < filteredCards.Count)
+                    cardsToShow[i] = filteredCards.ElementAt(index);
+            }
+            cardViews = layoutCardViews(cardsToShow);
+        }
+        private CardView[] layoutCardViews(Card[] cards)
+        {
+            //System.Console.WriteLine("Filtered cards count: " + filteredCards.Count);
+            //System.Console.WriteLine("Cards count: " + cards.Length);
+            cardViews = new CardView[cards.Length];
+            int x = CARD_VIEW_X;
+            int y = CARD_VIEW_Y;
+            for(int i = 0; i < cards.Length; i++)
+            {
+                if(cards[i] != null) //should work without this but it doesnt (: problem for later  :)))) (:
+                {
+                    cardViews[i] = new CardView(cards[i]);
+
+                    cardViews[i].Width = CARD_VIEW_WIDTH;
                     if (i == NR_OF_CARD_VIEWS / 2)
                     {
                         y += CARD_VIEW_STRIDE_Y;
                         x = CARD_VIEW_X;
                     }
-
-
                     cardViews[i].setLocation(x, y);
+                    x += CARD_VIEW_STRIDE_X;
+                    addElement(cardViews[i]);
+
+                    int i1 = i;
                     cardViews[i].clicked += (__) =>
                     {
                         addToDeck(cardViews[i1].card.template);
                     };
-                    addElement(cardViews[i]);
-                    x += CARD_VIEW_STRIDE_X;
                 }
+                
             }
-            
             return cardViews;
         }
+
         #endregion
 
         private void addToDeck(CardTemplate ct)
