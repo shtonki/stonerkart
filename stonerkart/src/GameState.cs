@@ -122,7 +122,9 @@ namespace stonerkart
 
         public int ord(Card c)
         {
-            return cards.IndexOf(c);
+            int v = cards.IndexOf(c);
+            if (v == -1) throw new Exception();
+            return v;
         }
 
         public Card cardFromOrd(int i)

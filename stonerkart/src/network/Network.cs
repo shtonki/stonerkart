@@ -43,6 +43,7 @@ namespace stonerkart
         {
             switch (m.messageType)
             {
+                case Message.MessageType.QUERYRESPONSE:
                 case Message.MessageType.RESPONSE:
                 {
                     receivedMessage = m;
@@ -104,10 +105,8 @@ namespace stonerkart
             serverConnection.send(new Message(servername, Message.MessageType.LOGIN, b));
             Message m = awaitResponseMessage();
             ResponseBody rb = new ResponseBody(m.body);
-            if (rb.code == ResponseBody.ResponseCode.OKWITHFRIENDS)
+            if (rb.code == ResponseBody.ResponseCode.OK)
             {
-                FriendListBody fb = new FriendListBody(rb.text);
-                //UIController.setFriendList(fb.friends);
                 return true;
             }
             else
@@ -139,6 +138,15 @@ namespace stonerkart
             Message m = awaitResponseMessage();
             ResponseBody rb = new ResponseBody(m.body);
             return rb.code == ResponseBody.ResponseCode.OK;
+        }
+
+        public static string[] queryFriends()
+        {
+            QueryBody b = new QueryBody(Queries.FRIENDS);
+            serverConnection.send(new Message(servername, Message.MessageType.QUERY, b));
+            Message m = awaitResponseMessage();
+            QueryResponseBody rb = new QueryResponseBody(m.body);
+            return rb.values;
         }
 
         public static bool matchmake()

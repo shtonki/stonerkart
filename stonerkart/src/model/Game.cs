@@ -332,7 +332,7 @@ namespace stonerkart
                 //gameController.highlight(pathed.Select(c => c.tile), Color.ForestGreen);
 
                 Tile from = chooseTileSynced(movingPlayer, tile => tile.card != null && tile.card.canMove && tile.card.owner == movingPlayer,
-                    "Choose what to move.", String.Format("{0} is choosing what to move.", movingPlayer.name), unpathed.Count == 0);
+                    "Choose what to move.", String.Format("{0} is choosing what to move.", movingPlayer.name), unpathed.Count == 0 ? ButtonOption.OK : (ButtonOption?)null);
                 if (from == null) break;
                 Card mover = from.card;
                 if (mover.combatPath != null)
@@ -361,9 +361,9 @@ namespace stonerkart
                         ).ToList();
                     if (options.Count == 1) break;
                     var v = gameState.map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
-                    highlight(options.Select(p => p.to), Color.Green);
+                    if (movingPlayer.isHero) highlight(options.Select(p => p.to), Color.Green);
                     Tile to = chooseTileSynced(movingPlayer, tile => options.Select(p => p.to).Contains(tile),
-                        "Choose where to move.", String.Format("{0} is choosing where to move.", movingPlayer.name), true);
+                        "Choose where to move.", String.Format("{0} is choosing where to move.", movingPlayer.name), ButtonOption.Cancel);
                     clearHighlights();
                     if (to == null) continue;
                     if (to == from) break;
@@ -745,7 +745,7 @@ namespace stonerkart
             }
 
             if (activatableAbilities.Length == 0) return null;
-            if (activatableAbilities.Length > 1)
+            if (activatableAbilities.Length > 1 || c.location.pile == PileLocation.Field)
             {
                 var dummyCards = activatableAbilities.Select(a => a.createDummy()).ToList();
                 var selectedCard = chooseCardsFromCardsSynced(c.controller, dummyCards, _ => true, "", "", ButtonOption.Cancel);
@@ -915,13 +915,13 @@ namespace stonerkart
             return v;
         }
 
-        public Tile chooseTileSynced(Player chooser, Func<Tile, bool> filter, string chooserPrompt, string waiterPrompt, bool cancellable)
+        public Tile chooseTileSynced(Player chooser, Func<Tile, bool> filter, string chooserPrompt, string waiterPrompt, ButtonOption? button = null)
         {
             Tile rt;
             if (chooser.isHero)
             {
                 screen.promptPanel.prompt(chooserPrompt);
-                if (cancellable) screen.promptPanel.promptButtons(ButtonOption.Cancel);
+                if (button.HasValue) screen.promptPanel.promptButtons(button.Value);
                 rt = chooseTileUnsynced(filter);
                 if (rt == null) connection.sendChoice(null);
                 else connection.sendChoice(gameState.ord(rt));
@@ -986,14 +986,15 @@ namespace stonerkart
         public Card chooseCardsFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter,
             string chooserPrompt, string waiterPrompt, ButtonOption? button, string title = "")
         {
+            List<Card> cardList = cards.ToList();
             Card rt;
             if (chooser.isHero)
             {
                 screen.promptPanel.prompt(chooserPrompt);
                 if (button.HasValue) screen.promptPanel.promptButtons(button.Value);
-                rt = chooseCardsFromCardsUnsynced(cards, filter, title);
+                rt = chooseCardsFromCardsUnsynced(cardList, filter, title);
                 if (rt == null) connection.sendChoice(null);
-                else connection.sendChoice(gameState.ord(rt));
+                else connection.sendChoice(cardList.IndexOf(rt));
             }
             else
             {
@@ -1001,7 +1002,7 @@ namespace stonerkart
                 var cs = connection.receiveChoice();
                 if (cs.HasValue)
                 {
-                    rt = gameState.cardFromOrd(cs.Value);
+                    rt = cardList[cs.Value];
                 }
                 else
                 {

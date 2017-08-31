@@ -547,8 +547,8 @@ namespace stonerkart
             Tile tl = hs.game.chooseTileSynced(chooser,
                 t => hs.tilesInRange.Contains(t) && t.card != null && filter(t.card),
                 String.Format("Choose target for {0}", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}", chooser.name, hs.resolveCard), 
-                true);
+                String.Format("{0} is choosing a target.", chooser.name),
+                ButtonOption.Cancel);
             if (tl == null) return null;
             return (tl.card);
         }
@@ -557,7 +557,7 @@ namespace stonerkart
         {
             hs.game.chooseButtonSynced(chooser,
                 String.Format("Not enough valid targets for {0}.", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
+                String.Format("{0} is choosing a target.", chooser.name),
                 ButtonOption.OK);
         }
     }
@@ -573,8 +573,8 @@ namespace stonerkart
         {
             return hs.game.chooseTileSynced(chooser, t => hs.tilesInRange.Contains(t) && filter(t),
                 String.Format("Choose target for {0}", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}", chooser.name, hs.resolveCard), 
-                true);
+                String.Format("{0} is choosing a target.", chooser.name),
+                ButtonOption.Cancel);
         }
 
         public void pickNone(Player chooser, HackStruct hs)
@@ -597,8 +597,8 @@ namespace stonerkart
         {
             Tile tl = hs.game.chooseTileSynced(chooser, t => t.card != null && t.card.isHeroic && filter(t.card.owner),
                 String.Format("Choose target for {0}", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}", chooser.name, hs.resolveCard), 
-                true);
+                String.Format("{0} is choosing a target.", chooser.name),
+                ButtonOption.Cancel);
             if (tl == null) return null;
             return tl.card.owner;
         }
@@ -615,12 +615,14 @@ namespace stonerkart
     {
         public IEnumerable<ManaOrb> candidates(HackStruct hs, Player p)
         {
-            throw new NotImplementedException();
+            return G.orbOrder.Select(c => new ManaOrb(c));
         }
 
         public ManaOrb pickOne(Player chooser, Func<ManaOrb, bool> filter, HackStruct hs)
         {
-            throw new NotImplementedException();
+            var v = hs.game.chooseManaColourSynced(chooser, c => filter(new ManaOrb(c)), "", "", ButtonOption.Cancel);
+            if (v == null) return null;
+            return new ManaOrb(v.Value);
         }
 
         public void pickNone(Player chooser, HackStruct hs)

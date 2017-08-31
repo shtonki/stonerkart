@@ -52,6 +52,8 @@ namespace stonerkart
             LOGIN,
             REGISTER,
             RESPONSE,
+            QUERY,
+            QUERYRESPONSE,
             ADDFRIEND,
             CHALLENGE,
             ACCEPTCHALLENGE,
@@ -67,6 +69,72 @@ namespace stonerkart
     interface MessageBody
     {
         string toBody();
+    }
+
+    class QueryBody : MessageBody
+    {
+        public readonly Queries query;
+
+        public QueryBody(string s)
+        {
+            if (!Enum.TryParse(s, out query)) throw new Exception();
+        }
+
+        public QueryBody(Queries query)
+        {
+            this.query = query;
+        }
+
+        public string toBody()
+        {
+            return query.ToString();
+        }
+    }
+
+    public enum Queries
+    {
+        FRIENDS,
+    }
+
+    class QueryResponseBody : MessageBody
+    {
+        private Queries query;
+        public readonly string[] values;
+
+        private const char separator = ':';
+
+        public QueryResponseBody(string s)
+        {
+            var ss = s.Split(separator);
+            if (!Enum.TryParse(ss[0], out query)) throw new Exception();
+
+            values = new string[ss.Length - 1];
+            for (int i = 1; i < ss.Length; i++)
+            {
+                values[i - 1] = ss[i];
+            }
+        }
+
+        public QueryResponseBody(Queries query, string[] values)
+        {
+            this.query = query;
+            this.values = values;
+        }
+
+        public string toBody()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(query.ToString());
+            if (values == null || values.Length == 0) return sb.ToString();
+            sb.Append(separator);
+            foreach (var v in values)
+            {
+                sb.Append(v);
+                sb.Append(separator);
+            }
+            sb.Length--;
+            return sb.ToString();
+        }
     }
 
     class LoginBody : MessageBody
@@ -119,7 +187,6 @@ namespace stonerkart
         public enum ResponseCode
         {
             OK,
-            OKWITHFRIENDS,
             FAILEDGENERIC,
             FAILEDREQUIRESLOGIN,
         }

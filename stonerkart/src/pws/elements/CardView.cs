@@ -63,7 +63,6 @@ namespace stonerkart
         private  Square namebox;
         private const int nameboxOrigX = 26;
         private const int nameboxOrigY = 17;
-        private const int nameboxOrigW = 246;
         private const int nameboxOrigH = 40;
                  
         private  Square breadbox;
@@ -73,13 +72,13 @@ namespace stonerkart
         private const int breadboxOrigH = 236;
                  
         private  Square movementbox;
-        private const int movementboxOrigX = 32;
+        private const int movementboxOrigX = 420;
         private const int movementboxOrigY = 646;
         private const int movementboxOrigW = 40;
         private const int movementboxOrigH = 48;
                  
         private  Square ptbox;
-        private const int ptboxOrigX = 398;
+        private const int ptboxOrigX = 20;
         private const int ptboxOrigY = movementboxOrigY;
         private const int ptboxOrigW = 86;
         private const int ptboxOrigH = 48;
