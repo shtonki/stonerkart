@@ -2510,7 +2510,7 @@ namespace stonerkart
             this.owner = owner;
             controller = owner;
 
-            name = ct.ToString().Replace("_a", "'").Replace("_s", " ");
+            name = G.replaceUnderscoresAndShit(ct.ToString());
 
             eventHandler = generatedlft();
         }

@@ -8,16 +8,12 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    interface SyncConnection
-    {
-        Message receive();
-        void send(Message m);
-    }
 
     static class Network
     {
-        public static ServerConnection serverConnection = null;
+        private static ServerConnection serverConnection;
         private const string servername = "_server";
+
         private static ManualResetEvent messageReceived = new ManualResetEvent(false);
         private static Message receivedMessage;
 
@@ -99,12 +95,36 @@ namespace stonerkart
             return r;
         }
 
+        private static ResponseBody askServer(Message.MessageType messageType, MessageBody body)
+        {
+            tellServer(messageType, body);
+            Message message = awaitResponseMessage();
+            if (message.messageType != Message.MessageType.RESPONSE) throw new Exception();
+            ResponseBody rb = new ResponseBody(message.body);
+            return rb;
+        }
+
+        private static QueryResponseBody queryServer(Queries query)
+        {
+            tellServer(Message.MessageType.QUERY, new QueryBody(query));
+            Message message = awaitResponseMessage();
+            if (message.messageType != Message.MessageType.QUERYRESPONSE) throw new Exception();
+            QueryResponseBody rb = new QueryResponseBody(message.body);
+            return rb;
+        }
+
+        private static bool tellServer(Message.MessageType messageType, MessageBody body)
+        {
+            serverConnection.send(new Message(servername, messageType, body));
+            return true;
+        } 
+
         public static bool login(string username, string password)
         {
-            LoginBody b = new LoginBody(username, password);
-            serverConnection.send(new Message(servername, Message.MessageType.LOGIN, b));
-            Message m = awaitResponseMessage();
-            ResponseBody rb = new ResponseBody(m.body);
+            ResponseBody rb = askServer(
+                Message.MessageType.LOGIN,
+                new LoginBody(username, password));
+
             if (rb.code == ResponseBody.ResponseCode.OK)
             {
                 return true;
@@ -142,10 +162,7 @@ namespace stonerkart
 
         public static string[] queryFriends()
         {
-            QueryBody b = new QueryBody(Queries.FRIENDS);
-            serverConnection.send(new Message(servername, Message.MessageType.QUERY, b));
-            Message m = awaitResponseMessage();
-            QueryResponseBody rb = new QueryResponseBody(m.body);
+            QueryResponseBody rb = queryServer(Queries.FRIENDS);
             return rb.values;
         }
 

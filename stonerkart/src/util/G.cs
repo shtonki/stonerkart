@@ -46,6 +46,11 @@ namespace stonerkart
             ManaColour.Colourless,
         });
 
+        public static string replaceUnderscoresAndShit(string input)
+        {
+            return input.Replace("_a", "'").Replace("_s", " ");;
+        }
+
         /*
         private static char[] hackish = G.range(0, 20).Select(v => (char)('\u2460' + v)).ToArray();
 

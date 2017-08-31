@@ -11,13 +11,6 @@ namespace stonerkart
     {
         public Imege background { get; }
 
-        static Screen()
-        {
-            menu = new Square(Frame.BACKSCREENWIDTH, Frame.MENUHEIGHT);
-            menu.Backimege = new MemeImege(Textures.buttonbg2, 1);
-            menu.Y = Frame.BACKSCREENHEIGHT - menu.Height;
-        }
-
         public Screen()
         {
         }
@@ -29,10 +22,8 @@ namespace stonerkart
 
         public List<GuiElement> elements { get; } = new List<GuiElement>();
 
-        public IEnumerable<GuiElement> Elements => elements.Concat(new [] { menu } );
-
-        public static Square menu;
-
+        public IEnumerable<GuiElement> Elements => elements;
+        
         public void addElement(GuiElement element)
         {
             lock (elements)

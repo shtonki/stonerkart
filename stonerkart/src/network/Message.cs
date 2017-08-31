@@ -94,14 +94,14 @@ namespace stonerkart
     public enum Queries
     {
         FRIENDS,
-    }
+    };
 
     class QueryResponseBody : MessageBody
     {
         private Queries query;
         public readonly string[] values;
 
-        private const char separator = ':';
+        protected const char separator = ':';
 
         public QueryResponseBody(string s)
         {

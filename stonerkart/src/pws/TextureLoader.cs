@@ -21,6 +21,8 @@ namespace stonerkart
 
         buttonbg0,
         buttonbg2,
+        buttonChallenge,
+        buttonFriends,
 
         border0,
 
@@ -207,6 +209,8 @@ namespace stonerkart
 
             images[Textures.buttonbg0] = Resources.buttonbg0;
             images[Textures.buttonbg2] = Resources.buttonbg2;
+            images[Textures.buttonChallenge] = Resources.buttonChallenge;
+            images[Textures.buttonFriends] = Resources.buttonFriends;
 
             images[Textures.border0] = Resources.border0;
 

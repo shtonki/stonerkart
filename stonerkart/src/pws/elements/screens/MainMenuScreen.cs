@@ -11,13 +11,6 @@ namespace stonerkart
     {
         public MainMenuScreen()
         {
-            InputBox box = new InputBox(500, 200);
-            addElement(box);
-            Button b = new Button(300, 300);
-            addElement(b);
-            b.Backcolor = Color.DodgerBlue;
-            b.setLocation(500, 500);
-            b.clicked += a => Network.challenge(box.Text);
         }
     }
 }

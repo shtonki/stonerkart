@@ -51,7 +51,9 @@ namespace stonerkart
         {
             if (Network.login(username, password))
             {
-                Network.queryFriends();
+                var v = Network.queryFriends();
+                User user = new User(username, CardTemplate.Wolf, Title.NOTITLE);
+                GUI.frame.loginAs(user);
                 GUI.setScreen(mainMenuScreen);
             }
             else

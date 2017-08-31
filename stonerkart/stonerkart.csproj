@@ -99,9 +99,13 @@
     <Compile Include="src\pws\elements\base\Winduh.cs" />
     <Compile Include="src\pws\elements\CardView.cs" />
     <Compile Include="src\pws\elements\DraggablePanel.cs" />
+    <Compile Include="src\pws\elements\FriendsPanel.cs" />
+    <Compile Include="src\pws\elements\GameMenuBar.cs" />
     <Compile Include="src\pws\elements\HexPanel.cs" />
     <Compile Include="src\pws\elements\MemeButton.cs" />
+    <Compile Include="src\model\User.cs" />
     <Compile Include="src\pws\elements\PileView.cs" />
+    <Compile Include="src\pws\elements\PlayerFlarePanel.cs" />
     <Compile Include="src\pws\elements\PlayerPanel.cs" />
     <Compile Include="src\pws\elements\PromptPanel.cs" />
     <Compile Include="src\pws\elements\screens\DeckEditorScreen.cs" />
@@ -175,6 +179,8 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\buttonFriends.png" />
+    <None Include="Resources\buttonChallenge.png" />
     <None Include="Resources\buttonbg0.png" />
     <None Include="Resources\cl1.png" />
     <None Include="Resources\cl0.png" />
