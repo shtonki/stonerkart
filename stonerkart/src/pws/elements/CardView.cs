@@ -21,47 +21,45 @@ namespace stonerkart
 
             namebox = new Square();
             namebox.TextLayout = new SingleLineFitLayout(Justify.Left);
+            namebox.Hoverable = false;
             addChild(namebox);
 
             breadbox = new Square();
+            breadbox.Hoverable = false;
             addChild(breadbox);
 
             movementbox = new Square();
             movementbox.TextLayout = new SingleLineFitLayout();
+            movementbox.Hoverable = false;
             addChild(movementbox);
 
             ptbox = new Square();
             ptbox.TextLayout = new SingleLineFitLayout();
+            ptbox.Hoverable = false;
             addChild(ptbox);
 
             typebox = new Square();
             typebox.TextLayout = new SingleLineFitLayout(Justify.Middle);
+            typebox.Hoverable = false;
             addChild(typebox);
 
             artbox = new Square();
+            artbox.Hoverable = false;
             addChild(artbox);
 
             orbbox = new Square();
+            orbbox.Hoverable = false;
             addChild(orbbox);
 
             raritybox = new Square();
+            raritybox.Hoverable = false;
             addChild(raritybox);
-
-            topbutton = new Square(width, height);
-            topbutton.clicked += args =>
-            {
-                this.onClick(args);
-            };
-            addChild(topbutton);
-
-            //layoutStuff();
             populate(c);
+
             Height = frameheight;
         }
 
         #region yup
-
-        private Square topbutton;
 
         private Square raritybox;
         private const int rarityboxOrigX = 238;
@@ -179,8 +177,6 @@ namespace stonerkart
 
         public void layoutStuff()
         {
-            topbutton.setSize(width, height);
-
             var scale = ((double)(height)) / frameheight;
 
             var colours = orbs.Where(o => o.colour != ManaColour.Colourless).ToArray();
