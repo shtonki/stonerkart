@@ -176,6 +176,7 @@ namespace stonerkart
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
+            if (hovered != null && !hovered.Selectable) OnMouseMove(new MouseMoveEventArgs(e.X, e.Y, 0, 0));
             e.Position = scalePoint(e.Position);
             focus(hovered);
             hovered?.onMouseDown(e);
@@ -185,6 +186,7 @@ namespace stonerkart
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
+            if (hovered != null && !hovered.Selectable) OnMouseMove(new MouseMoveEventArgs(e.X, e.Y, 0, 0));
             e.Position = scalePoint(e.Position);
 
             hovered?.onMouseUp(e);
@@ -236,7 +238,7 @@ namespace stonerkart
 
         private GuiElement elementAt(int x, int y, GuiElement[] l)
         {
-            foreach (var v in l)
+            foreach (var v in l.Reverse())
             {
                 if (v.Hoverable &&
                     v.X < x &&
@@ -259,7 +261,7 @@ namespace stonerkart
 
             int x = sp.X;
             int y = sp.Y;
-            var l = activeElements.Reverse().ToArray();
+            var l = activeElements.ToArray();
 
             return elementAt(x, y, l);
         }

@@ -17,12 +17,17 @@ namespace stonerkart
     {
         font0,
 
-        bg3,
+        background3,
+        background0,
 
         buttonbg0,
         buttonbg2,
-        buttonChallenge,
-        buttonFriends,
+
+        iconChallenge,
+        iconFriends,
+        iconShekel,
+
+        packFirstEdition12Pack,
 
         border0,
 
@@ -207,12 +212,17 @@ namespace stonerkart
 
             images[Textures.font0] = Resources.font0;
 
-            images[Textures.bg3] = Resources.background3;
+            images[Textures.background3] = Resources.background3;
+            images[Textures.background0] = Resources.background0;
 
             images[Textures.buttonbg0] = Resources.buttonbg0;
             images[Textures.buttonbg2] = Resources.buttonbg2;
-            images[Textures.buttonChallenge] = Resources.buttonChallenge;
-            images[Textures.buttonFriends] = Resources.buttonFriends;
+
+            images[Textures.iconChallenge] = Resources.buttonChallenge;
+            images[Textures.iconFriends] = Resources.buttonFriends;
+            images[Textures.iconShekel] = Resources.iconShekel;
+
+            images[Textures.packFirstEdition12Pack] = Resources.firstedition12cardpack;
 
             images[Textures.border0] = Resources.border0;
 
@@ -427,6 +437,16 @@ namespace stonerkart
                 case 12: return Textures.orbColourless12;
                 default: throw new Exception();
             }
+        }
+
+        public static Textures packDisplayImage(Packs pack)
+        {
+            switch (pack)
+            {
+                case Packs.FirstEdition12Pack: return Textures.packFirstEdition12Pack;
+            }
+
+            throw new Exception();
         }
 
         public static Textures setIcon(CardSet set)

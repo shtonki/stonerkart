@@ -781,6 +781,7 @@ namespace stonerkart
         Lone_sRanger,
     }
 
+
     internal enum CardType
     {
         Creature,

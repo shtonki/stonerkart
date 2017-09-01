@@ -76,7 +76,7 @@ namespace stonerkart
             addChild(challenge);
             challenge.Backcolor = Color.Silver;
             challenge.X = width - height;
-            challenge.Backimege = new Imege(Textures.buttonChallenge);
+            challenge.Backimege = new Imege(Textures.iconChallenge);
 
             playerflare = new PlayerFlarePanel(friend.Name, friend.Icon, width - height, height);
             addChild(playerflare);

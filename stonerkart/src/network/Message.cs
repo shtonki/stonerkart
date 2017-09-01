@@ -64,6 +64,8 @@ namespace stonerkart
             BUGREPORT,
             MATCHMAKEME,
             SURRENDER,
+            MAKEPURCHASE,
+            RIPPACK,
         }
     }
 
@@ -96,6 +98,9 @@ namespace stonerkart
     {
         FRIENDS,
         MYCOSMETICS,
+        SHEKELS,
+        COLLECTION,
+        OWNEDPACKS,
     };
 
     public class QueryResponseBody : MessageBody
@@ -250,6 +255,26 @@ namespace stonerkart
         public string toBody()
         {
             return username + separator + status.ToString();
+        }
+    }
+
+    public class ProductBody : MessageBody
+    {
+        public ProductUnion product { get; private set; }
+
+        public ProductBody(ProductUnion product)
+        {
+            this.product = product;
+        }
+
+        public ProductBody(string s)
+        {
+            product = ProductUnion.FromString(s);
+        }
+
+        public string toBody()
+        {
+            return product.ToString();
         }
     }
 

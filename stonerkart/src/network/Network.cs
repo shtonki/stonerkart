@@ -181,6 +181,52 @@ namespace stonerkart
             return rb.values.Select(User.FromString).ToArray();
         }
 
+        public static IEnumerable<CardTemplate> queryCollection()
+        {
+            var rb = queryServer(Queries.COLLECTION);
+            return rb.values.Select(i => (CardTemplate)Int32.Parse(i));
+        }
+
+        public static int queryShekels()
+        {
+            var rb = queryServer(Queries.SHEKELS);
+            if (rb.values.Length != 1) throw new Exception();
+            return Int32.Parse(rb.values[0]);
+        }
+
+        public static Packs[] queryOwnedPacks()
+        {
+            var rv = queryServer(Queries.OWNEDPACKS);
+            return rv.values.Select(i => (Packs)Int32.Parse(i)).ToArray();
+        }
+
+        public static int makePurchase(ProductUnion product)
+        {
+            ProductBody pb = new ProductBody(product);
+            var response = askServer(Message.MessageType.MAKEPURCHASE, pb);
+            if (response.code == ResponseBody.ResponseCode.OK)
+            {
+                return Int32.Parse(response.text);
+            }
+            else
+            {
+                Console.WriteLine(response.text);
+                return -1;
+            }
+        }
+
+        public static IEnumerable<CardTemplate> ripPack(Packs pack)
+        {
+            var v = askServer(Message.MessageType.RIPPACK, new ProductBody(new ProductUnion(pack)));
+            if (v.code == ResponseBody.ResponseCode.FAILEDGENERIC) return null;
+            else
+            {
+                var body = v.text;
+                var ss = body.Split(':');
+                return ss.Select(s => (CardTemplate)Int32.Parse(s));
+            }
+        }
+
         public static bool matchmake()
         {
             MatchmakemeBody mmb = new MatchmakemeBody();

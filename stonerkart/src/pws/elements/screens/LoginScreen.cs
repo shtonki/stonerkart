@@ -18,7 +18,7 @@ namespace stonerkart
         private Button loginButton;
         private Button registerButton;
 
-        public LoginScreen() : base(new Imege(Textures.bg3))
+        public LoginScreen() : base(new Imege(Textures.background3))
         {
             username = new InputBox(1000, 100);
             addElement(username);

@@ -140,7 +140,7 @@ namespace stonerkart
 
         public void removeChild(GuiElement child)
         {
-            children.Remove(child);
+            if (!children.Remove(child)) throw new Exception();
             child.parent = null;
         }
 

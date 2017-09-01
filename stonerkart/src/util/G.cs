@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
-    class ReduceResult<T>
+    public class ReduceResult<T>
     {
         public IEnumerable<T> values => d.Keys;
 
@@ -33,8 +33,14 @@ namespace stonerkart
         }
     }
 
-    static class G
+    public static class G
     {
+        public static Tuple<CardSet, Rarity> fuckInternalHack(CardTemplate ct)
+        {
+            Card c = new Card(ct);
+            return new Tuple<CardSet, Rarity>(c.set, c.rarity);
+        }
+
         public static List<ManaColour> orbOrder = new List<ManaColour>(new[]
         {
             ManaColour.Chaos,
@@ -45,6 +51,13 @@ namespace stonerkart
             ManaColour.Nature,
             ManaColour.Colourless,
         });
+
+        public static string shekelsToString(int shekelCount)
+        {
+            int bigs = shekelCount/100;
+            int smalls = shekelCount%100;
+            return bigs + "." + smalls.ToString().PadLeft(2, '0');
+        }
 
         public static string replaceUnderscoresAndShit(string input)
         {
