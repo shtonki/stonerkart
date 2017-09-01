@@ -92,7 +92,7 @@ namespace stonerkart
         private const int ptboxOrigH = 48;
 
         private Square typebox;
-        private const int typeboxOrigX = 134;
+        private const int typeboxOrigX = 140;
         private const int typeboxOrigY = movementboxOrigY;
         private const int typeboxOrigW = 236;
         private const int typeboxOrigH = 50;
@@ -125,14 +125,22 @@ namespace stonerkart
 
             namebox.Text = c.name;
             breadbox.Text = c.breadText;
-            movementbox.Text = c.movement.ToString();
             ptbox.Text = c.power + "/" + c.toughness;
-            typebox.Text = c.typeText;
             artbox.Backimege = new Imege(TextureLoader.cardArt(c.template));
             raritybox.Backimege = new Imege(TextureLoader.setIcon(c.set), TextureLoader.rarityColor(c.rarity));
             ptbox.Visible = c.hasPT;
+            typebox.Text = c.typeText;
 
-            
+
+            if (c.cardType == CardType.Creature || c.cardType == CardType.Relic)
+            {
+                movementbox.Text = c.movement.ToString();
+            }
+            else if ((c.cardType == CardType.Channel || c.cardType == CardType.Interrupt) && c.castRange > 0)
+            {
+                movementbox.Text = c.castRange.ToString();
+            }
+
             if (c.isDummy)
             {
                 ptbox.Visible = movementbox.Visible = orbbox.Visible = false;

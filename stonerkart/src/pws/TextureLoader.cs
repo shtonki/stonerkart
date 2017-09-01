@@ -513,7 +513,7 @@ namespace stonerkart
                 case CardTemplate.Damage_sWard: return Textures.artDamageWard;
                 case CardTemplate.One_sWith_sNature: return Textures.artOneWithNature;
                 case CardTemplate.Graverobber_sSyrdin: return Textures.artGraverobberSyrdin;
-                case CardTemplate.Alter_sFate: return Textures.artAlterFate;
+                case CardTemplate.Alter_sFate: return Textures.artAlterTime;
                 case CardTemplate.Goblin_sGrenade: return Textures.artGoblinGrenade;
                 case CardTemplate.Cleansing_sFire: return Textures.artCleansingFire;
                 case CardTemplate.Bhewas: return Textures.artBelwas;

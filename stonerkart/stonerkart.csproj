@@ -96,6 +96,7 @@
     <Compile Include="src\pws\elements\base\GuiElement.cs" />
     <Compile Include="src\pws\elements\base\InputBox.cs" />
     <Compile Include="src\pws\elements\base\Square.cs" />
+    <Compile Include="src\pws\elements\base\ToggleButton.cs" />
     <Compile Include="src\pws\elements\base\Winduh.cs" />
     <Compile Include="src\pws\elements\CardView.cs" />
     <Compile Include="src\pws\elements\DraggablePanel.cs" />

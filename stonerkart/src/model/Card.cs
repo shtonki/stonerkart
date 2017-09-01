@@ -39,8 +39,8 @@ namespace stonerkart
         public CardType cardType { get; }
         public Rarity rarity { get; set; }
         public CardSet set { get; }
-        public Race? race => forceRace.HasValue ? forceRace : baseRace;
-        private Race? baseRace { get; }
+        public Race race => forceRace.HasValue ? forceRace.Value : baseRace;
+        private Race baseRace { get; }
         private Race? forceRace { get; set; }
 
         public Subtype? subtype { get; }
@@ -238,10 +238,17 @@ namespace stonerkart
 
         private string typeTextEx()
         {
-            string s = isHeroic ? "Heroic " : "";
-            s += cardType.ToString();
-
-            return s;
+            if (cardType == CardType.Creature)
+            {
+                string s = isHeroic ? "Heroic " : "";
+                s += race.ToString();
+                if (subtype.HasValue) s += ' ' + subtype.Value.ToString();
+                return s;
+            }
+            else
+            {
+                return cardType.ToString();
+            }
         }
 
         private string breadTextEx()
