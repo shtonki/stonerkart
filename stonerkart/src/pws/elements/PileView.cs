@@ -19,9 +19,7 @@ namespace stonerkart
         public PileView()
         {
             Backcolor = Color.Crimson;
-            Backimege = new Imege(Textures.artFireheartPheonix);
-            Width = (int)(Frame.BACKSCREENWIDTH * 0.80);
-            Height = Frame.BACKSCREENHEIGHT/4;
+            
         }
 
 
