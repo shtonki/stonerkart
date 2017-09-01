@@ -30,6 +30,8 @@ namespace stonerkart
 
         cardframegrey,
 
+        setFirstedition,
+
         deckButton,
         handButton,
         displaceButton,
@@ -222,6 +224,8 @@ namespace stonerkart
             images[Textures.deckButton] = Resources.buttonDeck;
 
             images[Textures.cardframegrey] = Resources.whiteframe4;
+
+            images[Textures.setFirstedition] = Resources.setFirstedition;
 
             images[Textures.orbChaos] = Resources.orbChaos;
             images[Textures.orbNature] = Resources.orbNature;
@@ -423,6 +427,30 @@ namespace stonerkart
                 case 12: return Textures.orbColourless12;
                 default: throw new Exception();
             }
+        }
+
+        public static Textures setIcon(CardSet set)
+        {
+            switch (set)
+            {
+                case CardSet.FirstEdition: return Textures.setFirstedition;
+            }
+
+            throw new Exception();
+        }
+
+        public static Color rarityColor(Rarity rarity)
+        {
+            switch (rarity)
+            {
+                case Rarity.Common: return Color.White;
+                case Rarity.Uncommon: return Color.MediumPurple;
+                case Rarity.Rare: return Color.Gold;
+                case Rarity.Legendary: return Color.LightCoral;
+                case Rarity.None: return Color.ForestGreen;
+            }
+
+            throw new Exception();
         }
 
         public static Textures cardArt(CardTemplate ct)

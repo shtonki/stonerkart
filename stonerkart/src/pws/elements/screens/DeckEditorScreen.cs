@@ -1,112 +1,270 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace stonerkart
 {
+
     class DeckEditorScreen : Screen
     {
-        private CardView[] cards;
-        private Square cardSquare;
+        #region constants
+        private const int NR_OF_CARD_VIEWS = 10;
+        private const int FRAME_WIDTH = 500;
+        private const int FRAME_HEIGHT = 700;
+        private const int PILE_VIEW_X = Frame.BACKSCREENWIDTH - CARD_VIEW_WIDTH;
+        private const int PILE_VIEW_Y = DECK_NAME_BOX_HEIGHT + SAVE_BUTTON_HEIGHT;
+        private const int PILE_VIEW_WIDTH = CARD_VIEW_WIDTH;
+        private const int PILE_VIEW_HEIGHT = (int)(Frame.BACKSCREENHEIGHT * 0.8);
+        private const int CARD_VIEW_X = 250;
+        private const int CARD_VIEW_STRIDE_X = 250;
+        private const int CARD_VIEW_STRIDE_Y = 350;
+        private const int CARD_VIEW_Y = 300;
+        private const int CARD_VIEW_WIDTH = Frame.BACKSCREENWIDTH / 8;
+        private const int CARD_VIEW_WIDTHd2 = CARD_VIEW_WIDTH / 2;
+        private const int DECK_NAME_BOX_WIDTH = CARD_VIEW_WIDTH;
+        private const int DECK_NAME_BOX_HEIGHT = (int)(Frame.BACKSCREENHEIGHT * 0.05);
+        private const int SAVE_BUTTON_HEIGHT = DECK_NAME_BOX_HEIGHT / 2;
+        private const int SAVE_BUTTON_WIDTH = PILE_VIEW_WIDTH / 2;
+        private const int SAVE_BUTTON_X = PILE_VIEW_X;
+        private const int SAVE_BUTTON_Y = DECK_NAME_BOX_HEIGHT;
+        private const int PREVIOUS_PAGE_BUTTON_WIDTH = Frame.BACKSCREENWIDTH / 16;
+        private const int PREVIOUS_PAGE_BUTTON_HEIGHT = CARD_VIEW_WIDTH * FRAME_HEIGHT / FRAME_WIDTH + CARD_VIEW_STRIDE_Y; //erf
+        private const int PREVIOUS_PAGE_BUTTON_X = CARD_VIEW_X - CARD_VIEW_WIDTHd2;
+        private const int PREVIOUS_PAGE_BUTTON_Y = CARD_VIEW_Y;
+        private const int NEXT_PAGE_BUTTON_X = CARD_VIEW_X + CARD_VIEW_WIDTH * 5 + (CARD_VIEW_STRIDE_X - CARD_VIEW_WIDTH) * 4;//erf erf
+        private const int NEXT_PAGE_BUTTON_Y = CARD_VIEW_Y;
+        #endregion
 
         private CardList deck;
-        private PileView deckView;
+        private Card hero;
 
-        private const int deckViewHeight = 800;
-        private const int deckViewWidth = 300;
-        private const int deckViewX = 1000;
-        private const int deckViewY = 100;
-        private const int deckViewMaxPadding = 50;
+        private DeckContraints deckConstraints;
 
-        private const int cardRows = 3;
-        private const int cardCols = 4;
-        private const int cardCount = cardRows*cardCols;
-        private const int cardSquareWidth = 800;
-        private const int cardPadding = 20;
+        private Func<Card, bool> currentFilter;
+        private int currentPageNr = 0;
 
-        public DeckEditorScreen()
+        private List<Card> allCardsEver;
+        private List<Card> filteredCards;
+
+        private PileView pileView;
+        private CardView[] cardViews;
+
+
+        //todo fix hero saving/loading/ui
+        public DeckEditorScreen() : base()
         {
-            deckView = new PileView();
-            deckView.setSize(deckViewWidth, deckViewHeight);
-            addElement(deckView);
-            deckView.Columns = 1;
-            deckView.maxPadding = deckViewMaxPadding;
-            deckView.setLocation(deckViewX, deckViewY);
-            deckView.Backimege = new MemeImege(Textures.buttonbg2);
-            deckView.clicked += a =>
+            setupCards();
+            setupCardViews(); 
+            pileView = setupPileView();
+            deck = setupCardList(pileView);
+            deckConstraints = new DeckContraints(Format.Standard);
+            List<Button> buttons = setupButtons();
+        }
+        
+        private List<Card> filter(Func<Card, bool> filter)
+        {
+            List<Card> fCards = new List<Card>();
+            foreach(var c in allCardsEver)
             {
-                CardView v = deckView.viewAtClick(a);
-                if (v != null)
+                if(filter(c) == true)
                 {
-                    removeCardFromDeck(v.card);
+                    fCards.Add(c);
                 }
-            };
-
-            deck = new CardList();
-            deck.addObserver(deckView);
-
-            cardSquare = new Square();
-            cardSquare.Backcolor = Color.FloralWhite;
-            addElement(cardSquare);
-
-            populate(new[]
-            {
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-                CardTemplate.Zap,
-            });
+            }
+            return fCards;
         }
 
-        private void populate(CardTemplate[] templates)
+
+        private void addFilter(Func<Card, bool> f)
         {
-            if (templates.Length > cardCount) throw new Exception();
+            currentFilter = c => currentFilter(c) && f(c);
+        }
 
-            int cvHeight = (cardSquareWidth-cardPadding)/cardRows - cardPadding;
-            int cvWidth = CardView.widthFromHeight(cvHeight);
-            int cardSquareHeight = cardRows*(cvHeight + cardPadding) + cardPadding;
-            cardSquare.clearChildren();
-            cardSquare.setSize(cardSquareWidth, cardSquareHeight);
+        #region setups
 
-            cards = new CardView[cardRows * cardCols];
-            for (int i = 0; i < cardRows; i++)
+        private void setupCards()
+        {
+            allCardsEver = new List<Card>();
+            var cardTemplates = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().ToList();
+            allCardsEver = cardTemplates.Select(c => new Card(c)).ToList();
+
+            currentFilter = new Func<Card, bool>(c => true);
+            filteredCards = filter(currentFilter);
+        }
+
+        private List<Button> setupButtons()
+        {
+            List<Button> bs = new List<Button>();
+
+            InputBox deckNameBox = new InputBox(DECK_NAME_BOX_WIDTH, DECK_NAME_BOX_HEIGHT);
+            deckNameBox.setLocation(PILE_VIEW_X, 0);
+            deckNameBox.setText("My Deck");
+            deckNameBox.clicked += (_) =>
             {
-                for (int j = 0; j < cardCols; j++)
+                deckNameBox.setText("");
+            };
+            
+            Button saveButton = new Button();
+            saveButton.setLocation(SAVE_BUTTON_X, SAVE_BUTTON_Y);
+            saveButton.Backcolor = System.Drawing.Color.Red;
+            saveButton.Text = "Save";
+            saveButton.clicked += (_) => 
+            {
+                DeckController.saveDeck(new Deck(CardTemplate.Bhewas, deck.Select(c => c.template).ToArray()), "erf");
+            };
+
+            Button loadButton = new Button();
+            loadButton.clicked += (_) =>
+            {
+                Deck d = DeckController.loadDeck("erf");
+                deck.clear();
+                foreach (var t in d.templates)
                 {
-                    int c = i*cardCols + j;
-                    if (c > templates.Length) break;
-
-                    CardTemplate ct = templates[c];
-
-                    CardView cv = cards[i*cardCols + j] = new CardView(new Card(templates[c]));
-                    cv.Height = cvHeight;
-                    cv.X = cardPadding + j*(cardPadding + cvWidth);
-                    cv.Y = cardPadding + i*(cardPadding + cvHeight);
-                    cardSquare.addChild(cv);
-                    cv.clicked += a => addCardToDeck(ct);
+                    deck.addTop(new Card(t));
                 }
+            };
+            loadButton.Text = "Load";
+            loadButton.setLocation(SAVE_BUTTON_X + SAVE_BUTTON_WIDTH, SAVE_BUTTON_Y);
+            loadButton.Backcolor = System.Drawing.Color.Red;
+
+
+
+
+
+            Button previousPageButton = new Button();
+            previousPageButton.setLocation(PREVIOUS_PAGE_BUTTON_X, PREVIOUS_PAGE_BUTTON_Y);
+            previousPageButton.Width = PREVIOUS_PAGE_BUTTON_WIDTH;
+            previousPageButton.Height = PREVIOUS_PAGE_BUTTON_HEIGHT;
+            previousPageButton.Backcolor = System.Drawing.Color.AliceBlue;
+            previousPageButton.clicked += (_) => 
+            {
+                if (currentPageNr > 0) currentPageNr--;
+                setupCardViews();
+            };
+
+            Button nextPageButton = new Button();
+            nextPageButton.setLocation(NEXT_PAGE_BUTTON_X, NEXT_PAGE_BUTTON_Y);
+            nextPageButton.Width = PREVIOUS_PAGE_BUTTON_WIDTH;
+            nextPageButton.Height = PREVIOUS_PAGE_BUTTON_HEIGHT;
+            nextPageButton.Backcolor = System.Drawing.Color.AliceBlue;
+            nextPageButton.clicked += (_) =>
+            {
+                if (currentPageNr * NR_OF_CARD_VIEWS + NR_OF_CARD_VIEWS < filteredCards.Count) currentPageNr++;
+                setupCardViews();
+            };
+
+
+            addElement(nextPageButton);
+            addElement(previousPageButton);
+            addElement(deckNameBox);
+            addElement(loadButton);
+            addElement(saveButton);
+
+            return bs;
+        }
+
+        private CardList setupCardList(PileView pv)
+        {
+            CardList cardList = new CardList();
+            cardList.addObserver(pv);
+            return cardList;
+        }
+
+        private PileView setupPileView()
+        {
+            PileView pv = new PileView();
+            pv.Backimege = new MemeImege(Textures.buttonbg0, 456795425);
+            pv.Height = (int)(PILE_VIEW_HEIGHT);
+            pv.Width = PILE_VIEW_WIDTH;
+            pv.setLocation(PILE_VIEW_X, PILE_VIEW_Y);
+            pv.Columns = 1;
+            pv.mouseDown += (a) =>
+            {
+                var cardView = pv.viewAtClick(a);
+                if (cardView != null) deck.remove(cardView.card);
+            };
+            addElement(pv);
+
+            return pv;
+        }
+
+        private void theyShouldveBeenInAPanel()
+        {
+            cardViews = elements.Where(g => g is CardView).Cast<CardView>().ToArray();
+            foreach (var cv in cardViews)
+            {
+                removeElement(cv);
             }
         }
 
-        private void addCardToDeck(CardTemplate t)
+
+        private void setupCardViews()
         {
-            deck.addTop(new Card(t));
+            theyShouldveBeenInAPanel();
+
+            filteredCards = allCardsEver.Where(currentFilter).ToList();
+
+            Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
+
+            for(int i = 0; i < NR_OF_CARD_VIEWS; i++)
+            {
+                int index = i + NR_OF_CARD_VIEWS * currentPageNr;
+                if (index < filteredCards.Count)
+                    cardsToShow[i] = filteredCards.ElementAt(index);
+            }
+            cardViews = layoutCardViews(cardsToShow);
+        }
+        private CardView[] layoutCardViews(Card[] cards)
+        {
+            //System.Console.WriteLine("Filtered cards count: " + filteredCards.Count);
+            //System.Console.WriteLine("Cards count: " + cards.Length);
+            cardViews = new CardView[cards.Length];
+            int x = CARD_VIEW_X;
+            int y = CARD_VIEW_Y;
+            for(int i = 0; i < cards.Length; i++)
+            {
+                if(cards[i] != null) //should work without this but it doesnt (: problem for later  :)))) (:
+                {
+                    cardViews[i] = new CardView(cards[i]);
+
+                    cardViews[i].Width = CARD_VIEW_WIDTH;
+                    if (i == NR_OF_CARD_VIEWS / 2)
+                    {
+                        y += CARD_VIEW_STRIDE_Y;
+                        x = CARD_VIEW_X;
+                    }
+                    cardViews[i].setLocation(x, y);
+                    x += CARD_VIEW_STRIDE_X;
+                    addElement(cardViews[i]);
+
+                    int i1 = i;
+                    cardViews[i].clicked += (__) =>
+                    {
+                        addToDeck(cardViews[i1].card.template);
+                    };
+                }
+                
+            }
+            return cardViews;
         }
 
-        private void removeCardFromDeck(Card c)
+        #endregion
+
+        private void addToDeck(CardTemplate ct)
         {
-            deck.remove(c);
+            if (deckConstraints.willBeLegal(CardTemplate.Shibby_sShtank, deck.Select(c => c.template).ToArray(), ct))
+            {
+                deck.addTop(new Card(ct));
+            }
         }
+
+
+        
     }
 }

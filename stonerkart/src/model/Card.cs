@@ -782,7 +782,7 @@ namespace stonerkart
         Relic
     }
 
-    internal enum Rarity
+    public enum Rarity
     {
         None,
         Common,
@@ -797,7 +797,7 @@ namespace stonerkart
         Channel
     }
 
-    internal enum CardSet
+    public enum CardSet
     {
         FirstEdition
     }

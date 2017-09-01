@@ -50,6 +50,8 @@ namespace stonerkart
             orbbox = new Square();
             addChild(orbbox);
 
+            raritybox = new Square();
+            addChild(raritybox);
 
             //layoutStuff();
             populate(c);
@@ -60,42 +62,48 @@ namespace stonerkart
 
         private Square topbutton;
 
-        private  Square namebox;
+        private Square raritybox;
+        private const int rarityboxOrigX = 238;
+        private const int rarityboxOrigY = 368;
+        private const int rarityboxOrigW = 25;
+        private const int rarityboxOrigH = 25;
+
+        private Square namebox;
         private const int nameboxOrigX = 26;
         private const int nameboxOrigY = 17;
         private const int nameboxOrigH = 40;
-                 
-        private  Square breadbox;
+
+        private Square breadbox;
         private const int breadboxOrigX = 44;
         private const int breadboxOrigY = 402;
         private const int breadboxOrigW = 408;
         private const int breadboxOrigH = 236;
-                 
-        private  Square movementbox;
+
+        private Square movementbox;
         private const int movementboxOrigX = 420;
         private const int movementboxOrigY = 646;
         private const int movementboxOrigW = 40;
         private const int movementboxOrigH = 48;
-                 
-        private  Square ptbox;
+
+        private Square ptbox;
         private const int ptboxOrigX = 20;
         private const int ptboxOrigY = movementboxOrigY;
         private const int ptboxOrigW = 86;
         private const int ptboxOrigH = 48;
-                 
-        private  Square typebox;
+
+        private Square typebox;
         private const int typeboxOrigX = 134;
         private const int typeboxOrigY = movementboxOrigY;
         private const int typeboxOrigW = 236;
         private const int typeboxOrigH = 50;
-                 
-        private  Square artbox;
+
+        private Square artbox;
         private const int artboxOrigX = 52;
         private const int artboxOrigY = 68;
         private const int artboxOrigW = 398;
         private const int artboxOrigH = 298;
-                 
-        private  Square orbbox;
+
+        private Square orbbox;
         private const int orbboxOrigR = 470;
         private const int orbboxOrigY = 20;
         private const int orbboxOrigW = 398;
@@ -121,7 +129,7 @@ namespace stonerkart
             ptbox.Text = c.power + "/" + c.toughness;
             typebox.Text = c.typeText;
             artbox.Backimege = new Imege(TextureLoader.cardArt(c.template));
-
+            raritybox.Backimege = new Imege(TextureLoader.setIcon(c.set), TextureLoader.rarityColor(c.rarity));
             ptbox.Visible = c.hasPT;
 
             
@@ -164,7 +172,7 @@ namespace stonerkart
         {
             topbutton.setSize(width, height);
 
-            var scale = ((double)(height))/frameheight;
+            var scale = ((double)(height)) / frameheight;
 
             var colours = orbs.Where(o => o.colour != ManaColour.Colourless).ToArray();
             var colourlessCount = orbs.Count() - colours.Count();
@@ -244,6 +252,13 @@ namespace stonerkart
                 (int)Math.Round((scale * artboxOrigW)),
                 (int)Math.Round((scale * artboxOrigH))
                 );
+
+            raritybox.X = (int)Math.Round((scale * rarityboxOrigX));
+            raritybox.Y = (int)Math.Round((scale * rarityboxOrigY));
+            raritybox.setSize(
+                (int)Math.Round((scale * rarityboxOrigW)),
+                (int)Math.Round((scale * rarityboxOrigH))
+                );
         }
 
         public override int Width
@@ -268,11 +283,10 @@ namespace stonerkart
             set
             {
                 height = value;
-                width = height*framewidth/frameheight;
+                width = height * framewidth / frameheight;
                 layoutStuff();
             }
         }
-
         public static int heightFromWidth(int width)
         {
             return width * frameheight / framewidth;

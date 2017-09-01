@@ -179,6 +179,7 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\firstedition.png" />
     <None Include="Resources\buttonFriends.png" />
     <None Include="Resources\buttonChallenge.png" />
     <None Include="Resources\buttonbg0.png" />
@@ -273,7 +274,6 @@
     <None Include="Resources\buttonGraveyard.png" />
     <None Include="Resources\buttonHand.png" />
     <None Include="Resources\multi.png" />
-    <None Include="Resources\firstedition.png" />
     <None Include="Resources\frameMight.png" />
     <None Include="Resources\frameOrder.png" />
     <None Include="Resources\Namnlös.png" />

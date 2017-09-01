@@ -17,6 +17,7 @@ namespace stonerkart
             {
                 byte[] xd = Encoding.ASCII.GetBytes(d.toSaveText());
                 f.Write(xd, 0, xd.Length);
+                f.Close();
             }
         }
 
@@ -36,8 +37,10 @@ namespace stonerkart
                 string s = r.ReadToEnd();
                 Deck d =  new Deck(s);
                 d.name = name;
+                r.Close();
                 return d;
             }
+            
         }
 
         public static Deck chooseDeck()

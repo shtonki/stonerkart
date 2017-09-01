@@ -15,6 +15,7 @@ namespace stonerkart
     {
         private static LoginScreen loginScreen = new LoginScreen();
         private static MainMenuScreen mainMenuScreen = new MainMenuScreen();
+        private static DeckEditorScreen deckeditorScreen = new DeckEditorScreen();
 
         public static User user { get; private set; }
 
@@ -29,11 +30,11 @@ namespace stonerkart
             return;
             //*/ 
 
-            if (!Network.connectToServer()) throw new Exception("Serber offline");
+            //if (!Network.connectToServer()) throw new Exception("Serber offline");
 
             GUI.launch();
 
-            GUI.setScreen(loginScreen);
+            GUI.setScreen(deckeditorScreen);
 
             /*
 
