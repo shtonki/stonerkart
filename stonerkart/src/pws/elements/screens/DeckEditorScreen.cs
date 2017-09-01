@@ -15,37 +15,40 @@ namespace stonerkart
     {
         #region constants
 
-        private const int CARD_VIEW_PANEL_NUMBER_OF_ROWS = 3;
+        private const int NR_OF_CARDS_PER_ROW = 7;
+        private const int NR_OF_CARDS_PER_COLLUMN = 3;
+        private const int NR_OF_CARD_VIEWS = NR_OF_CARDS_PER_ROW*NR_OF_CARDS_PER_COLLUMN;
+        private const int CARD_VIEW_WIDTH = Frame.BACKSCREENWIDTH / 12;
+        private const int CARD_VIEW_HEIGHT = CARD_VIEW_WIDTH * 700 / 500;
 
-        private const int NR_OF_CARD_VIEWS = 10;
-        private const int FRAME_WIDTH = 500;
-        private const int FRAME_HEIGHT = 700;
-        private const int PILE_VIEW_X = 0;//Frame.BACKSCREENWIDTH - CARD_VIEW_WIDTH;
-        private const int PILE_VIEW_Y = 0;//DECK_NAME_BOX_HEIGHT + SAVE_BUTTON_HEIGHT;
-        private const int PILE_VIEW_WIDTH = CARD_VIEW_PANEL_WIDTH + PREVIOUS_PAGE_BUTTON_WIDTH;
-        private const int PILE_VIEW_HEIGHT = CARD_VIEW_HEIGHT;//(int)(Frame.BACKSCREENHEIGHT * 0.8);
+        private const int FRAME_WIDTH = Frame.BACKSCREENWIDTH;
+        private const int FRAME_HEIGHT = Frame.AVAILABLEHEIGHT;
+        private const int HOVER_VIEW_WIDTH = CARD_VIEW_WIDTH * NR_OF_CARDS_PER_COLLUMN;
+        private const int PILE_VIEW_X = 0;
+        private const int PILE_VIEW_Y = 0;
+        private const int PILE_VIEW_WIDTH = CARD_VIEW_PANEL_WIDTH;
+        private const int PILE_VIEW_HEIGHT = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT <= 0 ? CARD_VIEW_PANEL_HEIGHT : FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT; 
         private const int CARD_VIEW_PANEL_X = 0;
-        private const int CARD_VIEW_PANEL_Y = Frame.AVAILABLEHEIGHT-CARD_VIEW_PANEL_HEIGHT;
+        private const int CARD_VIEW_PANEL_Y = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT;
+        private const int CARD_VIEW_PANEL_WIDTH = NR_OF_CARDS_PER_ROW * CARD_VIEW_STRIDE_X;
+        private const int CARD_VIEW_PANEL_HEIGHT = NR_OF_CARDS_PER_COLLUMN * CARD_VIEW_HEIGHT;
         private const int CARD_VIEW_X = CARD_VIEW_PANEL_X;
         private const int CARD_VIEW_Y = CARD_VIEW_PANEL_Y;
-        private const int CARD_VIEW_STRIDE_X = 250;
-        private const int CARD_VIEW_STRIDE_Y = 350;
-        private const int CARD_VIEW_WIDTH = Frame.BACKSCREENWIDTH / 8;
-        private const int CARD_VIEW_HEIGHT = CARD_VIEW_WIDTH * FRAME_HEIGHT / FRAME_WIDTH;
-        private const int CARD_VIEW_WIDTHd2 = CARD_VIEW_WIDTH / 2;
-        private const int CARD_VIEW_PANEL_WIDTH = 4*(CARD_VIEW_STRIDE_X-CARD_VIEW_WIDTH) + 2*PREVIOUS_PAGE_BUTTON_WIDTH + 4*CARD_VIEW_WIDTH;
-        private const int CARD_VIEW_PANEL_HEIGHT = PREVIOUS_PAGE_BUTTON_HEIGHT;
-
+        private const int CARD_VIEW_STRIDE_X = CARD_VIEW_WIDTH + 0;
+        private const int CARD_VIEW_STRIDE_Y = CARD_VIEW_HEIGHT + 0;
+        
+        
+        //private const int CARD_VIEW_PANEL_HEIGHT = CARD_VIEW_PANEL_NUMBER_OF_ROWS * CARD_VIEW_HEIGHT;
         private const int DECK_NAME_BOX_WIDTH = CARD_VIEW_WIDTH;
         private const int DECK_NAME_BOX_HEIGHT = (int)(Frame.BACKSCREENHEIGHT * 0.05);
         private const int SAVE_BUTTON_HEIGHT = DECK_NAME_BOX_HEIGHT / 2;
         private const int SAVE_BUTTON_WIDTH = PILE_VIEW_WIDTH / 2;
         private const int SAVE_BUTTON_X = PILE_VIEW_X;
         private const int SAVE_BUTTON_Y = DECK_NAME_BOX_HEIGHT;
-        private const int PREVIOUS_PAGE_BUTTON_WIDTH = Frame.BACKSCREENWIDTH / 16;
-        private const int PREVIOUS_PAGE_BUTTON_HEIGHT = CARD_VIEW_WIDTH * FRAME_HEIGHT / FRAME_WIDTH + CARD_VIEW_STRIDE_Y; //erf
-        private const int PREVIOUS_PAGE_BUTTON_X = CARD_VIEW_X - CARD_VIEW_WIDTHd2;
-        private const int PREVIOUS_PAGE_BUTTON_Y = CARD_VIEW_Y;
+        private const int PREVIOUS_PAGE_BUTTON_WIDTH = 15;//Frame.BACKSCREENWIDTH / 16;
+        private const int PREVIOUS_PAGE_BUTTON_HEIGHT = 15;//(CARD_VIEW_WIDTH * FRAME_HEIGHT / FRAME_WIDTH + CARD_VIEW_STRIDE_Y)/2; //erf
+        private const int PREVIOUS_PAGE_BUTTON_X = NEXT_PAGE_BUTTON_X;//CARD_VIEW_X - CARD_VIEW_WIDTH/2;
+        private const int PREVIOUS_PAGE_BUTTON_Y = CARD_VIEW_Y+CARD_VIEW_PANEL_HEIGHT/2;
         private const int NEXT_PAGE_BUTTON_X = CARD_VIEW_X + CARD_VIEW_WIDTH * 5 + (CARD_VIEW_STRIDE_X - CARD_VIEW_WIDTH) * 4;//erf erf
         private const int NEXT_PAGE_BUTTON_Y = CARD_VIEW_Y;
         private const int NEXT_PAGE_BUTTON_WIDTH = PREVIOUS_PAGE_BUTTON_WIDTH;
@@ -226,10 +229,8 @@ namespace stonerkart
 
         private void setupCardViewsFirstTime()
         {
-            cardViewPanel = new Square();
-            cardViewPanel.setSize(CARD_VIEW_PANEL_WIDTH, CARD_VIEW_PANEL_HEIGHT);
-            cardViewPanel.setLocation(CARD_VIEW_PANEL_X, CARD_VIEW_PANEL_Y);
-            cardViewPanel.Backcolor = CARD_PANEL_BACKCOLOR;
+            setupCardViewPanel();
+            
 
             //setupHeroCardViews();
             setupHoverCardView();
@@ -250,10 +251,18 @@ namespace stonerkart
             addElement(cardViewPanel);
         }
 
+        private void setupCardViewPanel()
+        {
+            cardViewPanel = new Square();
+            cardViewPanel.setSize(CARD_VIEW_PANEL_WIDTH, CARD_VIEW_PANEL_HEIGHT);
+            cardViewPanel.setLocation(CARD_VIEW_PANEL_X, CARD_VIEW_PANEL_Y);
+            cardViewPanel.Backcolor = CARD_PANEL_BACKCOLOR;
+        }
+
         private void setupHoverCardView()
         {
             hoverView = new CardView(new Card(CardTemplate.Abolish));
-            hoverView.Width = NEXT_PAGE_BUTTON_X - FRAME_WIDTH; 
+            hoverView.Width = HOVER_VIEW_WIDTH; 
             hoverView.X = PILE_VIEW_WIDTH;
             hoverView.Y = NEXT_PAGE_BUTTON_Y;
             addElement(hoverView);
@@ -262,7 +271,7 @@ namespace stonerkart
         private void setupHoverCardView(Card c)
         {
             hoverView = new CardView(new Card(c.template));
-            hoverView.Width = NEXT_PAGE_BUTTON_X - FRAME_WIDTH;
+            //hoverView.Width = NEXT_PAGE_BUTTON_X - FRAME_WIDTH;
             hoverView.X = PILE_VIEW_WIDTH;
             hoverView.Y = NEXT_PAGE_BUTTON_Y;
             addElement(hoverView);
@@ -297,7 +306,7 @@ namespace stonerkart
             
             
         }
-        [STAThread]
+
         private void layoutCardViews(Card[] cards) 
         {
             int x = 0;
@@ -310,10 +319,11 @@ namespace stonerkart
                     cardViews[i] = new CardView(cards[i]);
 
                     cardViews[i].Width = CARD_VIEW_WIDTH;
-                    if (i == NR_OF_CARD_VIEWS / 2)
+                    
+                    if(x >= cardViewPanel.Width)
                     {
-                        y += CARD_VIEW_STRIDE_Y;
-                        x = 0;
+                            y += CARD_VIEW_STRIDE_Y;
+                            x = 0;
                     }
                     cardViews[i].setLocation(x, y);
                     x += CARD_VIEW_STRIDE_X;
