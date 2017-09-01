@@ -16,6 +16,8 @@ namespace stonerkart
         private static LoginScreen loginScreen = new LoginScreen();
         private static MainMenuScreen mainMenuScreen = new MainMenuScreen();
 
+        public static User user { get; private set; }
+
         public static void launchGame()
         {
             /*
@@ -51,9 +53,13 @@ namespace stonerkart
         {
             if (Network.login(username, password))
             {
-                var v = Network.queryFriends();
-                User user = new User(username, CardTemplate.Wolf, Title.NOTITLE);
+                user = Network.queryMyUser();
                 GUI.frame.loginAs(user);
+
+                var friends = Network.queryFriends();
+                user.setFriends(friends);
+                //GUI.frame.friendsPanel.addFriends(friends);
+
                 GUI.setScreen(mainMenuScreen);
             }
             else

@@ -83,6 +83,7 @@ namespace stonerkart
         {
             menu.setFlare(user);
             menu.Visible = true;
+            user.addObserver(friendsPanel);
         }
 
         protected override void OnLoad(EventArgs e)

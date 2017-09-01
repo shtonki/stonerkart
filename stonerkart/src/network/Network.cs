@@ -74,6 +74,14 @@ namespace stonerkart
                     gm.endGame(b.ges);
                 } break;
 
+                case Message.MessageType.USERSTATUSCHANGED:
+                {
+                    var body = new UserStatusChangedBody(m.body);
+                    var friend = Controller.user.Friends.First(u => u.Name == body.username);
+                    friend.Status = body.status;
+                } break;
+
+
                 default:
                     throw new Exception(m.messageType.ToString());
             }
@@ -160,10 +168,17 @@ namespace stonerkart
             return rb.code == ResponseBody.ResponseCode.OK;
         }
 
-        public static string[] queryFriends()
+        public static User queryMyUser()
+        {
+            var rb = queryServer(Queries.MYCOSMETICS);
+            if (rb.values.Length != 1) throw new Exception();
+            return User.FromString(rb.values[0]);
+        }
+
+        public static User[] queryFriends()
         {
             QueryResponseBody rb = queryServer(Queries.FRIENDS);
-            return rb.values;
+            return rb.values.Select(User.FromString).ToArray();
         }
 
         public static bool matchmake()

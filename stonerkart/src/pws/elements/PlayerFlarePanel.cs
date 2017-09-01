@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,9 @@ namespace stonerkart
         public PlayerFlarePanel(string playername, CardTemplate icon, int width, int height) : base(width, height)
         {
             if (width < height) throw new Exception();
+
+
+            //Backcolor = Color.FromArgb(150, 150, 150, 150);
 
             flare = new Square(height, height);
             addChild(flare);

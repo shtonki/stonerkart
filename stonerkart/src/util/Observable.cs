@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    interface Observer<T>
+    public interface Observer<T>
     {
         void notify(object o, T t);
     }
     
 
-    abstract class Observable<T>
+    public abstract class Observable<T>
     {
         private List<WeakReference<Observer<T>>> observers = new List<WeakReference<Observer<T>>>();
 

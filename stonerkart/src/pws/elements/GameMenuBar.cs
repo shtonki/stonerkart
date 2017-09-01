@@ -38,10 +38,10 @@ namespace stonerkart
         public void setFlare(User user)
         {
             if (playerFlarePanel != null) throw new Exception();
-            playerFlarePanel = new PlayerFlarePanel(user.name, user.icon, playerFlareWidth, Height);
+            playerFlarePanel = new PlayerFlarePanel(user.Name, user.Icon, playerFlareWidth, Height);
+            playerFlarePanel.Backcolor = Color.Silver;
             addChild(playerFlarePanel);
             playerFlarePanel.X = playerFlareX;
-            playerFlarePanel.Backcolor = Color.FromArgb(150, 150, 150, 150);
         }
     }
 }

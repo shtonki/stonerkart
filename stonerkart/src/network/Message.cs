@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace stonerkart
 {
-    class Message
+    public class Message
     {
         public string recipient;
         public MessageType messageType;
@@ -54,6 +54,7 @@ namespace stonerkart
             RESPONSE,
             QUERY,
             QUERYRESPONSE,
+            USERSTATUSCHANGED,
             ADDFRIEND,
             CHALLENGE,
             ACCEPTCHALLENGE,
@@ -66,12 +67,12 @@ namespace stonerkart
         }
     }
 
-    interface MessageBody
+    public interface MessageBody
     {
         string toBody();
     }
 
-    class QueryBody : MessageBody
+    public class QueryBody : MessageBody
     {
         public readonly Queries query;
 
@@ -94,9 +95,10 @@ namespace stonerkart
     public enum Queries
     {
         FRIENDS,
+        MYCOSMETICS,
     };
 
-    class QueryResponseBody : MessageBody
+    public class QueryResponseBody : MessageBody
     {
         private Queries query;
         public readonly string[] values;
@@ -137,7 +139,7 @@ namespace stonerkart
         }
     }
 
-    class LoginBody : MessageBody
+    public class LoginBody : MessageBody
     {
         public string username;
         public string password;
@@ -161,7 +163,7 @@ namespace stonerkart
         }
     }
 
-    class ResponseBody : MessageBody
+    public class ResponseBody : MessageBody
     {
         public ResponseCode code;
         public string text;
@@ -192,7 +194,7 @@ namespace stonerkart
         }
     }
 
-    class MatchmakemeBody : MessageBody
+    public class MatchmakemeBody : MessageBody
     {
         public MatchmakemeBody()
         {
@@ -210,7 +212,7 @@ namespace stonerkart
         }
     }
 
-    class AddFriendBody : MessageBody
+    public class AddFriendBody : MessageBody
     {
         public string name;
 
@@ -225,7 +227,33 @@ namespace stonerkart
         }
     }
 
-    class BugReportBody : MessageBody
+    public class UserStatusChangedBody : MessageBody
+    {
+        public readonly string username;
+        public readonly UserStatus status;
+
+        private const char separator = ':';
+
+        public UserStatusChangedBody(string username, UserStatus status)
+        {
+            this.username = username;
+            this.status = status;
+        }
+
+        public UserStatusChangedBody(string s)
+        {
+            var ss = s.Split(separator);
+            username = ss[0];
+            if (!UserStatus.TryParse(ss[1], out status)) throw new Exception();
+        }
+
+        public string toBody()
+        {
+            return username + separator + status.ToString();
+        }
+    }
+
+    public class BugReportBody : MessageBody
     {
         public string text;
 
@@ -239,36 +267,8 @@ namespace stonerkart
             return text;
         }
     }
-
-    class FriendListBody : MessageBody
-    {
-        public List<string> friends;
-
-        public FriendListBody(List<string> fs)
-        {
-            friends = fs;
-        }
-
-        public FriendListBody(string s)
-        {
-            friends = s.Split(':').ToList();
-        }
-
-        public string toBody()
-        {
-            if (friends.Count == 0) return "";
-            StringBuilder b = new StringBuilder();
-            b.Append(friends[0]);
-            for (int i = 1; i < friends.Count; i++)
-            {
-                b.Append(':');
-                b.Append(friends[i]);
-            }
-            return b.ToString();
-        }
-    }
-
-    class GameMessageBody : MessageBody
+    
+    public class GameMessageBody : MessageBody
     {
         public int gameid { get; }
         public string message { get; }
@@ -298,7 +298,7 @@ namespace stonerkart
         }
     }
 
-    class EndGameMessageBody : MessageBody
+    public class EndGameMessageBody : MessageBody
     {
         public int gameid { get; }
         public GameEndStruct ges { get; }
@@ -396,7 +396,7 @@ namespace stonerkart
         }
     }
 
-    class SurrenderMessageBody : MessageBody
+    public class SurrenderMessageBody : MessageBody
     {
         public int gameid { get; }
         public GameEndStateReason reason { get; }
@@ -429,7 +429,7 @@ namespace stonerkart
         }
     }
 
-    class ChallengeBody : MessageBody
+    public class ChallengeBody : MessageBody
     {
         public string challengee;
 
@@ -444,7 +444,7 @@ namespace stonerkart
         }
     }
 
-    class NewGameStruct
+    public class NewGameStruct
     {
         public readonly int gameid;
         public readonly int randomSeed;
@@ -460,7 +460,7 @@ namespace stonerkart
         }
     }
 
-    class NewGameBody : MessageBody
+    public class NewGameBody : MessageBody
     {
         public NewGameStruct newGameStruct;
 
