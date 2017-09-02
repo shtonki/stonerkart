@@ -120,25 +120,23 @@ namespace stonerkart
             promptText.Text = text;
         }
 
-        public void promptButtons(string text, params ButtonOption[] labels)
+        public void promptButtons(params ButtonOption[] labels)
         {
             hideButtons();
-            promptText.Text = text;
 
             for (int i = 0; i < labels.Length; i++)
             {
                 Button b = buttons[i];
                 var l = labels[i];
+                if (l == ButtonOption.NOTHING) continue;
                 b.Text = l.ToString();
                 b.Visible = true;
             }
         }
 
-        public void promptManaChoice(string text, params ManaColour[] colours)
+        public void promptManaChoice(bool hideRegularButtons, params ManaColour[] colours)
         {
-            hideButtons();
-            promptText.Text = text;
-            
+            if (hideRegularButtons) hideButtons();
 
             foreach (var c in colours)
             {
@@ -146,6 +144,11 @@ namespace stonerkart
                 Button b = manaButtons[ix];
                 b.Visible = true;
             }
+        }
+
+        public void clear()
+        {
+            prompt("");
         }
     }
 }

@@ -17,16 +17,25 @@ namespace stonerkart
     {
         font0,
 
-        bg3,
+        background3,
+        background0,
 
         buttonbg0,
         buttonbg2,
+
+        iconChallenge,
+        iconFriends,
+        iconShekel,
+
+        packFirstEdition12Pack,
 
         border0,
 
         table0,
 
         cardframegrey,
+
+        setFirstedition,
 
         deckButton,
         handButton,
@@ -203,10 +212,17 @@ namespace stonerkart
 
             images[Textures.font0] = Resources.font0;
 
-            images[Textures.bg3] = Resources.background3;
+            images[Textures.background3] = Resources.background3;
+            images[Textures.background0] = Resources.background0;
 
             images[Textures.buttonbg0] = Resources.buttonbg0;
             images[Textures.buttonbg2] = Resources.buttonbg2;
+
+            images[Textures.iconChallenge] = Resources.buttonChallenge;
+            images[Textures.iconFriends] = Resources.buttonFriends;
+            images[Textures.iconShekel] = Resources.iconShekel;
+
+            images[Textures.packFirstEdition12Pack] = Resources.firstedition12cardpack;
 
             images[Textures.border0] = Resources.border0;
 
@@ -218,6 +234,8 @@ namespace stonerkart
             images[Textures.deckButton] = Resources.buttonDeck;
 
             images[Textures.cardframegrey] = Resources.whiteframe4;
+
+            images[Textures.setFirstedition] = Resources.setFirstedition;
 
             images[Textures.orbChaos] = Resources.orbChaos;
             images[Textures.orbNature] = Resources.orbNature;
@@ -421,6 +439,40 @@ namespace stonerkart
             }
         }
 
+        public static Textures packDisplayImage(Packs pack)
+        {
+            switch (pack)
+            {
+                case Packs.FirstEdition12Pack: return Textures.packFirstEdition12Pack;
+            }
+
+            throw new Exception();
+        }
+
+        public static Textures setIcon(CardSet set)
+        {
+            switch (set)
+            {
+                case CardSet.FirstEdition: return Textures.setFirstedition;
+            }
+
+            throw new Exception();
+        }
+
+        public static Color rarityColor(Rarity rarity)
+        {
+            switch (rarity)
+            {
+                case Rarity.Common: return Color.White;
+                case Rarity.Uncommon: return Color.MediumPurple;
+                case Rarity.Rare: return Color.Gold;
+                case Rarity.Legendary: return Color.LightCoral;
+                case Rarity.None: return Color.ForestGreen;
+            }
+
+            throw new Exception();
+        }
+
         public static Textures cardArt(CardTemplate ct)
         {
             switch (ct)
@@ -481,7 +533,7 @@ namespace stonerkart
                 case CardTemplate.Damage_sWard: return Textures.artDamageWard;
                 case CardTemplate.One_sWith_sNature: return Textures.artOneWithNature;
                 case CardTemplate.Graverobber_sSyrdin: return Textures.artGraverobberSyrdin;
-                case CardTemplate.Alter_sFate: return Textures.artAlterFate;
+                case CardTemplate.Alter_sFate: return Textures.artAlterTime;
                 case CardTemplate.Goblin_sGrenade: return Textures.artGoblinGrenade;
                 case CardTemplate.Cleansing_sFire: return Textures.artCleansingFire;
                 case CardTemplate.Bhewas: return Textures.artBelwas;

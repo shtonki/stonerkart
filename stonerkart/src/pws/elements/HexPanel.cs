@@ -142,22 +142,25 @@ namespace stonerkart
                     var powerText = tl.Layout(c.power.ToString(), statTextSize, statTextSize, ff);
                     var movementText = tl.Layout(c.movement.ToString(), statTextSize, statTextSize, ff);
 
-                    int toughnessX = hexX + ((int)(hexsize*0.58));
-                    int toughnessY = hexY + ((int)(hexsize*0.765));
-                    int powerX = hexX + ((int)(hexsize*0.22));
-                    int powerY = toughnessY;
                     int movementX = hexX + (int)(hexsize*0.76);
                     int movementY = hexY + (int)(hexsize*0.41);
 
-
-                    dm.fillHexagon(toughnessX, toughnessY, statTextSize, clr, clr);
-                    toughnessText.draw(dm, toughnessX, toughnessY, 0, Color.Black, true);
-
-                    dm.fillHexagon(powerX, powerY, statTextSize, clr, clr);
-                    powerText.draw(dm, powerX, powerY, 0, Color.Black, true);
-
                     dm.fillHexagon(movementX, movementY, statTextSize, clr, clr);
                     movementText.draw(dm, movementX, movementY, 0, Color.Black, true);
+
+                    if (c.hasPT)
+                    {
+                        int toughnessX = hexX + ((int)(hexsize * 0.58));
+                        int toughnessY = hexY + ((int)(hexsize * 0.765));
+                        int powerX = hexX + ((int)(hexsize * 0.22));
+                        int powerY = toughnessY;
+
+                        dm.fillHexagon(toughnessX, toughnessY, statTextSize, clr, clr);
+                        toughnessText.draw(dm, toughnessX, toughnessY, 0, Color.Black, true);
+
+                        dm.fillHexagon(powerX, powerY, statTextSize, clr, clr);
+                        powerText.draw(dm, powerX, powerY, 0, Color.Black, true);
+                    }
                 }
             }
 

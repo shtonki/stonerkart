@@ -15,6 +15,8 @@ namespace stonerkart
 
         private const int headingHeight = 30;
 
+        private Point? headingClick;
+
         public string Title
         {
             get { return heading.Text; }
@@ -50,7 +52,10 @@ namespace stonerkart
                 }
                 else
                 {
-                    throw new Exception();
+                    closeButton.clicked += a =>
+                    {
+                        close();
+                    };
                 }
             }
 
@@ -82,6 +87,17 @@ namespace stonerkart
             };
         }
 
-        private Point? headingClick;
+
+        public void close()
+        {
+            if (parent != null)
+            {
+                parent.removeChild(this);
+            }
+            else
+            {
+                screen.removeElement(this);
+            }
+        }
     }
 }

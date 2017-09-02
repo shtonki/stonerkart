@@ -26,6 +26,11 @@ namespace stonerkart
         {
         }
 
+        public Imege(Textures texture, Color brushColor) : this(texture)
+        {
+            this.brushColor = brushColor;
+        }
+
         public Imege(Textures texture, Box crop) : this(texture, crop, Color.White)
         {
         }

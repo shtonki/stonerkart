@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,19 +75,23 @@ namespace stonerkart
 
         #endregion
 
-        private CardList cardList;
+        private CardList deck;
         private Card currentHero;
         private CardView hoverView;
-        private PileView pileView;
         private DeckContraints deckConstraints;
-        private CardView[] cardViews;
-        private List<Card> allCardsEver;
+
         private List<Card> allHeroes;
-        private List<Card> filteredCards;
         private Func<Card, bool> currentFilter;
         private Square cardViewPanel;
         
         private int currentPageNr = 0;
+
+        private List<Card> allCardsEver;
+        private List<Card> filteredCards;
+
+        private PileView pileView;
+        private CardView[] cardViews;
+
 
         //todo fix hero saving/loading/ui
         public DeckEditorScreen() : base(new Imege(Textures.artCallToArms))
@@ -94,11 +99,11 @@ namespace stonerkart
             setupCards();
             setupCardViewsFirstTime();
             pileView = setupPileView();
-            cardList = setupCardList(pileView);
+            pileView.maxPadding = 30;
+            deck = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
 
             setupButtons();
-        }
 
         private List<Card> filter(Func<Card, bool> filter)
         {
@@ -124,7 +129,6 @@ namespace stonerkart
         private void setupCards()
         {
             
-            allCardsEver = new List<Card>();
             var cardTemplates = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().ToList();
             allCardsEver = cardTemplates.Select(c => new Card(c)).Where(c => c.isToken == false).OrderBy(d => d.name).ToList(); //sort after colors instead? xd
 
@@ -132,6 +136,15 @@ namespace stonerkart
             allHeroes = allCardsEver.Where(c => c.isHeroic).ToList();
             currentHero = allHeroes[0];
             //foreach (var a in allHeroes) System.Console.WriteLine(a);
+                if (c1.colours.Count < 2)
+                {
+                    var colourdiff = c1.colours[0] - c2.colours[0];
+                    if (colourdiff != 0) return colourdiff;
+                }
+
+                var cmcdiff = c1.convertedManaCost - c2.convertedManaCost;
+                return cmcdiff;
+            });
 
             currentFilter = new Func<Card, bool>(c => true);
             filteredCards = filter(currentFilter);
@@ -149,7 +162,7 @@ namespace stonerkart
                 deckNameBox.setText("");
             };
             
-            Button saveButton = new Button();
+            Button saveButton = new Button(128, 32);
             saveButton.setLocation(SAVE_BUTTON_X, SAVE_LOAD_BUTTON_Y);
             saveButton.Backcolor = System.Drawing.Color.Red;
             saveButton.Text = "Save";
@@ -161,14 +174,14 @@ namespace stonerkart
                 DeckController.saveDeck(new Deck(CardTemplate.Bhewas, cardList.Select(c => c.template).ToArray()), deckNameBox.Text);
             };
 
-            Button loadButton = new Button();
+            Button loadButton = new Button(128, 32);
             loadButton.clicked += (_) =>
             {
                 Deck d = DeckController.loadDeck("erf");
-                cardList.clear();
+                deck.clear();
                 foreach (var t in d.templates)
                 {
-                    cardList.addTop(new Card(t));
+                    deck.addTop(new Card(t));
                 }
             };
             loadButton.Text = "Load";
@@ -179,7 +192,7 @@ namespace stonerkart
 
 
 
-            Button previousPageButton = new Button();
+            Button previousPageButton = new Button(PREVIOUS_PAGE_BUTTON_WIDTH, PREVIOUS_PAGE_BUTTON_HEIGHT);
             previousPageButton.setLocation(UP_PAGE_BUTTON_X, UP_PAGE_BUTTON_Y);
             previousPageButton.Width = UP_PAGE_BUTTON_WIDTH;
             previousPageButton.Height = UP_PAGE_BUTTON_HEIGHT;
@@ -190,7 +203,7 @@ namespace stonerkart
                 setupCardViews();
             };
 
-            Button nextPageButton = new Button();
+            Button nextPageButton = new Button(PREVIOUS_PAGE_BUTTON_WIDTH, PREVIOUS_PAGE_BUTTON_HEIGHT);
             nextPageButton.setLocation(DOWN_PAGE_BUTTON_X, DOWN_PAGE_BUTTON_Y);
             nextPageButton.Width = UP_PAGE_BUTTON_WIDTH;
             nextPageButton.Height = UP_PAGE_BUTTON_HEIGHT;
@@ -231,7 +244,7 @@ namespace stonerkart
             pv.mouseDown += (a) =>
             {
                 var cardView = pv.viewAtClick(a);
-                if (cardView != null) cardList.remove(cardView.card);
+                if (cardView != null) deck.remove(cardView.card);
             };
             addElement(pv);
 
@@ -288,7 +301,6 @@ namespace stonerkart
             hoverView.Y = DOWN_PAGE_BUTTON_Y;
             addElement(hoverView);
         }
-
         private void setupCardViews()
         {
             cardViewPanel.clearChildren();
@@ -358,7 +370,7 @@ namespace stonerkart
         {
             if (deckConstraints.willBeLegal(currentHero.template, cardList.Select(c => c.template).ToArray(), ct))
             {
-                cardList.addTop(new Card(ct));
+                deck.addTop(new Card(ct));
             }
         }
     }

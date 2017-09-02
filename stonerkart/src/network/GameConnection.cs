@@ -8,9 +8,9 @@ namespace stonerkart
 {
     class MultiplayerConnection : GameConnection
     {
-        private GameState game;
+        private Game game;
 
-        public MultiplayerConnection(GameState g, NewGameStruct ngs)
+        public MultiplayerConnection(Game g, NewGameStruct ngs)
         {
             game = g;
         }
@@ -18,6 +18,7 @@ namespace stonerkart
         public override int[] receiveChoices()
         {
             string s = dequeueGameMessage();
+            if (s == "") return new int[0];
             var ss = s.Split(intsplitter);
             return ss.Select(Int32.Parse).ToArray();
         }
@@ -26,10 +27,10 @@ namespace stonerkart
         {
             StringBuilder sb = new StringBuilder();
             foreach (var choice in choices) sb.Append(choice.ToString() + intsplitter);
-            sb.Length--;
+            if (sb.Length > 0) sb.Length--;
 
             string s = sb.ToString();
-            Network.sendGameMessage(game, s);
+            Network.sendGameMessage(game.gameid, s);
         }
 
         public override Deck[] deckify(Deck myDeck, int myIndex)

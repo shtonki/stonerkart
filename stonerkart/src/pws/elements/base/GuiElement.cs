@@ -37,8 +37,8 @@ namespace stonerkart
             set { setLocation(x, value); }
         }
 
-        public int AbsoluteX => parent == null ? X : X - parent.AbsoluteX;
-        public int AbsoluteY => parent == null ? Y : X - parent.AbsoluteY;
+        public int AbsoluteX => parent == null ? X : X + parent.AbsoluteX;
+        public int AbsoluteY => parent == null ? Y : Y + parent.AbsoluteY;
         public int Bottom => Y + Height;
         public int Right => X + Width;
 
@@ -140,7 +140,7 @@ namespace stonerkart
 
         public void removeChild(GuiElement child)
         {
-            children.Remove(child);
+            if (!children.Remove(child)) throw new Exception();
             child.parent = null;
         }
 

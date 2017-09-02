@@ -349,9 +349,6 @@
   <data name="orbColourless" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Namnlös.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="setFirstedition" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\firstedition.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="orbMulti" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\multi.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -726,5 +723,23 @@ z 2661 39
   </data>
   <data name="buttonbg0" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\buttonbg0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="buttonChallenge" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\buttonChallenge.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="buttonFriends" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\buttonFriends.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iconShekel" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iconShekel.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="setFirstedition" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\firstedition.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="background0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\background0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="firstedition12cardpack" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\firstedition12cardpack.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

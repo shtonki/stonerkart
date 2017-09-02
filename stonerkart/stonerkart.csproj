@@ -82,6 +82,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="src\GameState.cs" />
+    <Compile Include="src\model\ProductUnion.cs" />
     <Compile Include="src\pws\Border.cs" />
     <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />
@@ -96,18 +97,26 @@
     <Compile Include="src\pws\elements\base\GuiElement.cs" />
     <Compile Include="src\pws\elements\base\InputBox.cs" />
     <Compile Include="src\pws\elements\base\Square.cs" />
+    <Compile Include="src\pws\elements\base\ToggleButton.cs" />
     <Compile Include="src\pws\elements\base\Winduh.cs" />
     <Compile Include="src\pws\elements\CardView.cs" />
     <Compile Include="src\pws\elements\DraggablePanel.cs" />
+    <Compile Include="src\pws\elements\FriendsPanel.cs" />
+    <Compile Include="src\pws\elements\GameMenuBar.cs" />
     <Compile Include="src\pws\elements\HexPanel.cs" />
     <Compile Include="src\pws\elements\MemeButton.cs" />
+    <Compile Include="src\model\User.cs" />
     <Compile Include="src\pws\elements\PileView.cs" />
+    <Compile Include="src\pws\elements\PlayerFlarePanel.cs" />
     <Compile Include="src\pws\elements\PlayerPanel.cs" />
+    <Compile Include="src\pws\elements\PricePanel.cs" />
     <Compile Include="src\pws\elements\PromptPanel.cs" />
     <Compile Include="src\pws\elements\screens\DeckEditorScreen.cs" />
     <Compile Include="src\pws\elements\screens\GameScreen.cs" />
     <Compile Include="src\pws\elements\screens\LoginScreen.cs" />
+    <Compile Include="src\pws\elements\screens\MainMenuScreen.cs" />
     <Compile Include="src\pws\elements\screens\Screen.cs" />
+    <Compile Include="src\pws\elements\screens\ShopScreen.cs" />
     <Compile Include="src\pws\elements\TextLayout.cs" />
     <Compile Include="src\pws\elements\TurnIndicator.cs" />
     <Compile Include="src\pws\Font.cs" />
@@ -174,6 +183,12 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\firstedition12cardpack.png" />
+    <None Include="Resources\background0.png" />
+    <None Include="Resources\firstedition.png" />
+    <None Include="Resources\iconShekel.png" />
+    <None Include="Resources\buttonFriends.png" />
+    <None Include="Resources\buttonChallenge.png" />
     <None Include="Resources\buttonbg0.png" />
     <None Include="Resources\cl1.png" />
     <None Include="Resources\cl0.png" />
@@ -266,7 +281,6 @@
     <None Include="Resources\buttonGraveyard.png" />
     <None Include="Resources\buttonHand.png" />
     <None Include="Resources\multi.png" />
-    <None Include="Resources\firstedition.png" />
     <None Include="Resources\frameMight.png" />
     <None Include="Resources\frameOrder.png" />
     <None Include="Resources\Namnlös.png" />

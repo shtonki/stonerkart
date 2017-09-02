@@ -97,7 +97,7 @@ namespace stonerkart
 
         public void payMana(ManaSet iz)
         {
-            manaPool.subtractCurrent(iz);
+            manaPool.pay(iz);
             notify(new PlayerChangedArgs(this));
         }
 
@@ -112,28 +112,6 @@ namespace stonerkart
             manaPool.resetBonus();
             notify(new PlayerChangedArgs(this));
         }
-
-        public bool stunthack;
-        public ManaSet stunthackset;
-        public void stuntMana()
-        {
-            stunthack = true;
-            notify(new PlayerChangedArgs(this));
-        }
-
-        public void unstuntMana()
-        {
-            stunthack = false;
-            stunthackset = null;
-            notify(new PlayerChangedArgs(this));
-        }
-
-        public void stuntLoss(ManaSet l)
-        {
-            stunthackset = l;
-            notify(new PlayerChangedArgs(this));
-        }
-
         #endregion
 
     }

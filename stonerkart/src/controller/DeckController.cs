@@ -60,18 +60,9 @@ namespace stonerkart
 
         public static void chooseDeck(Action<Deck> cb)
         {
-            Deck d = new Deck(CardTemplate.Shibby_sShtank, 
+            Deck d = new Deck(CardTemplate.Bhewas, 
                 new []
                 {
-                    CardTemplate.Zap, 
-                    CardTemplate.Zap, 
-                    CardTemplate.Zap, 
-                    CardTemplate.Zap, 
-                    CardTemplate.Zap, 
-                    CardTemplate.Zap, 
-                    CardTemplate.Zap, 
-                    CardTemplate.Zap, 
-                    CardTemplate.Zap, 
                     CardTemplate.Rockhand_sEchion, 
                     CardTemplate.Rockhand_sEchion, 
                     CardTemplate.Rockhand_sEchion, 
@@ -81,8 +72,10 @@ namespace stonerkart
                     CardTemplate.Rockhand_sEchion, 
                     CardTemplate.Rockhand_sEchion, 
                     CardTemplate.Rockhand_sEchion, 
-                }
-                );
+                    CardTemplate.Rockhand_sEchion, 
+                    CardTemplate.Rockhand_sEchion, 
+                    CardTemplate.Rockhand_sEchion, 
+                });
             cb(d);
             return;
             throw new Exception();

@@ -43,64 +43,58 @@ namespace stonerkart
 
             switch (ct)
             {
+
                 #region Illegal Goblin Laboratory
+                case CardTemplate.Illegal_sGoblin_sLaboratory:
+                {
+                    cardType = CardType.Relic;
+                    rarity = Rarity.Uncommon;
 
-            case CardTemplate.Illegal_sGoblin_sLaboratory:
-            {
-                cardType = CardType.Relic;
-                rarity = Rarity.Uncommon;
+                    chaosCost = 2;
+                    greyCost = 1;
 
-                chaosCost = 2;
-                greyCost = 1;
-
-                addTriggeredAbility(
-                    "At the end of your turn deal 1 damage to every enemy player.",
-                    new TargetRuleSet(
-                        new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                        new CardsRule(c => c.isHeroic && !c.owner.isHero)),
-                    new ZepperDoer(1),
-                    new Foo(),
-                    new TypedGameEventFilter<StartOfStepEvent>(
-                        e => e.step == Steps.End && e.activePlayer == controller),
-                    0,
-                    PileLocation.Field,
-                    false
-                    );
-            }
-                break;
+                    addTriggeredAbility(
+                        "At the end of your turn deal 1 damage to every enemy heroic creature.",
+                        new TargetRuleSet(resolveCard, enemyHeroicCreatures),
+                        new PingDoer(1),
+                        emptyFoo,
+                        startOfHerosStep(Steps.End),
+                        0,
+                        PileLocation.Field,
+                        false
+                        );
+                } break;
 
                 #endregion
                 #region Bhewas
 
-            case CardTemplate.Bhewas:
-            {
-                cardType = CardType.Creature;
-                baseRace = Race.Human;
-                subtype = Subtype.Warrior;
-                rarity = Rarity.Legendary;
-                isHeroic = true;
-                forceColour = ManaColour.Life;
+                case CardTemplate.Bhewas:
+                {
+                    cardType = CardType.Creature;
+                    baseRace = Race.Human;
+                    subtype = Subtype.Warrior;
+                    rarity = Rarity.Legendary;
+                    isHeroic = true;
+                    forceColour = ManaColour.Life;
 
-                baseMovement = 2;
-                basePower = 1;
-                baseToughness = 25;
+                    baseMovement = 2;
+                    basePower = 1;
+                    baseToughness = 25;
 
-                addActivatedAbility(
-                    String.Format("{2}{1}{1}, {0}: Your other white creatures get +1/+0 until end of turn. {3}",
-                        G.exhaustGhyph, G.colouredGlyph(ManaColour.Life), G.colourlessGlyph(1), G.channelOnly),
-                    new TargetRuleSet(
-                        new CardsRule(
-                            c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
-                    new ModifyDoer(LL.add(1), LL.endOfTurn, ModifiableStats.Power),
-                    new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
-                    0,
-                    PileLocation.Field,
-                    CastSpeed.Channel
-                    );
-            }
-                break;
-
-                #endregion
+                    addActivatedAbility(
+                        String.Format("{2}{1}{1}, {0}: Your other white creatures get +1/+0 until end of turn. {3}",
+                            G.exhaustGhyph, G.colouredGlyph(ManaColour.Life), G.colourlessGlyph(1), G.channelOnly),
+                        new TargetRuleSet(
+                            new CardsRule(
+                                c => c != this && c.controller == this.controller && c.isColour(ManaColour.Life))),
+                        new ModifyDoer(add(1), endOfTurn, ModifiableStats.Power),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Life, ManaColour.Life, ManaColour.Colourless)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Channel
+                        );
+                } break;
+                    #endregion
                 #region Kappa
 
             case CardTemplate.Kappa:
@@ -175,8 +169,9 @@ namespace stonerkart
                             new SelectCardRule(PileLocation.Hand, SelectCardRule.Mode.ResolverLooksAtPlayer),
                             new ChooseRule<Player>(),
                             ChooseRule<Card>.ChooseAt.Resolve, 
-                            c => false),
-                        new ModifyDoer(LL.add(0), LL.clearAura, ModifiableStats.Movement))); //ugliest hack i've seen in a while
+                            c => true,
+                            0, true),
+                        new ModifyDoer(add(0), clearAura, ModifiableStats.Movement))); //ugliest hack i've seen in a while
                 castDescription = "Look at target players hand. Draw a card.";
 
             }
@@ -216,17 +211,17 @@ namespace stonerkart
                 greyCost = 2;
 
                 addTriggeredAbility(
-                    "Whenever a creature enters the battlefield under your control, you may restore 1 toughness to your hero.",
+                    "Whenever a creature enters the battlefield under your control, restore 1 toughness to your hero.",
                     new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                         new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
-                    new ZepperDoer(-1),
+                    new PingDoer(-1),
                     new Foo(),
                     new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
                         moveEvent.card.controller == controller &&
                         moveEvent.to.location.pile == PileLocation.Field),
                     0,
                     PileLocation.Field,
-                    true,
+                    false,
                     TriggeredAbility.Timing.Post
                     );
             }
@@ -250,9 +245,9 @@ namespace stonerkart
 
                 addActivatedAbility(
                     String.Format("{1}, {0}: Exhaust another target creature within 3 tiles.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Nature)),
-                    new TargetRuleSet(LL.creature(c => c != this)),
+                    new TargetRuleSet(creature(c => c != this)),
                     new FatigueDoer(true),
-                    new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Nature)),
+                    new Foo(exhaustThis, manaCostEffect(ManaColour.Nature)),
                     3,
                     PileLocation.Field,
                     CastSpeed.Interrupt
@@ -299,7 +294,7 @@ namespace stonerkart
                         G.colourlessGlyph(2), G.exhaustGhyph, G.channelOnly),
                     new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
                     new DrawCardsDoer(1),
-                    fooFromManaCost(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
+                    manaCostFoo(ManaColour.Order, ManaColour.Order, ManaColour.Colourless, ManaColour.Colourless),
                     0,
                     PileLocation.Field,
                     CastSpeed.Interrupt
@@ -321,7 +316,7 @@ namespace stonerkart
                 greyCost = 1;
 
                 castEffect =
-                    new Effect(LL.nonheroicCreature(),
+                    new Effect(nonheroicCreature(),
                         new MoveToPileDoer(PileLocation.Hand));
                 castDescription = "Return target non-heroic creature to its owner's hand.";
             }
@@ -376,7 +371,7 @@ namespace stonerkart
                     new Effect(
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                             new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
-                        new ZepperDoer(-3)));
+                        new PingDoer(-3)));
                 castDescription = "Deal 3 damage to target creature. You gain 3 life.";
 
 
@@ -399,7 +394,7 @@ namespace stonerkart
                     new Effect(
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                             new AoeRule(t => true, 1, c => true)),
-                        new ZepperDoer(1));
+                        new PingDoer(1));
                 castDescription = "Deal 1 damage to all creatures within 1 tile of target tile.";
 
             }
@@ -534,7 +529,7 @@ namespace stonerkart
                 castRange = 4;
                 castEffect = new Effect(
                     new TargetRuleSet(new ChooseRule<Card>()),
-                    new ModifyDoer(LL.add(3), LL.never, ModifiableStats.Toughness));
+                    new ModifyDoer(add(3), never, ModifiableStats.Toughness));
                 castDescription = "Target creature gains 3 toughness.";
 
             }
@@ -557,9 +552,9 @@ namespace stonerkart
                         new TargetRuleSet(
                             new CardResolveRule(CardResolveRule.Rule.ResolveCard), 
                             new ChooseRule<Card>()),
-                        new ZepperDoer(-2));
+                        new PingDoer(-2));
                 additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(1, c => c),
-                    new ModifyDoer(LL.add(2), LL.endOfTurn, ModifiableStats.Power)));
+                    new ModifyDoer(add(2), endOfTurn, ModifiableStats.Power)));
                 castDescription =
                     "Target creature is healed for 2 and gains 2 power until the end of this turn.";
             } break;
@@ -586,9 +581,9 @@ namespace stonerkart
                     new TargetRuleSet(
                         new CardResolveRule(CardResolveRule.Rule.ResolveCard), 
                         new ChooseRule<Card>()),
-                    new ZepperDoer(1),
+                    new PingDoer(1),
                     new Foo(),
-                    LL.thisEnters(this, PileLocation.Field),
+                    thisEnters(this, PileLocation.Field),
                     3,
                     PileLocation.Field,
                     true,
@@ -690,7 +685,7 @@ namespace stonerkart
                             ChooseRule<Card>.ChooseAt.Resolve, 
                             c => true)), 
                     new MoveToPileDoer(PileLocation.Graveyard),
-                    new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death, ManaColour.Death)),
+                    new Foo(exhaustThis, manaCostEffect(ManaColour.Death, ManaColour.Death)),
                     0,
                     PileLocation.Field,
                     CastSpeed.Channel
@@ -805,7 +800,7 @@ namespace stonerkart
                             ChooseRule<Tile>.ChooseAt.Resolve,
                             t => t.passable && !t.isEdgy)),
                     new SummonToTileDoer(),
-                    new Foo(LL.manaCost(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
+                    new Foo(manaCostEffect(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
                     2,
                     PileLocation.Graveyard,
                     CastSpeed.Channel,
@@ -842,7 +837,11 @@ namespace stonerkart
                 greyCost = 1;
 
                 castDescription = "Counter target spell.";
-                castEffect = new Effect(new ChooseRule<Card>(c => c.location.pile == PileLocation.Stack && !c.isDummy),
+                castEffect = new Effect(
+                    new ChooseRule<Card>(
+                        new ClickCardRule(), 
+                        ChooseRule<Card>.ChooseAt.Cast, 
+                        c => c.location.pile == PileLocation.Stack && !c.isDummy),
                     new MoveToPileDoer(PileLocation.Graveyard));
             }
                 break;
@@ -859,7 +858,7 @@ namespace stonerkart
 
                 castDescription = "Destroy target non-heroic creature.";
                 castEffect =
-                    new Effect(LL.nonheroicCreature(),
+                    new Effect(nonheroicCreature(),
                         new MoveToPileDoer(PileLocation.Graveyard));
                 castRange = 4;
             }
@@ -877,7 +876,7 @@ namespace stonerkart
 
                 castDescription = "Destroy target relic.";
                 castEffect =
-                    new Effect(LL.relic,
+                    new Effect(relic,
                         new MoveToPileDoer(PileLocation.Graveyard));
                 castRange = 6;
             }
@@ -918,7 +917,7 @@ namespace stonerkart
 
                     addTriggeredAbility(
                         "Whenever Rider of Death enters the battlefield you may destroy target non-heroic creature.",
-                        new TargetRuleSet(LL.nonheroicCreature()),
+                        new TargetRuleSet(nonheroicCreature()),
                         new MoveToPileDoer(PileLocation.Graveyard),
                         new Foo(),
                         new TypedGameEventFilter<MoveToPileEvent>(
@@ -1027,7 +1026,7 @@ namespace stonerkart
                         new TargetRuleSet(
                             new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                             new TriggeredTargetRule<DrawEvent, Card>(g => g.player.heroCard)),
-                        new ZepperDoer(1),
+                        new PingDoer(1),
                         new Foo(),
                         new TypedGameEventFilter<DrawEvent>(),
                         0,
@@ -1046,8 +1045,8 @@ namespace stonerkart
                     greyCost = 2;
 
                     castDescription = "Set target non-life creatures movement to 1.";
-                    castEffect = new Effect(LL.nonColouredCreature(ManaColour.Life),
-                        new ModifyDoer(LL.set(1), LL.never, ModifiableStats.Movement));
+                    castEffect = new Effect(nonColouredCreature(ManaColour.Life),
+                        new ModifyDoer(setTo(1), never, ModifiableStats.Movement));
                     castRange = 4;
                 } break;
                 #endregion
@@ -1061,8 +1060,8 @@ namespace stonerkart
                         greyCost = 1;
 
                         castDescription = "Reduce target non-death creatures movement by 2. This cannot reduce the targets movement below 1.";
-                        castEffect = new Effect(LL.nonColouredCreature(ManaColour.Death),
-                            new ModifyDoer(v => Math.Max(Math.Min(v, 1), v - 2), LL.never, ModifiableStats.Movement));
+                        castEffect = new Effect(nonColouredCreature(ManaColour.Death),
+                            new ModifyDoer(v => Math.Max(Math.Min(v, 1), v - 2), never, ModifiableStats.Movement));
                         castRange = 4;
                     }
                     break;
@@ -1079,7 +1078,7 @@ namespace stonerkart
 
                         castDescription = "Destroy target relic.";
                         castEffect =
-                            new Effect(LL.relic,
+                            new Effect(relic,
                                 new MoveToPileDoer(PileLocation.Graveyard));
                         castRange = 6;
                     } break;
@@ -1142,7 +1141,7 @@ namespace stonerkart
                         String.Format("{0}: Gain {1} until end of step.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Nature)),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new StaticManaRule(ManaColour.Nature)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis),
+                        new Foo(exhaustThis),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -1192,10 +1191,10 @@ namespace stonerkart
                     castDescription = "Return all movement to target creature and give it +2/+0 until end of turn.";
                     castEffect =
                         new Effect(
-                            new TargetRuleSet(LL.creature()),
+                            new TargetRuleSet(creature()),
                             new FatigueDoer(false));
                     additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(0, c => c),
-                        new ModifyDoer(LL.add(2), LL.endOfTurn, ModifiableStats.Power)));
+                        new ModifyDoer(add(2), endOfTurn, ModifiableStats.Power)));
                     castRange = 3;
                 } break;
                 #endregion
@@ -1247,8 +1246,8 @@ namespace stonerkart
                         addTriggeredAbility(
                             "Whenever a creature enters the graveyard from the battlefield under your control, Sanguine Artisan deals 1 damage to target heroic creature.",
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                                LL.player),
-                            new ZepperDoer(1),
+                                player),
+                            new PingDoer(1),
                             new Foo(),
                             new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
                                 moveEvent.card.controller == controller &&
@@ -1336,7 +1335,7 @@ namespace stonerkart
                         new TargetRuleSet(
                             new ModifyPreviousRule<Card, Card>(0, c => c),
                             new ModifyPreviousRule<Card, Card>(1, c => c.controller.heroCard)),
-                        new ZepperDoer(3)
+                        new PingDoer(3)
                         ));
                     castDescription = "Deal 3 damage to target non-heroic creature and 3 damage to that creatures controller.";
 
@@ -1354,11 +1353,11 @@ namespace stonerkart
                     baseMovement = 1;
 
                     addActivatedAbility(
-                        String.Format("{0}, {1}: Gain one Death mana until end of step.",
-                            G.colourlessGlyph(1), G.exhaustGhyph),
+                        String.Format("{0}, {1}: Gain {2} until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph, G.colouredGlyph(ManaColour.Death)),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new StaticManaRule(ManaColour.Death)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Colourless)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -1367,7 +1366,7 @@ namespace stonerkart
                     addActivatedAbility(
                         String.Format("{0}{0}, {1}, Sacrifice Solemn Lotus: Target player sacrifices a non-heroic creature.", G.colouredGlyph(ManaColour.Death), G.exhaustGhyph),
                         playerSacLambda(new ChooseRule<Player>()),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Death, ManaColour.Death), sacThisLambda),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Death, ManaColour.Death), sacThisLambda),
                         -1,
                         PileLocation.Field, 
                         CastSpeed.Channel
@@ -1387,12 +1386,12 @@ namespace stonerkart
                     baseMovement = 1;
 
                     addActivatedAbility(
-                        String.Format("{0}, {1}: Gain one Order mana until end of step.",
-                            G.colourlessGlyph(1), G.exhaustGhyph),
+                        String.Format("{0}, {1}: Gain {2} until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph, G.colouredGlyph(ManaColour.Order)),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                             new StaticManaRule(ManaColour.Order)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Colourless)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -1401,7 +1400,7 @@ namespace stonerkart
                         addActivatedAbility(
                         String.Format("{0}{0}, {1}, Sacrifice Mysterious Lilac: Draw a card.", G.colouredGlyph(ManaColour.Order), G.exhaustGhyph),
                         new Effect(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new DrawCardsDoer(1)),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Order, ManaColour.Order), sacThisLambda),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Order, ManaColour.Order), sacThisLambda),
                         -1,
                         PileLocation.Field,
                         CastSpeed.Channel
@@ -1421,11 +1420,11 @@ namespace stonerkart
                         baseMovement = 1;
 
                         addActivatedAbility(
-                        String.Format("{0}, {1}: Gain one Chaos mana until end of step.",
-                            G.colourlessGlyph(1), G.exhaustGhyph),
+                        String.Format("{0}, {1}: Gain {2} until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph, G.colouredGlyph(ManaColour.Chaos)),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new StaticManaRule(ManaColour.Chaos)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Colourless)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -1434,7 +1433,7 @@ namespace stonerkart
                         addActivatedAbility(
                             String.Format("{0}{0}, {1}, Sacrifice Daring Poppy: Deal 2 damage to target creature.", G.colouredGlyph(ManaColour.Chaos), G.exhaustGhyph),
                             zepLambda(2),
-                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Chaos, ManaColour.Chaos), sacThisLambda),
+                            new Foo(exhaustThis, manaCostEffect(ManaColour.Chaos, ManaColour.Chaos), sacThisLambda),
                             -1,
                             PileLocation.Field,
                             CastSpeed.Channel
@@ -1455,11 +1454,11 @@ namespace stonerkart
                         baseMovement = 1;
 
                         addActivatedAbility(
-                        String.Format("{0}, {1}: Gain one Life mana until end of step.",
-                            G.colourlessGlyph(1), G.exhaustGhyph),
+                        String.Format("{0}, {1}: Gain {2} until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph, G.colouredGlyph(ManaColour.Life)),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new StaticManaRule(ManaColour.Life)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Colourless)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -1468,7 +1467,7 @@ namespace stonerkart
                         addActivatedAbility(
                             String.Format("{0}{0}, {1}, Sacrifice Serene Dandelion: Restore 4 toughness to target creature.", G.colouredGlyph(ManaColour.Life), G.exhaustGhyph),
                             zepLambda(-4),
-                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Life, ManaColour.Life), sacThisLambda),
+                            new Foo(exhaustThis, manaCostEffect(ManaColour.Life, ManaColour.Life), sacThisLambda),
                             -1,
                             PileLocation.Field,
                             CastSpeed.Channel
@@ -1489,12 +1488,12 @@ namespace stonerkart
                     baseMovement = 1;
 
                     addActivatedAbility(
-                        String.Format("{0}, {1}: Gain one Might mana until end of step.",
-                            G.colourlessGlyph(1), G.exhaustGhyph),
+                        String.Format("{0}, {1}: Gain {2} until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph, G.colouredGlyph(ManaColour.Might)),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                             new StaticManaRule(ManaColour.Might)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Colourless)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -1503,7 +1502,7 @@ namespace stonerkart
                         addActivatedAbility(
                         String.Format("{0}{0}, {1}, Sacrifice Stark Lily: Summon a 2/2 Gryphon token with Flying.", G.colouredGlyph(ManaColour.Might), G.exhaustGhyph),
                         Effect.summonTokensEffect(CardTemplate.Gryphon),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Might, ManaColour.Might), sacThisLambda),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Might, ManaColour.Might), sacThisLambda),
                         2,
                         PileLocation.Field,
                         CastSpeed.Channel
@@ -1523,26 +1522,26 @@ namespace stonerkart
                         baseMovement = 1;
 
                         addActivatedAbility(
-                        String.Format("{0}, {1}: Gain one Nature mana until end of step.",
-                            G.colourlessGlyph(1), G.exhaustGhyph),
+                        String.Format("{0}, {1}: Gain {2} until end of step.",
+                            G.colourlessGlyph(1), G.exhaustGhyph, G.colouredGlyph(ManaColour.Nature)),
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new StaticManaRule(ManaColour.Nature)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Colourless)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
                         );
 
 
-                        Effect e1 = new Effect(LL.nonheroicCreature(),
-                            new ModifyDoer(LL.add(2), LL.never, ModifiableStats.Power));
+                        Effect e1 = new Effect(nonheroicCreature(),
+                            new ModifyDoer(add(2), never, ModifiableStats.Power));
                         Effect e2 = new Effect(new ModifyPreviousRule<Card, Card>(0, c => c),
-                            new ModifyDoer(LL.add(2), LL.never, ModifiableStats.Toughness));
+                            new ModifyDoer(add(2), never, ModifiableStats.Toughness));
 
                         addActivatedAbility(
                             String.Format("{0}{0}, {1}, Sacrifice Vibrant Zinnia: Target non-heroic creature gets +2/+2", G.colouredGlyph(ManaColour.Nature), G.exhaustGhyph),
                             new Effect[] {e1, e2}, 
-                            new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Nature, ManaColour.Nature), sacThisLambda),
+                            new Foo(exhaustThis, manaCostEffect(ManaColour.Nature, ManaColour.Nature), sacThisLambda),
                             -1,
                             PileLocation.Field,
                             CastSpeed.Channel
@@ -1622,9 +1621,9 @@ namespace stonerkart
                     greyCost = 3;
 
                     etbLambda(
-                        "When Bubastis enters the battlefield you may return another target non-heroic creature within 5 tiles to it's owners hand.",
-                        new Effect(LL.nonheroicCreature(c => c != this), new MoveToPileDoer(PileLocation.Hand)),
-                        5,
+                        "When Bubastis enters the battlefield you may return another target non-heroic creature within 3 tiles to it's owners hand.",
+                        new Effect(nonheroicCreature(c => c != this), new MoveToPileDoer(PileLocation.Hand)),
+                        3,
                         true
                         );
                 } break;
@@ -1644,7 +1643,7 @@ namespace stonerkart
                     baseMovement = 3;
 
                     diesLambda(
-                        "Whenever Unyeilding Stalwart enters the graveyard from the battlefield under your control, summon a 1/1 Spirit token with Flying.",
+                        "When Unyeilding Stalwart enters the graveyard from the battlefield under your control, summon a 1/1 Spirit token with Flying.",
                         Effect.summonTokensEffect(CardTemplate.Spirit),
                         2);
                 } break;
@@ -1665,7 +1664,7 @@ namespace stonerkart
                             G.colouredGlyph(ManaColour.Life), G.colouredGlyph(ManaColour.Death), G.channelOnly),
                         Effect.summonTokensEffect(CardTemplate.Spirit),
                         new Foo(
-                            LL.manaCost(ManaColour.Death, ManaColour.Life),
+                            manaCostEffect(ManaColour.Death, ManaColour.Life),
                             displaceFromGraveyard(c => c.cardType == CardType.Creature)),
                         2,
                         PileLocation.Field,
@@ -1689,8 +1688,8 @@ namespace stonerkart
                     addActivatedAbility(
                         String.Format("{0}: Enraged Dragon gets +1/+0 until end of turn.", G.colouredGlyph(ManaColour.Chaos)),
                         new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                            new ModifyDoer(LL.add(1), LL.endOfTurn, ModifiableStats.Power)),
-                        new Foo(LL.manaCost(ManaColour.Chaos)),
+                            new ModifyDoer(add(1), endOfTurn, ModifiableStats.Power)),
+                        new Foo(manaCostEffect(ManaColour.Chaos)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -1754,13 +1753,13 @@ namespace stonerkart
                     Effect e1 = new Effect(
                         new CardResolveRule(CardResolveRule.Rule.ResolveCard), new ForceStaticModifyDoer(ModifiableStats.Power, 
                         grtr, 
-                        LL.never)
+                        never)
                         );
 
                     Effect e2 = new Effect(
                         new CardResolveRule(CardResolveRule.Rule.ResolveCard), new ForceStaticModifyDoer(ModifiableStats.Toughness,
                         grtr,
-                        LL.never)
+                        never)
                         );
 
                     etbLambda("When Seraph enters the battlefield it gets +1/+1 for every non-heroic you control.",
@@ -1779,14 +1778,14 @@ namespace stonerkart
                     lifeCost = 3;
 
                     auras.Add(new Aura("",
-                        LL.add(1),
+                        add(1),
                         ModifiableStats.Toughness,
                         c => c.controller == this.controller && !c.isHeroic && c.isColour(ManaColour.Life),
                         PileLocation.Field
                         ));
 
                     auras.Add(new Aura("Your non-heroic Life creatures get +1/+1.",
-                        LL.add(1),
+                        add(1),
                         ModifiableStats.Power,
                         c => c.controller == this.controller && !c.isHeroic && c.isColour(ManaColour.Life),
                         PileLocation.Field
@@ -1813,9 +1812,9 @@ namespace stonerkart
                             G.colouredGlyph(ManaColour.Chaos), G.exhaustGhyph),
                         zepLambda(2),
                         new Foo(
-                            LL.manaCost(ManaColour.Chaos),
+                            manaCostEffect(ManaColour.Chaos),
                             displaceFromGraveyard(c => c.cardType == CardType.Channel || c.cardType == CardType.Interrupt),
-                            LL.exhaustThis),
+                            exhaustThis),
                         5,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -1842,8 +1841,8 @@ namespace stonerkart
                         new TargetRuleSet(
                             new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                             new CardsRule(c => c.isHeroic)),
-                        new ZepperDoer(2),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Chaos, ManaColour.Chaos)),
+                        new PingDoer(2),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Chaos, ManaColour.Chaos)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -1968,9 +1967,9 @@ namespace stonerkart
                     );
 
                         etbLambda(
-                            "Whenever Spirit of Salvation enters the battlefield you may displace target non-spirit, non-heroic creature you control then summon it to the battlefield to another target tile.",
+                            "Whenever Spirit of Salvation enters the battlefield you may displace target non-spirit, non-heroic creature you control then summon it to the battlefield to another target tile within 2 tiles.",
                             new Effect[] {e1, e2},
-                            -1, 
+                            2, 
                             true);
                         
                     } break;
@@ -2007,7 +2006,7 @@ namespace stonerkart
                     castEffect =
                         new Effect(
                             new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                                new CardsRule(c => c.location.pile == PileLocation.Field)), new ZepperDoer(2));
+                                new CardsRule(c => c.location.pile == PileLocation.Field)), new PingDoer(2));
                     castDescription = "Deal 2 damage to all creatures.";
                 } break;
                 #endregion
@@ -2028,7 +2027,7 @@ namespace stonerkart
                     etbLambda(
                         "When Elven Cultivator enters the battlefield give another non-heroic creature you control +1/+1.",
                         new Effect(new ChooseRule<Card>(c => c != this && !c.isHeroic && c.controller == this.controller),
-                            new ModifyDoer(LL.add(1), LL.never, ModifiableStats.Power, ModifiableStats.Toughness)),
+                            new ModifyDoer(add(1), never, ModifiableStats.Power, ModifiableStats.Toughness)),
                         3
                         );
 
@@ -2091,7 +2090,7 @@ namespace stonerkart
                     castDescription = "Give target damaged non-heroic creature +2/+2.";
 
 
-                    castEffect = new Effect(new ChooseRule<Card>(c => c.damageTaken > 0 && !c.isHeroic), new ModifyDoer(LL.add(2), LL.never, ModifiableStats.Power, ModifiableStats.Toughness));
+                    castEffect = new Effect(new ChooseRule<Card>(c => c.damageTaken > 0 && !c.isHeroic), new ModifyDoer(add(2), never, ModifiableStats.Power, ModifiableStats.Toughness));
 
                 } break;
                 #endregion
@@ -2101,7 +2100,7 @@ namespace stonerkart
                     cardType = CardType.Relic;
                     rarity = Rarity.Rare;
 
-                    greyCost = 2;
+                    greyCost = 0;
 
                     baseMovement = 1;
 
@@ -2111,7 +2110,7 @@ namespace stonerkart
                         new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                         new ChooseRule<ManaOrb>(ChooseRule<ManaOrb>.ChooseAt.Resolve)),
                         new GainBonusManaDoer(),
-                        new Foo(LL.exhaustThis, LL.manaCost(ManaColour.Colourless)),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Colourless)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -2138,7 +2137,7 @@ namespace stonerkart
 
                     etbLambda(
                         "When Shibby's Saboteur enters the battlefield you may set target non-heroic creature's power to 1.",
-                        new Effect(new ChooseRule<Card>(c => !c.isHeroic), new ModifyDoer(LL.set(1), LL.never, ModifiableStats.Power)),
+                        new Effect(new ChooseRule<Card>(c => !c.isHeroic), new ModifyDoer(setTo(1), never, ModifiableStats.Power)),
                         4, 
                         true
                         );
@@ -2153,9 +2152,9 @@ namespace stonerkart
                     mightCost = 1;
                     greyCost = 1;
 
-                    castDescription = "Heroic creatures you control get +2/+0 until end of turn.";
+                    castDescription = "Heroic creatures you control get +3/+0 until end of turn.";
                     castEffect = new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard),
-                        new ModifyDoer(LL.add(3), LL.endOfTurn, ModifiableStats.Power));
+                        new ModifyDoer(add(3), endOfTurn, ModifiableStats.Power));
                 } break;
                 #endregion
                 #region Scroll of Earth
@@ -2262,7 +2261,7 @@ namespace stonerkart
                     addActivatedAbility(
                         String.Format("{1}, {0}: Deal 1 damage to target creature within 1 tile.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Might)),
                         zepLambda(1),
-                        new Foo(LL.exhaustThis, LL.manaCost()),
+                        new Foo(exhaustThis, manaCostEffect()),
                         1,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -2503,7 +2502,7 @@ namespace stonerkart
             es.Add(castEffect);
             es.AddRange(additionalCastEffects);
 
-            additionalCastCosts.Add(LL.manaCost(castManaCost));
+            additionalCastCosts.Add(manaCostEffect(castManaCost));
 
             castAbility = new ActivatedAbility(this, PileLocation.Hand, castRange, new Foo(additionalCastCosts.ToArray()), castSpeed, castDescription, es.ToArray());
             abilities.Add(castAbility);
@@ -2511,7 +2510,7 @@ namespace stonerkart
             this.owner = owner;
             controller = owner;
 
-            name = ct.ToString().Replace("_a", "'").Replace("_s", " ");
+            name = G.replaceUnderscoresAndShit(ct.ToString());
 
             eventHandler = generatedlft();
         }
@@ -2554,116 +2553,7 @@ namespace stonerkart
             if (alternateCast) alternateCasts.Add(aa);
         }
 
-        private static Foo fooFromManaCost(params ManaColour[] cs)
-        {
-            return new Foo(
-                new Effect(new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                new StaticManaRule(cs)), new PayManaDoer()));
-        }
 
-        public Effect zepLambda(int damage)
-        {
-            return
-                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.creature()),
-                    new ZepperDoer(damage));
-        }
 
-        public Effect zepNonHeroicLambda(int damage)
-        {
-            return
-                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), LL.nonheroicCreature()),
-                    new ZepperDoer(damage));
-        }
-
-        public void etbLambda(String description, Effect e, int range = -1, bool optional = false)
-        {
-            addTriggeredAbility(
-                        description, 
-                        e,
-                        new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(
-                            moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
-                        range,
-                        PileLocation.Field,
-                        optional,
-                        TriggeredAbility.Timing.Post
-                        );
-        }
-
-        public void etbLambda(String description, Effect[] es, int range = -1, bool optional = false)
-        {
-            addTriggeredAbility(
-                        description,
-                        es,
-                        new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(
-                            moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
-                        range,
-                        PileLocation.Field,
-                        optional,
-                        TriggeredAbility.Timing.Post
-                        );
-        }
-
-        public void diesLambda(String description, Effect e, int range = -1, bool optional = false)
-        {
-            addTriggeredAbility(
-                description,
-                e,
-                new Foo(),
-                new TypedGameEventFilter<MoveToPileEvent>(
-                    moveEvent =>
-                        moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard &&
-                        location.pile == PileLocation.Field),
-                range,
-                PileLocation.Field,
-                optional
-                );
-        }
-
-        public void deathtouchLambda()
-        {
-            addTriggeredAbility(
-                        "Whenever this creature deals damage to a non-heroic creature destroy it.",
-                        new TargetRuleSet(new TriggeredTargetRule<DamageEvent, Card>(de => de.target)),
-                        new MoveToPileDoer(PileLocation.Graveyard),
-                        new Foo(),
-                        new TypedGameEventFilter<DamageEvent>(de => de.source == this && !de.target.isHeroic),
-                        0,
-                        PileLocation.Field,
-                        false
-                        );
-        }
-
-        public Effect sacThisLambda =>
-            new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new MoveToPileDoer(PileLocation.Graveyard));
-
-        public Effect sacCostLambda
-            =>
-                new Effect(
-                    new ChooseRule<Card>(
-                        c => !c.isHeroic && c.controller == this.controller && c.cardType == CardType.Creature),
-                    new MoveToPileDoer(PileLocation.Graveyard));
-
-        public static Effect displaceFromGraveyard(Func<Card, bool> filter = null)
-        {
-            filter = filter ?? (c => true);
-            return new Effect(new ChooseRule<Card>(
-                new SelectCardRule(PileLocation.Graveyard, SelectCardRule.Mode.PlayerLooksAtPlayer),
-                ChooseRule<Card>.ChooseAt.Cast,
-                filter), 
-                new MoveToPileDoer(PileLocation.Displaced));
-        }
-
-        public Effect playerSacLambda(TargetRule sacrificer)
-        {
-            return new Effect(new ChooseRule<Card>(
-                new SelectCardRule(PileLocation.Field, SelectCardRule.Mode.PlayerLooksAtPlayer),
-                sacrificer,
-                ChooseRule<Card>.ChooseAt.Resolve,
-                c => c.cardType == CardType.Creature && !c.isHeroic),
-                new MoveToPileDoer(PileLocation.Graveyard));
-        }
-        
     }
 }

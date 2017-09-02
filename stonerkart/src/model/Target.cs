@@ -38,56 +38,155 @@ namespace stonerkart
             this.rules = rules;
         }
 
-        public TargetSet[] fillCast(HackStruct hs)
+        public TargetVector fillCast(HackStruct hs)
         {
             var cache = new TargetSet[rules.Length];
             for (int i = 0; i < rules.Length; i++)
             {
                 var targetSet = rules[i].fillCastTargets(hs);
-                if (targetSet == null)
+                if (targetSet.Cancelled)
                 {
-                    return null;
+                    return TargetVector.CreateCancelled();
+                }
+                if (targetSet.Fizzled)
+                {
+                    return TargetVector.CreateFizzled();
                 }
                 cache[i] = targetSet;
             }
-            return cache;
+            return new TargetVector(cache);
         }
 
-        public TargetSet[] fillResolve(HackStruct hs, TargetSet[] cached)
+        public TargetVector fillResolve(HackStruct hs, TargetVector cached)
         {
-            if (rules.Length != cached.Length) throw new Exception();
+            if (rules.Length != cached.targetSets.Length) throw new Exception();
+
+            TargetSet[] newSets = new TargetSet[rules.Length];
 
             for (int i = 0; i < rules.Length; i++)
             {
-                var cachedTargetSet = cached[i];
-                if (cachedTargetSet == null) throw new Exception();
-                var newTargetSet = rules[i].fillResolveTargets(hs, cachedTargetSet);
-                if (newTargetSet == null)
+                var rule = rules[i];
+                var cachedTargetSet = cached.targetSets[i];
+                var newTargetSet = rule.fillResolveTargets(hs, cachedTargetSet);
+                var validated = rule.validate(hs, newTargetSet);
+
+                if (validated.Cancelled)
                 {
-                    return null;
+                    return TargetVector.CreateCancelled();
                 }
-                cached[i] = newTargetSet;
+                if (validated.Fizzled)
+                {
+                    return TargetVector.CreateFizzled();
+                }
+                newSets[i] = validated;
             }
 
-            return cached;
+            return new TargetVector(newSets);
         }
 
     }
 
-    class TargetSet
+    struct TargetSet
     {
+        private int[] stateCtrs { get; }
         public Targetable[] targets { get; }
+        public bool Cancelled { get; private set; }
+        public bool Fizzled { get; private set; }
+
 
         public TargetSet(params Targetable[] targets)
         {
             this.targets = targets;
+            if (targets != null) stateCtrs = targets.Select(t => t.stateCtr()).ToArray();
+            else stateCtrs = null;
+            Cancelled = false;
+            Fizzled = false;
         }
 
         public TargetSet(IEnumerable<Targetable> ts) : this(ts.ToArray())
         {
 
         }
+
+        public TargetSet clearInvalids(Func<Targetable, bool> filter)
+        {
+            if (Cancelled || Fizzled) return this;
+            var nicelanguage = stateCtrs;
+            var ts = targets.Where((t, i) => filter(t) && t.stateCtr() == nicelanguage[i]);
+            return new TargetSet(ts);
+        }
+
+        public static TargetSet CreateCancelled()
+        {
+            var rt = new TargetSet(null);
+            rt.Cancelled = true;
+            return rt;
+        }
+
+        public static TargetSet CreateFizzled()
+        {
+            var rt = new TargetSet(null);
+            rt.Fizzled = true;
+            return rt;
+        }
+
+        public static TargetSet CreateEmpty()
+        {
+            return new TargetSet(new Targetable[0]);
+        }
     }
+
+    struct TargetVector
+    {
+        public TargetSet[] targetSets { get; }
+
+        public bool Cancelled => targetSets.Any(ts => ts.Cancelled);
+        public bool Fizzled => targetSets.Any(ts => ts.Fizzled);
+
+        public TargetVector(TargetSet[] targetSets)
+        {
+            this.targetSets = targetSets;
+        }
+
+        public static TargetVector CreateCancelled()
+        {
+            return new TargetVector(new []{ TargetSet.CreateCancelled() });
+        }
+        public static TargetVector CreateFizzled()
+        {
+            return new TargetVector(new[] { TargetSet.CreateFizzled() });
+        }
+    }
+
+    struct TargetMatrix
+    {
+        public TargetVector[] targetVectors { get; }
+
+        public bool Cancelled => targetVectors.Any(tv => tv.Cancelled);
+        public bool Fizzled => targetVectors.Any(tv => tv.Fizzled);
+
+        public TargetMatrix(TargetVector[] targetVectors)
+        {
+            this.targetVectors = targetVectors;
+            if (Cancelled || Fizzled) throw new Exception();
+        }
+
+        private TargetMatrix(TargetVector vector)
+        {
+            targetVectors = new[] {vector};
+        }
+
+        public static TargetMatrix CreateCancelled()
+        {
+            return new TargetMatrix(TargetVector.CreateCancelled());
+        }
+
+        public static TargetMatrix CreateFizzled()
+        {
+            return new TargetMatrix(TargetVector.CreateFizzled());
+        }
+    }
+
 
     class TargetRow
     {
@@ -120,12 +219,24 @@ namespace stonerkart
         
         public abstract TargetSet fillCastTargets(HackStruct hs);
         public abstract TargetSet fillResolveTargets(HackStruct hs, TargetSet ts);
+
+        public virtual TargetSet validate(HackStruct hs, TargetSet ts)
+        {
+            var newset = ts.clearInvalids(filterfunc);
+            if (newset.Cancelled || newset.Fizzled) return newset;
+            if (newset.targets.Length < mincount()) return TargetSet.CreateFizzled();
+            return newset;
+        }
+
+        protected virtual bool filterfunc(Targetable t) { return true; }
+        protected virtual int mincount() { return 0; }
     }
 
     interface chooserface<T> where T : Targetable
     {
-        IEnumerable<T> candidates(HackStruct hs);
+        IEnumerable<T> candidates(HackStruct hs, Player p);
         T pickOne(Player chooser, Func<T, bool> filter, HackStruct hs);
+        void pickNone(Player chooser, HackStruct hs);
     }
 
     class ChooseRule<T> : TargetRule where T : Targetable
@@ -140,9 +251,9 @@ namespace stonerkart
         private static chooserface<T> dflt()
         {
             Type t = typeof (T);
-            if (t == typeof (Card)) return (chooserface<T>)new ClickCardRule();
-            if (t == typeof (Tile)) return (chooserface<T>)new ClickTileRule();
-            if (t == typeof (Player)) return (chooserface<T>)new ClickPlayerRule();
+            if (t == typeof (Card)) return (chooserface<T>)new PryCardRule();
+            if (t == typeof (Tile)) return (chooserface<T>)new PryTileRule();
+            if (t == typeof (Player)) return (chooserface<T>)new PryPlayerRule();
             if (t == typeof (ManaOrb)) return (chooserface<T>)new ClickManaRule();
             throw new Exception();
         }
@@ -232,29 +343,85 @@ namespace stonerkart
 
         private TargetSet choose(IEnumerable<Player> players, HackStruct hs)
         {
-            var v = chooser.candidates(hs).Where(filter);
-            hs.game.highlight(v.Cast<Targetable>(), Color.Green);
-
-            if (count != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             if (players.Count() != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
 
-            TargetSet rt = null;
             foreach (var player in players)
             {
+                return playerChooses(player, hs);
+            }
+            throw new Exception();
+        }
+
+        private TargetSet playerChooses(Player player, HackStruct hs)
+        {
+            int requiredCandidates = count;
+
+            var v = chooser.candidates(hs, player).Where(filter);
+
+            if (requiredCandidates == 0)
+            {
+                chooser.pickNone(player, hs);
+                return TargetSet.CreateEmpty();
+            }
+
+            if (v.Count() < requiredCandidates)
+            {
+                chooser.pickNone(player, hs);
+                return TargetSet.CreateFizzled();
+            }
+
+            TargetSet? ts = null;
+            List<Targetable> chosenList = new List<Targetable>();
+            if (player.isHero) hs.game.highlight(v.Cast<Targetable>(), Color.Green);
+
+            while (chosenList.Count < count)
+            {
                 var chosen = chooser.pickOne(player, filter, hs);
+
                 if (chosen == null)
                 {
-                    rt = null;
+                    if (v.Count() == 0)
+                    {
+                        ts = TargetSet.CreateFizzled();
+                        break;
+                    }
+                    else
+                    {
+                        ts = TargetSet.CreateCancelled();
+                        break;
+                    }
                 }
                 else
                 {
-                    rt = new TargetSet(chosen);
+                    if (!allowDuplicates && chosenList.Contains(chosen))
+                    {
+
+                    }
+                    else
+                    {
+                        chosenList.Add(chosen);
+                    }
                 }
-                break;
+            }
+
+            if (!ts.HasValue)
+            {
+                ts = new TargetSet(chosenList);
             }
 
             hs.game.clearHighlights();
-            return rt;
+
+            return ts.Value;
+        }
+
+        protected override bool filterfunc(Targetable t)
+        {
+            return t is T && filter((T)t);
+        }
+
+        protected override int mincount()
+        {
+            return count;
         }
 
         public enum ChooseAt
@@ -275,14 +442,68 @@ namespace stonerkart
             this.pile = pile;
         }
 
-        public IEnumerable<Card> candidates(HackStruct hs)
+        public IEnumerable<Card> candidates(HackStruct hs, Player p)
         {
-            throw new NotImplementedException();
+            Player lookedAt;
+            switch (mode)
+            {
+                case Mode.PlayerLooksAtPlayer:
+                case Mode.ResolverLooksAtPlayer:
+                {
+                    lookedAt = p;
+                } break;
+
+                case Mode.PlayerLooksAtResolver:
+                {
+                    lookedAt = hs.resolveController;
+                } break;
+
+                default: throw new Exception();
+            }
+
+            return p.pileFrom(pile);
         }
 
-        public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
+        private Player chooser(Player player, HackStruct hs)
         {
-            throw new NotImplementedException();
+            switch (mode)
+            {
+                case Mode.PlayerLooksAtPlayer:
+                case Mode.PlayerLooksAtResolver:
+                {
+                    return player;
+                }
+                case Mode.ResolverLooksAtPlayer:
+                {
+                    return hs.resolveController;
+                }
+                default:
+                    throw new Exception();
+            }
+        }
+
+        public Card pickOne(Player player, Func<Card, bool> filter, HackStruct hs)
+        {
+            var chsr = chooser(player, hs);
+            var cs = candidates(hs, player);
+            return hs.game.chooseCardsFromCardsSynced(
+                chsr, cs, filter,
+                String.Format("Choose target for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", player.name, hs.resolveCard),
+                ButtonOption.Cancel,
+                String.Format("{0}'s {1}", player.name, pile.ToString()));
+        }
+
+        public void pickNone(Player player, HackStruct hs)
+        {
+            var chsr = chooser(player, hs);
+            var cs = candidates(hs, player);
+            var v = hs.game.chooseCardsFromCardsSynced(
+                chsr, cs, _ => false,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", player.name, hs.resolveCard),
+                ButtonOption.OK,
+                String.Format("{0}'s {1}", player.name, pile.ToString()));
         }
 
         public enum Mode
@@ -293,10 +514,30 @@ namespace stonerkart
         }
     }
 
-
     class ClickCardRule : chooserface<Card>
     {
-        public IEnumerable<Card> candidates(HackStruct hs)
+        public IEnumerable<Card> candidates(HackStruct hs, Player p)
+        {
+            return hs.cards;
+        }
+
+        public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
+        {
+            return hs.game.chooseCardSynced(chooser, filter, "sfgjflk", "flvkxv", ButtonOption.Cancel);
+        }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
+                ButtonOption.OK);
+        }
+    }
+
+    class PryCardRule : chooserface<Card>
+    {
+        public IEnumerable<Card> candidates(HackStruct hs, Player p)
         {
             return hs.tilesInRange.Where(t => t.card != null).Select(t => t.card);
         }
@@ -304,58 +545,102 @@ namespace stonerkart
         public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
         {
             Tile tl = hs.game.chooseTileSynced(chooser,
-                t => hs.tilesInRange.Contains(t) && t.card != null && filter(t.card), "swroigjs", "ioerhjgohr", true);
+                t => hs.tilesInRange.Contains(t) && t.card != null && filter(t.card),
+                String.Format("Choose target for {0}", hs.resolveCard),
+                String.Format("{0} is choosing a target.", chooser.name),
+                ButtonOption.Cancel);
             if (tl == null) return null;
             return (tl.card);
         }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target.", chooser.name),
+                ButtonOption.OK);
+        }
     }
 
-    class ClickTileRule : chooserface<Tile>
+    class PryTileRule : chooserface<Tile>
     {
-        public IEnumerable<Tile> candidates(HackStruct hs)
+        public IEnumerable<Tile> candidates(HackStruct hs, Player p)
         {
             return hs.tilesInRange;
         }
 
         public Tile pickOne(Player chooser, Func<Tile, bool> filter, HackStruct hs)
         {
-            return hs.game.chooseTileSynced(chooser, t => hs.tilesInRange.Contains(t) && filter(t), "tehtehethsf", "aethadtgngf", true);
+            return hs.game.chooseTileSynced(chooser, t => hs.tilesInRange.Contains(t) && filter(t),
+                String.Format("Choose target for {0}", hs.resolveCard),
+                String.Format("{0} is choosing a target.", chooser.name),
+                ButtonOption.Cancel);
+        }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
+                ButtonOption.OK);
         }
     }
 
-    class ClickPlayerRule : chooserface<Player>
+    class PryPlayerRule : chooserface<Player>
     {
-        public IEnumerable<Player> candidates(HackStruct hs)
+        public IEnumerable<Player> candidates(HackStruct hs, Player p)
         {
-            throw new NotImplementedException();
+            return hs.gameState.players;
         }
 
         public Player pickOne(Player chooser, Func<Player, bool> filter, HackStruct hs)
         {
-            throw new NotImplementedException();
+            Tile tl = hs.game.chooseTileSynced(chooser, t => t.card != null && t.card.isHeroic && filter(t.card.owner),
+                String.Format("Choose target for {0}", hs.resolveCard),
+                String.Format("{0} is choosing a target.", chooser.name),
+                ButtonOption.Cancel);
+            if (tl == null) return null;
+            return tl.card.owner;
+        }
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
+                ButtonOption.OK);
         }
     }
 
     class ClickManaRule : chooserface<ManaOrb>
     {
-        public IEnumerable<ManaOrb> candidates(HackStruct hs)
+        public IEnumerable<ManaOrb> candidates(HackStruct hs, Player p)
         {
-            throw new NotImplementedException();
+            return G.orbOrder.Select(c => new ManaOrb(c));
         }
 
         public ManaOrb pickOne(Player chooser, Func<ManaOrb, bool> filter, HackStruct hs)
         {
-            throw new NotImplementedException();
+            var v = hs.game.chooseManaColourSynced(chooser, c => filter(new ManaOrb(c)), "", "", ButtonOption.Cancel);
+            if (v == null) return null;
+            return new ManaOrb(v.Value);
+        }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
+                ButtonOption.OK);
         }
     }
 
     class ManaCostRule : TargetRule
     {
-        private ManaSet cst;
+        private ManaSet cost;
 
-        public ManaCostRule(ManaSet cst) : base(typeof(ManaOrb))
+        public ManaCostRule(ManaSet cost) : base(typeof(ManaOrb))
         {
-            this.cst = cst;
+            this.cost = cost;
         }
 
         public override TargetSet fillCastTargets(HackStruct hs)
@@ -370,32 +655,62 @@ namespace stonerkart
 
         private TargetSet meme(Player p, HackStruct hs)
         {
-            ManaSet cost = cst.clone();
-            for (int i = 0; i < ManaSet.size; i++)
+            var playerMana = p.manaPool;
+            var costOrbs = cost.orbs.ToList();
+            var poolOrbs = playerMana.orbs.ToList();
+
+            foreach (var orb in costOrbs.Where(c => c.colour != ManaColour.Colourless))
             {
-                if ((ManaColour)i == ManaColour.Colourless) continue;
-                if (p.manaPool.currentMana((ManaColour)i) < cost[i]) return null;
+                if (!poolOrbs.Any(o => o.colour == orb.colour)) return TargetSet.CreateFizzled();
+                poolOrbs.Remove(poolOrbs.First(o => o.colour == orb.colour));
             }
+
+            var colourlessCost = costOrbs.Where(c => c.colour == ManaColour.Colourless);
+            var colouredCost = costOrbs.Where(c => c.colour != ManaColour.Colourless);
+            int colourlessToPay = colourlessCost.Count();
+
+            if (colourlessToPay == 0) return new TargetSet(costOrbs);
+            if (colourlessToPay == poolOrbs.Count()) return new TargetSet(p.manaPool.orbs);
+
+            var stateOfAffairs = playerMana.clone();
+            playerMana.pay(new ManaSet(colouredCost));
+            var paid = new List<ManaOrb>();
+            int diff;
+
+            while ((diff = colourlessToPay - paid.Count) > 0)
+            {
+                var chosen = hs.game.chooseManaColourSynced(p, c => playerMana.orbs.Any(o => o.colour == c),
+                    String.Format("Pay {0}", G.colourlessGlyph(diff)), String.Format("{0} is paying mana.", p.name), ButtonOption.Cancel);
+                if (chosen == null) break;
+                paid.Add(new ManaOrb(chosen.Value));
+                playerMana.pay(new ManaSet(chosen.Value));
+            }
+
+            p.manaPool.setTo(stateOfAffairs);
+            if (paid.Count == colourlessToPay) return new TargetSet(colouredCost.Concat(paid));
+            else return TargetSet.CreateCancelled();
+
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            var v = playerMana.orbs.Where(c => c != ManaColour.Colourless).
 
             IEnumerable<ManaColour> poolOrbs = p.manaPool.orbs;
             IEnumerable<ManaColour> costOrbs = cost.orbs.Select(o => o.colour);
 
             int diff = costOrbs.Count() - poolOrbs.Count();
 
-            if (diff > 0) return null;
+            if (diff > 0) return TargetSet.CreateFizzled();
 
             if (cost[ManaColour.Colourless] > 0)
             {
                 if (diff < 0) // we have more total mana than the cost
                 {
-
-                    throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                     ManaSet colours = cost.clone();
                     colours[ManaColour.Colourless] = 0;
                     p.stuntLoss(colours);
                     while (cost[ManaColour.Colourless] > 0)
                     {
-                        var clr = hs.game.chooseManaColourSynced(p, c => true).Value;
+                        var clr = hs.game.chooseManaColourSynced(p, c => true, "1", "2").Value;
                         if (bc.targets.Length == 1)
                         {
                             var orb = (ManaOrb)bc.targets[0];
@@ -414,14 +729,14 @@ namespace stonerkart
                                 return null;
                         }
                     }
-                    p.unstuntMana();*/
+                    p.unstuntMana();
                 }
                 else
                 {
                     cost = new ManaSet(hs.castingPlayer.manaPool.orbs);
                 }
             }
-            return new TargetSet(cost.orbs);
+            return new TargetSet(cost.orbs);*/
         }
     }
 
@@ -436,7 +751,7 @@ namespace stonerkart
 
         public override TargetSet fillCastTargets(HackStruct f)
         {
-            return new TargetSet();
+            return TargetSet.CreateEmpty();
         }
 
         public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
@@ -514,15 +829,12 @@ namespace stonerkart
 
         public override TargetSet fillCastTargets(HackStruct hs)
         {
-            return new TargetSet();
+            return TargetSet.CreateEmpty();
         }
 
         public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            return new TargetSet(hs.previousTargets.columns[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
-            //return hs.previousTargets.columns[column];*/
+            return new TargetSet(hs.previousTargets.targetSets[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
         }
 
     }
@@ -560,33 +872,43 @@ namespace stonerkart
     class CardResolveRule : TargetRule
     {
         private Rule rule;
+        private Func<Card, bool> filter = _ => true;
 
         public CardResolveRule(Rule rule) : base(typeof(Card))
         {
             this.rule = rule;
         }
 
+        public CardResolveRule(Rule rule, Func<Card, bool> filter) : this(rule)
+        {
+            this.filter = filter;
+        }
+
         public override TargetSet fillCastTargets(HackStruct hs)
         {
-            return new TargetSet();
+            return TargetSet.CreateEmpty();
         }
 
         public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
             if (c.targets.Length != 0) throw new Exception();
+            Card card;
             switch (rule)
             {
                 case Rule.ResolveCard:
                 {
-                    return new TargetSet(hs.resolveCard);
-                }
+                    card = hs.resolveCard;
+                } break;
 
                 case Rule.ResolveControllerCard:
                 {
-                    return new TargetSet(hs.resolveCard.controller.heroCard);
-                }
+                    card = hs.resolveCard.controller.heroCard;
+                } break;
+                default: throw new Exception();
             }
-            throw new Exception();
+
+            if (filter(card)) return new TargetSet(card);
+            else return TargetSet.CreateFizzled();
         }
         
 
@@ -609,7 +931,7 @@ namespace stonerkart
 
         public override TargetSet fillCastTargets(HackStruct hs)
         {
-            return new TargetSet();
+            return TargetSet.CreateEmpty();
         }
 
         public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
@@ -629,7 +951,7 @@ namespace stonerkart
 
         public override TargetSet fillCastTargets(HackStruct hs)
         {
-            return new TargetSet();
+            return TargetSet.CreateEmpty();
         }
 
         public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)

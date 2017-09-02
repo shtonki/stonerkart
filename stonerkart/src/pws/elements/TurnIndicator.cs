@@ -10,8 +10,7 @@ namespace stonerkart
     class TurnIndicator : Square
     {
         private Square[] squares;
-        private Square yourTurn;
-        private Square opponentsTurn;
+        private Square turnIndicator;
 
 
         public TurnIndicator(int width, int height) : base(width, height)
@@ -30,18 +29,10 @@ namespace stonerkart
                 s.Backcolor = inactive;
             }
 
-            opponentsTurn = new Square(width, squareHeight);
-            opponentsTurn.Text = "Opponents Turn";
-            addChild(opponentsTurn);
-            opponentsTurn.Border = new SolidBorder(4, Color.White);
-            opponentsTurn.Backcolor = Color.Black;
-
-            yourTurn = new Square(width, squareHeight);
-            yourTurn.Text = "Your Turn";
-            yourTurn.Y = squares.Length*squareHeight + squareHeight;
-            addChild(yourTurn);
-            yourTurn.Border = new SolidBorder(4, Color.White);
-            yourTurn.Backcolor = Color.Black;
+            turnIndicator = new Square(width, squareHeight);
+            addChild(turnIndicator);
+            turnIndicator.Border = new SolidBorder(4, Color.White);
+            turnIndicator.Backcolor = Color.Black;
         }
 
         private Square activeSquare;
@@ -49,7 +40,6 @@ namespace stonerkart
         private Color active = Color.DarkGreen;
         private Color heroturn = Color.DodgerBlue;
         private Color oppturn = Color.Maroon;
-        private Color notturn = Color.Black;
 
         public void setActive(Steps step, bool herosTurn)
         {
@@ -58,8 +48,8 @@ namespace stonerkart
             activeSquare = squares[ix];
             activeSquare.Backcolor = active;
 
-            yourTurn.Backcolor = herosTurn ? heroturn : notturn;
-            opponentsTurn.Backcolor = !herosTurn ? oppturn : notturn;
+            turnIndicator.Text = herosTurn ? "Your turn" : "Opponents turn";
+            turnIndicator.Backcolor = herosTurn ? heroturn : oppturn;
         }
     }
 }

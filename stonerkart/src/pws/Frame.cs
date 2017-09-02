@@ -19,10 +19,39 @@ namespace stonerkart
     class Frame : GameWindow
     {
         private Screen activeScreen;
+        private IEnumerable<GuiElement> activeElements => activeScreen.Elements.Concat(frameElements);
 
         private ManualResetEventSlim loadre;
 
         private Designer designer;
+
+        #region FrameElements
+        private List<GuiElement> frameElements;
+        public GameMenuBar menu { get; private set; }
+        public FriendsPanel friendsPanel { get; private set; }
+        public Winduh friendsWinduh { get; private set; }
+
+        private void generateFrameElements()
+        {
+            frameElements = new List<GuiElement>();
+
+            menu = new GameMenuBar();
+            frameElements.Add(menu);
+            menu.Visible = false;
+            menu.showFriendsButton.clicked += a =>
+            {
+                friendsWinduh.Visible = !friendsWinduh.Visible;
+            };
+
+            friendsPanel = new FriendsPanel(300, 500);
+            friendsWinduh = new Winduh(friendsPanel, "Friends", true, true);
+            friendsWinduh.Backimege = new MemeImege(Textures.buttonbg2, 6845324);
+            friendsWinduh.Visible = false;
+            frameElements.Add(friendsWinduh);
+        }
+
+        #endregion
+
 
         public Frame(int width, int height, ManualResetEventSlim ld = null, bool design = false) : base(width, height, new GraphicsMode(32,24,0,32), "StonerKart")
         {
@@ -41,11 +70,20 @@ namespace stonerkart
 
                 t.Start();
             }
+
+            generateFrameElements();
         }
 
         public void setScreen(Screen screen)
         {
             activeScreen = screen;
+        }
+
+        public void loginAs(User user)
+        {
+            menu.setFlare(user);
+            menu.Visible = true;
+            user.addObserver(friendsPanel);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -103,9 +141,12 @@ namespace stonerkart
 
                 if (activeScreen.background != null) dm.drawImege(activeScreen.background, 0, 0, BACKSCREENWIDTH, BACKSCREENHEIGHT);
 
-                foreach (var elem in activeScreen.Elements)
+                lock (activeScreen.elements)
                 {
-                    drawElement(elem, dm);
+                    foreach (var elem in activeElements)
+                    {
+                        drawElement(elem, dm);
+                    }
                 }
             }
 
@@ -135,6 +176,7 @@ namespace stonerkart
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
+            if (hovered != null && !hovered.Selectable) OnMouseMove(new MouseMoveEventArgs(e.X, e.Y, 0, 0));
             e.Position = scalePoint(e.Position);
             focus(hovered);
             hovered?.onMouseDown(e);
@@ -144,6 +186,7 @@ namespace stonerkart
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
+            if (hovered != null && !hovered.Selectable) OnMouseMove(new MouseMoveEventArgs(e.X, e.Y, 0, 0));
             e.Position = scalePoint(e.Position);
 
             hovered?.onMouseUp(e);
@@ -195,7 +238,7 @@ namespace stonerkart
 
         private GuiElement elementAt(int x, int y, GuiElement[] l)
         {
-            foreach (var v in l)
+            foreach (var v in l.Reverse())
             {
                 if (v.Hoverable &&
                     v.X < x &&
@@ -218,7 +261,7 @@ namespace stonerkart
 
             int x = sp.X;
             int y = sp.Y;
-            var l = activeScreen.Elements.Reverse().ToArray();
+            var l = activeElements.ToArray();
 
             return elementAt(x, y, l);
         }

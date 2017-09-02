@@ -13,24 +13,35 @@ namespace stonerkart
     /// </summary>
     static class Controller
     {
+        private static LoginScreen loginScreen = new LoginScreen();
+        private static MainMenuScreen mainMenuScreen = new MainMenuScreen();
+        private static DeckEditorScreen deckeditorScreen = new DeckEditorScreen();
+        private static ShopScreen shopScreen = new ShopScreen();
+
+        private static List<Packs> ownedPacks { get; set; }
+        private static List<CardTemplate> ownedCards { get; set; }
+
+        public static IEnumerable<Packs> OwnedPacks => ownedPacks;
+        public static IEnumerable<CardTemplate> OwnedCards => ownedCards;
+
+        public static User user { get; private set; }
+
         public static void launchGame()
         {
-            //if (!Network.connectToServer()) throw new Exception("Serber offline");
+            /*
+            GUI.launch();
+            var gsc = new GameScreen();
+            GUI.setScreen(gsc);
+            Game g = new Game(new NewGameStruct(0, 420, new[] { "Hero", "Villain" }, 0), true, gsc);
+            g.startGameThread();
+            return;
+            //*/ 
+
+            if (!Network.connectToServer()) throw new Exception("Serber offline");
 
             GUI.launch();
 
-            var gsc = new GameScreen();
-            //GUI.setScreen(gsc);
-            //GUI.setScreen(new LoginScreen());
-            GUI.setScreen(new DeckEditorScreen());
-
-
-            Game g = new Game(new NewGameStruct(0, 420, new []{"Hero", "Villain"}, 0), true, gsc);
-
-            g.startGameThread();
-
-            //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-            //UIController.launchUI();
+            GUI.setScreen(loginScreen);
 
             /*
 
@@ -48,15 +59,63 @@ namespace stonerkart
 
         public static void attemptLogin(string username, string password)
         {
-            throw new Exception();
             if (Network.login(username, password))
             {
-                GUI.setScreen(new GameScreen());
+                user = Network.queryMyUser();
+                GUI.frame.loginAs(user);
+
+                var friends = Network.queryFriends();
+                user.setFriends(friends);
+
+                var collection = Network.queryCollection();
+                ownedCards = collection.ToList();
+
+                var shekels = Network.queryShekels();
+                setShekelBalance(shekels);
+
+                var ownedPacks = Network.queryOwnedPacks();
+                shopScreen.populate(ownedPacks);
+
+                GUI.setScreen(shopScreen);
             }
             else
             {
                 
             }
+        }
+
+        public static bool ripPack(Packs pack)
+        {
+            var ripped = Network.ripPack(pack);
+            if (ripped == null) return false;
+            else
+            {
+                shopScreen.ripPack(ripped);
+                ownedCards.AddRange(ripped);
+                return true;
+            }
+        }
+
+        public static bool makePurchase(ProductUnion product)
+        {
+            int newbalance = Network.makePurchase(product);
+            if (newbalance == -1) return false; //purchase failed
+            setShekelBalance(newbalance);
+            return true;
+        }
+
+        public static void setShekelBalance(int i)
+        {
+            GUI.frame.menu.setShekelCount(i);
+        }
+
+        public static Game startGame(NewGameStruct ngs)
+        {
+            GameScreen gsc = new GameScreen();
+            Game g = new Game(ngs, false, gsc);
+            GUI.setScreen(gsc);
+            g.startGameThread();
+            return g;
         }
 
         public static void quit()

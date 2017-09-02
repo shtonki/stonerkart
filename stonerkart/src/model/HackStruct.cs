@@ -10,13 +10,16 @@ namespace stonerkart
         public Player castingPlayer { get; }
         public Player hero => gameState.hero;
         public bool heroIsCasting => hero == castingPlayer;
-        public Tile castFrom => !resolveAbility.isCastAbility ? (resolveAbility.card.tile ?? resolveAbility.card.lastSeenAt) : hero.heroCard.tile;
+
+        public Tile castFrom => !resolveAbility.isCastAbility
+                    ? (resolveAbility.card.tile ?? resolveAbility.card.lastSeenAt)
+                    : resolveCard.controller.heroCard.tile;
         public int castRange => resolveAbility.castRange;
         public Player resolveController => resolveCard.controller;
         public bool heroIsResolver => hero == resolveController;
         public Card resolveCard => resolveAbility.card;
         public Ability resolveAbility { get; }
-        public TargetSet previousTargets { get; set; }
+        public TargetVector previousTargets { get; set; }
         public GameEvent triggeringEvent { get; set; }
         public IEnumerable<Tile> tilesInRange => castFrom.withinDistance(castRange);
 

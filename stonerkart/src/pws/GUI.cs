@@ -9,7 +9,7 @@ namespace stonerkart
 {
     static class GUI
     {
-        private static Frame frame;
+        public static Frame frame { get; private set; } 
 
         public static void launch()
         {

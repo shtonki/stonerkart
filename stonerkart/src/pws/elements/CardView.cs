@@ -18,52 +18,58 @@ namespace stonerkart
         {
             card = c;
 
-            topbutton = new Square(0, 0);
-            topbutton.clicked += args =>
-            {
-                this.onClick(args);
-            };
-            addChild(topbutton);
 
             namebox = new Square();
             namebox.TextLayout = new SingleLineFitLayout(Justify.Left);
+            namebox.Hoverable = false;
             addChild(namebox);
 
             breadbox = new Square();
+            breadbox.Hoverable = false;
             addChild(breadbox);
 
             movementbox = new Square();
             movementbox.TextLayout = new SingleLineFitLayout();
+            movementbox.Hoverable = false;
             addChild(movementbox);
 
             ptbox = new Square();
             ptbox.TextLayout = new SingleLineFitLayout();
+            ptbox.Hoverable = false;
             addChild(ptbox);
 
             typebox = new Square();
             typebox.TextLayout = new SingleLineFitLayout(Justify.Middle);
+            typebox.Hoverable = false;
             addChild(typebox);
 
             artbox = new Square();
+            artbox.Hoverable = false;
             addChild(artbox);
 
             orbbox = new Square();
+            orbbox.Hoverable = false;
             addChild(orbbox);
 
-
-            //layoutStuff();
+            raritybox = new Square();
+            raritybox.Hoverable = false;
+            addChild(raritybox);
             populate(c);
+
             Height = frameheight;
         }
 
         #region yup
 
-        private Square topbutton;
+        private Square raritybox;
+        private const int rarityboxOrigX = 238;
+        private const int rarityboxOrigY = 368;
+        private const int rarityboxOrigW = 25;
+        private const int rarityboxOrigH = 25;
 
         private Square namebox;
         private const int nameboxOrigX = 26;
         private const int nameboxOrigY = 17;
-        private const int nameboxOrigW = 246;
         private const int nameboxOrigH = 40;
 
         private Square breadbox;
@@ -73,19 +79,19 @@ namespace stonerkart
         private const int breadboxOrigH = 236;
 
         private Square movementbox;
-        private const int movementboxOrigX = 32;
+        private const int movementboxOrigX = 420;
         private const int movementboxOrigY = 646;
         private const int movementboxOrigW = 40;
         private const int movementboxOrigH = 48;
 
         private Square ptbox;
-        private const int ptboxOrigX = 398;
+        private const int ptboxOrigX = 20;
         private const int ptboxOrigY = movementboxOrigY;
         private const int ptboxOrigW = 86;
         private const int ptboxOrigH = 48;
 
         private Square typebox;
-        private const int typeboxOrigX = 134;
+        private const int typeboxOrigX = 140;
         private const int typeboxOrigY = movementboxOrigY;
         private const int typeboxOrigW = 236;
         private const int typeboxOrigH = 50;
@@ -118,10 +124,28 @@ namespace stonerkart
 
             namebox.Text = c.name;
             breadbox.Text = c.breadText;
-            movementbox.Text = c.movement.ToString();
             ptbox.Text = c.power + "/" + c.toughness;
-            typebox.Text = c.typeText;
             artbox.Backimege = new Imege(TextureLoader.cardArt(c.template));
+            raritybox.Backimege = new Imege(TextureLoader.setIcon(c.set), TextureLoader.rarityColor(c.rarity));
+            ptbox.Visible = c.hasPT;
+            typebox.Text = c.typeText;
+
+
+            if (c.cardType == CardType.Creature || c.cardType == CardType.Relic)
+            {
+                movementbox.Text = c.movement.ToString();
+            }
+            else if ((c.cardType == CardType.Channel || c.cardType == CardType.Interrupt) && c.castRange > 0)
+            {
+                movementbox.Text = c.castRange.ToString();
+            }
+
+            if (c.isDummy)
+            {
+                ptbox.Visible = movementbox.Visible = orbbox.Visible = false;
+                typebox.Text = "Ability";
+                breadbox.textColor = Color.Teal;
+            }
 
             orbs = c.castManaCost.orbs;
 
@@ -153,8 +177,6 @@ namespace stonerkart
 
         public void layoutStuff()
         {
-            topbutton.setSize(width, height);
-
             var scale = ((double)(height)) / frameheight;
 
             var colours = orbs.Where(o => o.colour != ManaColour.Colourless).ToArray();
@@ -234,6 +256,13 @@ namespace stonerkart
             artbox.setSize(
                 (int)Math.Round((scale * artboxOrigW)),
                 (int)Math.Round((scale * artboxOrigH))
+                );
+
+            raritybox.X = (int)Math.Round((scale * rarityboxOrigX));
+            raritybox.Y = (int)Math.Round((scale * rarityboxOrigY));
+            raritybox.setSize(
+                (int)Math.Round((scale * rarityboxOrigW)),
+                (int)Math.Round((scale * rarityboxOrigH))
                 );
         }
 

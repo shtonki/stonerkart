@@ -17,40 +17,67 @@ namespace stonerkart
 
         public Foo(params Effect[] effects)
         {
+            if (effects.Any(e => e == null)) throw new Exception();
             this.effects = effects;
         }
 
-        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetSet[][] cached)
+        public TargetMatrix fillCast(HackStruct hs)
         {
-            if (cached.Length != effects.Length) throw new Exception();
+            TargetVector[] vectors = new TargetVector[effects.Length];
+
+            for (int i = 0; i < effects.Length; i++)
+            {
+                TargetVector cache = effects[i].fillCast(hs);
+                if (cache.Cancelled) return TargetMatrix.CreateCancelled();
+                if (cache.Fizzled) return TargetMatrix.CreateFizzled();
+                vectors[i] = cache;
+            }
+
+            return new TargetMatrix(vectors);
+        }
+
+        public TargetMatrix fillResolve(HackStruct hs, TargetMatrix cache)
+        {
+            if (effects.Length != cache.targetVectors.Length) throw new Exception();
+
+            TargetVector[] vectors = new TargetVector[effects.Length];
+
+            for (int i = 0; i < effects.Length; i++)
+            {
+                TargetVector newcache = effects[i].fillResolve(hs, cache.targetVectors[i]);
+                if (newcache.Cancelled) return TargetMatrix.CreateCancelled();
+                if (newcache.Fizzled) return TargetMatrix.CreateFizzled();
+                vectors[i] = newcache;
+                hs.previousTargets = newcache;
+            }
+
+            return new TargetMatrix(vectors);
+        }
+
+        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix cached)
+        {
+            if (cached.targetVectors.Length != effects.Length) throw new Exception();
 
             List<GameEvent> rt = new List<GameEvent>();
 
             for (int i = 0; i < effects.Length; i++)
             {
                 var effect = effects[i];
-                var cache = cached[i];
+                var cache = cached.targetVectors[i];
                 var events = effect.resolve(hs, cache);
-                if (events == null) return null;
-                rt.AddRange(events);
+                if (events == null) //targeting was cancelled
+                {
+                    i = -1;
+                }
+                else
+                {
+                    rt.AddRange(events);
+                }
             }
 
             return rt;
         }
 
-        public TargetSet[][] fillCast(HackStruct hs)
-        {
-            TargetSet[][] rt = new TargetSet[effects.Length][];
-
-            for (int i = 0; i < effects.Length; i++)
-            {
-                var cache = effects[i].fillCast(hs);
-                if (cache == null) return null;
-                rt[i] = cache;
-            }
-
-            return rt;
-        }
         
     }
 }

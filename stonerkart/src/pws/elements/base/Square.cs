@@ -64,7 +64,7 @@ namespace stonerkart
             set { backimege = value; }
         }
 
-        public string Text
+        public virtual string Text
         {
             get { return text; }
             set
@@ -180,11 +180,8 @@ namespace stonerkart
 
         protected override void draw(DrawerMaym dm)
         {
-            if (Backimege == null)
-            {
-                dm.fillRectange(Backcolor, 0, 0, width, height);
-            }
-            else
+            dm.fillRectange(Backcolor, 0, 0, width, height);
+            if (Backimege != null)
             {
                 dm.drawImege(Backimege, 0, 0, Width, Height);
             }
