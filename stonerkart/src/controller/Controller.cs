@@ -41,8 +41,8 @@ namespace stonerkart
 
             GUI.launch();
 
-            GUI.setScreen(loginScreen);
-
+            //GUI.setScreen(loginScreen);
+            GUI.setScreen(new DeckEditorScreen());
             /*
 
             if (Network.connectToServer())
