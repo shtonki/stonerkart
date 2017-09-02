@@ -27,7 +27,7 @@ namespace stonerkart
 
         private const int HERO_VIEW_X = PILE_VIEW_WIDTH;
         private const int HERO_VIEW_Y = 0;
-        private const int HOVER_VIEW_WIDTH = CARD_VIEW_WIDTH * NR_OF_CARDS_PER_COLLUMN;
+        private const int HOVER_VIEW_WIDTH = CARD_VIEW_WIDTH * NR_OF_CARDS_PER_COLLUMN;// + CARD_VIEW_PANEL_WIDTH > FRAME_WIDTH ? FRAME_WIDTH - CARD_VIEW_PANEL_WIDTH - DOWN_PAGE_BUTTON_WIDTH : CARD_VIEW_PANEL_WIDTH * NR_OF_CARDS_PER_COLLUMN;
         private const int HOVER_VIEW_X = FRAME_WIDTH-HOVER_VIEW_WIDTH;
         private const int HOVER_VIEW_Y = CARD_VIEW_PANEL_Y;
         private const int PILE_VIEW_X = 0;
@@ -156,7 +156,7 @@ namespace stonerkart
             saveButton.clicked += (_) => 
             {
                 System.Console.WriteLine("e:");
-                System.Console.WriteLine(deckNameBox.Text);
+                foreach (var c in deckNameBox.laidText.characters) System.Console.WriteLine(c);
 
                 DeckController.saveDeck(new Deck(CardTemplate.Bhewas, cardList.Select(c => c.template).ToArray()), deckNameBox.Text);
             };
