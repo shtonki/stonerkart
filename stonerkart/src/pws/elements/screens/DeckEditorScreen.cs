@@ -178,10 +178,7 @@ namespace stonerkart
                 Square deckScreen = new Square(DECK_SCREEN_WIDTH, deckScreenHeight);
                 
                 deckScreen.setLocation(LOAD_BUTTON_X, SAVE_LOAD_BUTTON_Y+BUTTON_HEIGHT);
-                deckScreen.Backcolor = System.Drawing.Color.Aqua;
-                addElement(deckScreen);
-                System.Console.WriteLine("screen height: " + deckScreenHeight);
-                System.Console.WriteLine("button height: " + BUTTON_HEIGHT);
+                //addElement(deckScreen);
                 int x = 0;
                 int y = 0;
                 foreach (var de in decks)
@@ -209,8 +206,13 @@ namespace stonerkart
 
                     };
                 }
-                //Deck d = DeckController.loadDeck("erf");
-                
+
+                Winduh deckSelectWindow = new Winduh(deckScreen);
+                //deckSelectWindow.setSize(5000, 500);
+                deckSelectWindow.setLocation(LOAD_BUTTON_X, SAVE_LOAD_BUTTON_Y + BUTTON_HEIGHT);
+                deckSelectWindow.Backcolor = System.Drawing.Color.BlanchedAlmond;
+                addElement(deckSelectWindow);
+
             };
             loadButton.Text = "Load";
             loadButton.setLocation(LOAD_BUTTON_X, SAVE_LOAD_BUTTON_Y);
