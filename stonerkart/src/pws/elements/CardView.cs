@@ -18,7 +18,6 @@ namespace stonerkart
         {
             card = c;
 
-
             namebox = new Square();
             namebox.TextLayout = new SingleLineFitLayout(Justify.Left);
             namebox.Hoverable = false;

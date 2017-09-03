@@ -10,6 +10,7 @@ namespace stonerkart
     class GameMenuBar : Square
     {
         public Button showFriendsButton { get; }
+        public Button addFriendsButton { get; }
         private PlayerFlarePanel playerFlarePanel;
         private PricePanel shekelsCount { get; }
 
@@ -19,6 +20,7 @@ namespace stonerkart
         private const int playerFlareX = 20;
 
         private const int friendsButtonX = 250;
+        private const int addFriendsButtonX = 300;
 
         private const int shekelSquareWidth = 200;
         private const int shekelSquareX = Frame.BACKSCREENWIDTH - shekelSquareWidth - 50;
@@ -40,6 +42,11 @@ namespace stonerkart
             showFriendsButton.Backimege = new Imege(Textures.iconFriends);
             showFriendsButton.X = friendsButtonX;
             addChild(showFriendsButton);
+
+            addFriendsButton = new Button(friendsButtonHeight, friendsButtonHeight);
+            addFriendsButton.Backimege = new Imege(Textures.iconAddFriends);
+            addFriendsButton.X = addFriendsButtonX;
+            addChild(addFriendsButton);
         }
 
         public void setFlare(User user)

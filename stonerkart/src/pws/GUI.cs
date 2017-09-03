@@ -9,7 +9,12 @@ namespace stonerkart
 {
     static class GUI
     {
-        public static Frame frame { get; private set; } 
+        public static Frame frame { get; private set; }
+
+        public static LoginScreen loginScreen { get; } = new LoginScreen();
+        public static MainMenuScreen mainMenuScreen { get; } = new MainMenuScreen();
+        public static DeckEditorScreen deckeditorScreen { get; } = new DeckEditorScreen();
+        public static ShopScreen shopScreen { get; } = new ShopScreen();
 
         public static void launch()
         {
@@ -26,7 +31,7 @@ namespace stonerkart
             frame.Run(100, 0);
         }
 
-        public static void setScreen(Screen s)
+        public static void transitionToScreen(Screen s)
         {
             frame.setScreen(s);
         }

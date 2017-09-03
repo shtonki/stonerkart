@@ -25,6 +25,7 @@ namespace stonerkart
 
         iconChallenge,
         iconFriends,
+        iconAddFriends,
         iconShekel,
 
         packFirstEdition12Pack,
@@ -220,6 +221,7 @@ namespace stonerkart
 
             images[Textures.iconChallenge] = Resources.buttonChallenge;
             images[Textures.iconFriends] = Resources.buttonFriends;
+            images[Textures.iconAddFriends] = Resources.buttonAddFriend;
             images[Textures.iconShekel] = Resources.iconShekel;
 
             images[Textures.packFirstEdition12Pack] = Resources.firstedition12cardpack;

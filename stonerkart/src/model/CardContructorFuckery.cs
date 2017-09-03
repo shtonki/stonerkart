@@ -2100,7 +2100,7 @@ namespace stonerkart
                     cardType = CardType.Relic;
                     rarity = Rarity.Rare;
 
-                    greyCost = 0;
+                    greyCost = 2;
 
                     baseMovement = 1;
 

@@ -13,10 +13,6 @@ namespace stonerkart
     /// </summary>
     static class Controller
     {
-        private static LoginScreen loginScreen = new LoginScreen();
-        private static MainMenuScreen mainMenuScreen = new MainMenuScreen();
-        private static DeckEditorScreen deckeditorScreen = new DeckEditorScreen();
-        private static ShopScreen shopScreen = new ShopScreen();
 
         private static List<Packs> ownedPacks { get; set; }
         private static List<CardTemplate> ownedCards { get; set; }
@@ -31,7 +27,7 @@ namespace stonerkart
             /*
             GUI.launch();
             var gsc = new GameScreen();
-            GUI.setScreen(gsc);
+            GUI.transitionToScreen(gsc);
             Game g = new Game(new NewGameStruct(0, 420, new[] { "Hero", "Villain" }, 0), true, gsc);
             g.startGameThread();
             return;
@@ -41,7 +37,7 @@ namespace stonerkart
 
             GUI.launch();
 
-            GUI.setScreen(loginScreen);
+            GUI.transitionToScreen(GUI.loginScreen);
 
             /*
 
@@ -74,9 +70,9 @@ namespace stonerkart
                 setShekelBalance(shekels);
 
                 var ownedPacks = Network.queryOwnedPacks();
-                shopScreen.populate(ownedPacks);
+                GUI.shopScreen.populate(ownedPacks);
 
-                GUI.setScreen(shopScreen);
+                GUI.transitionToScreen(GUI.mainMenuScreen);
             }
             else
             {
@@ -90,7 +86,7 @@ namespace stonerkart
             if (ripped == null) return false;
             else
             {
-                shopScreen.ripPack(ripped);
+                GUI.shopScreen.ripPack(ripped);
                 ownedCards.AddRange(ripped);
                 return true;
             }
@@ -113,7 +109,7 @@ namespace stonerkart
         {
             GameScreen gsc = new GameScreen();
             Game g = new Game(ngs, false, gsc);
-            GUI.setScreen(gsc);
+            GUI.transitionToScreen(gsc);
             g.startGameThread();
             return g;
         }
