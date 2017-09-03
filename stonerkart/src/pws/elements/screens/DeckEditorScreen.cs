@@ -18,14 +18,14 @@ namespace stonerkart
         private const int NR_OF_CARDS_PER_ROW = 8;
         private const int NR_OF_CARDS_PER_COLLUMN = 3;
         private const int NR_OF_CARD_VIEWS = NR_OF_CARDS_PER_ROW * NR_OF_CARDS_PER_COLLUMN;
+        private const int DECK_SCREEN_ITEMS_PER_ROW = 2; //load button and save button
         private const int CARD_VIEW_WIDTH = Frame.BACKSCREENWIDTH / 12;
         private const int CARD_VIEW_HEIGHT = CARD_VIEW_WIDTH * 700 / 500;
         private const int FRAME_WIDTH = Frame.BACKSCREENWIDTH;
         private const int FRAME_HEIGHT = Frame.AVAILABLEHEIGHT;
         private const int HERO_VIEW_WIDTH = PILE_VIEW_HEIGHT * 500 / 700;
 
-
-
+        private const int DECK_SCREEN_WIDTH = DECK_SCREEN_ITEMS_PER_ROW * BUTTON_WIDTH;
         private const int HERO_VIEW_X = PILE_VIEW_WIDTH;
         private const int HERO_VIEW_Y = 0;
         private const int HOVER_VIEW_WIDTH = CARD_VIEW_WIDTH * NR_OF_CARDS_PER_COLLUMN;// + CARD_VIEW_PANEL_WIDTH > FRAME_WIDTH ? FRAME_WIDTH - CARD_VIEW_PANEL_WIDTH - DOWN_PAGE_BUTTON_WIDTH : CARD_VIEW_PANEL_WIDTH * NR_OF_CARDS_PER_COLLUMN;
@@ -52,9 +52,9 @@ namespace stonerkart
         private const int DECK_NAME_BOX_Y = 0;
         private const int DECK_NAME_BOX_WIDTH = FRAME_WIDTH - PILE_VIEW_WIDTH - HERO_VIEW_WIDTH;
         private const int DECK_NAME_BOX_HEIGHT = (int)(Frame.BACKSCREENHEIGHT * 0.05);
-        private const int SAVE_LOAD_BUTTON_HEIGHT = DECK_NAME_BOX_HEIGHT / 2;
-        private const int SAVE_LOAD_BUTTON_WIDTH = DECK_NAME_BOX_WIDTH / 2;
-        private const int SAVE_BUTTON_X = LOAD_BUTTON_X + SAVE_LOAD_BUTTON_WIDTH;
+        private const int BUTTON_HEIGHT = DECK_NAME_BOX_HEIGHT / 2;
+        private const int BUTTON_WIDTH = DECK_NAME_BOX_WIDTH / 2;
+        private const int SAVE_BUTTON_X = LOAD_BUTTON_X + BUTTON_WIDTH;
         private const int SAVE_LOAD_BUTTON_Y = DECK_NAME_BOX_HEIGHT;
         private const int LOAD_BUTTON_X = DECK_NAME_BOX_X;
 
@@ -124,15 +124,26 @@ namespace stonerkart
 
         private void setupCards()
         {
-
             allCardsEver = new List<Card>();
             var cardTemplates = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().ToList();
-            allCardsEver = cardTemplates.Select(c => new Card(c)).Where(c => c.isToken == false).OrderBy(d => d.name).ToList(); //sort after colors instead? xd
+            allCardsEver = cardTemplates.Select(c => new Card(c)).ToList();
+            allCardsEver.Sort((c1, c2) =>
+            {
+                var colourcountdiff = Math.Min(2, c1.colours.Count) - Math.Min(2, c2.colours.Count);
+                if (colourcountdiff != 0) return colourcountdiff;
 
+                if (c1.colours.Count < 2)
+                {
+                    var colourdiff = c1.colours[0] - c2.colours[0];
+                    if (colourdiff != 0) return colourdiff;
+                }
+
+                var cmcdiff = c1.convertedManaCost - c2.convertedManaCost;
+                return cmcdiff;
+            });
             allHeroes = new List<Card>();
             allHeroes = allCardsEver.Where(c => c.isHeroic).ToList();
             currentHero = allHeroes[0];
-            //foreach (var a in allHeroes) System.Console.WriteLine(a);
 
             currentFilter = new Func<Card, bool>(c => true);
             filteredCards = filter(currentFilter);
@@ -150,27 +161,56 @@ namespace stonerkart
                 deckNameBox.setText("");
             };
 
-            Button saveButton = new Button(SAVE_LOAD_BUTTON_WIDTH, SAVE_LOAD_BUTTON_HEIGHT);
+            Button saveButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
             saveButton.setLocation(SAVE_BUTTON_X, SAVE_LOAD_BUTTON_Y);
             saveButton.Backcolor = System.Drawing.Color.Red;
             saveButton.Text = "Save";
             saveButton.clicked += (_) =>
             {
-                System.Console.WriteLine("e:");
-                foreach (var c in deckNameBox.laidText.characters) System.Console.WriteLine(c);
-
                 DeckController.saveDeck(new Deck(CardTemplate.Bhewas, cardList.Select(c => c.template).ToArray()), deckNameBox.Text);
             };
 
-            Button loadButton = new Button(SAVE_LOAD_BUTTON_WIDTH, SAVE_LOAD_BUTTON_HEIGHT);
+            Button loadButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
             loadButton.clicked += (_) =>
             {
-                Deck d = DeckController.loadDeck("erf");
-                cardList.clear();
-                foreach (var t in d.templates)
+                var decks = DeckController.getDecks();
+                int deckScreenHeight = ((decks.Count()+DECK_SCREEN_ITEMS_PER_ROW)/DECK_SCREEN_ITEMS_PER_ROW)*BUTTON_HEIGHT;
+                Square deckScreen = new Square(DECK_SCREEN_WIDTH, deckScreenHeight);
+                
+                deckScreen.setLocation(LOAD_BUTTON_X, SAVE_LOAD_BUTTON_Y+BUTTON_HEIGHT);
+                deckScreen.Backcolor = System.Drawing.Color.Aqua;
+                addElement(deckScreen);
+                System.Console.WriteLine("screen height: " + deckScreenHeight);
+                System.Console.WriteLine("button height: " + BUTTON_HEIGHT);
+                int x = 0;
+                int y = 0;
+                foreach (var de in decks)
                 {
-                    cardList.addTop(new Card(t));
+                    Button deckButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
+                    deckButton.Text = de.name;
+                    deckButton.Backcolor = System.Drawing.Color.Azure;
+                    deckButton.setLocation(x, y);
+                    deckScreen.addChild(deckButton);
+                    x += BUTTON_WIDTH;
+                    if (x >= deckScreen.Width)
+                    {
+                        x = 0;
+                        y += BUTTON_HEIGHT;
+                    }
+                    deckButton.clicked += (__) =>
+                    {
+                        cardList.clear();
+                        foreach (var t in de.templates)
+                        {
+                            cardList.addTop(new Card(t));
+                        }
+
+                        removeElement(deckScreen);
+
+                    };
                 }
+                //Deck d = DeckController.loadDeck("erf");
+                
             };
             loadButton.Text = "Load";
             loadButton.setLocation(LOAD_BUTTON_X, SAVE_LOAD_BUTTON_Y);
@@ -180,7 +220,7 @@ namespace stonerkart
 
 
 
-            Button previousPageButton = new Button(SAVE_LOAD_BUTTON_WIDTH, SAVE_LOAD_BUTTON_HEIGHT);
+            Button previousPageButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
             previousPageButton.setLocation(UP_PAGE_BUTTON_X, UP_PAGE_BUTTON_Y);
             previousPageButton.Width = UP_PAGE_BUTTON_WIDTH;
             previousPageButton.Height = UP_PAGE_BUTTON_HEIGHT;
@@ -191,7 +231,7 @@ namespace stonerkart
                 setupCardViews();
             };
 
-            Button nextPageButton = new Button(SAVE_LOAD_BUTTON_WIDTH, SAVE_LOAD_BUTTON_HEIGHT);
+            Button nextPageButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
             nextPageButton.setLocation(DOWN_PAGE_BUTTON_X, DOWN_PAGE_BUTTON_Y);
             nextPageButton.Width = UP_PAGE_BUTTON_WIDTH;
             nextPageButton.Height = UP_PAGE_BUTTON_HEIGHT;
@@ -211,6 +251,7 @@ namespace stonerkart
 
             return bs;
         }
+
 
         private CardList setupCardList(PileView pv)
         {
@@ -362,5 +403,7 @@ namespace stonerkart
                 cardList.addTop(new Card(ct));
             }
         }
+
+        
     }
 }

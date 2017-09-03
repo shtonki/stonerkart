@@ -35,14 +35,15 @@ namespace stonerkart
             Game g = new Game(new NewGameStruct(0, 420, new[] { "Hero", "Villain" }, 0), true, gsc);
             g.startGameThread();
             return;
-            //*/ 
-
+            //*/
+            GUI.launch();
+            GUI.setScreen(new DeckEditorScreen());
             if (!Network.connectToServer()) throw new Exception("Serber offline");
 
-            GUI.launch();
+            
 
             //GUI.setScreen(loginScreen);
-            GUI.setScreen(new DeckEditorScreen());
+            
             /*
 
             if (Network.connectToServer())

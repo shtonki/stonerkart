@@ -50,7 +50,7 @@ namespace stonerkart
 
             if (!(CardTemplate.TryParse(s, out xd)))
             {
-                throw new Exception();
+                throw new Exception("Deck contains invalid card(s)");
             }
 
             return xd;
