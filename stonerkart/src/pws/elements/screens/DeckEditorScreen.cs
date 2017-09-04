@@ -33,7 +33,7 @@ namespace stonerkart
         private const int PILE_VIEW_X = 0;
         private const int PILE_VIEW_Y = 0;
         private const int PILE_VIEW_WIDTH = CARD_VIEW_PANEL_WIDTH;//-HERO_VIEW_WIDTH;
-        private const int PILE_VIEW_HEIGHT = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT <= 0 ? CARD_VIEW_PANEL_HEIGHT : FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT;
+        private const int PILE_VIEW_HEIGHT = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT - MANA_BUTTON_HEIGHT <= 0 ? CARD_VIEW_PANEL_HEIGHT : FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT - MANA_BUTTON_HEIGHT;//FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT <= 0 ? CARD_VIEW_PANEL_HEIGHT : FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT;
         private const int CARD_VIEW_PANEL_X = 0;
         private const int CARD_VIEW_PANEL_Y = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT;
         private const int CARD_VIEW_PANEL_WIDTH = NR_OF_CARDS_PER_ROW * CARD_VIEW_STRIDE_X;
@@ -42,11 +42,15 @@ namespace stonerkart
         private const int CARD_VIEW_Y = CARD_VIEW_PANEL_Y;
         private const int CARD_VIEW_STRIDE_X = CARD_VIEW_WIDTH + 0;
         private const int CARD_VIEW_STRIDE_Y = CARD_VIEW_HEIGHT + 0;
-
-        private const int NR_OF_MANA_BUTTONS = 6;
-        private const int MANA_BUTTON_X = CARD_VIEW_PANEL_WIDTH + HERO_VIEW_WIDTH;
+        private const int INPUT_BOX_X = MANA_BUTTON_X + MANA_BUTTON_WIDTH * NR_OF_MANA_BUTTONS;
+        private const int INPUT_BOX_Y = MANA_BUTTON_Y;
+        private const int INPUT_BOX_WIDTH = MANA_BUTTON_WIDTH * NR_OF_MANA_BUTTONS;
+        private const int INPUT_BOX_HEIGHT = MANA_BUTTON_HEIGHT;
+        private const int NR_OF_MANA_BUTTONS = 7;
+        private const int MANA_BUTTON_X = 0;//CARD_VIEW_PANEL_WIDTH + HERO_VIEW_WIDTH;
         private const int MANA_BUTTON_Y = CARD_VIEW_PANEL_Y - MANA_BUTTON_WIDTH;
-        private const int MANA_BUTTON_WIDTH = (FRAME_WIDTH - PILE_VIEW_WIDTH - HERO_VIEW_WIDTH)/NR_OF_MANA_BUTTONS;
+        private const int MANA_BUTTON_WIDTH = CARD_VIEW_HEIGHT/4;//(FRAME_WIDTH - PILE_VIEW_WIDTH - HERO_VIEW_WIDTH)/NR_OF_MANA_BUTTONS;
+        private const int MANA_BUTTON_HEIGHT = MANA_BUTTON_WIDTH;
 
         //private const int CARD_VIEW_PANEL_HEIGHT = CARD_VIEW_PANEL_NUMBER_OF_ROWS * CARD_VIEW_HEIGHT;
         private const int DECK_NAME_BOX_X = CARD_VIEW_PANEL_WIDTH + HERO_VIEW_WIDTH;
@@ -90,7 +94,15 @@ namespace stonerkart
         private Square cardViewPanel;
         private int currentPageNr = 0;
         private ToggleButton[] manaButtons;
-        
+        private Func<Card, bool>[] filters;
+        private enum Filter
+        {
+            MANA = 0,
+            SEARCH = 1,
+            COST= 2,
+            TYPE = 3,
+            RARITY = 4
+        }
 
         //todo fix hero and filter and search
         public DeckEditorScreen() : base(new Imege(Textures.artCallToArms))
@@ -119,7 +131,7 @@ namespace stonerkart
 
         private void addFilter(Func<Card, bool> f)
         {
-            //currentFilter = c => currentFilter(c) && f(c);
+            currentFilter = c => currentFilter(c) || f(c);
         }
 
         #region setups
@@ -155,7 +167,6 @@ namespace stonerkart
             #region input
             List<Button> bs = new List<Button>();
             InputBox deckNameBox = new InputBox(DECK_NAME_BOX_WIDTH, DECK_NAME_BOX_HEIGHT);
-            deckNameBox.Width = DECK_NAME_BOX_WIDTH;
             deckNameBox.setLocation(DECK_NAME_BOX_X, DECK_NAME_BOX_Y);
             deckNameBox.setText("My Deck");
             deckNameBox.clicked += (_) =>
@@ -163,6 +174,22 @@ namespace stonerkart
                 deckNameBox.setText("");
             };
             addElement(deckNameBox);
+            
+
+
+            InputBox searchBox = new InputBox(INPUT_BOX_WIDTH, INPUT_BOX_HEIGHT);
+            searchBox.setLocation(INPUT_BOX_X, INPUT_BOX_Y);
+            searchBox.setText("Search");
+            searchBox.clicked += (_) =>
+            {
+                searchBox.setText("");
+            };
+            searchBox.keyDown += (_) =>
+            {
+                //erf = new Func<Card, bool>(c => c.ToString().StartsWith(searchBox.Text));
+                setupCardViews();
+            };
+            addElement(searchBox);
             #endregion
             #region save
             Button saveButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -271,8 +298,8 @@ namespace stonerkart
                 addElement(manaButtons[i]);
                 manaButtons[i].clicked += (args) =>
                 {
+                    currentPageNr = 0;
                     setupCardViews();
-                    
                 };
             }
 
@@ -392,7 +419,7 @@ namespace stonerkart
             filteredCards = allCardsEver.Where(currentFilter).ToList();
             if (manaButtons != null)
             {
-                var activecolours = manaButtons.Select((b, i) => b.Toggled ? i : -1).Where(i => i > 0).Cast<ManaColour>();
+                var activecolours = manaButtons.Where(e => e != null).Select((b, i) => b.Toggled ? i : -1).Where(i => i >= 0).Cast<ManaColour>();
 
                 currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
                 filteredCards = filter(currentFilter).Where(c => c.colours.Any(clr => activecolours.Contains(clr))).ToList();
@@ -445,13 +472,11 @@ namespace stonerkart
                     {
                         addToDeck(cardViews[i1].card.template);
                     };
-                    /*
+                    
                     cardViews[i].mouseEnter += (__) =>
                     {
-                        //wait for seba to fix mouse enter
-                        removeElement(hoverView); //erf
                         setupHoverCardView(cardViews[i1].card);
-                    };*/
+                    };
                 }
             }
         }
