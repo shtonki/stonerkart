@@ -29,6 +29,7 @@ namespace stonerkart
         iconShekel,
 
         packFirstEdition12Pack,
+        packFirstEdition40Pack,
 
         border0,
 
@@ -225,6 +226,7 @@ namespace stonerkart
             images[Textures.iconShekel] = Resources.iconShekel;
 
             images[Textures.packFirstEdition12Pack] = Resources.firstedition12cardpack;
+            images[Textures.packFirstEdition40Pack] = Resources.firstedition40cardpack;
 
             images[Textures.border0] = Resources.border0;
 
@@ -446,6 +448,7 @@ namespace stonerkart
             switch (pack)
             {
                 case Packs.FirstEdition12Pack: return Textures.packFirstEdition12Pack;
+                case Packs.FirstEdition40Pack: return Textures.packFirstEdition40Pack;
             }
 
             throw new Exception();

@@ -15,6 +15,7 @@ namespace stonerkart
         public static MainMenuScreen mainMenuScreen { get; } = new MainMenuScreen();
         public static DeckEditorScreen deckeditorScreen { get; } = new DeckEditorScreen();
         public static ShopScreen shopScreen { get; } = new ShopScreen();
+        public static PlayScreen playScreen { get; } = new PlayScreen();
 
         public static void launch()
         {

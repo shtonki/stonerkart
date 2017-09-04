@@ -745,4 +745,7 @@ z 2661 39
   <data name="buttonAddFriend" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\buttonAddFriend.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="firstedition40cardpack" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\firstedition40cardpack.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

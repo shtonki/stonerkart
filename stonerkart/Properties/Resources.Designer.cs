@@ -1683,6 +1683,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap firstedition40cardpack {
+            get {
+                object obj = ResourceManager.GetObject("firstedition40cardpack", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap font0 {
             get {
                 object obj = ResourceManager.GetObject("font0", resourceCulture);

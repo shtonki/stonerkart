@@ -23,7 +23,18 @@ namespace stonerkart
 
         protected int priceEx()
         {
-            return 420;
+            if (isPack)
+            {
+                switch (Pack)
+                {
+                    case Packs.FirstEdition12Pack:
+                        return 420;
+
+                    case Packs.FirstEdition40Pack:
+                        return 1420;
+                }
+            }
+            throw new Exception();
         }
 
         public override string ToString()
@@ -41,6 +52,7 @@ namespace stonerkart
 
     public enum Packs
     {
-        FirstEdition12Pack
+        FirstEdition12Pack,
+        FirstEdition40Pack,
     }
 }
