@@ -10,7 +10,6 @@ using System.Timers;
 
 namespace stonerkart
 {
-
     class DeckEditorScreen : Screen
     {
         #region constants
@@ -44,7 +43,7 @@ namespace stonerkart
         private const int CARD_VIEW_STRIDE_X = CARD_VIEW_WIDTH + 0;
         private const int CARD_VIEW_STRIDE_Y = CARD_VIEW_HEIGHT + 0;
 
-        private const int NR_OF_MANA_BUTTONS = 7;
+        private const int NR_OF_MANA_BUTTONS = 6;
         private const int MANA_BUTTON_X = CARD_VIEW_PANEL_WIDTH + HERO_VIEW_WIDTH;
         private const int MANA_BUTTON_Y = CARD_VIEW_PANEL_Y - MANA_BUTTON_WIDTH;
         private const int MANA_BUTTON_WIDTH = (FRAME_WIDTH - PILE_VIEW_WIDTH - HERO_VIEW_WIDTH)/NR_OF_MANA_BUTTONS;
@@ -89,10 +88,11 @@ namespace stonerkart
         private CardView heroCardView;
         private Func<Card, bool> currentFilter;
         private Square cardViewPanel;
-
         private int currentPageNr = 0;
+        private ToggleButton[] manaButtons;
+        
 
-        //todo fix hero saving/loading/ui
+        //todo fix hero and filter and search
         public DeckEditorScreen() : base(new Imege(Textures.artCallToArms))
         {
             setupCards();
@@ -100,7 +100,6 @@ namespace stonerkart
             pileView = setupPileView();
             cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
-
             setupButtons();
         }
 
@@ -120,7 +119,7 @@ namespace stonerkart
 
         private void addFilter(Func<Card, bool> f)
         {
-            currentFilter = c => currentFilter(c) && f(c);
+            //currentFilter = c => currentFilter(c) && f(c);
         }
 
         #region setups
@@ -147,8 +146,7 @@ namespace stonerkart
             allHeroes = new List<Card>();
             allHeroes = allCardsEver.Where(c => c.isHeroic).ToList();
             currentHero = allHeroes[0];
-
-            currentFilter = new Func<Card, bool>(c => true);
+            currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
             filteredCards = filter(currentFilter);
         }
 
@@ -255,7 +253,7 @@ namespace stonerkart
             #endregion
             #region mana buttons
 
-            var manaButtons = new ToggleButton[Enum.GetValues(typeof(ManaColour)).Length];
+            manaButtons = new ToggleButton[Enum.GetValues(typeof(ManaColour)).Length];
             int mx = MANA_BUTTON_X;
             int my = MANA_BUTTON_Y;
             for (int i = 0; i < manaButtons.Length-1; i++)
@@ -273,8 +271,8 @@ namespace stonerkart
                 addElement(manaButtons[i]);
                 manaButtons[i].clicked += (args) =>
                 {
-                    addFilter(c => c.colours.Contains(G.orbOrder[ii]));
-                    setupCardViewPanel();
+                    setupCardViews();
+                    
                 };
             }
 
@@ -326,7 +324,7 @@ namespace stonerkart
             setupHeroCardView(new Card(CardTemplate.Bhewas));
             
             cardViews = new CardView[NR_OF_CARD_VIEWS];
-
+            currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
             filteredCards = allCardsEver.Where(currentFilter).ToList();
 
             Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
@@ -392,6 +390,13 @@ namespace stonerkart
             cardViewPanel.clearChildren();
 
             filteredCards = allCardsEver.Where(currentFilter).ToList();
+            if (manaButtons != null)
+            {
+                var activecolours = manaButtons.Select((b, i) => b.Toggled ? i : -1).Where(i => i > 0).Cast<ManaColour>();
+
+                currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
+                filteredCards = filter(currentFilter).Where(c => c.colours.Any(clr => activecolours.Contains(clr))).ToList();
+            }
 
             Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
             for (int i = 0; i < NR_OF_CARD_VIEWS; i++)
