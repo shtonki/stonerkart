@@ -18,7 +18,7 @@ namespace stonerkart
 {
     class Frame : GameWindow
     {
-        private Screen activeScreen;
+        public Screen activeScreen { get; private set; }
         private IEnumerable<GuiElement> activeElements => activeScreen.Elements.Concat(frameElements);
 
         private ManualResetEventSlim loadre;

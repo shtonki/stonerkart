@@ -49,7 +49,9 @@ namespace stonerkart
                 case Message.MessageType.CHALLENGE:
                 {
                     ChallengeBody cb = new ChallengeBody(m.body);
-                    serverConnection.send(new Message("_server", Message.MessageType.ACCEPTCHALLENGE, new ChallengeBody(cb.challengee)));
+                    var option = GUI.promptUser(cb.challengee + " challenges you to a battle to the death. Do you wish to accept this challenge?", 
+                        ButtonOption.Yes, ButtonOption.No);
+                    if (option == ButtonOption.Yes) serverConnection.send(new Message("_server", Message.MessageType.ACCEPTCHALLENGE, new ChallengeBody(cb.challengee)));
                 } break;
 
                 case Message.MessageType.NEWGAME:

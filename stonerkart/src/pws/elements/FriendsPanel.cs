@@ -78,6 +78,7 @@ namespace stonerkart
             challenge.X = width - height;
             challenge.Backimege = new Imege(Textures.iconChallenge);
             challenge.Visible = friend.Status != UserStatus.Offline;
+            challenge.clicked += a => Controller.challengePlayer(friend.Name);
 
             playerflare = new PlayerFlarePanel(friend, width - height, height);
             addChild(playerflare);
