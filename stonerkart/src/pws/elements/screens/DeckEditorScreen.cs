@@ -97,30 +97,49 @@ namespace stonerkart
         private Func<Card, bool>[] filters;
         private enum Filter
         {
-            MANA = 0,
-            SEARCH = 1,
-            COST= 2,
-            TYPE = 3,
-            RARITY = 4
+            FREE = 0,
+            MANA = 1,
+            SEARCH = 2,
+            //COST= 3,
+            //TYPE = 4,
+            //RARITY = 5
         }
 
         //todo fix hero and filter and search
         public DeckEditorScreen() : base(new Imege(Textures.artCallToArms))
         {
+            setupFilters();
+            //filters[(int)Filter.SEARCH] = c => c.ToString().StartsWith("Risen");
+            
             setupCards();
             setupCardViewsFirstTime();
             pileView = setupPileView();
             cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
             setupButtons();
+            var activeColours = manaButtons.Where(d=> d !=  null).Select((b, i) => b.Toggled ? i : -1).Where(i => i > 0).Cast<ManaColour>();
+            Func<Card, bool> f = new Func<Card, bool>(c => true);
+
+            foreach (var ac in activeColours)
+            {
+                f = c => c.colours.Contains(ac) && f(c);
+            }
         }
 
-        private List<Card> filter(Func<Card, bool> filter)
+        private void setupFilters()
+        {
+            filters = new Func<Card, bool>[3];
+            filters[(int)Filter.FREE] = c => c.isHeroic == false && c.isToken == false;
+            filters[(int)Filter.MANA] = c => c.castManaCost.colours.Exists(col => true);
+            filters[(int)Filter.SEARCH] = c => c.ToString().StartsWith("Risen");
+        }
+
+        private List<Card> filter(List<Card> cards)
         {
             List<Card> fCards = new List<Card>();
-            foreach (var c in allCardsEver)
+            foreach (var c in cards)
             {
-                if (filter(c) == true)
+                if(filters.All(f => f(c)) == true)
                 {
                     fCards.Add(c);
                 }
@@ -129,9 +148,9 @@ namespace stonerkart
         }
 
 
-        private void addFilter(Func<Card, bool> f)
+        private void addFilter(Func<Card, bool> f, Filter filterType)
         {
-            currentFilter = c => currentFilter(c) || f(c);
+            filters[(int)filterType] = f;
         }
 
         #region setups
@@ -158,8 +177,8 @@ namespace stonerkart
             allHeroes = new List<Card>();
             allHeroes = allCardsEver.Where(c => c.isHeroic).ToList();
             currentHero = allHeroes[0];
-            currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
-            filteredCards = filter(currentFilter);
+            //currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
+            filteredCards = filter(allCardsEver);
         }
 
         private List<Button> setupButtons()
@@ -346,14 +365,11 @@ namespace stonerkart
         {
             
             setupCardViewPanel();
-            
-
             setupHeroCardView(new Card(CardTemplate.Bhewas));
             
             cardViews = new CardView[NR_OF_CARD_VIEWS];
-            currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
-            filteredCards = allCardsEver.Where(currentFilter).ToList();
 
+            filteredCards = filter(allCardsEver);//allCardsEver;
             Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
 
             for (int i = 0; i < NR_OF_CARD_VIEWS; i++)
@@ -363,6 +379,7 @@ namespace stonerkart
                     cardsToShow[i] = filteredCards.ElementAt(index);
             }
 
+            
             layoutCardViews(cardsToShow);
             addElement(cardViewPanel);
 
@@ -388,10 +405,13 @@ namespace stonerkart
             if (cardViews == null) throw new Exception("you must setup hovercardview after cardviews, i s this a legit way of doing this? i dont know");
             foreach(CardView cv in cardViews)
             {
-                cv.mouseEnter += (__) =>
+                if (cv != null)
                 {
-                    setupHoverCardView(cv.card);
-                };
+                    cv.mouseEnter += (__) =>
+                    {
+                        setupHoverCardView(cv.card);
+                    };
+                }
             }
             heroCardView.mouseEnter += (__) =>
             {
@@ -416,13 +436,13 @@ namespace stonerkart
         {
             cardViewPanel.clearChildren();
 
-            filteredCards = allCardsEver.Where(currentFilter).ToList();
+            filteredCards = filter(allCardsEver);//allCardsEver.Where(currentFilter).ToList();
             if (manaButtons != null)
             {
-                var activecolours = manaButtons.Where(e => e != null).Select((b, i) => b.Toggled ? i : -1).Where(i => i >= 0).Cast<ManaColour>();
+                //var activecolours = manaButtons.Where(e => e != null).Select((b, i) => b.Toggled ? i : -1).Where(i => i >= 0).Cast<ManaColour>();
 
-                currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
-                filteredCards = filter(currentFilter).Where(c => c.colours.Any(clr => activecolours.Contains(clr))).ToList();
+                //currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
+                //filteredCards = filter(currentFilter).Where(c => c.colours.Any(clr => activecolours.Contains(clr))).ToList();
             }
 
             Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
@@ -433,6 +453,13 @@ namespace stonerkart
                     cardsToShow[i] = filteredCards.ElementAt(index);
             }
             layoutCardViews(cardsToShow);
+
+            //is this erf?
+            while (cardsToShow.Count() < 1)
+            {
+                currentPageNr--;
+                setupCardViews();
+            }
         }
 
 
