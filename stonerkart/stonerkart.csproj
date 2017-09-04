@@ -184,6 +184,8 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\iconCheck.png" />
+    <None Include="Resources\iconCross.png" />
     <None Include="Resources\firstedition40cardpack.png" />
     <None Include="Resources\buttonAddFriend.png" />
     <None Include="Resources\firstedition12cardpack.png" />

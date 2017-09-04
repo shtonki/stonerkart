@@ -33,7 +33,7 @@ namespace stonerkart
             return;
             //*/ 
 
-            if (!Network.connectToServer()) throw new Exception("Serber offline");
+            if (!Network.connectToServer()) throw new Exception("Server down for more or less routine maintenance.");
 
             GUI.launch();
 
@@ -63,6 +63,9 @@ namespace stonerkart
                 var friends = Network.queryFriends();
                 user.setFriends(friends);
 
+                var friendrequests = Network.queryFriendRequests();
+                GUI.frame.addFriendsPanel.addRequests(friendrequests);
+
                 var collection = Network.queryCollection();
                 ownedCards = collection.ToList();
 
@@ -78,6 +81,11 @@ namespace stonerkart
             {
                 
             }
+        }
+
+        public static void respondToFriendRequest(string username, bool accept)
+        {
+            Network.respondToFriendRequest(username, accept);
         }
 
         public static bool ripPack(Packs pack)

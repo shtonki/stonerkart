@@ -30,6 +30,8 @@ namespace stonerkart
         public GameMenuBar menu { get; private set; }
         public FriendsPanel friendsPanel { get; private set; }
         public Winduh friendsWinduh { get; private set; }
+        public PendingFriendsPanel addFriendsPanel { get; private set; }
+        public Winduh addFriendsWinduh { get; private set; }
 
         private void generateFrameElements()
         {
@@ -42,12 +44,23 @@ namespace stonerkart
             {
                 friendsWinduh.Visible = !friendsWinduh.Visible;
             };
+            menu.addFriendsButton.clicked += a =>
+            {
+                addFriendsWinduh.Visible = !addFriendsWinduh.Visible;
+            };
 
             friendsPanel = new FriendsPanel(300, 500);
             friendsWinduh = new Winduh(friendsPanel, "Friends", true, true);
             friendsWinduh.Backimege = new MemeImege(Textures.buttonbg2, 6845324);
             friendsWinduh.Visible = false;
             frameElements.Add(friendsWinduh);
+
+
+            addFriendsPanel = new PendingFriendsPanel(300, 500);
+            addFriendsWinduh = new Winduh(addFriendsPanel, "Friend Requests", true, true);
+            addFriendsWinduh.Backimege = new MemeImege(Textures.buttonbg2, 6845324);
+            addFriendsWinduh.Visible = false;
+            frameElements.Add(addFriendsWinduh);
         }
 
         #endregion

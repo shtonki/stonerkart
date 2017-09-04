@@ -13,10 +13,11 @@ namespace stonerkart
         private Square name;
 
 
-        public PlayerFlarePanel(string playername, CardTemplate icon, int width, int height) : base(width, height)
+        public PlayerFlarePanel(User user, int width, int height) : base(width, height)
         {
             if (width < height) throw new Exception();
-
+            var icon = user.Icon;
+            var playername = user.Name;
 
             //Backcolor = Color.FromArgb(150, 150, 150, 150);
 
