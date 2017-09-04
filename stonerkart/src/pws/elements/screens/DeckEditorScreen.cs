@@ -93,7 +93,7 @@ namespace stonerkart
         private Func<Card, bool> currentFilter;
         private Square cardViewPanel;
         private int currentPageNr = 0;
-        private ToggleButton[] manaButtons;
+        private ToggleButton[] manaButtons { get; set; }
         private Func<Card, bool>[] filters;
         private enum Filter
         {
@@ -108,6 +108,8 @@ namespace stonerkart
         //todo fix hero and filter and search
         public DeckEditorScreen() : base(new Imege(Textures.artCallToArms))
         {
+            setupButtons();
+
             setupFilters();
             //filters[(int)Filter.SEARCH] = c => c.ToString().StartsWith("Risen");
             
@@ -116,7 +118,6 @@ namespace stonerkart
             pileView = setupPileView();
             cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
-            setupButtons();
             var activeColours = manaButtons.Where(d=> d !=  null).Select((b, i) => b.Toggled ? i : -1).Where(i => i > 0).Cast<ManaColour>();
             Func<Card, bool> f = new Func<Card, bool>(c => true);
 
@@ -134,23 +135,19 @@ namespace stonerkart
             filters[(int)Filter.SEARCH] = c => c.ToString().StartsWith("Risen");
         }
 
-        private List<Card> filter(List<Card> cards)
+        private void refilter()
         {
-            List<Card> fCards = new List<Card>();
-            foreach (var c in cards)
-            {
-                if(filters.All(f => f(c)) == true)
-                {
-                    fCards.Add(c);
-                }
-            }
-            return fCards;
+            filteredCards = allCardsEver.Where(filterx).ToList();
         }
 
-
-        private void addFilter(Func<Card, bool> f, Filter filterType)
+        private bool filterx(Card c)
         {
-            filters[(int)filterType] = f;
+            return
+                (
+                    (c.castManaCost[ManaColour.Chaos] > 0 && manaButtons[0].Toggled) || 
+                    (c.castManaCost[ManaColour.Death] > 0 && manaButtons[1].Toggled) || 
+                    false
+                );
         }
 
         #region setups
@@ -178,7 +175,7 @@ namespace stonerkart
             allHeroes = allCardsEver.Where(c => c.isHeroic).ToList();
             currentHero = allHeroes[0];
             //currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
-            filteredCards = filter(allCardsEver);
+            //refilter();
         }
 
         private List<Button> setupButtons()
@@ -369,7 +366,7 @@ namespace stonerkart
             
             cardViews = new CardView[NR_OF_CARD_VIEWS];
 
-            filteredCards = filter(allCardsEver);//allCardsEver;
+            refilter();
             Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
 
             for (int i = 0; i < NR_OF_CARD_VIEWS; i++)
@@ -436,7 +433,7 @@ namespace stonerkart
         {
             cardViewPanel.clearChildren();
 
-            filteredCards = filter(allCardsEver);//allCardsEver.Where(currentFilter).ToList();
+            refilter();
             if (manaButtons != null)
             {
                 //var activecolours = manaButtons.Where(e => e != null).Select((b, i) => b.Toggled ? i : -1).Where(i => i >= 0).Cast<ManaColour>();
