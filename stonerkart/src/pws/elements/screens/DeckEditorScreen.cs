@@ -95,6 +95,7 @@ namespace stonerkart
         private int currentPageNr = 0;
         private ToggleButton[] manaButtons { get; set; }
         private Func<Card, bool>[] filters;
+        private string searchString;
         private enum Filter
         {
             FREE = 0,
@@ -108,31 +109,14 @@ namespace stonerkart
         //todo fix hero and filter and search
         public DeckEditorScreen() : base(new Imege(Textures.artCallToArms))
         {
+            searchString = "";
             setupButtons();
-
-            setupFilters();
-            //filters[(int)Filter.SEARCH] = c => c.ToString().StartsWith("Risen");
             
             setupCards();
-            setupCardViewsFirstTime();
+            setupCardViewsFirstTime(); //fix duplicate code
             pileView = setupPileView();
             cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
-            var activeColours = manaButtons.Where(d=> d !=  null).Select((b, i) => b.Toggled ? i : -1).Where(i => i > 0).Cast<ManaColour>();
-            Func<Card, bool> f = new Func<Card, bool>(c => true);
-
-            foreach (var ac in activeColours)
-            {
-                f = c => c.colours.Contains(ac) && f(c);
-            }
-        }
-
-        private void setupFilters()
-        {
-            filters = new Func<Card, bool>[3];
-            filters[(int)Filter.FREE] = c => c.isHeroic == false && c.isToken == false;
-            filters[(int)Filter.MANA] = c => c.castManaCost.colours.Exists(col => true);
-            filters[(int)Filter.SEARCH] = c => c.ToString().StartsWith("Risen");
         }
 
         private void refilter()
@@ -142,12 +126,17 @@ namespace stonerkart
 
         private bool filterx(Card c)
         {
-            return
-                (
-                    (c.castManaCost[ManaColour.Chaos] > 0 && manaButtons[0].Toggled) || 
-                    (c.castManaCost[ManaColour.Death] > 0 && manaButtons[1].Toggled) || 
-                    false
-                );
+            bool x = (c.castManaCost[ManaColour.Chaos] > 0 && manaButtons[0].Toggled) ||
+                    (c.castManaCost[ManaColour.Death] > 0 && manaButtons[1].Toggled) ||
+                    (c.castManaCost[ManaColour.Might] > 0 && manaButtons[2].Toggled) ||
+                    (c.castManaCost[ManaColour.Order] > 0 && manaButtons[3].Toggled) ||
+                    (c.castManaCost[ManaColour.Life] > 0 && manaButtons[4].Toggled) ||
+                    (c.castManaCost[ManaColour.Nature] > 0 && manaButtons[5].Toggled) ||
+                    (c.castManaCost[ManaColour.Colourless] == c.convertedManaCost && c.convertedManaCost > 0 && manaButtons[6].Toggled) && c.isToken == false;
+            //&& c.ToString().StartsWith(searchString);
+
+            System.Console.WriteLine(c +" "+ x);
+            return x;
         }
 
         #region setups
@@ -202,6 +191,7 @@ namespace stonerkart
             };
             searchBox.keyDown += (_) =>
             {
+                searchString = searchBox.Text;
                 //erf = new Func<Card, bool>(c => c.ToString().StartsWith(searchBox.Text));
                 setupCardViews();
             };
