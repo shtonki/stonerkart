@@ -24,33 +24,9 @@ namespace stonerkart
 
         public static void launchGame()
         {
-            /*
-            GUI.launch();
-            var gsc = new GameScreen();
-            GUI.transitionToScreen(gsc);
-            Game g = new Game(new NewGameStruct(0, 420, new[] { "Hero", "Villain" }, 0), true, gsc);
-            g.startGameThread();
-            return;
-            //*/ 
-
             if (!Network.connectToServer()) throw new Exception("Server down for more or less routine maintenance.");
-
             GUI.launch();
-
             GUI.transitionToScreen(GUI.loginScreen);
-
-            /*
-
-            if (Network.connectToServer())
-            {
-                ScreenController.transitionToLoginScreen();
-            }
-            else
-            {
-                ScreenController.transitionToMainMenu();
-            }
-            */
-
         }
 
         public static void attemptLogin(string username, string password)

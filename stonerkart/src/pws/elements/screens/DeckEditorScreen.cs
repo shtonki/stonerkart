@@ -3,95 +3,137 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 
 namespace stonerkart
 {
-
     class DeckEditorScreen : Screen
     {
         #region constants
-        private const int NR_OF_CARD_VIEWS = 10;
-        private const int FRAME_WIDTH = 500;
-        private const int FRAME_HEIGHT = 700;
-        private const int PILE_VIEW_X = Frame.BACKSCREENWIDTH - CARD_VIEW_WIDTH;
-        private const int PILE_VIEW_Y = DECK_NAME_BOX_HEIGHT + SAVE_BUTTON_HEIGHT;
-        private const int PILE_VIEW_WIDTH = CARD_VIEW_WIDTH;
-        private const int PILE_VIEW_HEIGHT = (int)(Frame.BACKSCREENHEIGHT * 0.8);
-        private const int CARD_VIEW_X = 250;
-        private const int CARD_VIEW_STRIDE_X = 250;
-        private const int CARD_VIEW_STRIDE_Y = 350;
-        private const int CARD_VIEW_Y = 300;
-        private const int CARD_VIEW_WIDTH = Frame.BACKSCREENWIDTH / 8;
-        private const int CARD_VIEW_WIDTHd2 = CARD_VIEW_WIDTH / 2;
-        private const int DECK_NAME_BOX_WIDTH = CARD_VIEW_WIDTH;
+
+        private const int NR_OF_CARDS_PER_ROW = 8;
+        private const int NR_OF_CARDS_PER_COLLUMN = 3;
+        private const int NR_OF_CARD_VIEWS = NR_OF_CARDS_PER_ROW * NR_OF_CARDS_PER_COLLUMN;
+        private const int DECK_SCREEN_ITEMS_PER_ROW = 2; //load button and save button
+        private const int CARD_VIEW_WIDTH = Frame.BACKSCREENWIDTH / 12;
+        private const int CARD_VIEW_HEIGHT = CARD_VIEW_WIDTH * 700 / 500;
+        private const int FRAME_WIDTH = Frame.BACKSCREENWIDTH;
+        private const int FRAME_HEIGHT = Frame.AVAILABLEHEIGHT;
+        private const int HERO_VIEW_WIDTH = PILE_VIEW_HEIGHT * 500 / 700;
+
+        private const int DECK_SCREEN_WIDTH = DECK_SCREEN_ITEMS_PER_ROW * BUTTON_WIDTH;
+        private const int HERO_VIEW_X = PILE_VIEW_WIDTH;
+        private const int HERO_VIEW_Y = 0;
+        private const int HOVER_VIEW_WIDTH = CARD_VIEW_WIDTH * NR_OF_CARDS_PER_COLLUMN;// + CARD_VIEW_PANEL_WIDTH > FRAME_WIDTH ? FRAME_WIDTH - CARD_VIEW_PANEL_WIDTH - DOWN_PAGE_BUTTON_WIDTH : CARD_VIEW_PANEL_WIDTH * NR_OF_CARDS_PER_COLLUMN;
+        private const int HOVER_VIEW_X = FRAME_WIDTH - HOVER_VIEW_WIDTH;
+        private const int HOVER_VIEW_Y = CARD_VIEW_PANEL_Y;
+        private const int PILE_VIEW_X = 0;
+        private const int PILE_VIEW_Y = 0;
+        private const int PILE_VIEW_WIDTH = CARD_VIEW_PANEL_WIDTH;//-HERO_VIEW_WIDTH;
+        private const int PILE_VIEW_HEIGHT = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT - MANA_BUTTON_HEIGHT <= 0 ? CARD_VIEW_PANEL_HEIGHT : FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT - MANA_BUTTON_HEIGHT;//FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT <= 0 ? CARD_VIEW_PANEL_HEIGHT : FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT;
+        private const int CARD_VIEW_PANEL_X = 0;
+        private const int CARD_VIEW_PANEL_Y = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT;
+        private const int CARD_VIEW_PANEL_WIDTH = NR_OF_CARDS_PER_ROW * CARD_VIEW_STRIDE_X;
+        private const int CARD_VIEW_PANEL_HEIGHT = NR_OF_CARDS_PER_COLLUMN * CARD_VIEW_HEIGHT;
+        private const int CARD_VIEW_X = CARD_VIEW_PANEL_X;
+        private const int CARD_VIEW_Y = CARD_VIEW_PANEL_Y;
+        private const int CARD_VIEW_STRIDE_X = CARD_VIEW_WIDTH + 0;
+        private const int CARD_VIEW_STRIDE_Y = CARD_VIEW_HEIGHT + 0;
+        private const int INPUT_BOX_X = MANA_BUTTON_X + MANA_BUTTON_WIDTH * NR_OF_MANA_BUTTONS;
+        private const int INPUT_BOX_Y = MANA_BUTTON_Y;
+        private const int INPUT_BOX_WIDTH = MANA_BUTTON_WIDTH * NR_OF_MANA_BUTTONS;
+        private const int INPUT_BOX_HEIGHT = MANA_BUTTON_HEIGHT;
+        private const int NR_OF_MANA_BUTTONS = 7;
+        private const int MANA_BUTTON_X = 0;//CARD_VIEW_PANEL_WIDTH + HERO_VIEW_WIDTH;
+        private const int MANA_BUTTON_Y = CARD_VIEW_PANEL_Y - MANA_BUTTON_WIDTH;
+        private const int MANA_BUTTON_WIDTH = CARD_VIEW_HEIGHT/4;//(FRAME_WIDTH - PILE_VIEW_WIDTH - HERO_VIEW_WIDTH)/NR_OF_MANA_BUTTONS;
+        private const int MANA_BUTTON_HEIGHT = MANA_BUTTON_WIDTH;
+
+        //private const int CARD_VIEW_PANEL_HEIGHT = CARD_VIEW_PANEL_NUMBER_OF_ROWS * CARD_VIEW_HEIGHT;
+        private const int DECK_NAME_BOX_X = CARD_VIEW_PANEL_WIDTH + HERO_VIEW_WIDTH;
+        private const int DECK_NAME_BOX_Y = 0;
+        private const int DECK_NAME_BOX_WIDTH = FRAME_WIDTH - PILE_VIEW_WIDTH - HERO_VIEW_WIDTH;
         private const int DECK_NAME_BOX_HEIGHT = (int)(Frame.BACKSCREENHEIGHT * 0.05);
-        private const int SAVE_BUTTON_HEIGHT = DECK_NAME_BOX_HEIGHT / 2;
-        private const int SAVE_BUTTON_WIDTH = PILE_VIEW_WIDTH / 2;
-        private const int SAVE_BUTTON_X = PILE_VIEW_X;
-        private const int SAVE_BUTTON_Y = DECK_NAME_BOX_HEIGHT;
-        private const int PREVIOUS_PAGE_BUTTON_WIDTH = Frame.BACKSCREENWIDTH / 16;
-        private const int PREVIOUS_PAGE_BUTTON_HEIGHT = CARD_VIEW_WIDTH * FRAME_HEIGHT / FRAME_WIDTH + CARD_VIEW_STRIDE_Y; //erf
-        private const int PREVIOUS_PAGE_BUTTON_X = CARD_VIEW_X - CARD_VIEW_WIDTHd2;
-        private const int PREVIOUS_PAGE_BUTTON_Y = CARD_VIEW_Y;
-        private const int NEXT_PAGE_BUTTON_X = CARD_VIEW_X + CARD_VIEW_WIDTH * 5 + (CARD_VIEW_STRIDE_X - CARD_VIEW_WIDTH) * 4;//erf erf
-        private const int NEXT_PAGE_BUTTON_Y = CARD_VIEW_Y;
+        private const int BUTTON_HEIGHT = DECK_NAME_BOX_HEIGHT / 2;
+        private const int BUTTON_WIDTH = DECK_NAME_BOX_WIDTH / 2;
+        private const int SAVE_BUTTON_X = LOAD_BUTTON_X + BUTTON_WIDTH;
+        private const int SAVE_LOAD_BUTTON_Y = DECK_NAME_BOX_HEIGHT;
+        private const int LOAD_BUTTON_X = DECK_NAME_BOX_X;
+
+
+        private const int UP_PAGE_BUTTON_WIDTH = DOWN_PAGE_BUTTON_WIDTH;
+        private const int UP_PAGE_BUTTON_HEIGHT = DOWN_PAGE_BUTTON_HEIGHT;
+        private const int UP_PAGE_BUTTON_X = CARD_VIEW_PANEL_WIDTH;
+        private const int UP_PAGE_BUTTON_Y = CARD_VIEW_PANEL_Y;
+        private const int DOWN_PAGE_BUTTON_X = CARD_VIEW_PANEL_WIDTH;
+        private const int DOWN_PAGE_BUTTON_Y = CARD_VIEW_PANEL_Y + UP_PAGE_BUTTON_HEIGHT;
+        private const int DOWN_PAGE_BUTTON_WIDTH = FRAME_WIDTH - CARD_VIEW_PANEL_WIDTH - HOVER_VIEW_WIDTH;
+        private const int DOWN_PAGE_BUTTON_HEIGHT = CARD_VIEW_PANEL_HEIGHT / 2;
+
+
+
+        private readonly static System.Drawing.Color CARD_PANEL_BACKCOLOR = System.Drawing.Color.FromKnownColor(System.Drawing.KnownColor.Silver);
+        private readonly static System.Drawing.Color PAGE_BUTTON_BACKCOLOR = System.Drawing.Color.FromKnownColor(System.Drawing.KnownColor.SaddleBrown);
+
         #endregion
 
-        private CardList deck;
-        private Card hero;
-
+        private CardList cardList;
+        private Card currentHero;
+        private CardView hoverView;
+        private PileView pileView;
         private DeckContraints deckConstraints;
-
-        private Func<Card, bool> currentFilter;
-        private int currentPageNr = 0;
-
+        private CardView[] cardViews;
         private List<Card> allCardsEver;
         private List<Card> filteredCards;
+        private CardView heroCardView;
+        private Square cardViewPanel;
+        private int currentPageNr = 0;
+        private ToggleButton[] manaButtons { get; set; }
+        private string searchString;
 
-        private PileView pileView;
-        private CardView[] cardViews;
-
-
-        //todo fix hero saving/loading/ui
-        public DeckEditorScreen() : base()
+        //todo fix hero and search and deckinfo
+        public DeckEditorScreen() : base(new Imege(Textures.artCallToArms))
         {
+            searchString = "";
+            setupButtons();
+            
             setupCards();
-            setupCardViews();
+            initCardViews(); //fix duplicate code
             pileView = setupPileView();
-            pileView.maxPadding = 30;
-            deck = setupCardList(pileView);
+            cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
-            List<Button> buttons = setupButtons();
-        }
-        
-        private List<Card> filter(Func<Card, bool> filter)
-        {
-            List<Card> fCards = new List<Card>();
-            foreach(var c in allCardsEver)
-            {
-                if(filter(c) == true)
-                {
-                    fCards.Add(c);
-                }
-            }
-            return fCards;
         }
 
-
-        private void addFilter(Func<Card, bool> f)
+        private void refilter()
         {
-            currentFilter = c => currentFilter(c) && f(c);
+            filteredCards = allCardsEver.Where(filterx).ToList();
+        }
+
+        private bool filterx(Card c)
+        {
+            bool x = (c.castManaCost[ManaColour.Chaos] > 0 && manaButtons[0].Toggled) ||
+                    (c.castManaCost[ManaColour.Death] > 0 && manaButtons[1].Toggled) ||
+                    (c.castManaCost[ManaColour.Might] > 0 && manaButtons[2].Toggled) ||
+                    (c.castManaCost[ManaColour.Order] > 0 && manaButtons[3].Toggled) ||
+                    (c.castManaCost[ManaColour.Life] > 0 && manaButtons[4].Toggled) ||
+                    (c.castManaCost[ManaColour.Nature] > 0 && manaButtons[5].Toggled) ||
+                    (c.castManaCost[ManaColour.Colourless] == c.convertedManaCost && c.convertedManaCost > 0 && manaButtons[6].Toggled && c.isToken == false) ||
+                    (c.isHeroic);
+            //&& c.ToString().StartsWith(searchString);
+            if(c.isHeroic)
+             System.Console.WriteLine(c +" "+ x);
+            return x;
         }
 
         #region setups
 
         private void setupCards()
         {
+            allCardsEver = new List<Card>();
             var cardTemplates = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().ToList();
             allCardsEver = cardTemplates.Select(c => new Card(c)).ToList();
             allCardsEver.Sort((c1, c2) =>
@@ -108,76 +150,123 @@ namespace stonerkart
                 var cmcdiff = c1.convertedManaCost - c2.convertedManaCost;
                 return cmcdiff;
             });
-
-            currentFilter = new Func<Card, bool>(c => true);
-            filteredCards = filter(currentFilter);
         }
 
         private List<Button> setupButtons()
         {
+            #region input
             List<Button> bs = new List<Button>();
-
             InputBox deckNameBox = new InputBox(DECK_NAME_BOX_WIDTH, DECK_NAME_BOX_HEIGHT);
-            deckNameBox.setLocation(PILE_VIEW_X, 0);
+            deckNameBox.setLocation(DECK_NAME_BOX_X, DECK_NAME_BOX_Y);
             deckNameBox.setText("My Deck");
             deckNameBox.clicked += (_) =>
             {
                 deckNameBox.setText("");
             };
+            addElement(deckNameBox);
             
-            Button saveButton = new Button(128, 32);
-            saveButton.setLocation(SAVE_BUTTON_X, SAVE_BUTTON_Y);
+
+
+            InputBox searchBox = new InputBox(INPUT_BOX_WIDTH, INPUT_BOX_HEIGHT);
+            searchBox.setLocation(INPUT_BOX_X, INPUT_BOX_Y);
+            searchBox.setText("Search");
+            searchBox.clicked += (_) =>
+            {
+                searchBox.setText("");
+            };
+            searchBox.keyDown += (_) =>
+            {
+                searchString = searchBox.Text;
+                //erf = new Func<Card, bool>(c => c.ToString().StartsWith(searchBox.Text));
+                setupCardViews();
+            };
+            addElement(searchBox);
+            #endregion
+            #region save
+            Button saveButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
+            saveButton.setLocation(SAVE_BUTTON_X, SAVE_LOAD_BUTTON_Y);
             saveButton.Backcolor = System.Drawing.Color.Red;
             saveButton.Text = "Save";
-            saveButton.clicked += (_) => 
+            saveButton.clicked += (_) =>
             {
-                DeckController.saveDeck(new Deck(CardTemplate.Bhewas, deck.Select(c => c.template).ToArray()), "erf");
+                DeckController.saveDeck(new Deck(currentHero.template, cardList.Select(c => c.template).ToArray()), deckNameBox.Text);
             };
-
-            Button loadButton = new Button(128, 32);
+            addElement(saveButton);
+            #endregion
+            #region load
+            Button loadButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
             loadButton.clicked += (_) =>
             {
-                Deck d = DeckController.loadDeck("erf");
-                deck.clear();
-                foreach (var t in d.templates)
+                new Thread(() =>
                 {
-                    deck.addTop(new Card(t));
-                }
-            };
+                    Deck d = DeckController.chooseDeck();
+                    loadDeck(d);
+                }).Start();
+            };    
             loadButton.Text = "Load";
-            loadButton.setLocation(SAVE_BUTTON_X + SAVE_BUTTON_WIDTH, SAVE_BUTTON_Y);
+            loadButton.setLocation(LOAD_BUTTON_X, SAVE_LOAD_BUTTON_Y);
             loadButton.Backcolor = System.Drawing.Color.Red;
-
-
-
-
-
-            Button previousPageButton = new Button(PREVIOUS_PAGE_BUTTON_WIDTH, PREVIOUS_PAGE_BUTTON_HEIGHT);
-            previousPageButton.setLocation(PREVIOUS_PAGE_BUTTON_X, PREVIOUS_PAGE_BUTTON_Y);
-            previousPageButton.Backcolor = System.Drawing.Color.AliceBlue;
-            previousPageButton.clicked += (_) => 
+            addElement(loadButton);
+            #endregion
+            #region page buttons
+            Button previousPageButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
+            previousPageButton.setLocation(UP_PAGE_BUTTON_X, UP_PAGE_BUTTON_Y);
+            previousPageButton.Width = UP_PAGE_BUTTON_WIDTH;
+            previousPageButton.Height = UP_PAGE_BUTTON_HEIGHT;
+            previousPageButton.Backcolor = PAGE_BUTTON_BACKCOLOR;
+            previousPageButton.clicked += (_) =>
             {
                 if (currentPageNr > 0) currentPageNr--;
                 setupCardViews();
             };
 
-            Button nextPageButton = new Button(PREVIOUS_PAGE_BUTTON_WIDTH, PREVIOUS_PAGE_BUTTON_HEIGHT);
-            nextPageButton.setLocation(NEXT_PAGE_BUTTON_X, NEXT_PAGE_BUTTON_Y);
-            nextPageButton.Backcolor = System.Drawing.Color.AliceBlue;
+            Button nextPageButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
+            nextPageButton.setLocation(DOWN_PAGE_BUTTON_X, DOWN_PAGE_BUTTON_Y);
+            nextPageButton.Width = UP_PAGE_BUTTON_WIDTH;
+            nextPageButton.Height = UP_PAGE_BUTTON_HEIGHT;
+            nextPageButton.Backcolor = PAGE_BUTTON_BACKCOLOR;
             nextPageButton.clicked += (_) =>
             {
                 if (currentPageNr * NR_OF_CARD_VIEWS + NR_OF_CARD_VIEWS < filteredCards.Count) currentPageNr++;
                 setupCardViews();
             };
-
-
             addElement(nextPageButton);
             addElement(previousPageButton);
-            addElement(deckNameBox);
-            addElement(loadButton);
-            addElement(saveButton);
+            #endregion
+            #region mana buttons
 
+            manaButtons = new ToggleButton[Enum.GetValues(typeof(ManaColour)).Length];
+            int mx = MANA_BUTTON_X;
+            int my = MANA_BUTTON_Y;
+            for (int i = 0; i < manaButtons.Length-1; i++)
+            {
+                int ii = i;
+                manaButtons[i] = new ToggleButton(MANA_BUTTON_WIDTH, MANA_BUTTON_WIDTH);
+                manaButtons[i].setLocation(mx, my);
+                manaButtons[i].Backimege = new Imege(TextureLoader.orbTexture(G.orbOrder[i]));
+                mx += MANA_BUTTON_WIDTH;
+                if (mx > FRAME_WIDTH)
+                {
+                    mx = MANA_BUTTON_X;
+                    my -= MANA_BUTTON_WIDTH;
+                }
+                addElement(manaButtons[i]);
+                manaButtons[i].clicked += (args) =>
+                {
+                    currentPageNr = 0;
+                    setupCardViews();
+                };
+            }
+
+            #endregion
             return bs;
+        }
+
+        private void loadDeck(Deck deck)
+        {
+            cardList.clear();
+            var cards = deck.templates.Select(t => new Card(t)).ToArray();
+            cardList.addRange(cards);
         }
 
         private CardList setupCardList(PileView pv)
@@ -190,91 +279,177 @@ namespace stonerkart
         private PileView setupPileView()
         {
             PileView pv = new PileView();
-            pv.Backimege = new MemeImege(Textures.buttonbg0, 456795425);
+            pv.Backimege = new Imege(Textures.artDeath);
+            pv.Width = (int)(Frame.BACKSCREENWIDTH * 0.80);
+            pv.Height = Frame.BACKSCREENHEIGHT / 4;
             pv.Height = (int)(PILE_VIEW_HEIGHT);
             pv.Width = PILE_VIEW_WIDTH;
             pv.setLocation(PILE_VIEW_X, PILE_VIEW_Y);
-            pv.Columns = 1;
+            //pv.Columns = 1;
             pv.mouseDown += (a) =>
             {
                 var cardView = pv.viewAtClick(a);
-                if (cardView != null) deck.remove(cardView.card);
+                if (cardView != null) cardList.remove(cardView.card);
             };
+            pv.mouseMove += (__) =>
+            {
+                var cardView = pv.viewAtClick(__);
+                if(hoverView != null && cardView != null) setupHoverCardView(cardView.card);
+            };
+
             addElement(pv);
 
             return pv;
         }
-
-        private void theyShouldveBeenInAPanel()
+        private void setupCardViews()
         {
-            cardViews = elements.Where(g => g is CardView).Cast<CardView>().ToArray();
-            foreach (var cv in cardViews)
+            cardViewPanel.clearChildren();
+            refilter();
+            Card[] cardsToShow = getCardsFromPage();
+            layoutCardViews(cardsToShow);
+
+            //is this erf?
+            while (cardsToShow.Count() < 1)
             {
-                removeElement(cv);
+                currentPageNr--;
+                setupCardViews();
             }
         }
 
-        private void setupCardViews()
+        private Card[] getCardsFromPage()
         {
-            theyShouldveBeenInAPanel();
-
-            filteredCards = allCardsEver.Where(currentFilter).ToList();
-
             Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
-
-            for(int i = 0; i < NR_OF_CARD_VIEWS; i++)
+            for (int i = 0; i < NR_OF_CARD_VIEWS; i++)
             {
                 int index = i + NR_OF_CARD_VIEWS * currentPageNr;
                 if (index < filteredCards.Count)
                     cardsToShow[i] = filteredCards.ElementAt(index);
             }
-            cardViews = layoutCardViews(cardsToShow);
+            return cardsToShow;
         }
 
-        private CardView[] layoutCardViews(Card[] cards)
+        private void initCardViews()
         {
-            //System.Console.WriteLine("Filtered cards count: " + filteredCards.Count);
-            //System.Console.WriteLine("Cards count: " + cards.Length);
-            cardViews = new CardView[cards.Length];
-            int x = CARD_VIEW_X;
-            int y = CARD_VIEW_Y;
-            for(int i = 0; i < cards.Length; i++)
+            setupCardViewPanel();
+            setupHeroCardView(new Card(CardTemplate.Bhewas));
+            
+            cardViews = new CardView[NR_OF_CARD_VIEWS];
+
+            refilter();
+            Card[] cardsToShow = getCardsFromPage();
+            
+            layoutCardViews(cardsToShow);
+            addElement(cardViewPanel);
+            setupHoverCardView();
+        }
+
+        private void setupCardViewPanel()
+        {
+            cardViewPanel = new Square();
+            cardViewPanel.setSize(CARD_VIEW_PANEL_WIDTH, CARD_VIEW_PANEL_HEIGHT);
+            cardViewPanel.setLocation(CARD_VIEW_PANEL_X, CARD_VIEW_PANEL_Y);
+            cardViewPanel.Backcolor = CARD_PANEL_BACKCOLOR;
+        }
+
+        private void setupHoverCardView()
+        {
+            hoverView = new CardView(new Card(CardTemplate.Abolish));
+            hoverView.Width = HOVER_VIEW_WIDTH;
+            hoverView.X = HOVER_VIEW_X;
+            hoverView.Y = HOVER_VIEW_Y;
+            addElement(hoverView);
+
+            if (cardViews == null) throw new Exception("you must setup hovercardview after cardviews");
+            foreach(CardView cv in cardViews)
             {
-                if(cards[i] != null) //should work without this but it doesnt (: problem for later  :)))) (:
+                if (cv != null)
+                {
+                    cv.mouseEnter += (__) =>
+                    {
+                        setupHoverCardView(cv.card);
+                    };
+                }
+            }
+            heroCardView.mouseEnter += (__) =>
+            {
+                setupHoverCardView(heroCardView.card);
+            }; 
+        }
+
+        private void setupHoverCardView(Card c)
+        {
+            removeElement(hoverView);
+            hoverView = new CardView(new Card(c.template));
+            //hoverView.Width = NEXT_PAGE_BUTTON_X - FRAME_WIDTH;
+            hoverView.X = HOVER_VIEW_X;
+            hoverView.Y = HOVER_VIEW_Y;
+            addElement(hoverView);
+        }
+
+       
+
+        private void setupHeroCardView(Card c)
+        {
+            heroCardView = new CardView(c);
+            heroCardView.setLocation(HERO_VIEW_X, HERO_VIEW_Y);
+            heroCardView.Width = HERO_VIEW_WIDTH;
+            heroCardView.Backimege = new Imege(TextureLoader.cardArt(c.template));
+            currentHero = c;
+            addElement(heroCardView);
+        }
+
+        private void layoutCardViews(Card[] cards)
+        {
+            int x = 0;
+            int y = 0;
+            for (int i = 0; i < cards.Length; i++)
+            {
+
+                if (cards[i] != null) //should work without this but it doesnt (: problem for later  :)))) (:
                 {
                     cardViews[i] = new CardView(cards[i]);
 
                     cardViews[i].Width = CARD_VIEW_WIDTH;
-                    if (i == NR_OF_CARD_VIEWS / 2)
+
+                    if (x >= cardViewPanel.Width)
                     {
                         y += CARD_VIEW_STRIDE_Y;
-                        x = CARD_VIEW_X;
+                        x = 0;
                     }
                     cardViews[i].setLocation(x, y);
                     x += CARD_VIEW_STRIDE_X;
-                    addElement(cardViews[i]);
+                    cardViewPanel.addChild(cardViews[i]);
 
                     int i1 = i;
                     cardViews[i].clicked += (__) =>
                     {
-                        addToDeck(cardViews[i1].card.template);
+                        if (cardViews[i1].card.isHeroic)
+                        {
+                            setupHeroCardView(cardViews[i1].card);
+                        }
+                        else
+                        {
+                            addToDeck(cardViews[i1].card.template);
+                        }            
+                    };
+                    
+                    cardViews[i].mouseEnter += (__) =>
+                    {
+                        setupHoverCardView(cardViews[i1].card);
                     };
                 }
-                
             }
-            return cardViews;
         }
 
         #endregion
 
         private void addToDeck(CardTemplate ct)
         {
-            if (deckConstraints.willBeLegal(CardTemplate.Shibby_sShtank, deck.Select(c => c.template).ToArray(), ct))
+            if (deckConstraints.willBeLegal(currentHero.template, cardList.Select(c => c.template).ToArray(), ct))
             {
-                deck.addTop(new Card(ct));
+                cardList.addTop(new Card(ct));
             }
         }
-
 
         
     }

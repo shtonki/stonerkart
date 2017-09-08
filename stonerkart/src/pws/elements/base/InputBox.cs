@@ -36,6 +36,7 @@ namespace stonerkart
         {
             textBox.Text = text;
         }
+        
 
         public override Border Border
         {

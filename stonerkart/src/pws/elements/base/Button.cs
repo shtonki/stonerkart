@@ -11,6 +11,7 @@ namespace stonerkart
     {
         private static Color pressedColor = Color.FromArgb(50, 50, 50, 50);
 
+
         public Button(int width, int height) : base(width, height)
         {
         }
