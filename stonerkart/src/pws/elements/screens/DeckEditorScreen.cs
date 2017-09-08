@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -258,6 +259,15 @@ namespace stonerkart
                 };
             }
 
+            #endregion
+            #region back
+            Button back = new Button(100, 40);
+            back.Text = "Back";
+            back.Backcolor = Color.Silver;;
+            back.Border = new SolidBorder(4, Color.Black);
+            back.clicked += a => GUI.transitionToScreen(GUI.mainMenuScreen);
+            addElement(back);
+            back.setLocation(1350, 310);
             #endregion
             return bs;
         }

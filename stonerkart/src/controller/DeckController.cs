@@ -45,24 +45,6 @@ namespace stonerkart
 
         public static Deck chooseDeck()
         {
-            return new Deck(CardTemplate.Prince_sIla,
-                new[]
-                {
-                    CardTemplate.Solemn_sLotus,
-                    CardTemplate.Solemn_sLotus,
-                    CardTemplate.Solemn_sLotus,
-                    CardTemplate.Solemn_sLotus,
-                    CardTemplate.Solemn_sLotus,
-                    CardTemplate.Rockhand_sEchion, 
-                    CardTemplate.Rockhand_sEchion, 
-                    CardTemplate.Rockhand_sEchion, 
-                    CardTemplate.Rockhand_sEchion, 
-                    CardTemplate.Rockhand_sEchion, 
-                    CardTemplate.Rockhand_sEchion, 
-                    CardTemplate.Rockhand_sEchion, 
-                    CardTemplate.Rockhand_sEchion, 
-                });
-
             Deck[] decks = getDecks().ToArray();
             PublicSaxophone sax = new PublicSaxophone(o => o is Deck);
 
