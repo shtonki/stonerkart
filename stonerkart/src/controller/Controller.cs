@@ -38,7 +38,7 @@ namespace stonerkart
             //*/
             GUI.launch();
             GUI.setScreen(new DeckEditorScreen());
-            if (!Network.connectToServer()) throw new Exception("Serber offline");
+            //if (!Network.connectToServer()) throw new Exception("Serber offline");
 
             
 

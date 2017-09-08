@@ -87,33 +87,21 @@ namespace stonerkart
         private DeckContraints deckConstraints;
         private CardView[] cardViews;
         private List<Card> allCardsEver;
-        private List<Card> allHeroes;
         private List<Card> filteredCards;
         private CardView heroCardView;
-        private Func<Card, bool> currentFilter;
         private Square cardViewPanel;
         private int currentPageNr = 0;
         private ToggleButton[] manaButtons { get; set; }
-        private Func<Card, bool>[] filters;
         private string searchString;
-        private enum Filter
-        {
-            FREE = 0,
-            MANA = 1,
-            SEARCH = 2,
-            //COST= 3,
-            //TYPE = 4,
-            //RARITY = 5
-        }
 
-        //todo fix hero and filter and search
+        //todo fix hero and search and deckinfo
         public DeckEditorScreen() : base(new Imege(Textures.artCallToArms))
         {
             searchString = "";
             setupButtons();
             
             setupCards();
-            setupCardViewsFirstTime(); //fix duplicate code
+            initCardViews(); //fix duplicate code
             pileView = setupPileView();
             cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
@@ -132,10 +120,11 @@ namespace stonerkart
                     (c.castManaCost[ManaColour.Order] > 0 && manaButtons[3].Toggled) ||
                     (c.castManaCost[ManaColour.Life] > 0 && manaButtons[4].Toggled) ||
                     (c.castManaCost[ManaColour.Nature] > 0 && manaButtons[5].Toggled) ||
-                    (c.castManaCost[ManaColour.Colourless] == c.convertedManaCost && c.convertedManaCost > 0 && manaButtons[6].Toggled) && c.isToken == false;
+                    (c.castManaCost[ManaColour.Colourless] == c.convertedManaCost && c.convertedManaCost > 0 && manaButtons[6].Toggled && c.isToken == false) ||
+                    (c.isHeroic);
             //&& c.ToString().StartsWith(searchString);
-
-            System.Console.WriteLine(c +" "+ x);
+            if(c.isHeroic)
+             System.Console.WriteLine(c +" "+ x);
             return x;
         }
 
@@ -160,11 +149,6 @@ namespace stonerkart
                 var cmcdiff = c1.convertedManaCost - c2.convertedManaCost;
                 return cmcdiff;
             });
-            allHeroes = new List<Card>();
-            allHeroes = allCardsEver.Where(c => c.isHeroic).ToList();
-            currentHero = allHeroes[0];
-            //currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
-            //refilter();
         }
 
         private List<Button> setupButtons()
@@ -204,7 +188,7 @@ namespace stonerkart
             saveButton.Text = "Save";
             saveButton.clicked += (_) =>
             {
-                DeckController.saveDeck(new Deck(CardTemplate.Bhewas, cardList.Select(c => c.template).ToArray()), deckNameBox.Text);
+                DeckController.saveDeck(new Deck(currentHero.template, cardList.Select(c => c.template).ToArray()), deckNameBox.Text);
             };
             addElement(saveButton);
             #endregion
@@ -346,30 +330,45 @@ namespace stonerkart
 
             return pv;
         }
-
-
-        private void setupCardViewsFirstTime()
+        private void setupCardViews()
         {
-            
-            setupCardViewPanel();
-            setupHeroCardView(new Card(CardTemplate.Bhewas));
-            
-            cardViews = new CardView[NR_OF_CARD_VIEWS];
-
+            cardViewPanel.clearChildren();
             refilter();
-            Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
+            Card[] cardsToShow = getCardsFromPage();
+            layoutCardViews(cardsToShow);
 
+            //is this erf?
+            while (cardsToShow.Count() < 1)
+            {
+                currentPageNr--;
+                setupCardViews();
+            }
+        }
+
+        private Card[] getCardsFromPage()
+        {
+            Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
             for (int i = 0; i < NR_OF_CARD_VIEWS; i++)
             {
                 int index = i + NR_OF_CARD_VIEWS * currentPageNr;
                 if (index < filteredCards.Count)
                     cardsToShow[i] = filteredCards.ElementAt(index);
             }
+            return cardsToShow;
+        }
 
+        private void initCardViews()
+        {
+            setupCardViewPanel();
+            setupHeroCardView(new Card(CardTemplate.Bhewas));
+            
+            cardViews = new CardView[NR_OF_CARD_VIEWS];
+
+            refilter();
+            Card[] cardsToShow = getCardsFromPage();
             
             layoutCardViews(cardsToShow);
             addElement(cardViewPanel);
-
             setupHoverCardView();
         }
 
@@ -389,7 +388,7 @@ namespace stonerkart
             hoverView.Y = HOVER_VIEW_Y;
             addElement(hoverView);
 
-            if (cardViews == null) throw new Exception("you must setup hovercardview after cardviews, i s this a legit way of doing this? i dont know");
+            if (cardViews == null) throw new Exception("you must setup hovercardview after cardviews");
             foreach(CardView cv in cardViews)
             {
                 if (cv != null)
@@ -403,10 +402,7 @@ namespace stonerkart
             heroCardView.mouseEnter += (__) =>
             {
                 setupHoverCardView(heroCardView.card);
-            };
-            
-
-
+            }; 
         }
 
         private void setupHoverCardView(Card c)
@@ -419,43 +415,15 @@ namespace stonerkart
             addElement(hoverView);
         }
 
-        private void setupCardViews()
-        {
-            cardViewPanel.clearChildren();
-
-            refilter();
-            if (manaButtons != null)
-            {
-                //var activecolours = manaButtons.Where(e => e != null).Select((b, i) => b.Toggled ? i : -1).Where(i => i >= 0).Cast<ManaColour>();
-
-                //currentFilter = new Func<Card, bool>(c => c.isHeroic == false || c.isToken == false);
-                //filteredCards = filter(currentFilter).Where(c => c.colours.Any(clr => activecolours.Contains(clr))).ToList();
-            }
-
-            Card[] cardsToShow = new Card[NR_OF_CARD_VIEWS];
-            for (int i = 0; i < NR_OF_CARD_VIEWS; i++)
-            {
-                int index = i + NR_OF_CARD_VIEWS * currentPageNr;
-                if (index < filteredCards.Count)
-                    cardsToShow[i] = filteredCards.ElementAt(index);
-            }
-            layoutCardViews(cardsToShow);
-
-            //is this erf?
-            while (cardsToShow.Count() < 1)
-            {
-                currentPageNr--;
-                setupCardViews();
-            }
-        }
-
+       
 
         private void setupHeroCardView(Card c)
         {
             heroCardView = new CardView(c);
             heroCardView.setLocation(HERO_VIEW_X, HERO_VIEW_Y);
             heroCardView.Width = HERO_VIEW_WIDTH;
-            heroCardView.Backimege = new Imege(Textures.artBelwas);
+            heroCardView.Backimege = new Imege(TextureLoader.cardArt(c.template));
+            currentHero = c;
             addElement(heroCardView);
         }
 
@@ -484,7 +452,14 @@ namespace stonerkart
                     int i1 = i;
                     cardViews[i].clicked += (__) =>
                     {
-                        addToDeck(cardViews[i1].card.template);
+                        if (cardViews[i1].card.isHeroic)
+                        {
+                            setupHeroCardView(cardViews[i1].card);
+                        }
+                        else
+                        {
+                            addToDeck(cardViews[i1].card.template);
+                        }            
                     };
                     
                     cardViews[i].mouseEnter += (__) =>
