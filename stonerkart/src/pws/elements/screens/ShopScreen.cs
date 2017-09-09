@@ -10,9 +10,10 @@ namespace stonerkart
     class ShopScreen : Screen
     {
         private Square packsSquare { get; }
+        private Button backButton { get; }
 
         private const int packSquareWidth = 1200;
-        private const int packSquareHeight = 500;
+        private const int packSquareHeight = 600;
         private const int packWidth = 250;
         private const int packPadding = 25;
 
@@ -22,8 +23,17 @@ namespace stonerkart
         {
             packsSquare = new Square(packSquareWidth, packSquareHeight);
             addElement(packsSquare);
-            packsSquare.X = 100;
-            packsSquare.Y = 100;
+            packsSquare.X = 200;
+            packsSquare.Y = 200;
+
+            backButton = new Button(120, 40);
+            addElement(backButton);
+            backButton.Backimege = new MemeImege(Textures.buttonbg2, 43985);
+            backButton.Border = new AnimatedBorder(Textures.border0, 4);
+            backButton.X = 20;
+            backButton.Y = 20;
+            backButton.Text = "Back";
+            backButton.clicked += a => GUI.transitionToScreen(GUI.mainMenuScreen);
         }
 
         public void ripPack(IEnumerable<CardTemplate> ripped)
@@ -40,9 +50,9 @@ namespace stonerkart
             {
                 if (i >= displayedPacks.Length) break;
                 Packs pack = displayedPacks[i];
-                var pp = new PackProductPanel(packWidth, packSquareHeight, new ProductUnion(Packs.FirstEdition12Pack), ownedPacks.Count(p => p == pack));
+                var pp = new PackProductPanel(packWidth, packSquareHeight, new ProductUnion(displayedPacks[i]), ownedPacks.Count(p => p == pack));
                 packsSquare.addChild(pp);
-                pp.X = i*packWidth;
+                pp.X = packPadding + i*(packWidth + packPadding);
             }
 
         }

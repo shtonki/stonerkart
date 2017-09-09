@@ -56,6 +56,11 @@ namespace stonerkart
             notify(new UserChanged(this));
         }
 
+        public void addFriend(User friend)
+        {
+            friends.Add(friend);
+        }
+
         public static User FromString(string s)
         {
             var ss = s.Split(separator);

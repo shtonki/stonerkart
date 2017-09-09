@@ -55,7 +55,9 @@ namespace stonerkart
             QUERY,
             QUERYRESPONSE,
             USERSTATUSCHANGED,
-            ADDFRIEND,
+            FRIENDREQUEST,
+            ACCEPTFRIEND,
+            DECLINEFRIEND,
             CHALLENGE,
             ACCEPTCHALLENGE,
             NEWGAME,
@@ -97,6 +99,7 @@ namespace stonerkart
     public enum Queries
     {
         FRIENDS,
+        FRIENDREQUESTS,
         MYCOSMETICS,
         SHEKELS,
         COLLECTION,

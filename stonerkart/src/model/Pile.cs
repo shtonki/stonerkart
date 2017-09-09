@@ -101,7 +101,7 @@ namespace stonerkart
 
         public void clear()
         {
-            PileChangedMessage m = new PileChangedMessage(PileChangedArg.Remove, cards);
+            PileChangedMessage m = new PileChangedMessage(PileChangedArg.Remove, cards.ToArray());
             cardList.Clear();
             notify(m);
         }

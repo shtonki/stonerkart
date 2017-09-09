@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -258,48 +260,12 @@ namespace stonerkart
             Button loadButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
             loadButton.clicked += (_) =>
             {
-                var decks = DeckController.getDecks();
-                int deckScreenHeight = ((decks.Count()+DECK_SCREEN_ITEMS_PER_ROW)/DECK_SCREEN_ITEMS_PER_ROW)*BUTTON_HEIGHT;
-                Square deckScreen = new Square(DECK_SCREEN_WIDTH, deckScreenHeight);
-                
-                deckScreen.setLocation(LOAD_BUTTON_X, SAVE_LOAD_BUTTON_Y+BUTTON_HEIGHT);
-                Winduh deckSelectWindow = new Winduh(deckScreen);
-                //deckSelectWindow.setSize(5000, 500);
-                deckSelectWindow.setLocation(LOAD_BUTTON_X, SAVE_LOAD_BUTTON_Y + BUTTON_HEIGHT);
-                deckSelectWindow.Backcolor = System.Drawing.Color.BlanchedAlmond;
-                addElement(deckSelectWindow);
-
-                int x = 0;
-                int y = 0;
-                foreach (var de in decks)
+                new Thread(() =>
                 {
-                    Button deckButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT);
-                    deckButton.Text = de.name;
-                    deckButton.Backcolor = System.Drawing.Color.Azure;
-                    deckButton.setLocation(x, y);
-                    deckScreen.addChild(deckButton);
-                    x += BUTTON_WIDTH;
-                    if (x >= deckScreen.Width)
-                    {
-                        x = 0;
-                        y += BUTTON_HEIGHT;
-                    }
-                    deckButton.clicked += (__) =>
-                    {
-                        cardList.clear();
-                        foreach (var t in de.templates)
-                        {
-                            cardList.addTop(new Card(t));
-                        }
-                        loadButton.Hoverable = true;
-                        removeElement(deckSelectWindow);
-                    };
-                    loadButton.Hoverable = false;
-                }
-
-                
-
-            };
+                    Deck d = DeckController.chooseDeck();
+                    loadDeck(d);
+                }).Start();
+            };    
             loadButton.Text = "Load";
             loadButton.setLocation(LOAD_BUTTON_X, SAVE_LOAD_BUTTON_Y);
             loadButton.Backcolor = System.Drawing.Color.Red;
@@ -356,9 +322,24 @@ namespace stonerkart
             }
 
             #endregion
+            #region back
+            Button back = new Button(100, 40);
+            back.Text = "Back";
+            back.Backcolor = Color.Silver;;
+            back.Border = new SolidBorder(4, Color.Black);
+            back.clicked += a => GUI.transitionToScreen(GUI.mainMenuScreen);
+            addElement(back);
+            back.setLocation(1350, 310);
+            #endregion
             return bs;
         }
-        
+
+        private void loadDeck(Deck deck)
+        {
+            cardList.clear();
+            var cards = deck.templates.Select(t => new Card(t)).ToArray();
+            cardList.addRange(cards);
+        }
 
         private CardList setupCardList(PileView pv)
         {

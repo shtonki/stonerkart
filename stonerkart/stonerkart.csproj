@@ -40,7 +40,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -115,6 +115,7 @@
     <Compile Include="src\pws\elements\screens\GameScreen.cs" />
     <Compile Include="src\pws\elements\screens\LoginScreen.cs" />
     <Compile Include="src\pws\elements\screens\MainMenuScreen.cs" />
+    <Compile Include="src\pws\elements\screens\PlayScreen.cs" />
     <Compile Include="src\pws\elements\screens\Screen.cs" />
     <Compile Include="src\pws\elements\screens\ShopScreen.cs" />
     <Compile Include="src\pws\elements\TextLayout.cs" />
@@ -183,6 +184,10 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\iconCheck.png" />
+    <None Include="Resources\iconCross.png" />
+    <None Include="Resources\firstedition40cardpack.png" />
+    <None Include="Resources\buttonAddFriend.png" />
     <None Include="Resources\firstedition12cardpack.png" />
     <None Include="Resources\background0.png" />
     <None Include="Resources\firstedition.png" />

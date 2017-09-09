@@ -49,7 +49,9 @@ namespace stonerkart
                 case Message.MessageType.CHALLENGE:
                 {
                     ChallengeBody cb = new ChallengeBody(m.body);
-                    serverConnection.send(new Message("_server", Message.MessageType.ACCEPTCHALLENGE, new ChallengeBody(cb.challengee)));
+                    var option = GUI.promptUser(cb.challengee + " challenges you to a battle to the death. Do you wish to accept this challenge?", 
+                        ButtonOption.Yes, ButtonOption.No);
+                    if (option == ButtonOption.Yes) serverConnection.send(new Message("_server", Message.MessageType.ACCEPTCHALLENGE, new ChallengeBody(cb.challengee)));
                 } break;
 
                 case Message.MessageType.NEWGAME:
@@ -81,6 +83,19 @@ namespace stonerkart
                     friend.Status = body.status;
                 } break;
 
+                case Message.MessageType.FRIENDREQUEST:
+                {
+                    AddFriendBody body = new AddFriendBody(m.body);
+                    GUI.frame.addFriendsPanel.addRequests(new [] {body.name});
+                } break;
+
+                case Message.MessageType.ACCEPTFRIEND:
+                {
+                    var body = new AddFriendBody(m.body);
+                    var newfriend = User.FromString(body.name);
+                    GUI.frame.friendsPanel.addFriends(new [] {newfriend});
+                    Controller.user.addFriend(newfriend);
+                } break;
 
                 default:
                     throw new Exception(m.messageType.ToString());
@@ -146,17 +161,22 @@ namespace stonerkart
         public static bool register(string username, string password)
         {
             LoginBody b = new LoginBody(username, password);
-            serverConnection.send(new Message(servername, Message.MessageType.REGISTER, b));
+            tellServer(Message.MessageType.REGISTER, b);
             return false;
         }
 
-        public static bool addFriend(string username)
+        public static bool sendFriendRequest(string username)
         {
             AddFriendBody b = new AddFriendBody(username);
-            serverConnection.send(new Message(servername, Message.MessageType.ADDFRIEND, b));
-            Message m = awaitResponseMessage();
-            ResponseBody rb = new ResponseBody(m.body);
+            ResponseBody rb = askServer(Message.MessageType.FRIENDREQUEST, b);
             return rb.code == ResponseBody.ResponseCode.OK;
+        }
+
+        public static void respondToFriendRequest(string username, bool accept)
+        {
+            AddFriendBody b = new AddFriendBody(username);
+            Message.MessageType mt = accept ? Message.MessageType.ACCEPTFRIEND : Message.MessageType.DECLINEFRIEND;
+            tellServer(mt, b);
         }
 
         public static bool challenge(string username)
@@ -179,6 +199,12 @@ namespace stonerkart
         {
             QueryResponseBody rb = queryServer(Queries.FRIENDS);
             return rb.values.Select(User.FromString).ToArray();
+        }
+
+        public static IEnumerable<string> queryFriendRequests()
+        {
+            var rb = queryServer(Queries.FRIENDREQUESTS);
+            return rb.values;
         }
 
         public static IEnumerable<CardTemplate> queryCollection()

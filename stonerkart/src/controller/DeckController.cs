@@ -45,77 +45,31 @@ namespace stonerkart
 
         public static Deck chooseDeck()
         {
-            ManualResetEventSlim re = new ManualResetEventSlim(false);
-            Deck s = null;
-            Thread t = new Thread(() => chooseDeck(v =>
-            {
-                s = v;
-                re.Set();
-            }));
-            t.Start();
-            re.Wait();
-
-            return s;
-        }
-
-        public static void chooseDeck(Action<Deck> cb)
-        {
-            Deck d = new Deck(CardTemplate.Bhewas, 
-                new []
-                {
-                    CardTemplate.Bhewas,
-                    CardTemplate.Risen_sAbberation,
-                    CardTemplate.Risen_sAbberation,
-                    CardTemplate.Risen_sAbberation,
-                    CardTemplate.Ilatian_sHaunter,
-                    CardTemplate.Ilatian_sHaunter,
-                    CardTemplate.Ilatian_sHaunter,
-                    CardTemplate.Ilatian_sHaunter,
-                    CardTemplate.Sanguine_sArtisan,
-                    CardTemplate.Sanguine_sArtisan,
-                    CardTemplate.Sanguine_sArtisan,
-                    CardTemplate.Sanguine_sArtisan,
-                    CardTemplate.Decaying_sHorror,
-                    CardTemplate.Decaying_sHorror,
-                    CardTemplate.Maleficent_sSpirit,
-                    CardTemplate.Call_sTo_sArms,
-                    CardTemplate.Call_sTo_sArms,
-                    CardTemplate.Call_sTo_sArms,
-                    CardTemplate.Call_sTo_sArms,
-                    CardTemplate.Rapture,
-                    CardTemplate.Rapture,
-                    CardTemplate.Rapture,
-                    CardTemplate.Solemn_sLotus,
-                    CardTemplate.Solemn_sLotus,
-                    CardTemplate.Solemn_sLotus,
-                    CardTemplate.Risen_sAbberation,
-                });
-            cb(d);
-            return;
-            throw new Exception();
-            /*
-            Panel p = new Panel();
-            p.BackColor = Color.Tomato;
             Deck[] decks = getDecks().ToArray();
-            p.Size = new Size(100, 20 * decks.Length);
-            DraggablePanel dp = null;
+            PublicSaxophone sax = new PublicSaxophone(o => o is Deck);
+
+            int panelheight = 800;
+            int buttonheight = Math.Min(100, panelheight / decks.Length);
+
+            Square allofit = new Square(400, panelheight);
+
             for (int i = 0; i < decks.Length; i++)
             {
                 Deck d = decks[i];
-                Button b = new Button();
+                Button b = new Button(400, buttonheight);
                 b.Text = d.name;
-                b.Click += (_, __) =>
-                {
-                    cb(d);
-                    dp.close();
-                };
-                p.Controls.Add(b);
-                b.BackColor = Color.Violet;
-                b.SetBounds(0, i * 20, p.Size.Width, 20);
+                b.Backcolor = Color.Silver;;
+                b.Border = new SolidBorder(4, Color.Black);
+                b.Y = i*buttonheight;
+                b.clicked += a => sax.answer(d);
+                allofit.addChild(b);
             }
 
-            dp = UIController.showControl(p, true, false);
-            */
+            var winduh = new Winduh(allofit);
+            GUI.frame.activeScreen.addWinduh(winduh);
+            var deck = (Deck)sax.call();
+            winduh.close();
+            return deck;
         }
 
     }

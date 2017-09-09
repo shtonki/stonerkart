@@ -25,9 +25,13 @@ namespace stonerkart
 
         iconChallenge,
         iconFriends,
+        iconAddFriends,
         iconShekel,
+        iconCheck,
+        iconCross,
 
         packFirstEdition12Pack,
+        packFirstEdition40Pack,
 
         border0,
 
@@ -220,9 +224,13 @@ namespace stonerkart
 
             images[Textures.iconChallenge] = Resources.buttonChallenge;
             images[Textures.iconFriends] = Resources.buttonFriends;
+            images[Textures.iconAddFriends] = Resources.buttonAddFriend;
             images[Textures.iconShekel] = Resources.iconShekel;
+            images[Textures.iconCheck] = Resources.iconCheck;
+            images[Textures.iconCross] = Resources.iconCross;
 
             images[Textures.packFirstEdition12Pack] = Resources.firstedition12cardpack;
+            images[Textures.packFirstEdition40Pack] = Resources.firstedition40cardpack;
 
             images[Textures.border0] = Resources.border0;
 
@@ -444,6 +452,7 @@ namespace stonerkart
             switch (pack)
             {
                 case Packs.FirstEdition12Pack: return Textures.packFirstEdition12Pack;
+                case Packs.FirstEdition40Pack: return Textures.packFirstEdition40Pack;
             }
 
             throw new Exception();
