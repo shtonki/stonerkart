@@ -24,6 +24,12 @@ namespace stonerkart
         private const int FRAME_HEIGHT = Frame.AVAILABLEHEIGHT;
         private const int HERO_VIEW_WIDTH = PILE_VIEW_HEIGHT * 500 / 700;
 
+
+        private const int STATS_MAX_BAR_HEIGHT = 256;
+        private const int STATS_BAR_WIDTH = 32;
+        private const int STATS_BAR_SPACING = 16;
+        private const int STATS_TEXT_SPACING = 32;
+        private const int STATS_MANA_BUTTON_HEIGHT = 32;
         private const int DECK_SCREEN_WIDTH = DECK_SCREEN_ITEMS_PER_ROW * BUTTON_WIDTH;
         private const int HERO_VIEW_X = PILE_VIEW_WIDTH;
         private const int HERO_VIEW_Y = 0;
@@ -93,18 +99,74 @@ namespace stonerkart
         private int currentPageNr = 0;
         private ToggleButton[] manaButtons { get; set; }
         private string searchString;
+        private Square barChartPanel;
+
 
         //todo fix hero and search and deckinfo
         public DeckEditorScreen() : base(new Imege(Textures.artCallToArms))
         {
             searchString = "";
             setupButtons();
-            
+            initStatsThingy();
             setupCards();
             initCardViews(); //fix duplicate code
             pileView = setupPileView();
             cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
+
+            
+        }
+
+        private void initStatsThingy()
+        {
+            barChartPanel = new Square(NR_OF_MANA_BUTTONS * (STATS_BAR_WIDTH + STATS_BAR_SPACING), STATS_MAX_BAR_HEIGHT + STATS_TEXT_SPACING);
+            barChartPanel.setLocation(FRAME_WIDTH - barChartPanel.Width, SAVE_LOAD_BUTTON_Y + BUTTON_HEIGHT);
+            barChartPanel.Backcolor = System.Drawing.Color.CadetBlue;
+            elements.Add(barChartPanel);
+
+            for (int i = 0; i < NR_OF_MANA_BUTTONS; i++)
+            {
+                int barsX = i * (STATS_BAR_WIDTH + STATS_BAR_SPACING);
+                int barsY = barChartPanel.Height - STATS_MANA_BUTTON_HEIGHT - STATS_BAR_SPACING;
+                Button mb = new Button(STATS_BAR_WIDTH, STATS_BAR_WIDTH);
+                mb.Backimege = new Imege(TextureLoader.orbTexture((ManaColour)i));
+                mb.setLocation(barsX, barsY);
+                barChartPanel.addChild(mb);
+
+                Button tb = new Button(STATS_MANA_BUTTON_HEIGHT, STATS_MANA_BUTTON_HEIGHT);
+                tb.Text = "0";
+                tb.setLocation(barsX, barsY - STATS_TEXT_SPACING);
+                barChartPanel.addChild(tb);
+            }
+        }
+
+        private void setupStatsThingy()
+        {
+            barChartPanel.clearChildren();
+            //Todo remove children but now i need to go work afk
+            int[] nrOfCardsOfEachMana = new int[NR_OF_MANA_BUTTONS];
+            foreach(var c in cardList)
+            {
+                nrOfCardsOfEachMana[(int)c.colours.Max()] += 1;
+            }
+
+            Square[] bars = new Square[NR_OF_MANA_BUTTONS];
+            for(int i = 0; i < NR_OF_MANA_BUTTONS; i++)
+            {
+                int barHeight = -((STATS_MAX_BAR_HEIGHT-STATS_TEXT_SPACING-STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / nrOfCardsOfEachMana.Aggregate((a, b) => a + b);// + STATS_TEXT_SPACING + STATS_MANA_BUTTON_HEIGHT;
+                bars[i] = new Square(i * (STATS_BAR_WIDTH + STATS_BAR_SPACING), barChartPanel.Height-STATS_MANA_BUTTON_HEIGHT-STATS_BAR_SPACING, STATS_BAR_WIDTH, barHeight, System.Drawing.Color.Black);
+                barChartPanel.addChild(bars[i]);
+
+                Button mb = new Button(STATS_BAR_WIDTH, STATS_BAR_WIDTH);
+                mb.Backimege = new Imege(TextureLoader.orbTexture((ManaColour)i));
+                mb.setLocation(bars[i].X, bars[i].Y);
+                barChartPanel.addChild(mb);
+
+                Button tb = new Button(STATS_MANA_BUTTON_HEIGHT, STATS_MANA_BUTTON_HEIGHT);
+                tb.Text = nrOfCardsOfEachMana[i].ToString();
+                tb.setLocation(bars[i].X, bars[i].Y + bars[i].Height - STATS_TEXT_SPACING);
+                barChartPanel.addChild(tb);
+            }
         }
 
         private void refilter()
@@ -123,8 +185,8 @@ namespace stonerkart
                     (c.castManaCost[ManaColour.Colourless] == c.convertedManaCost && c.convertedManaCost > 0 && manaButtons[6].Toggled && c.isToken == false) ||
                     (c.isHeroic);
             //&& c.ToString().StartsWith(searchString);
-            if(c.isHeroic)
-             System.Console.WriteLine(c +" "+ x);
+            //if(c.isHeroic)
+             //System.Console.WriteLine(c +" "+ x);
             return x;
         }
 
@@ -477,6 +539,7 @@ namespace stonerkart
             if (deckConstraints.willBeLegal(currentHero.template, cardList.Select(c => c.template).ToArray(), ct))
             {
                 cardList.addTop(new Card(ct));
+                setupStatsThingy();
             }
         }
 
