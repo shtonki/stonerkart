@@ -116,8 +116,17 @@ namespace stonerkart
             cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
 
+
+            //initTest();
             
         }
+
+        private void initTest()
+        {
+            Square panel = new Square(0, 0, FRAME_WIDTH, FRAME_HEIGHT, Color.Azure);
+            addElement(panel);
+        }
+
 
         private void initStatsThingy()
         {
@@ -145,18 +154,18 @@ namespace stonerkart
         private void setupStatsThingy()
         {
             barChartPanel.clearChildren();
-            //Todo remove children but now i need to go work afk
+
             int[] nrOfCardsOfEachMana = new int[NR_OF_MANA_BUTTONS];
             foreach(var c in cardList)
             {
-                nrOfCardsOfEachMana[(int)c.colours.Max()] += 1;
+                nrOfCardsOfEachMana[(int)c.colours.Max()] += 1; //this aint doin it 
             }
 
             Square[] bars = new Square[NR_OF_MANA_BUTTONS];
             for(int i = 0; i < NR_OF_MANA_BUTTONS; i++)
             {
-                int barHeight = -((STATS_MAX_BAR_HEIGHT-STATS_TEXT_SPACING-STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / nrOfCardsOfEachMana.Aggregate((a, b) => a + b);// + STATS_TEXT_SPACING + STATS_MANA_BUTTON_HEIGHT;
-                bars[i] = new Square(i * (STATS_BAR_WIDTH + STATS_BAR_SPACING), barChartPanel.Height-STATS_MANA_BUTTON_HEIGHT-STATS_BAR_SPACING, STATS_BAR_WIDTH, barHeight, System.Drawing.Color.Black);
+                int barHeight = -((STATS_MAX_BAR_HEIGHT-STATS_TEXT_SPACING-STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / nrOfCardsOfEachMana.Aggregate((a, b) => a + b);
+                bars[i] = new Square(i * (STATS_BAR_WIDTH + STATS_BAR_SPACING), barChartPanel.Height-STATS_MANA_BUTTON_HEIGHT-STATS_BAR_SPACING, STATS_BAR_WIDTH, barHeight, Color.Black);
                 barChartPanel.addChild(bars[i]);
 
                 Button mb = new Button(STATS_BAR_WIDTH, STATS_BAR_WIDTH);
