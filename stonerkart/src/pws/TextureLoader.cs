@@ -585,7 +585,7 @@ namespace stonerkart
                 case CardTemplate.Maleficent_sSpirit: return Textures.artMaleficentSpirit;
                 case CardTemplate.Thirstclaw: return Textures.artBloodclaw;
                 case CardTemplate.Flameheart_sPhoenix: return Textures.artFireheartPheonix;
-                case CardTemplate.Lord_sPlevin: return Textures.artLordPlevin;
+                case CardTemplate.Lord_sPlombie: return Textures.artLordPlevin;
                 case CardTemplate.Gryphon_sRider: return Textures.artGryphonRider;
                 case CardTemplate.Ravaging_sGreed: return Textures.artRavagingGreed;
                 case CardTemplate.Water_sBolt: return Textures.artWaterBolt;

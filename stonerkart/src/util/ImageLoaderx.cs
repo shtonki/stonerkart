@@ -130,7 +130,7 @@ namespace stonerkart
                     return Resources.artGryphonRider;
                 }
 
-                case CardTemplate.Lord_sPlevin:
+                case CardTemplate.Lord_sPlombie:
                 {
                     return Resources.artLordPlevin;
                 }

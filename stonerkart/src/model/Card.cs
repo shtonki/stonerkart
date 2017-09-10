@@ -774,7 +774,7 @@ namespace stonerkart
         Maleficent_sSpirit,
         Thirstclaw,
         Flameheart_sPhoenix,
-        Lord_sPlevin,
+        Lord_sPlombie,
         Gryphon_sRider,
         Ravaging_sGreed,
         Water_sBolt,

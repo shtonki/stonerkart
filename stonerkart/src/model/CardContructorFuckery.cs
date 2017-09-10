@@ -2245,7 +2245,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Lord Plevin
-                case CardTemplate.Lord_sPlevin:
+                case CardTemplate.Lord_sPlombie:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Legendary;
@@ -2261,7 +2261,7 @@ namespace stonerkart
                     addActivatedAbility(
                         String.Format("{1}, {0}: Deal 1 damage to target creature within 1 tile.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Might)),
                         zepLambda(1),
-                        new Foo(exhaustThis, manaCostEffect()),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Might)),
                         1,
                         PileLocation.Field,
                         CastSpeed.Interrupt
