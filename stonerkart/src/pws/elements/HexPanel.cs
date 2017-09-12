@@ -58,13 +58,16 @@ namespace stonerkart
             {
                 if (drawme == null || drawme.Count == 0) return;
                 var v = findHexagon(args.Position.X, args.Position.Y);
-                lock (drawme)
+                if (v != null)
                 {
-                    foreach (var c in drawme)
+                    lock (drawme)
                     {
-                        if (c.tile.x == v.Item1 && c.tile.y == v.Item2)
+                        foreach (var c in drawme)
                         {
-                            memeon(c, args.X - AbsoluteX, args.Y - AbsoluteY);
+                            if (c.tile.x == v.Item1 && c.tile.y == v.Item2)
+                            {
+                                memeon(c, args.X - AbsoluteX, args.Y - AbsoluteY);
+                            }
                         }
                     }
                 }
