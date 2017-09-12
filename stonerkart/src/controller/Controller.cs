@@ -24,9 +24,9 @@ namespace stonerkart
 
         public static void launchGame()
         {
-            if (!Network.connectToServer()) throw new Exception("Server down for more or less routine maintenance.");
+            //if (!Network.connectToServer()) throw new Exception("Server down for more or less routine maintenance.");
             GUI.launch();
-            GUI.transitionToScreen(GUI.loginScreen);
+            GUI.transitionToScreen(GUI.deckeditorScreen);
         }
 
         public static void attemptLogin(string username, string password)
