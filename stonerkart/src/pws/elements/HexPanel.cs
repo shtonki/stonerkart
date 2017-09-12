@@ -48,12 +48,62 @@ namespace stonerkart
             });
         }
 
+        private CardView rightclickview;
+
         public override void onMouseDown(MouseButtonEventArgs args)
         {
             base.onMouseDown(args);
 
-            var v = findHexagon(args.Position.X, args.Position.Y);
+            if (args.Button == MouseButton.Right)
+            {
+                if (drawme == null || drawme.Count == 0) return;
+                var v = findHexagon(args.Position.X, args.Position.Y);
+                lock (drawme)
+                {
+                    foreach (var c in drawme)
+                    {
+                        if (c.tile.x == v.Item1 && c.tile.y == v.Item2)
+                        {
+                            memeon(c, args.X - AbsoluteX, args.Y - AbsoluteY);
+                        }
+                    }
+                }
+            }
         }
+
+        public override void onMouseUp(MouseButtonEventArgs args)
+        {
+            base.onMouseUp(args);
+
+            memeoff();
+        }
+
+        public override void onMouseExit(MouseMoveEventArgs args)
+        {
+            base.onMouseExit(args);
+
+            memeoff();
+        }
+
+
+        private void memeon(Card c, int x, int y)
+        {
+            if (rightclickview != null) throw new Exception();
+            rightclickview = new CardView(c);
+            rightclickview.Height = 400;
+            rightclickview.X = x;
+            rightclickview.Y = y;
+            rightclickview.Hoverable = false;
+            addChild(rightclickview);
+        }
+
+        private void memeoff()
+        {
+            if (rightclickview == null) return;
+            removeChild(rightclickview);
+            rightclickview = null;
+        }
+
 
         private Tuple<int, int> findHexagon(int mousex, int mousey)
         {

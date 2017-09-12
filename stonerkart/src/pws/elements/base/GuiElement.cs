@@ -240,7 +240,10 @@ namespace stonerkart
         public virtual void onMouseDown(MouseButtonEventArgs args)
         {
             mouseDown?.Invoke(args);
-            pressed = true;
+            if (args.Button == MouseButton.Left)
+            {
+                pressed = true;
+            }
         }
 
         public virtual void onMouseUp(MouseButtonEventArgs args)
