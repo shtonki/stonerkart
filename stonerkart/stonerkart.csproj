@@ -40,7 +40,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -59,6 +59,10 @@
     <ApplicationIcon>Namnl_s.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\OpenTK.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -77,12 +81,50 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="src\GameState.cs" />
+    <Compile Include="src\model\ProductUnion.cs" />
+    <Compile Include="src\pws\Border.cs" />
     <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />
     <Compile Include="src\controller\DeckController.cs" />
     <Compile Include="src\controller\GameController.cs" />
     <Compile Include="src\controller\ScreenController.cs" />
-    <Compile Include="src\model\GameAction.cs" />
+    <Compile Include="src\pws\Designer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="src\pws\DrawerMaym.cs" />
+    <Compile Include="src\pws\elements\base\Button.cs" />
+    <Compile Include="src\pws\elements\base\GuiElement.cs" />
+    <Compile Include="src\pws\elements\base\InputBox.cs" />
+    <Compile Include="src\pws\elements\base\Square.cs" />
+    <Compile Include="src\pws\elements\base\ToggleButton.cs" />
+    <Compile Include="src\pws\elements\base\Winduh.cs" />
+    <Compile Include="src\pws\elements\CardView.cs" />
+    <Compile Include="src\pws\elements\DraggablePanel.cs" />
+    <Compile Include="src\pws\elements\FriendsPanel.cs" />
+    <Compile Include="src\pws\elements\GameMenuBar.cs" />
+    <Compile Include="src\pws\elements\HexPanel.cs" />
+    <Compile Include="src\pws\elements\Line.cs" />
+    <Compile Include="src\pws\elements\MemeButton.cs" />
+    <Compile Include="src\model\User.cs" />
+    <Compile Include="src\pws\elements\PileView.cs" />
+    <Compile Include="src\pws\elements\PlayerFlarePanel.cs" />
+    <Compile Include="src\pws\elements\PlayerPanel.cs" />
+    <Compile Include="src\pws\elements\PricePanel.cs" />
+    <Compile Include="src\pws\elements\PromptPanel.cs" />
+    <Compile Include="src\pws\elements\screens\DeckEditorScreen.cs" />
+    <Compile Include="src\pws\elements\screens\GameScreen.cs" />
+    <Compile Include="src\pws\elements\screens\LoginScreen.cs" />
+    <Compile Include="src\pws\elements\screens\MainMenuScreen.cs" />
+    <Compile Include="src\pws\elements\screens\PlayScreen.cs" />
+    <Compile Include="src\pws\elements\screens\Screen.cs" />
+    <Compile Include="src\pws\elements\screens\ShopScreen.cs" />
+    <Compile Include="src\pws\elements\TextLayout.cs" />
+    <Compile Include="src\pws\elements\TurnIndicator.cs" />
+    <Compile Include="src\pws\Font.cs" />
+    <Compile Include="src\pws\Frame.cs" />
+    <Compile Include="src\pws\GUI.cs" />
+    <Compile Include="src\pws\Imege.cs" />
     <Compile Include="src\model\GameEvent.cs" />
     <Compile Include="src\model\GameEventFilter.cs" />
     <Compile Include="src\model\GameEventHandler.cs" />
@@ -90,7 +132,7 @@
     <Compile Include="src\model\Ability.cs" />
     <Compile Include="src\model\Card.cs" />
     <Compile Include="src\model\CardContructorFuckery.cs" />
-    <Compile Include="src\model\Cost.cs" />
+    <Compile Include="src\model\Foo.cs" />
     <Compile Include="src\model\Deck.cs" />
     <Compile Include="src\model\Effect.cs" />
     <Compile Include="src\model\Game.cs" />
@@ -106,91 +148,19 @@
     <Compile Include="src\network\Message.cs" />
     <Compile Include="src\network\Network.cs" />
     <Compile Include="src\network\ServerConnection.cs" />
-    <Compile Include="src\util\ImageLoader.cs" />
+    <Compile Include="src\pws\PublicSaxophone.cs" />
+    <Compile Include="src\pws\TextureLoader.cs" />
+    <Compile Include="src\util\ImageLoaderx.cs" />
     <Compile Include="src\util\Observable.cs" />
     <Compile Include="src\util\Settings.cs" />
-    <Compile Include="src\view\AutoFontTextBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="src\view\BugReportPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\CardView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\ConsolePanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="src\util\G.cs" />
-    <Compile Include="src\view\DeckEditorPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\DraggablePanel.cs" />
-    <Compile Include="src\view\FriendsListPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\GameFrame.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="src\view\CardsPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\HexPanel.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\view\GamePanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\LoginScreen.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\MainMenuPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\ManaCostPanel.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="src\view\ManaPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\MapEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\MenuBar.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\PlayerPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\PostGameScreen.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\RankedScreen.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\RankedScreen.Designer.cs">
-      <DependentUpon>RankedScreen.cs</DependentUpon>
-    </Compile>
-    <Compile Include="src\view\ShiButton.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="src\view\ShowMeYourDeck.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="src\view\ShowMeYourDeck.Designer.cs">
       <DependentUpon>ShowMeYourDeck.cs</DependentUpon>
-    </Compile>
-    <Compile Include="src\view\StepPanel.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="src\view\StickyPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="src\view\TileView.cs" />
-    <Compile Include="src\view\TransparentPanel.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="UIController.cs" />
   </ItemGroup>
@@ -203,58 +173,10 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="src\view\BugReportPanel.resx">
-      <DependentUpon>BugReportPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\CardsPanel.resx">
-      <DependentUpon>CardsPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\CardView.resx">
-      <DependentUpon>CardView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\ConsolePanel.resx">
-      <DependentUpon>ConsolePanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\DeckEditorPanel.resx">
-      <DependentUpon>DeckEditorPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\GameFrame.resx">
-      <DependentUpon>GameFrame.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\HexPanel.resx">
-      <DependentUpon>HexPanel.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\GamePanel.resx">
-      <DependentUpon>GamePanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\LoginScreen.resx">
-      <DependentUpon>LoginScreen.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\MainMenuPanel.resx">
-      <DependentUpon>MainMenuPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\ManaPanel.resx">
-      <DependentUpon>ManaPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\MapEditor.resx">
-      <DependentUpon>MapEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\MenuBar.resx">
-      <DependentUpon>MenuBar.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\PlayerPanel.resx">
-      <DependentUpon>PlayerPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\PostGameScreen.resx">
-      <DependentUpon>PostGameScreen.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\view\RankedScreen.resx">
-      <DependentUpon>RankedScreen.cs</DependentUpon>
+    <EmbeddedResource Include="src\pws\Designer.resx" />
     </EmbeddedResource>
     <EmbeddedResource Include="src\view\ShowMeYourDeck.resx">
       <DependentUpon>ShowMeYourDeck.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="codemap.dgml" />
@@ -272,6 +194,42 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artGreatWhiteBuffalo.png" />
+    <None Include="Resources\artAlterFate2.png" />
+    <None Include="Resources\artSinisterPact.png" />
+    <None Include="Resources\artSoothsay.png" />
+    <None Include="Resources\artSeethingRage.png" />
+    <None Include="Resources\iconCheck.png" />
+    <None Include="Resources\iconCross.png" />
+    <None Include="Resources\firstedition40cardpack.png" />
+    <None Include="Resources\buttonAddFriend.png" />
+    <None Include="Resources\firstedition12cardpack.png" />
+    <None Include="Resources\background0.png" />
+    <None Include="Resources\firstedition.png" />
+    <None Include="Resources\iconShekel.png" />
+    <None Include="Resources\buttonFriends.png" />
+    <None Include="Resources\buttonChallenge.png" />
+    <None Include="Resources\buttonbg0.png" />
+    <None Include="Resources\cl1.png" />
+    <None Include="Resources\cl0.png" />
+    <None Include="Resources\cl2.png" />
+    <None Include="Resources\cl3.png" />
+    <None Include="Resources\cl4.png" />
+    <None Include="Resources\cl5.png" />
+    <None Include="Resources\cl6.png" />
+    <None Include="Resources\cl7.png" />
+    <None Include="Resources\cl8.png" />
+    <None Include="Resources\cl9.png" />
+    <None Include="Resources\cl10.png" />
+    <None Include="Resources\cl11.png" />
+    <None Include="Resources\cl12.png" />
+    <None Include="Resources\font0.png" />
+    <None Include="Resources\nature1.png" />
+    <None Include="Resources\table0.png" />
+    <None Include="Resources\whiteframe4.png" />
+    <None Include="Resources\buttonbg2.png" />
+    <None Include="Resources\border0.png" />
+    <None Include="Resources\background3.png" />
     <None Include="Resources\artWaterBolt.png" />
     <None Include="Resources\artRavagingGreed.png" />
     <None Include="Resources\artScrollOfEarth.png" />
@@ -343,7 +301,6 @@
     <None Include="Resources\buttonGraveyard.png" />
     <None Include="Resources\buttonHand.png" />
     <None Include="Resources\multi.png" />
-    <None Include="Resources\firstedition.png" />
     <None Include="Resources\frameMight.png" />
     <None Include="Resources\frameOrder.png" />
     <None Include="Resources\Namnlös.png" />

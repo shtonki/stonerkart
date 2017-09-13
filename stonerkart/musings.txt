@@ -1,27 +1,19 @@
-﻿looser than martin card ideas:
+﻿card ideas:
+solid:
+aoe exhaust
+mana leak/spell pierce
+ponder/
+
+loose:
+CC1 5/2/1, N: +1 mvmt til eot
+
+martin loose:
+
+
 
 missing features:
-see if opponent redrew or not
-enforce hero color
-
-#nottriggered
-things that are raised from the dead have their race set to undead
-
-thing which are up for debate:
-draw step before selecting which mana orb to gain
-
-things that are broken:
-martin rectum
-Tile.atDistance leaks memory
-
-
-things that are fucked:
-AutoFontTextBox eats inputs like mouseEntered and mouseClicked
-if we lose inputs it's because we don't buffer inputevents
-martin
-this code base
-Map.dijkstra using Int32.MaxValue/2 to denote an uninitialized node
-we up and load every fucking screen when loading the form
-if cardViews start sending their shit twice or to the wrong place it's because we never remove the MouseDown callback because we're autistic
-Tile.atDistance should probably be in Map
-Card.path makes me :puke:
+concede
+options
+post game screen
+autopass/turn stops
+timers

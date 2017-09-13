@@ -1,5 +1,5 @@
 ﻿
-using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
@@ -12,11 +12,13 @@ namespace stonerkart
 {
     class Program
     {
+        public static bool design = false;
+
         static void Main(string[] args)
         {
-            //System.AppDomain.CurrentDomain.UnhandledException += G.clapTrap;
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
-            Controller.startup();
+
+            Controller.launchGame();
         }
     }
 }

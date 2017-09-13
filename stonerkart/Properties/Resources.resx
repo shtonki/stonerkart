@@ -139,24 +139,6 @@
   <data name="orbOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\order.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="lifeFrame" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\white3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameChaos" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\red3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameDeath" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\black3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameGrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\grey3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameMulti" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\multi3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameNature" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\green3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="artAbolish" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Abolish.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -367,20 +349,8 @@
   <data name="orbColourless" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Namnlös.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="frameMight" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\frameMight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="frameOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\frameOrder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="setFirstedition" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\firstedition.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="orbMulti" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\multi.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="artAberrantSacrifice" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AberrantSacrifice.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="artUnstableMemeExperiment" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artUnstableMemeExperiment.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -588,6 +558,216 @@
   </data>
   <data name="artWaterBolt" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artWaterBolt.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameChaos" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\red3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameDeath" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\black3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameGrey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\grey3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameMight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\frameMight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameMulti" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\multi3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameNature" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\green3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frameOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\frameOrder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lifeFrame" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\white3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="background3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\background3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="border0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\border0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="buttonbg2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\buttonbg2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="font1" xml:space="preserve">
+    <value>A 0 62
+B 62 56
+C 118 54
+D 172 60
+E 232 54
+F 286 50
+G 336 62
+H 398 66
+I 464 34
+J 498 36
+K 534 63
+L 597 46
+M 643 73
+N 716 60
+O 776 64
+P 840 59
+Q 899 65
+R 964 60
+S 1024 52
+T 1076 53
+U 1129 62
+V 1191 58
+W 1249 84
+X 1333 54
+Y 1387 57
+Z 1444 45
+a 1489 48
+b 1537 51
+c 1588 42
+d 1630 51
+e 1681 46
+f 1727 36
+g 1763 44
+h 1807 54
+i 1861 30
+j 1891 29
+k 1920 54
+l 1974 27
+m 2001 81
+n 2082 56
+o 2138 53
+p 2191 51
+q 2242 51
+r 2293 41
+s 2334 37
+t 2371 32
+u 2403 52
+v 2455 45
+w 2500 69
+x 2570 43
+y 2613 48
+z 2661 39
+1 2700 38
+2 2738 49
+3 2787 43
+4 2830 46
+5 2876 42
+6 2918 47
+7 2965 42
+8 3007 45
+9 3052 45
+0 3097 47
+! 3144 27
+' 3171 16
+. 3187 22
+" 3209 31
+, 3240 20
+? 3260 42
+* 3302 41
+/ 3343 31
+- 3374 30
++ 3404 62
+&amp; 3466 70
+( 3536 26
+) 3562 27
+: 3589 17</value>
+  </data>
+  <data name="whiteframe4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\whiteframe4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="table0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\table0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="font0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\font0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl10" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl10.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl11" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl11.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl12" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl12.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl5.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl6.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl7" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl7.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl8" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl8.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cl9" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cl9.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="buttonbg0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\buttonbg0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="buttonChallenge" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\buttonChallenge.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="buttonFriends" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\buttonFriends.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iconShekel" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iconShekel.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="setFirstedition" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\firstedition.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="background0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\background0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="firstedition12cardpack" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\firstedition12cardpack.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artAberrantSacrifice" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AberrantSacrifice.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="buttonAddFriend" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\buttonAddFriend.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="firstedition40cardpack" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\firstedition40cardpack.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iconCheck" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iconCheck.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iconCross" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iconCross.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artSeethingRage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artSeethingRage.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artSoothsay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artSoothsay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artSinisterPact" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artSinisterPact.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artAlterFate2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artAlterFate2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artGreatWhiteBuffalo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artGreatWhiteBuffalo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Arachosa" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Arachosa.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

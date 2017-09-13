@@ -7,10 +7,18 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class Pile : Observable<PileChangedMessage>, IEnumerable<Card>
+    class Pile : CardList
     {
-        public readonly Location location;
+        public Location location { get; }
 
+        public Pile(Location location)
+        {
+            this.location = location;
+        }
+    }
+
+    class CardList : Observable<PileChangedMessage>, IEnumerable<Card>
+    {
         private List<Card> cardList = new List<Card>();
         public IEnumerable<Card> cards => cardList;
 
@@ -22,13 +30,8 @@ namespace stonerkart
             //set { InnerList[i] = value; }
         }
 
-        public Pile()
+        public CardList()
         {
-        }
-
-        public Pile(Location location)
-        {
-            this.location = location;
         }
 
         public int indexOf(Card c)
@@ -45,7 +48,7 @@ namespace stonerkart
             if (!cardList.Contains(c))
             {
                 cardList.Add(c);
-                notify(new PileChangedMessage(true, c));
+                notify(new PileChangedMessage(PileChangedArg.Add, c));
             }
             else
             {
@@ -56,7 +59,7 @@ namespace stonerkart
 
         public void addRange(IEnumerable<Card> cs)
         {
-            PileChangedMessage m = new PileChangedMessage(true, cs.ToArray());
+            PileChangedMessage m = new PileChangedMessage(PileChangedArg.Add, cs);
             foreach (Card c in cs)
             {
                 cardList.Add(c);
@@ -80,20 +83,25 @@ namespace stonerkart
         {
             if (!cardList.Contains(c)) throw new Exception();
             cardList.Remove(c);
-            notify(new PileChangedMessage(false, c));
+            notify(new PileChangedMessage(PileChangedArg.Remove, c));
+        }
+
+        public void removeWhere(Predicate<Card> f)
+        {
+            cardList.RemoveAll(f);
         }
 
         public Card removeTop()
         {
             Card r = cardList[cardList.Count - 1];
             cardList.RemoveAt(cardList.Count - 1);
-            notify(new PileChangedMessage(false, r));
+            notify(new PileChangedMessage(PileChangedArg.Remove, r));
             return r;
         }
 
         public void clear()
         {
-            PileChangedMessage m = new PileChangedMessage(false, cardList.ToArray());
+            PileChangedMessage m = new PileChangedMessage(PileChangedArg.Remove, cards.ToArray());
             cardList.Clear();
             notify(m);
         }
@@ -145,21 +153,22 @@ namespace stonerkart
         }
     }
 
-    struct PileChangedMessage
+    class PileChangedMessage
     {
-        public readonly bool added;
-        public readonly Card[] cards;
+        public PileChangedArg arg;
+        public Card[] cards;
 
-        public PileChangedMessage(bool added, Card card) : this(added, new[] { card})
+        public PileChangedMessage(PileChangedArg arg, IEnumerable<Card> cards)
         {
+            this.arg = arg;
+            this.cards = cards.ToArray();
         }
 
-        public PileChangedMessage(bool added, Card[] cards) : this()
+        public PileChangedMessage(PileChangedArg arg, Card card) : this (arg, new []{card})
         {
-            this.added = added;
-            this.cards = cards;
         }
-
     }
+
+    enum PileChangedArg { Add, Remove, }
 
 }

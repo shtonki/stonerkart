@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
-    class ReduceResult<T>
+    public class ReduceResult<T>
     {
         public IEnumerable<T> values => d.Keys;
 
@@ -33,8 +33,38 @@ namespace stonerkart
         }
     }
 
-    static class G
+    public static class G
     {
+        public static Tuple<CardSet, Rarity> fuckInternalHack(CardTemplate ct)
+        {
+            Card c = new Card(ct);
+            return new Tuple<CardSet, Rarity>(c.set, c.rarity);
+        }
+
+        public static List<ManaColour> orbOrder = new List<ManaColour>(new[]
+        {
+            ManaColour.Chaos,
+            ManaColour.Death,
+            ManaColour.Might,
+            ManaColour.Order,
+            ManaColour.Life,
+            ManaColour.Nature,
+            ManaColour.Colourless,
+        });
+
+        public static string shekelsToString(int shekelCount)
+        {
+            int bigs = shekelCount/100;
+            int smalls = shekelCount%100;
+            return bigs + "." + smalls.ToString().PadLeft(2, '0');
+        }
+
+        public static string replaceUnderscoresAndShit(string input)
+        {
+            return input.Replace("_a", "'").Replace("_s", " ");;
+        }
+
+        /*
         private static char[] hackish = G.range(0, 20).Select(v => (char)('\u2460' + v)).ToArray();
 
         private static char[] hackedaf =
@@ -42,6 +72,7 @@ namespace stonerkart
                 .Cast<ManaColour>()
                 .Select(c => (char)('\u24b6' + (c.ToString().ToLower())[0] - 97))
                 .ToArray();
+        */
 
         public static ReduceResult<T> Reduce<T>(this IEnumerable<T> e)
         {
@@ -208,16 +239,17 @@ namespace stonerkart
             return bmp;
         }
 
-        public static char colourlessGlyph(int i)
+        public static string colourlessGlyph(int i)
         {
-            return hackish[i-1];
+            return "\\cl" + i + "\\";
         }
 
-        public static char colouredGlyph(ManaColour c)
+        public static string colouredGlyph(ManaColour c)
         {
-            if (c == ManaColour.Colourless) throw new Exception();
-            return hackedaf[(int)c];
+            return "\\" + c + "\\";
         }
+
+        public static string newlineGlyph => "\\n\\";
 
         public static string exhaustGhyph => "Exhaust";
 
@@ -234,92 +266,6 @@ namespace stonerkart
 
             return r;
         }
-
-        public static void clapTrap(object sender, UnhandledExceptionEventArgs e)
-        {
-            Form2 f = new Form2();
-            AutoFontTextBox b = new AutoFontTextBox();
-            b.Text = e.ExceptionObject.ToString();
-            f.Controls.Add(b);
-            f.Closed += (_, __) => Environment.Exit(2);
-            f.Resize += (_, __) => b.Size = f.ClientSize;
-            f.Size = new Size(600, 600);
-            Application.Run(f);
-        }
-
-        private class Form2 : Form
-        {
-            
-        }
     }
 
-    static class LL
-    {
-        public static Func<int, int> add(int i)
-        {
-            return v => v + i;
-        }
-
-        public static Func<int, int> set(int i)
-        {
-            return v => i;
-        }
-
-        public static TargetRule player => new PryCardRule(c => c.isHeroic);
-        public static TargetRule relic => new PryCardRule(c => c.cardType == CardType.Relic);
-
-        public static TargetRule creature(Func<Card, bool> filter = null)
-        {
-            filter = filter ?? (c => true);
-            return new PryCardRule(c => c.cardType == CardType.Creature && filter(c));
-        }
-
-        public static TargetRule nonheroicCreature(Func<Card, bool> filter = null)
-        {
-            filter = filter ?? (c =>true);
-            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));
-        }
-
-        public static TargetRule nonColouredCreature(ManaColour notAllowed)
-        {
-            return new PryCardRule(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));
-        }
-
-        //costs
-        public static Effect manaCost(ManaSet castManaCost)
-        {
-            return new Effect(
-                new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                    new ManaCostRule(castManaCost)), new PayManaDoer());
-        }
-
-        public static Effect manaCost(params ManaColour[] ms)
-        {
-            return manaCost(new ManaSet(ms));
-        }
-
-        
-
-        public static Effect exhaustThis { get; } =
-            new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                new FatigueDoer(true));
-
-
-        public static GameEventFilter never { get; } = new StaticGameEventFilter(() => false);
-        public static GameEventFilter endOfTurn { get; } = new TypedGameEventFilter<EndOfStepEvent>((e) => e.step == Steps.End);
-        public static GameEventFilter clearAura { get; } = new TypedGameEventFilter<ClearAurasEvent>();
-
-        public static GameEventFilter thisEnters(Card c, PileLocation pl)
-        {
-            return new TypedGameEventFilter<MoveToPileEvent>(
-                e => e.card == c && e.to.location.pile == pl);
-        }
-        public static GameEventFilter startOfOwnersTurn(Card c)
-        {
-            return new TypedGameEventFilter<StartOfStepEvent>(
-                e => e.activePlayer == c.controller && e.step == Steps.Replenish);
-        }
-
-
-    }
 }

@@ -7,14 +7,15 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class ManaPool
+    class ManaPool : Observable<ManaPoolChanged>
     {
-        public IEnumerable<ManaColour> orbs => current.colours.Concat(bonus);
+        public IEnumerable<ManaOrb> orbs => current.colours.Concat(bonus).Select(c => new ManaOrb(c));
 
-        public ManaSet max { get; private set; }
-        public ManaSet current { get; private set; }
-
+        private ManaSet max { get; set; }
+        private ManaSet current { get; set; }
         private List<ManaColour> bonus { get; set; }
+
+        public int maxCount => max.orbs.Count();
 
         public ManaPool()
         {
@@ -53,6 +54,7 @@ namespace stonerkart
         {
             max[c]++;
             current[c]++;
+            notify(new ManaPoolChanged(this));
         }
 
         public int currentMana(ManaColour c, bool withBonus = true)
@@ -83,7 +85,15 @@ namespace stonerkart
             }
         }
 
-        public void subtractCurrent(ManaSet costs)
+        public void setTo(ManaPool other)
+        {
+            max = other.max.clone();
+            current = other.current.clone();
+            bonus = other.bonus.Select(c => c).ToList();
+            notify(new ManaPoolChanged(this));
+        }
+
+        public void pay(ManaSet costs)
         {
             List<ManaColour> r = new List<ManaColour>();
             foreach (ManaColour mc in bonus)
@@ -100,21 +110,35 @@ namespace stonerkart
             }
 
             current = current - costs;
+
+            notify(new ManaPoolChanged(this));
         }
 
         public void addBonusMana(ManaColour c)
         {
             bonus.Add(c);
+            notify(new ManaPoolChanged(this));
         }
 
         public void resetBonus()
         {
             bonus.Clear();
+            notify(new ManaPoolChanged(this));
         }
 
         public ManaPool clone()
         {
             return new ManaPool(max.clone(), current.clone());
+        }
+    }
+
+    class ManaPoolChanged
+    {
+        public ManaPool manaPool { get; }
+
+        public ManaPoolChanged(ManaPool manaPool)
+        {
+            this.manaPool = manaPool;
         }
     }
 
@@ -149,6 +173,11 @@ namespace stonerkart
         }
 
         public ManaSet(params ManaColour[] cs) : this((IEnumerable<ManaColour>)cs)
+        {
+            
+        }
+
+        public ManaSet(IEnumerable<ManaOrb> orbs) : this(orbs.Select(o => o.colour))
         {
             
         }
@@ -228,7 +257,7 @@ namespace stonerkart
         }
     }
 
-    enum ManaColour
+    public enum ManaColour
     {
         Colourless,
         Death,
@@ -239,4 +268,6 @@ namespace stonerkart
         Chaos,
         Multi,
     }
+
+
 }

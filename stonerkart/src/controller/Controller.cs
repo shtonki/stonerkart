@@ -5,8 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
-using stonerkart.src.view;
 
 namespace stonerkart
 {
@@ -16,23 +14,89 @@ namespace stonerkart
     static class Controller
     {
 
+        private static List<Packs> ownedPacks { get; set; }
+        private static List<CardTemplate> ownedCards { get; set; }
 
-        public static bool inGame;
+        public static IEnumerable<Packs> OwnedPacks => ownedPacks;
+        public static IEnumerable<CardTemplate> OwnedCards => ownedCards;
 
-        public static void startup()
+        public static User user { get; private set; }
+
+        public static void launchGame()
         {
-            UIController.launchUI();
-            
+            if (!Network.connectToServer()) throw new Exception("Server down for more or less routine maintenance.");
+            GUI.launch();
+            GUI.transitionToScreen(GUI.loginScreen);
+        }
 
-
-            if (Network.connectToServer())
+        public static void attemptLogin(string username, string password)
+        {
+            if (Network.login(username, password))
             {
-                ScreenController.transitionToLoginScreen();
+                user = Network.queryMyUser();
+                GUI.frame.loginAs(user);
+
+                var friends = Network.queryFriends();
+                user.setFriends(friends);
+
+                var friendrequests = Network.queryFriendRequests();
+                GUI.frame.addFriendsPanel.addRequests(friendrequests);
+
+                var collection = Network.queryCollection();
+                ownedCards = collection.ToList();
+
+                var shekels = Network.queryShekels();
+                setShekelBalance(shekels);
+
+                var ownedPacks = Network.queryOwnedPacks();
+                GUI.shopScreen.populate(ownedPacks);
+
+                GUI.transitionToScreen(GUI.mainMenuScreen);
             }
             else
             {
-                ScreenController.transitionToMainMenu();
+                
             }
+        }
+
+        public static void respondToFriendRequest(string username, bool accept)
+        {
+            Network.respondToFriendRequest(username, accept);
+        }
+
+        public static bool ripPack(Packs pack)
+        {
+            var ripped = Network.ripPack(pack);
+            if (ripped == null) return false;
+            else
+            {
+                GUI.shopScreen.ripPack(ripped);
+                ownedCards.AddRange(ripped);
+                return true;
+            }
+        }
+
+        public static bool makePurchase(ProductUnion product)
+        {
+            int newbalance = Network.makePurchase(product);
+            if (newbalance == -1) return false; //purchase failed
+            setShekelBalance(newbalance);
+            return true;
+        }
+
+        public static void setShekelBalance(int i)
+        {
+            GUI.frame.menu.setShekelCount(i);
+        }
+
+        public static Game startGame(NewGameStruct ngs)
+        {
+            Map map = Map.DefaultMap;
+            GameScreen gsc = new GameScreen(map);
+            Game g = new Game(ngs, false, gsc, map);
+            GUI.transitionToScreen(gsc);
+            g.start();
+            return g;
         }
 
         public static void quit()

@@ -14,8 +14,11 @@ namespace stonerkart
         public int b => abcCoord.b;
         public int c => abcCoord.c;
         public int ord => map.ord(this);
-        public Tile[] neighbours => atDistance(1).ToArray();
-        public bool isEdgy => neighbours.Length != 6;
+
+        public bool isEdgy => x < edgelordLimit || x >= map.width - edgelordLimit ||
+                              y < edgelordLimit + 1 || y >= map.height - edgelordLimit - 1;
+
+        public const int edgelordLimit = 1;
 
         public Card card { get; private set; }
 
@@ -59,7 +62,7 @@ namespace stonerkart
 
         public List<Tile> withinDistance(int distance, int mindistance = 0)
         {
-            if (distance == -1) return map.tyles.ToList();
+            if (distance == -1) return map.Tiles.ToList();
 
             IEnumerable<Tile> r = new List<Tile>(3*(distance*(distance + 1)) + 1);
 
@@ -74,40 +77,14 @@ namespace stonerkart
         public List<Tile> atDistance(int distance)
         {
             List<Tile> ta = new List<Tile>();
-            if (distance == 0)
+            foreach (var t in map.Tiles)
             {
-                ta.Add(this);
-                return ta;
-            }
-            unsafe
-            {
-                int ba;
-                int bb;
-                int bc;
-                var ps = new []
+                int da = Math.Abs(a - t.a);
+                int db = Math.Abs(b - t.b);
+                int dc = Math.Abs(c - t.c);
+                if (da + db + dc == distance*2)
                 {
-                    new [] {&ba, &bb, &bc}, 
-                    new [] {&bb, &bc, &ba}, 
-                    new [] {&bc, &ba, &bb}, 
-                };
-                foreach (var v in ps)
-                {
-                    foreach (int r in new [] { -1, 1})
-                    {
-                        ba = a;
-                        bb = b;
-                        bc = c;
-                        *v[0] += r*distance;
-                        *v[1] -= r*distance;
-
-                        for (int i = 0; i < distance; i++)
-                        {
-                            Tile t = map.tileAt(ba, bb, bc);
-                            if (t != null) ta.Add(t);
-                            *v[0] -= r*1;
-                            *v[2] += r*1;
-                        }
-                    }
+                    ta.Add(t);
                 }
             }
             return ta;
@@ -132,6 +109,7 @@ namespace stonerkart
 
             public XYCoord(int a, int b, int c)
             {
+                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
                 y = c;
                 x = a + y/2;
             }
@@ -153,9 +131,9 @@ namespace stonerkart
 
             public ABCCoord(int x, int y)
             {
-                a = -y / 2 + x;
-                b = -((y + 1) / 2 + x);
-                c = y;
+                a = y + x/2;
+                b = -x;
+                c = -(a + b);
             }
             
         }

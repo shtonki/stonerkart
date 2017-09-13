@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 
 namespace stonerkart
@@ -14,44 +15,25 @@ namespace stonerkart
             game = g;
         }
 
-        public T receiveAction<T>() where T : GameAction
+        public override int[] receiveChoices()
         {
-            GameAction r;
             string s = dequeueGameMessage();
-            if (typeof(T) == typeof (ManaOrbSelection))
-            {
-                r = new ManaOrbSelection(game, s);
-            }
-            else if (typeof(T) == typeof(MoveSelection))
-            {
-                r = new MoveSelection(game, s);
-            }
-            else if (typeof (T) == typeof (CastSelection))
-            {
-                r = new CastSelection(game, s);
-            }
-            else if (typeof (T) == typeof (ChoiceSelection))
-            {
-                r = new ChoiceSelection(game, s);
-            }
-            else if (typeof(T) == typeof(TriggeredAbilitiesGluer))
-            {
-                r = new TriggeredAbilitiesGluer(game, s);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-            return (T)r;
+            if (s == "") return new int[0];
+            var ss = s.Split(intsplitter);
+            return ss.Select(Int32.Parse).ToArray();
         }
 
-        public void sendAction(GameAction g)
+        public override void sendChoices(int [] choices)
         {
-            string s = g.toString(game);
-            Network.sendGameMessage(game, s);
+            StringBuilder sb = new StringBuilder();
+            foreach (var choice in choices) sb.Append(choice.ToString() + intsplitter);
+            if (sb.Length > 0) sb.Length--;
+
+            string s = sb.ToString();
+            Network.sendGameMessage(game.gameid, s);
         }
 
-        public Deck[] deckify(Deck myDeck, int myIndex)
+        public override Deck[] deckify(Deck myDeck, int myIndex)
         {
             Deck[] decks = new Deck[2]; //todo this is fucked
             decks[myIndex] = myDeck;
@@ -60,33 +42,38 @@ namespace stonerkart
             send.Add(myIndex);
             send.Add((int)myDeck.hero);
             send.AddRange(myDeck.templates.Select(v => (int)v));
-            var mc = new ChoiceSelection(send);
-            sendAction(mc);
+            sendChoices(send.ToArray());
 
             for (int i = 1; i < decks.Length; i++)
             {
-                string s = dequeueGameMessage();
-                var c = new ChoiceSelection(null, s);
+                int[] fuckme = receiveChoices();
 
-                int pix = c.choices[0];
-                CardTemplate hero = (CardTemplate)c.choices[1];
+                int playerIndex = fuckme[0];
+                CardTemplate hero = (CardTemplate)fuckme[1];
 
                 List<CardTemplate> ts = new List<CardTemplate>();
-                for (int j = 2; j < c.choices.Length; j++)
+                for (int j = 2; j < fuckme.Length; j++)
                 {
-                    ts.Add((CardTemplate)c.choices[j]);
+                    ts.Add((CardTemplate)fuckme[j]);
                 }
 
-                decks[pix] = new Deck(hero, ts.ToArray());
+                decks[playerIndex] = new Deck(hero, ts.ToArray());
             }
             
             return decks;
         }
 
+        public override void surrender(GameEndStateReason reason)
+        {
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            Network.surrender(game.gameid, reason);*/
+        }
+
+        private char intsplitter = ',';
 
         private string qdstring;
         private ManualResetEventSlim mre = new ManualResetEventSlim();
-        public void enqueueGameMessage(string s)
+        public override void enqueueGameMessage(string s)
         {
             if (qdstring != null) throw new Exception();
             qdstring = s;
@@ -101,52 +88,28 @@ namespace stonerkart
             mre.Reset();
             return r;
         }
-
-        public void surrender(GameEndStateReason reason)
-        {
-            Network.surrender(game.gameid, reason);
-        }
     }
 
     class DummyConnection : GameConnection
     {
-        public void sendAction(GameAction g)
+        public override void sendChoices(int[] choices)
         {
-            //Console.WriteLine(g.GetType());
+            
         }
 
-        public T receiveAction<T>() where T : GameAction
-        {
-            GameAction r;
-            if (typeof(T) == typeof (ManaOrbSelection))
-            {
-                r =  new ManaOrbSelection(ManaColour.Life);
-            }
-            else if (typeof(T) == typeof(MoveSelection))
-            {
-                r = new MoveSelection(new List<Tuple<Card, Path>>());
-            }
-            else if (typeof (T) == typeof (CastSelection))
-            {
-                r = new CastSelection(null);
-            }
-            else if (typeof (T) == typeof (ChoiceSelection))
-            {
-                r = new ChoiceSelection();
-            }
-            else if (typeof (T) == typeof(TriggeredAbilitiesGluer))
-            {
-                r = new TriggeredAbilitiesGluer();
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+        private bool sendno = true;
 
-            return (T)r;
+        public override int[] receiveChoices()
+        {
+            if (sendno)
+            {
+                sendno = false;
+                return new [] { (int)ButtonOption.No };
+            }
+            return new int[0];
         }
 
-        public Deck[] deckify(Deck myDeck, int myIndex)
+        public override Deck[] deckify(Deck myDeck, int myIndex)
         {
             Deck fucked = new Deck(CardTemplate.Bhewas, new []
             {
@@ -186,23 +149,46 @@ namespace stonerkart
             return r;
         }
 
-        public void enqueueGameMessage(string s)
+        public override void enqueueGameMessage(string s)
         {
             throw new Exception();
         }
 
-        public void surrender(GameEndStateReason rn)
+        public override void surrender(GameEndStateReason rn)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
             ScreenController.transitionToMainMenu();
+            */
         }
     }
 
-    interface GameConnection
+    abstract class GameConnection
     {
-        void sendAction(GameAction g);
-        T receiveAction<T>() where T : GameAction;
-        void enqueueGameMessage(string s);
-        Deck[] deckify(Deck myDeck, int myIndex);
-        void surrender(GameEndStateReason r);
+        public abstract void sendChoices(int[] choices);
+        public abstract int[] receiveChoices();
+        public abstract void enqueueGameMessage(string s);
+        public abstract Deck[] deckify(Deck myDeck, int myIndex);
+        public abstract void surrender(GameEndStateReason r);
+
+        public void sendChoice(int? choice)
+        {
+            if (choice.HasValue)
+            {
+                sendChoices(new[] {choice.Value});
+            }
+            else
+            {
+                sendChoices(new int[0]);
+            }
+        }
+
+        public int? receiveChoice()
+        {
+            var received = receiveChoices();
+            if (received.Length == 0) return null;
+            if (received.Length == 1) return received[0];
+            throw new Exception();
+        }
     }
 }

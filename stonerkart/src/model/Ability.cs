@@ -8,12 +8,12 @@ namespace stonerkart
 {
     abstract class Ability
     {
-        public Card card;
-        public PileLocation activeIn;
-        public Foo effects;
-        public Foo cost;
-        public int castRange;
-        public string description;
+        private Foo effects;
+        private Foo cost;
+        public Card card { get; protected set; }
+        public PileLocation activeIn { get; }
+        public int castRange { get; }
+        public string description { get; }
 
         public bool isCastAbility => card.isCastAbility(this);
 
@@ -26,23 +26,61 @@ namespace stonerkart
             this.description = description;
             this.card = card;
         }
-
-
-        public virtual IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] tms)
+        /*
+        public IEnumerable<GameEvent> payCosts(HackStruct hs)
         {
-            return effects.resolve(hs, tms);
+            var costCache = cost.fillCast(hs);
+            if (costCache == null) return null;
+            return cost.resolve(hs, costCache);
+        }
+        */
+
+        public TargetMatrix targetCosts(HackStruct hs)
+        {
+            var castTargets = cost.fillCast(hs);
+            if (castTargets.Cancelled || castTargets.Fizzled) return castTargets;
+            var resolveTargets = cost.fillResolve(hs, castTargets);
+            return resolveTargets;
         }
 
-        public bool possible(HackStruct hs)
+        public virtual IEnumerable<GameEvent> payCosts(HackStruct hs, TargetMatrix cache)
         {
-            return effects.possibleTargets(hs) && cost.possibleAsCost(hs);
+            return cost.resolve(hs, cache);
         }
 
+        public TargetMatrix targetCast(HackStruct hs)
+        {
+            return effects.fillCast(hs);
+        }
+
+        public TargetMatrix targetResolve(HackStruct hs, TargetMatrix cached)
+        {
+            TargetMatrix tm;
+            while (true)
+            {
+                tm = effects.fillResolve(hs, cached);
+
+                if (tm.Cancelled)
+                {
+                    continue;
+                }
+
+                return tm;
+            }
+        }
+
+        public virtual IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix cache)
+        {
+            return effects.resolve(hs, cache);
+        }
+
+        
         public Card createDummy()
         {
             return card.createDummy(this);
         }
     }
+
 
     class ActivatedAbility : Ability
     {
@@ -60,8 +98,8 @@ namespace stonerkart
     {
         public enum Timing { Pre, Post };
 
-        public Timing timing;
-        public bool isOptional;
+        public Timing timing { get; }
+        public bool isOptional { get; }
 
         private GameEventFilter filter;
 
@@ -73,27 +111,17 @@ namespace stonerkart
             this.isOptional = isOptional;
         }
 
-        public override IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix[] tms)
+        public override IEnumerable<GameEvent> resolve(HackStruct hs, TargetMatrix cached)
         {
             if (isOptional)
             {
-                ButtonOption opt;
-                if (hs.heroIsResolver)
-                {
-                    hs.setPrompt("Do you want to use this ability?", ButtonOption.Yes, ButtonOption.No);
-                    ShibbuttonStuff ss = hs.waitForStuff<ShibbuttonStuff>(b => true);
-                    opt = ss.option;
-                    hs.sendChoices(new[] {(int)opt});
-                }
-                else
-                {
-                    hs.setPrompt("Opponent is deciding whether to use the optional ability.");
-                    opt = (ButtonOption)hs.receiveChoices()[0];
-                }
+                ButtonOption opt = hs.game.chooseButtonSynced(hs.resolveController,
+                    "Do you want to use this ability?",
+                    ButtonOption.Yes, ButtonOption.No);
 
                 if (opt == ButtonOption.No) return new GameEvent[] {};
             }
-            return base.resolve(hs, tms);
+            return base.resolve(hs, cached);
         }
 
         public bool triggeredBy(GameEvent e)

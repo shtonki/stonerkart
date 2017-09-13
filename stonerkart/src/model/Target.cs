@@ -31,164 +31,762 @@ namespace stonerkart
 
     class TargetRuleSet : TypeSigned
     {
-        public TargetRule[] rules;
+        private TargetRule[] rules;
 
-        protected TargetRuleSet(IEnumerable<Type> typeSignatureTypes) : base(typeSignatureTypes)
-        {
-        }
-
-        public TargetRuleSet(params TargetRule[] rules) : base(rules.Select(r => r.targetType))
+        public TargetRuleSet(params TargetRule[] rules) : base(rules.Select(t => t.targetType))
         {
             this.rules = rules;
         }
 
-        public virtual TargetMatrix fillCast(HackStruct str)
+        public TargetVector fillCast(HackStruct hs)
         {
-            TargetColumn[] r = new TargetColumn[rules.Length];
+            var cache = new TargetSet[rules.Length];
+            for (int i = 0; i < rules.Length; i++)
+            {
+                var targetSet = rules[i].fillCastTargets(hs);
+                if (targetSet.Cancelled)
+                {
+                    return TargetVector.CreateCancelled();
+                }
+                if (targetSet.Fizzled)
+                {
+                    return TargetVector.CreateFizzled();
+                }
+                cache[i] = targetSet;
+            }
+            return new TargetVector(cache);
+        }
+
+        public TargetVector fillResolve(HackStruct hs, TargetVector cached)
+        {
+            if (rules.Length != cached.targetSets.Length) throw new Exception();
+
+            TargetSet[] newSets = new TargetSet[rules.Length];
 
             for (int i = 0; i < rules.Length; i++)
             {
-                TargetColumn? v = rules[i].fillCastTargets(str);
-                if (!v.HasValue) return null;
-                r[i] = v.Value;
+                var rule = rules[i];
+                var cachedTargetSet = cached.targetSets[i];
+                var newTargetSet = rule.fillResolveTargets(hs, cachedTargetSet);
+                var validated = rule.validate(hs, newTargetSet);
+
+                if (validated.Cancelled)
+                {
+                    return TargetVector.CreateCancelled();
+                }
+                if (validated.Fizzled)
+                {
+                    return TargetVector.CreateFizzled();
+                }
+                newSets[i] = validated;
             }
 
-            return new TargetMatrix(r);
+            return new TargetVector(newSets);
         }
 
-        public TargetMatrix fillResolve(TargetMatrix tm, HackStruct hs)
+    }
+
+    struct TargetSet
+    {
+        private int[] stateCtrs { get; }
+        public Targetable[] targets { get; }
+        public bool Cancelled { get; private set; }
+        public bool Fizzled { get; private set; }
+
+
+        public TargetSet(params Targetable[] targets)
         {
-            TargetColumn[] r = tm.columns;
-
-            for (int i = 0; i < rules.Length; i++)
-            {
-                var column = rules[i].fillResolveTargets(hs, r[i]);
-                if (!column.HasValue) return null;
-                r[i] = column.Value;
-            }
-
-            return new TargetMatrix(r);
+            this.targets = targets;
+            if (targets != null) stateCtrs = targets.Select(t => t.stateCtr()).ToArray();
+            else stateCtrs = null;
+            Cancelled = false;
+            Fizzled = false;
         }
 
-        public TargetMatrix possible(HackStruct hs)
+        public TargetSet(IEnumerable<Targetable> ts) : this(ts.ToArray())
         {
-            TargetColumn[] cs = new TargetColumn[rules.Length];
-            for (int i = 0; i < cs.Length; i++)
-            {
-                cs[i] = rules[i].possible(hs);
-            }
 
-            return new TargetMatrix(cs);
+        }
+
+        public TargetSet clearInvalids(Func<Targetable, bool> filter)
+        {
+            if (Cancelled || Fizzled) return this;
+            var nicelanguage = stateCtrs;
+            var ts = targets.Where((t, i) => filter(t) && t.stateCtr() == nicelanguage[i]);
+            return new TargetSet(ts);
+        }
+
+        public static TargetSet CreateCancelled()
+        {
+            var rt = new TargetSet(null);
+            rt.Cancelled = true;
+            return rt;
+        }
+
+        public static TargetSet CreateFizzled()
+        {
+            var rt = new TargetSet(null);
+            rt.Fizzled = true;
+            return rt;
+        }
+
+        public static TargetSet CreateEmpty()
+        {
+            return new TargetSet(new Targetable[0]);
         }
     }
 
-    class TargetMatrix
+    struct TargetVector
     {
-        public TargetColumn[] columns;
+        public TargetSet[] targetSets { get; }
 
-        public TargetMatrix(IEnumerable<TargetColumn> columns)
+        public bool Cancelled => targetSets.Any(ts => ts.Cancelled);
+        public bool Fizzled => targetSets.Any(ts => ts.Fizzled);
+
+        public TargetVector(TargetSet[] targetSets)
         {
-            this.columns = columns.ToArray();
+            this.targetSets = targetSets;
         }
 
-        public TargetRow[] generateRows(bool straightRows)
+        public static TargetVector CreateCancelled()
         {
-            TargetColumn[] cls = columns.Select(c => c.valid()).ToArray();
-            if (straightRows) return straightRowsEx();
-            int l = cls.Aggregate(1, (current, c) => current*c.targets.Length);
-            if (l == 0) return new TargetRow[] {};
+            return new TargetVector(new []{ TargetSet.CreateCancelled() });
+        }
+        public static TargetVector CreateFizzled()
+        {
+            return new TargetVector(new[] { TargetSet.CreateFizzled() });
+        }
+    }
 
-            int[] ms = cls.Select(c => c.targets.Length).ToArray();
-            int[] cs = cls.Select(c => 0).ToArray();
+    struct TargetMatrix
+    {
+        public TargetVector[] targetVectors { get; }
 
-            TargetRow[] r = new TargetRow[l];
-            int rc = 0;
-            while (true)
-            {
-                Targetable[] tr = new Targetable[cls.Length];
-                for (int i = 0; i < cls.Length; i++)
-                {
-                    tr[i] = cls[i].targets[cs[i]];
-                }
-                r[rc++] = new TargetRow(tr);
+        public bool Cancelled => targetVectors.Any(tv => tv.Cancelled);
+        public bool Fizzled => targetVectors.Any(tv => tv.Fizzled);
 
-                cs[cls.Length - 1]++;
-
-                for (int i = cls.Length - 1; i > 0; i--)
-                {
-                    if (cs[i] == ms[i])
-                    {
-                        cs[i] = 0;
-                        cs[i - 1]++;
-                    }
-                }
-
-                if (cs[0] == ms[0]) return r;
-            }
+        public TargetMatrix(TargetVector[] targetVectors)
+        {
+            this.targetVectors = targetVectors;
+            if (Cancelled || Fizzled) throw new Exception();
         }
 
-        public TargetRow[] straightRowsEx()
+        private TargetMatrix(TargetVector vector)
         {
-            if (columns.Select(c => c.targets.Length).Any(l => l != columns[0].targets.Length)) throw new Exception();
-            int length = columns[0].targets.Length;
-            TargetRow[] rows = new TargetRow[length];
-            for (int i = 0; i < length; i++)
-            {
-                rows[i] = new TargetRow(columns.Select(c => c.targets[i]).ToArray());
-            }
-            return rows;
+            targetVectors = new[] {vector};
+        }
+
+        public static TargetMatrix CreateCancelled()
+        {
+            return new TargetMatrix(TargetVector.CreateCancelled());
+        }
+
+        public static TargetMatrix CreateFizzled()
+        {
+            return new TargetMatrix(TargetVector.CreateFizzled());
+        }
+    }
+
+
+    class TargetRow
+    {
+        private Targetable[] targets;
+
+        public Targetable this[int index]
+        {
+            get { return targets[index]; }
+        }
+
+        public TargetRow(params Targetable[] targets)
+        {
+            this.targets = targets;
+        }
+
+        public TargetRow(IEnumerable<Targetable> ts) : this(ts.ToArray())
+        {
+            
         }
     }
 
     abstract class TargetRule
     {
-        public Type targetType { get; set; }
+        public Type targetType { get; protected set; }
 
         public TargetRule(Type targetType)
         {
             this.targetType = targetType;
         }
+        
+        public abstract TargetSet fillCastTargets(HackStruct hs);
+        public abstract TargetSet fillResolveTargets(HackStruct hs, TargetSet ts);
 
-        public abstract TargetColumn? fillCastTargets(HackStruct f);
-        public abstract TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c);
+        public virtual TargetSet validate(HackStruct hs, TargetSet ts)
+        {
+            var newset = ts.clearInvalids(filterfunc);
+            if (newset.Cancelled || newset.Fizzled) return newset;
+            if (newset.targets.Length < mincount()) return TargetSet.CreateFizzled();
+            return newset;
+        }
 
-        public abstract TargetColumn possible(HackStruct hs);
-
-        protected const bool IGNORE = true;
-
-        public abstract bool allowEmpty();
+        protected virtual bool filterfunc(Targetable t) { return true; }
+        protected virtual int mincount() { return 0; }
     }
 
-    class SelectManaRule : TargetRule
+    interface chooserface<T> where T : Targetable
     {
-        private TargetRule playerRule;
+        IEnumerable<T> candidates(HackStruct hs, Player p);
+        T pickOne(Player chooser, Func<T, bool> filter, HackStruct hs);
+        void pickNone(Player chooser, HackStruct hs);
+    }
 
-        public SelectManaRule(TargetRule playerRule) : base(typeof(ManaOrb))
+    class TargetOption : TargetRule
+    {
+        private TargetRule baserule;
+
+        public TargetOption(TargetRule baserule) : base(baserule.targetType)
+        {
+            this.baserule = baserule;
+        }
+
+        public override TargetSet fillCastTargets(HackStruct hs)
+        {
+            return baserule.fillCastTargets(hs);
+        }
+
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
+        {
+            var v = baserule.fillResolveTargets(hs, ts);
+            var option = hs.game.chooseButtonSynced(hs.resolveController, "placeholder", ButtonOption.Yes, ButtonOption.No);
+
+            return option == ButtonOption.Yes ? v : TargetSet.CreateEmpty();
+        }
+    }
+
+    class ChooseRule<T> : TargetRule where T : Targetable
+    {
+        private chooserface<T> chooser = dflt();
+        private TargetRule playerRule = new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController);
+        private ChooseAt chooseAt = ChooseAt.Cast;
+        protected Func<T, bool> filter = t => true;
+        private int count = 1;
+        private bool allowDuplicates = false;
+
+        private static chooserface<T> dflt()
+        {
+            Type t = typeof (T);
+            if (t == typeof (Card)) return (chooserface<T>)new PryCardRule();
+            if (t == typeof (Tile)) return (chooserface<T>)new PryTileRule();
+            if (t == typeof (Player)) return (chooserface<T>)new PryPlayerRule();
+            if (t == typeof (ManaOrb)) return (chooserface<T>)new ClickManaRule();
+            throw new Exception();
+        }
+
+        public ChooseRule(chooserface<T> chooser, TargetRule playerRule, ChooseAt chooseAt, Func<T, bool> filter, int count, bool allowDuplicates) : base(typeof(T))
         {
             this.playerRule = playerRule;
+            this.count = count;
+            this.allowDuplicates = allowDuplicates;
+            this.chooseAt = chooseAt;
+            this.filter = filter;
+            this.chooser = chooser;
         }
 
-        public override TargetColumn? fillCastTargets(HackStruct f)
+        public ChooseRule(Func<T, bool> filter) : base(typeof(T))
         {
-            return playerRule.fillCastTargets(f);
+            this.filter = filter;
         }
 
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        public ChooseRule(chooserface<T> chooser, TargetRule playerRule, ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
         {
-            var selectingPlayers = playerRule.fillResolveTargets(hs, c).Value;
-            return
-                new TargetColumn(
-                    selectingPlayers.targets.Cast<Player>().Select(p => new ManaOrb(hs.selectColour(p, clr => true))));
+            this.playerRule = playerRule;
+            this.chooseAt = chooseAt;
+            this.filter = filter;
+            this.chooser = chooser;
         }
 
-        public override TargetColumn possible(HackStruct hs)
+        public ChooseRule(ChooseAt chooseAt, Func<T, bool> filter, int count, bool allowDuplicates) : base(typeof(T))
         {
-            return new TargetColumn(Enum.GetValues(typeof (ManaColour)).Cast<ManaColour>().Select(c => new ManaOrb(c)));
+            this.chooseAt = chooseAt;
+            this.filter = filter;
+            this.count = count;
+            this.allowDuplicates = allowDuplicates;
         }
 
-        public override bool allowEmpty()
+        public ChooseRule(ChooseAt chooseAt) : base(typeof(T))
         {
-            return false;
+            this.chooseAt = chooseAt;
+        }
+
+        public ChooseRule(chooserface<T> chooser, ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
+        {
+            this.chooser = chooser;
+            this.chooseAt = chooseAt;
+            this.filter = filter;
+        }
+
+        public ChooseRule(chooserface<T> chooser) : base(typeof(T))
+        {
+            this.chooser = chooser;
+        }
+
+        public ChooseRule(ChooseAt chooseAt, Func<T, bool> filter) : base(typeof(T))
+        {
+            this.filter = filter;
+            this.chooseAt = chooseAt;
+        }
+
+        public ChooseRule() : base(typeof(T))
+        {
+        }
+
+        public ChooseRule(chooserface<T> chooser, ChooseAt chooseAt) : base(typeof(T))
+        {
+            this.chooser = chooser;
+            this.chooseAt = chooseAt;
+        }
+
+
+        public override TargetSet fillCastTargets(HackStruct hs)
+        {
+            var choosers = playerRule.fillCastTargets(hs);
+            if (chooseAt == ChooseAt.Cast)
+            {
+                choosers = playerRule.fillResolveTargets(hs, choosers);
+                return choose(choosers.targets.Cast<Player>(), hs);
+            }
+            else return choosers;
+        }
+
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
+        {
+            if (chooseAt == ChooseAt.Cast) return ts;
+            var choosers = playerRule.fillResolveTargets(hs, ts);
+            return choose(choosers.targets.Cast<Player>(), hs);
+        }
+
+        private TargetSet choose(IEnumerable<Player> players, HackStruct hs)
+        {
+            List<Targetable> targets = new List<Targetable>();
+            foreach (var player in players)
+            {
+                var ts = playerChooses(player, hs);
+                if (ts.Cancelled || ts.Fizzled) return ts;
+                targets.AddRange(ts.targets);
+            }
+
+            return new TargetSet(targets);
+        }
+
+        private TargetSet playerChooses(Player player, HackStruct hs)
+        {
+            int requiredCandidates = count;
+
+            var v = chooser.candidates(hs, player).Where(filter);
+
+            if (requiredCandidates == 0)
+            {
+                chooser.pickNone(player, hs);
+                return TargetSet.CreateEmpty();
+            }
+
+            if (v.Count() < requiredCandidates)
+            {
+                chooser.pickNone(player, hs);
+                return TargetSet.CreateFizzled();
+            }
+
+            TargetSet? ts = null;
+            List<Targetable> chosenList = new List<Targetable>();
+            if (player.isHero) hs.game.highlight(v.Cast<Targetable>(), Color.Green);
+
+            while (chosenList.Count < count)
+            {
+                var chosen = chooser.pickOne(player, filter, hs);
+
+                if (chosen == null)
+                {
+                    if (v.Count() == 0)
+                    {
+                        ts = TargetSet.CreateFizzled();
+                        break;
+                    }
+                    else
+                    {
+                        ts = TargetSet.CreateCancelled();
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!allowDuplicates && chosenList.Contains(chosen))
+                    {
+
+                    }
+                    else
+                    {
+                        chosenList.Add(chosen);
+                    }
+                }
+            }
+
+            if (!ts.HasValue)
+            {
+                ts = new TargetSet(chosenList);
+            }
+
+            hs.game.clearHighlights();
+
+            return ts.Value;
+        }
+
+        protected override bool filterfunc(Targetable t)
+        {
+            return t is T && filter((T)t);
+        }
+
+        protected override int mincount()
+        {
+            return count;
+        }
+
+        public enum ChooseAt
+        {
+            Cast,
+            Resolve
+        }
+    }
+
+    class SelectCardRule : chooserface<Card>
+    {
+        private Mode mode;
+        private PileLocation pile;
+        private int count = -1;
+
+        public SelectCardRule(PileLocation pile, Mode mode)
+        {
+            this.mode = mode;
+            this.pile = pile;
+        }
+
+        public SelectCardRule(PileLocation pile, Mode mode, int count)
+        {
+            this.mode = mode;
+            this.pile = pile;
+            this.count = count;
+        }
+
+        public IEnumerable<Card> candidates(HackStruct hs, Player p)
+        {
+            Player lookedAt;
+            switch (mode)
+            {
+                case Mode.PlayerLooksAtPlayer:
+                case Mode.ResolverLooksAtPlayer:
+                {
+                    lookedAt = p;
+                } break;
+
+                case Mode.PlayerLooksAtResolver:
+                {
+                    lookedAt = hs.resolveController;
+                } break;
+
+                default: throw new Exception();
+            }
+
+            return count == -1 ? 
+                lookedAt.pileFrom(pile) : 
+                lookedAt.pileFrom(pile).Take(count);
+        }
+
+        private Player chooser(Player player, HackStruct hs)
+        {
+            switch (mode)
+            {
+                case Mode.PlayerLooksAtPlayer:
+                case Mode.PlayerLooksAtResolver:
+                {
+                    return player;
+                }
+                case Mode.ResolverLooksAtPlayer:
+                {
+                    return hs.resolveController;
+                }
+                default:
+                    throw new Exception();
+            }
+        }
+
+        public Card pickOne(Player player, Func<Card, bool> filter, HackStruct hs)
+        {
+            var chsr = chooser(player, hs);
+            var cs = candidates(hs, player);
+            return hs.game.chooseCardsFromCardsSynced(
+                chsr, 
+                cs, 
+                filter,
+                String.Format("Choose target for {0}.", hs.resolveCard),
+                ButtonOption.Cancel,
+                String.Format("{0}'s {1}", player.name, pile.ToString()));
+        }
+
+        public void pickNone(Player player, HackStruct hs)
+        {
+            var chsr = chooser(player, hs);
+            var cs = candidates(hs, player);
+            var v = hs.game.chooseCardsFromCardsSynced(
+                chsr, 
+                cs, 
+                _ => false,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                ButtonOption.OK,
+                String.Format("{0}'s {1}", player.name, pile.ToString()));
+        }
+
+        public enum Mode
+        {
+            ResolverLooksAtPlayer,
+            PlayerLooksAtPlayer,
+            PlayerLooksAtResolver,
+        }
+    }
+
+    class ClickCardRule : chooserface<Card>
+    {
+        public IEnumerable<Card> candidates(HackStruct hs, Player p)
+        {
+            return hs.cards;
+        }
+
+        public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
+        {
+            return hs.game.chooseCardSynced(
+                chooser, 
+                filter, 
+                "Placeholder xd", 
+                ButtonOption.Cancel);
+        }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(
+                chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                ButtonOption.OK);
+        }
+    }
+
+    class PryCardRule : chooserface<Card>
+    {
+        public IEnumerable<Card> candidates(HackStruct hs, Player p)
+        {
+            return hs.tilesInRange.Where(t => t.card != null).Select(t => t.card);
+        }
+
+        public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
+        {
+            Tile tl = hs.game.chooseTileSynced(
+                chooser,
+                t => hs.tilesInRange.Contains(t) && t.card != null && filter(t.card),
+                String.Format("Choose target for {0}", hs.resolveCard),
+                ButtonOption.Cancel);
+            if (tl == null) return null;
+            return (tl.card);
+        }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(
+                chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                ButtonOption.OK);
+        }
+    }
+
+    class PryTileRule : chooserface<Tile>
+    {
+        public IEnumerable<Tile> candidates(HackStruct hs, Player p)
+        {
+            return hs.tilesInRange;
+        }
+
+        public Tile pickOne(Player chooser, Func<Tile, bool> filter, HackStruct hs)
+        {
+            return hs.game.chooseTileSynced(
+                chooser, 
+                t => hs.tilesInRange.Contains(t) && filter(t),
+                String.Format("Choose target for {0}", hs.resolveCard),
+                ButtonOption.Cancel);
+        }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(
+                chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                ButtonOption.OK);
+        }
+    }
+
+    class PryPlayerRule : chooserface<Player>
+    {
+        public IEnumerable<Player> candidates(HackStruct hs, Player p)
+        {
+            return hs.gameState.players;
+        }
+
+        public Player pickOne(Player chooser, Func<Player, bool> filter, HackStruct hs)
+        {
+            Tile tl = hs.game.chooseTileSynced(
+                chooser, 
+                t => t.card != null && t.card.isHeroic && filter(t.card.owner),
+                String.Format("Choose target for {0}", hs.resolveCard),
+                ButtonOption.Cancel);
+            if (tl == null) return null;
+            return tl.card.owner;
+        }
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(
+                chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                ButtonOption.OK);
+        }
+    }
+
+    class ClickManaRule : chooserface<ManaOrb>
+    {
+        public IEnumerable<ManaOrb> candidates(HackStruct hs, Player p)
+        {
+            return G.orbOrder.Select(c => new ManaOrb(c));
+        }
+
+        public ManaOrb pickOne(Player chooser, Func<ManaOrb, bool> filter, HackStruct hs)
+        {
+            var v = hs.game.chooseManaColourSynced(
+                chooser, 
+                c => filter(new ManaOrb(c)), 
+                "Placeholder", 
+                ButtonOption.Cancel);
+            if (v == null) return null;
+            return new ManaOrb(v.Value);
+        }
+
+        public void pickNone(Player chooser, HackStruct hs)
+        {
+            hs.game.chooseButtonSynced(
+                chooser,
+                String.Format("Not enough valid targets for {0}.", hs.resolveCard),
+                ButtonOption.OK);
+        }
+    }
+
+    class ManaCostRule : TargetRule
+    {
+        private ManaSet cost;
+
+        public ManaCostRule(ManaSet cost) : base(typeof(ManaOrb))
+        {
+            this.cost = cost;
+        }
+
+        public override TargetSet fillCastTargets(HackStruct hs)
+        {
+            return meme(hs.castingPlayer, hs);
+        }
+
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
+        {
+            return ts;
+        }
+
+        private TargetSet meme(Player p, HackStruct hs)
+        {
+            var playerMana = p.manaPool;
+            var costOrbs = cost.orbs.ToList();
+            var poolOrbs = playerMana.orbs.ToList();
+
+            foreach (var orb in costOrbs.Where(c => c.colour != ManaColour.Colourless))
+            {
+                if (!poolOrbs.Any(o => o.colour == orb.colour)) return TargetSet.CreateFizzled();
+                poolOrbs.Remove(poolOrbs.First(o => o.colour == orb.colour));
+            }
+
+            var colourlessCost = costOrbs.Where(c => c.colour == ManaColour.Colourless);
+            var colouredCost = costOrbs.Where(c => c.colour != ManaColour.Colourless);
+            int colourlessToPay = colourlessCost.Count();
+
+            if (colourlessToPay == 0) return new TargetSet(costOrbs);
+            if (colourlessToPay == poolOrbs.Count()) return new TargetSet(p.manaPool.orbs);
+
+            var stateOfAffairs = playerMana.clone();
+            playerMana.pay(new ManaSet(colouredCost));
+            var paid = new List<ManaOrb>();
+            int diff;
+
+            while ((diff = colourlessToPay - paid.Count) > 0)
+            {
+                var chosen = hs.game.chooseManaColourSynced(
+                    p, 
+                    c => playerMana.orbs.Any(o => o.colour == c),
+                    String.Format("Pay {0}", G.colourlessGlyph(diff)), 
+                    ButtonOption.Cancel);
+                if (chosen == null) break;
+                paid.Add(new ManaOrb(chosen.Value));
+                playerMana.pay(new ManaSet(chosen.Value));
+            }
+
+            p.manaPool.setTo(stateOfAffairs);
+            if (paid.Count == colourlessToPay) return new TargetSet(colouredCost.Concat(paid));
+            else return TargetSet.CreateCancelled();
+
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
+            var v = playerMana.orbs.Where(c => c != ManaColour.Colourless).
+
+            IEnumerable<ManaColour> poolOrbs = p.manaPool.orbs;
+            IEnumerable<ManaColour> costOrbs = cost.orbs.Select(o => o.colour);
+
+            int diff = costOrbs.Count() - poolOrbs.Count();
+
+            if (diff > 0) return TargetSet.CreateFizzled();
+
+            if (cost[ManaColour.Colourless] > 0)
+            {
+                if (diff < 0) // we have more total mana than the cost
+                {
+                    ManaSet colours = cost.clone();
+                    colours[ManaColour.Colourless] = 0;
+                    p.stuntLoss(colours);
+                    while (cost[ManaColour.Colourless] > 0)
+                    {
+                        var clr = hs.game.chooseManaColourSynced(p, c => true, "1", "2").Value;
+                        if (bc.targets.Length == 1)
+                        {
+                            var orb = (ManaOrb)bc.targets[0];
+                            var colour = orb.colour;
+                            if (p.manaPool.currentMana(colour) - cost[colour] > 0)
+                            {
+                                cost[colour]++;
+                                cost[ManaColour.Colourless]--;
+                                colours[colour]++;
+                                p.stuntLoss(colours);
+                            }
+                        }
+                        else
+                        {
+                                p.unstuntMana();
+                                return null;
+                        }
+                    }
+                    p.unstuntMana();
+                }
+                else
+                {
+                    cost = new ManaSet(hs.castingPlayer.manaPool.orbs);
+                }
+            }
+            return new TargetSet(cost.orbs);*/
         }
     }
 
@@ -201,24 +799,14 @@ namespace stonerkart
             this.colours = colours;
         }
 
-        public override TargetColumn? fillCastTargets(HackStruct f)
+        public override TargetSet fillCastTargets(HackStruct f)
         {
-            return TargetColumn.empty;
+            return TargetSet.CreateEmpty();
         }
 
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
-            return new TargetColumn(colours.Select(clr => new ManaOrb(clr)));
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return new TargetColumn(Enum.GetValues(typeof(ManaColour)).Cast<ManaColour>().Select(c => new ManaOrb(c)));
-        }
-
-        public override bool allowEmpty()
-        {
-            return false;
+            return new TargetSet(colours.Select(clr => new ManaOrb(clr)));
         }
     }
 
@@ -231,72 +819,20 @@ namespace stonerkart
             this.func = func;
         }
 
-        public override TargetColumn? fillCastTargets(HackStruct f)
+        public override TargetSet fillCastTargets(HackStruct f)
         {
             G g = (G)f.triggeringEvent;
             var t = (Targetable)func(g);
-            return new TargetColumn(new []{t});
+            return new TargetSet(new []{t});
         }
 
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
         {
-            return c;
+            return ts;
         }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return TargetColumn.empty;
-        }
-
-        public override bool allowEmpty()
-        {
-            return true;
-        }
+        
     }
-
-    class ClickCardRule : TargetRule
-    {
-        private Func<Card, bool> filter;
-
-        public ClickCardRule(Func<Card, bool> filter) : base(typeof(Card))
-        {
-            this.filter = filter;
-        }
-
-        public override TargetColumn? fillCastTargets(HackStruct f)
-        {
-            f.setPrompt("Select target.", ButtonOption.Cancel);
-            while (true)
-            {
-                var v = f.getStuff();
-                if (v is ShibbuttonStuff)
-                {
-                    return null;
-                }
-                if (v is Card)
-                {
-                    Card c = (Card)v;
-                    if (filter(c)) return new TargetColumn(c);
-                }
-            }
-        }
-
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
-        {
-            return c;
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return new TargetColumn(hs.cards.Where(filter));
-        }
-
-        public override bool allowEmpty()
-        {
-            return false;
-        }
-    }
-
+    
     class CreateTokenRule : TargetRule
     {
         private TargetRule summonFor;
@@ -308,686 +844,155 @@ namespace stonerkart
             this.tokens = tokens;
         }
 
-        public override TargetColumn? fillCastTargets(HackStruct f)
+        public override TargetSet fillCastTargets(HackStruct f)
         {
             return summonFor.fillCastTargets(f);
         }
 
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
-            TargetColumn? players = summonFor.fillResolveTargets(hs, c);
-            if (!players.HasValue) return null;
-            Player[] ps = players.Value.targets.Cast<Player>().ToArray();
+            TargetSet players = summonFor.fillResolveTargets(hs, c);
+            Player[] ps = players.targets.Cast<Player>().ToArray();
             List<Card> ts = new List<Card>(ps.Length);
+
             foreach (Player p in ps)
             {
                 foreach (var t in tokens)
                 {
-                    ts.Add(hs.createToken(t, p));
+                    ts.Add(hs.game.createToken(t, p));
                 }
             }
-            return new TargetColumn(ts);
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return TargetColumn.empty;
-        }
-
-        public override bool allowEmpty()
-        {
-            return true;
+            return new TargetSet(ts);
         }
     }
 
-    class SelectCardRule : TargetRule
-    {
-        public enum Mode { Resolver, Reflective}
-
-        private TargetRule pg;
-        private PileLocation l;
-        private Func<Card, bool> filter;
-        private Mode mode;
-        public bool cancelable { get; set; }
-        public bool breakOnEmpty { get; }
-        public bool sync { get; set; } = true;
-        public int count;
-
-        public SelectCardRule(TargetRule pileOwnerRule, PileLocation pile, Func<Card, bool> filter, Mode mode) : this(pileOwnerRule, pile, filter, mode, false)
-        {
-            
-        }
-
-        public SelectCardRule(PileLocation pile)
-            : this(
-                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), pile, c => true, Mode.Resolver, false)
-        {
-            
-        }
-
-        public SelectCardRule(TargetRule pileOwnerRule, PileLocation pile, Func<Card, bool> filter)
-            : this(pileOwnerRule, pile, filter, Mode.Resolver)
-        {
-            
-        }
-
-
-        public SelectCardRule(PileLocation pile, Func<Card, bool> filter)
-            : this(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), pile, filter, Mode.Resolver)
-        {
-
-        }
-
-        public SelectCardRule(TargetRule pg, PileLocation l, Func<Card, bool> filter, Mode mode, bool cancelable, int count = 1, bool breakOnEmpty = true) : base(typeof(Card))
-        {
-            this.pg = pg;
-            this.l = l;
-            this.filter = filter;
-            this.mode = mode;
-            this.cancelable = cancelable;
-            this.count = count;
-            this.breakOnEmpty = breakOnEmpty;
-        }
-
-        public override TargetColumn? fillCastTargets(HackStruct f)
-        {
-            return pg.fillCastTargets(f);
-        }
-
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
-        {
-            TargetColumn? t = pg.fillResolveTargets(hs, c);
-            if (!t.HasValue) return null;
-            List<Card> rt = new List<Card>();
-            TargetColumn r = t.Value;
-            foreach (var tbl in r.targets)
-            {
-                Player p = (Player)tbl;
-                Card crd;
-
-                Player seer;
-                if (mode == Mode.Reflective)
-                {
-                    seer = p;
-                }
-                else if (mode == Mode.Resolver)
-                {
-                    seer = hs.resolveController;
-                }
-                else throw new Exception();
-
-                for (int i = 0; i < Math.Min(count, p.pileFrom(l).Count); i++)
-                {
-                    crd = sync ? hs.selectCardHalfSynchronized(p.pileFrom(l), seer, filter, cancelable) : hs.selectCardUnsynchronized(p.pileFrom(l), seer, filter, cancelable);
-                    if (crd == null) break; //todo allow canceling or something
-                    if (rt.Contains(crd))
-                    {
-                        i--;
-                        continue;
-                    }
-                    rt.Add(crd);
-                }
-            }
-            return new TargetColumn(rt);
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            TargetColumn innerPossible = pg.possible(hs);
-            List<Targetable> psbl = new List<Targetable>();
-
-            foreach (var v in innerPossible.targets)
-            {
-                if (!(v is Player)) throw new Exception();
-                Player p = (Player)v;
-                psbl.AddRange(p.pileFrom(l));
-            }
-
-            return new TargetColumn(psbl);
-        }
-
-        public override bool allowEmpty()
-        {
-            return !breakOnEmpty || cancelable;
-        }
-    }
-
-    class CastSelectCardRule : TargetRule
-    {
-        private SelectCardRule r;
-
-        public CastSelectCardRule(SelectCardRule r) : base(typeof(Card))
-        {
-            this.r = r;
-            r.cancelable = true;
-            r.sync = false;
-        }
-
-        public override TargetColumn? fillCastTargets(HackStruct f)
-        {
-            var v = r.fillCastTargets(f);
-            if (!v.HasValue)
-            {
-                return null;
-            }
-            var rt =  r.fillResolveTargets(f, v.Value).Value;
-            if (rt.targets.Length == 0) return null;
-            return rt;
-        }
-
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
-        {
-            return c;
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return r.possible(hs);
-        }
-
-        public override bool allowEmpty()
-        {
-            return r.allowEmpty();
-        }
-    }
-
-    class CopyPreviousRule<T> : ResolveRule
+    class ModifyRule<P, T> : TargetRule where P : Targetable where T : Targetable
     {
         private int column;
-
-        public CopyPreviousRule(int column) : base(typeof(T))
-        {
-            this.column = column;
-        }
-
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
-        {
-            return hs.previousTargets.columns[column];
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return TargetColumn.empty;
-        }
-
-        public override bool allowEmpty()
-        {
-            return IGNORE;
-        }
-    }
-
-    class ModifyPreviousRule<P, T> : ResolveRule where P : Targetable where T : Targetable
-    {
-        private int column;
+        private int vector;
         private Func<P, T> fn;
 
-        public ModifyPreviousRule(int column, Func<P, T> f) : base(typeof(T))
+        public ModifyRule(int vector, int column, Func<P, T> f) : base(typeof(T))
         {
             this.column = column;
             this.fn = f;
+            this.vector = vector;
         }
 
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        public override TargetSet fillCastTargets(HackStruct hs)
         {
-            return new TargetColumn(hs.previousTargets.columns[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
-            //return hs.previousTargets.columns[column];
+            return TargetSet.CreateEmpty();
         }
 
-        public override TargetColumn possible(HackStruct hs)
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
-            return TargetColumn.empty;
-            //return new TargetColumn(hs.previousColumn.targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
-            //return hs.previousColumn;
+            return new TargetSet(hs.previousTargets[vector].targetSets[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
         }
 
-        public override bool allowEmpty()
-        {
-            return IGNORE;
-        }
     }
 
     class AoeRule : TargetRule
     {
-        private PryTileRule ruler;
+        private ChooseRule<Tile> ruler;
         private int radius;
         private Func<Card, bool> cardFilter;
 
 
         public AoeRule(Func<Tile, bool> filter, int radius, Func<Card, bool> cardFilter) : base(typeof(Card))
         {
-            ruler = new PryTileRule(filter, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController));
+            ruler = new ChooseRule<Tile>(filter);
             this.radius = radius;
             this.cardFilter = cardFilter;
         }
 
-        public override TargetColumn? fillCastTargets(HackStruct f)
+        public override TargetSet fillCastTargets(HackStruct f)
         {
             return ruler.fillCastTargets(f);
         }
 
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
+            c = ruler.fillResolveTargets(hs, c);
             if (c.targets.Length != 1) throw new Exception();
             Tile centre = (Tile)c.targets[0];
             var v = centre.withinDistance(radius).Where(t => t.card != null && cardFilter(t.card)).Select(t => t.card);
-            return new TargetColumn(v);
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return ruler.possible(hs);
-        }
-
-        public override bool allowEmpty()
-        {
-            return true;
-        }
-    }
-
-    class ManaCostRule : TargetRule
-    {
-        private ManaSet ms;
-
-        public ManaCostRule(ManaSet ms) : base(typeof(ManaOrb))
-        {
-            this.ms = ms;
-        }
-
-        public ManaCostRule(params ManaColour[] cs) : this(new ManaSet(cs))
-        {
-
-        }
-
-        public ManaCostRule(int[] cs) : this(new ManaSet(cs))
-        {
-
-        }
-
-        public override TargetColumn? fillCastTargets(HackStruct hs)
-        {
-            Player p = hs.castingPlayer;
-            ManaSet cost = ms.clone();
-            for (int i = 0; i < ManaSet.size; i++)
-            {
-                if ((ManaColour)i == ManaColour.Colourless) continue;
-                if (p.manaPool.currentMana((ManaColour)i) < cost[i]) return null;
-            }
-
-            IEnumerable<ManaColour> poolOrbs = p.manaPool.orbs;
-            IEnumerable<ManaColour> costOrbs = cost.orbs.Select(o => o.colour);
-
-            int diff = costOrbs.Count() - poolOrbs.Count();
-
-            if (diff > 0) return null;
-
-            if (cost[ManaColour.Colourless] > 0)
-            {
-                if (diff < 0) // we have more total mana than the cost
-                {
-                    hs.setPrompt("Cast using what mana", ButtonOption.Cancel);
-                    ManaSet colours = cost.clone();
-                    colours[ManaColour.Colourless] = 0;
-                    p.stuntLoss(colours);
-                    while (cost[ManaColour.Colourless] > 0)
-                    {
-                        var v = hs.getStuff();
-                        if (v is ManaOrb)
-                        {
-                            ManaOrb orb = (ManaOrb)v;
-                            ManaColour colour = orb.colour;
-                            if (p.manaPool.currentMana(colour) - cost[colour] > 0)
-                            {
-                                cost[colour]++;
-                                cost[ManaColour.Colourless]--;
-                                colours[colour]++;
-                                p.stuntLoss(colours);
-                            }
-                        }
-                        if (v is ShibbuttonStuff)
-                        {
-                            ShibbuttonStuff b = (ShibbuttonStuff)v;
-                            if (b.option == ButtonOption.Cancel)
-                            {
-                                p.unstuntMana();
-                                return null;
-                            }
-                        }
-                    }
-                    p.unstuntMana();
-                }
-                else
-                {
-                    cost = new ManaSet(hs.castingPlayer.manaPool.orbs);
-                }
-            }
-            return new TargetColumn(cost.orbs);
-        }
-
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
-        {
-            return c;
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return new TargetColumn(ms.orbs);
-        }
-
-        public override bool allowEmpty()
-        {
-            return false;
-        }
-    }
-
-    abstract class PryRule : TargetRule
-    {
-        private bool pryAtResolveTime;
-        private int count;
-        private bool allowDuplicates;
-        private TargetRule playerGenerator;
-
-        public PryRule(Type targetType, TargetRule playerGenerator, bool pryAtResolveTime, int count,
-            bool allowDuplicates) : base(targetType)
-        {
-            this.pryAtResolveTime = pryAtResolveTime;
-            this.count = count;
-            this.allowDuplicates = allowDuplicates;
-            this.playerGenerator = playerGenerator;
-        }
-
-        public override TargetColumn? fillCastTargets(HackStruct hs)
-        {
-            return pryAtResolveTime ? playerGenerator.fillCastTargets(hs) : selectTiles(hs);
-        }
-
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
-        {
-            if (pryAtResolveTime)
-            {
-                var v = playerGenerator.fillResolveTargets(hs, c);
-                if (!v.HasValue) throw new Exception();
-                return selectTiles(hs, v.Value);
-            }
-            else
-            {
-                return c;
-            }
-        }
-
-        private TargetColumn? selectTiles(HackStruct hs, TargetColumn tc)
-        {
-            var pc = tc.targets;
-            if (pc.Length != 1 || !(pc[0] is Player)) throw new Exception();
-            Player p = (Player)pc[0];
-
-            //List<Targetable> ts = new List<Targetable>();
-
-            if (p == hs.hero)
-            {
-                var v = selectTiles(hs);
-                if (!v.HasValue) throw new Exception();
-                var ts = v.Value.targets;
-                hs.sendChoices(ts.Select(t => TtoI(hs, t)).ToArray());
-                return v.Value;
-            }
-            else
-            {
-                hs.setPrompt("Opponent is making selections.");
-                return new TargetColumn(hs.receiveChoices().Select(i => ItoT(hs, i)));
-            }
-        }
-
-        protected abstract int TtoI(HackStruct hs, Targetable t);
-        protected abstract Targetable ItoT(HackStruct hs, int i);
-
-
-        private TargetColumn? selectTiles(HackStruct hs)
-        {
-            List<Targetable> ts = new List<Targetable>();
-            hs.highlight(hs.tilesInRange.Where(t => pryx(t, hs) != null), Color.OrangeRed);
-            hs.setPrompt("Click on a tile", pryAtResolveTime ? ButtonOption.NOTHING : ButtonOption.Cancel);
-            while (ts.Count < count)
-            {
-                Stuff v = hs.getStuff();
-
-                if (v is ShibbuttonStuff)
-                {
-                    var b = (ShibbuttonStuff)v;
-                    if (b.option == ButtonOption.Cancel)
-                    {
-                        ts.Clear();
-                        break;
-                    }
-                }
-
-                if (!(v is Tile)) continue;
-
-                Tile t = (Tile)v;
-                Card c = t.card;
-                Targetable target = pryx(t, hs);
-
-                if (target != null && hs.tilesInRange.Contains(t))
-                {
-                    if (allowDuplicates || !ts.Contains(target))
-                    {
-                        ts.Add(target);
-                        hs.highlight(new Tile[] {t}, Color.ForestGreen);
-                    }
-                    else
-                    {
-                        hs.highlight(new Tile[] {t}, Color.OrangeRed);
-                        ts.Remove(target);
-                    }
-
-                }
-            }
-            hs.clearHighlights();
-            if (ts.Count < count) return null;
-            return new TargetColumn(ts);
+            return new TargetSet(v);
         }
         
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return new TargetColumn(hs.tilesInRange.Select(t => pry(t)).Where(t => t != null));
-        }
-        
-        protected Targetable pryx(Tile t, HackStruct hs)
-        {
-            Card c = t.card;
-            if (c != null && !hs.resolveAbility.card.canTarget(c)) return null;
-            return pry(t);
-        }
-
-        protected abstract Targetable pry(Tile t);
-
-        public override bool allowEmpty()
-        {
-            return false;
-        }
     }
 
-    class PryTileRule : PryRule
-    {
-        private Func<Tile, bool> fltr;
-
-        public PryTileRule(Func<Tile, bool> filter, TargetRule playerGenerator, bool pryAtResolveTime = false, int count = 1, bool allowDuplicates = true) : base(typeof(Tile), playerGenerator, pryAtResolveTime, count, allowDuplicates)
-        {
-            this.fltr = filter;
-        }
-
-        protected override Targetable pry(Tile t)
-        {
-            return fltr(t) ? t : null;
-        }
-
-        protected override int TtoI(HackStruct hs, Targetable t)
-        {
-            return hs.ordT((Tile)t);
-        }
-
-        protected override Targetable ItoT(HackStruct hs, int i)
-        {
-            return hs.Tord(i);
-        }
-    }
-
-    class PryCardRule : PryRule
-    {
-        private Func<Card, bool> fltr;
-
-        public PryCardRule(bool flip = false) : this(c => true, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), flip)
-        {
-            
-        }
-
-        public PryCardRule(Func<Card, bool> filter, TargetRule playerGenerator, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Card), playerGenerator, flip, count, allowDuplicates)
-        {
-            this.fltr = filter;
-        }
-
-        public PryCardRule(Func<Card, bool> filter)
-            : this(filter, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))
-        {
-            
-        }
-
-        protected override Targetable pry(Tile t)
-        {
-            Card card = t.card;
-            return card != null && fltr(card) ? card : null;
-        }
-
-        protected override int TtoI(HackStruct hs, Targetable t)
-        {
-            return hs.ordC((Card)t);
-        }
-
-        protected override Targetable ItoT(HackStruct hs, int i)
-        {
-            return hs.Cord(i);
-        }
-    }
-
-    class PryPlayerRule : PryRule
-    {
-        private Func<Player, bool> fltr;
-
-
-        public PryPlayerRule() : this(p => true, new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))
-        {
-            
-        }
-
-        public PryPlayerRule(Func<Player, bool> filter, TargetRule playerGenerator, bool flip = false, int count = 1, bool allowDuplicates = true) : base(typeof(Card), playerGenerator, flip, count, allowDuplicates)
-        {
-            this.fltr = filter;
-        }
-
-        protected override Targetable pry(Tile t)
-        {
-            Card card = t.card;
-            return card != null && card.isHeroic && fltr(card.owner) ? card.owner : null;
-        }
-
-        protected override int TtoI(HackStruct hs, Targetable t)
-        {
-            return hs.ordP((Player)t);
-        }
-
-        protected override Targetable ItoT(HackStruct hs, int i)
-        {
-            return hs.Pord(i);
-        }
-    }
-
-    class CardResolveRule : ResolveRule
+    class CardResolveRule : TargetRule
     {
         private Rule rule;
+        private Func<Card, bool> filter = _ => true;
 
         public CardResolveRule(Rule rule) : base(typeof(Card))
         {
             this.rule = rule;
         }
 
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        public CardResolveRule(Rule rule, Func<Card, bool> filter) : this(rule)
+        {
+            this.filter = filter;
+        }
+
+        public override TargetSet fillCastTargets(HackStruct hs)
+        {
+            return TargetSet.CreateEmpty();
+        }
+
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
             if (c.targets.Length != 0) throw new Exception();
+            Card card;
             switch (rule)
             {
                 case Rule.ResolveCard:
                 {
-                    return new TargetColumn(hs.resolveCard);
-                }
+                    card = hs.resolveCard;
+                } break;
 
                 case Rule.ResolveControllerCard:
                 {
-                    return new TargetColumn(hs.resolveCard.controller.heroCard);
-                }
-
-                case Rule.VillainHeroes:
-                {
-                    return new TargetColumn(hs.cards.Where(crd => crd.isHeroic && crd.controller != hs.resolveCard.controller));
-                }
-
-                case Rule.AllHeroes:
-                {
-                    return new TargetColumn(hs.cards.Where(crd => crd.isHeroic));
-                }
-
-                case Rule.AllFieldCards:
-                {
-                    return new TargetColumn(hs.cards.Where(crd => crd.location.pile == PileLocation.Field));
-                }
+                    card = hs.resolveCard.controller.heroCard;
+                } break;
+                default: throw new Exception();
             }
-            throw new Exception();
-        }
 
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return fillResolveTargets(hs, new TargetColumn(new Targetable[0])).Value;
+            if (filter(card)) return new TargetSet(card);
+            else return TargetSet.CreateFizzled();
         }
+        
 
         public enum Rule
         {
             ResolveControllerCard,
             ResolveCard,
-            AllHeroes,
-            VillainHeroes,
-            AllFieldCards,
         }
-
-        public override bool allowEmpty()
-        {
-            return false;
-        }
+        
     }
 
-    class AllCardsRule : ResolveRule
+    class CardsRule : TargetRule
     {
         private Func<Card, bool> filter;
 
-        public AllCardsRule(Func<Card, bool> filter) : base(typeof(Card))
+        public CardsRule(Func<Card, bool> filter) : base(typeof(Card))
         {
             this.filter = filter;
         }
 
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        public override TargetSet fillCastTargets(HackStruct hs)
         {
-            return new TargetColumn(hs.cards.Where(filter));
+            return TargetSet.CreateEmpty();
         }
 
-        public override TargetColumn possible(HackStruct hs)
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
         {
-            return new TargetColumn(hs.cards.Where(filter));
-        }
-
-        public override bool allowEmpty()
-        {
-            return true;
+            return new TargetSet(hs.cards.Where(filter));
         }
     }
 
-    class PlayerResolveRule : ResolveRule
+    class PlayerResolveRule : TargetRule
     {
         private Rule rule;
 
@@ -996,27 +1001,27 @@ namespace stonerkart
             this.rule = rule;
         }
 
-        public override TargetColumn? fillResolveTargets(HackStruct hs, TargetColumn c)
+        public override TargetSet fillCastTargets(HackStruct hs)
+        {
+            return TargetSet.CreateEmpty();
+        }
+
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
             if (c.targets.Length != 0) throw new Exception();
             switch (rule)
             {
                 case Rule.ResolveController:
                 {
-                    return new TargetColumn(hs.resolveCard.controller);
+                    return new TargetSet(hs.resolveCard.controller);
                 }
 
                 case Rule.AllPlayers:
                 {
-                    return new TargetColumn(hs.players);
+                    return new TargetSet(hs.players);
                 }
             }
             throw new Exception();
-        }
-
-        public override TargetColumn possible(HackStruct hs)
-        {
-            return fillResolveTargets(hs, new TargetColumn(new Targetable[0])).Value;
         }
 
         public enum Rule
@@ -1024,65 +1029,10 @@ namespace stonerkart
             ResolveController,
             AllPlayers,
         }
-        public override bool allowEmpty()
-        {
-            return false;
-        }
-    }
-
-    abstract class ResolveRule : TargetRule
-    {
-        public ResolveRule(Type t) : base(t)
-        {
-        }
-
-        public override TargetColumn? fillCastTargets(HackStruct box)
-        {
-            return new TargetColumn(new Targetable[] {});
-        }
 
     }
 
 
-    struct TargetRow
-    {
-        private Targetable[] ts;
-
-        public TargetRow(Targetable[] ts)
-        {
-            this.ts = ts;
-        }
-
-        public Targetable this[int ix] => ts[ix];
-    }
-    
-
-    struct TargetColumn
-    {
-        public Targetable[] targets;
-        private int[] stateCtrs;
-
-        public static TargetColumn empty => new TargetColumn(new Targetable[0]);
-
-        public TargetColumn(params Targetable[] targets)
-        {
-            this.targets = targets;
-            stateCtrs = targets.Select(t => t.stateCtr()).ToArray();
-        }
-
-        public TargetColumn(IEnumerable<Targetable> ts) : this(ts.ToArray())
-        {
-            
-        }
-
-        public TargetColumn valid()
-        {
-            var ebinLanguage = stateCtrs;
-            return new TargetColumn(targets.Where((t, i) => t.stateCtr() == ebinLanguage[i]));
-        }
-    }
-    
-    
     interface Targetable
     {
         int stateCtr();

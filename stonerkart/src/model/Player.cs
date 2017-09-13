@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    internal class Player : Observable<PlayerChangedArgs>, Observer<PileChangedMessage>, Targetable
+    internal class Player : Observable<PlayerChangedArgs>, Targetable
     {
         public Card heroCard { get; private set; }
-        public readonly Game game;
+        public GameState game { get; }
 
         public string name { get; }
 
@@ -24,7 +24,7 @@ namespace stonerkart
 
         public bool isHero => this == game.hero;
 
-        public Player(Game g, string name)
+        public Player(GameState g, string name)
         {
             game = g;
             this.name = name;
@@ -34,12 +34,6 @@ namespace stonerkart
             hand = new Pile(new Location(this, PileLocation.Hand));
             graveyard = new Pile(new Location(this, PileLocation.Graveyard));
             displaced = new Pile(new Location(this, PileLocation.Displaced));
-
-            deck.addObserver(this);
-            field.addObserver(this);
-            hand.addObserver(this);
-            graveyard.addObserver(this);
-            displaced.addObserver(this);
 
             manaPool = new ManaPool();
         }
@@ -103,7 +97,7 @@ namespace stonerkart
 
         public void payMana(ManaSet iz)
         {
-            manaPool.subtractCurrent(iz);
+            manaPool.pay(iz);
             notify(new PlayerChangedArgs(this));
         }
 
@@ -118,34 +112,23 @@ namespace stonerkart
             manaPool.resetBonus();
             notify(new PlayerChangedArgs(this));
         }
-
-        public bool stunthack;
-        public ManaSet stunthackset;
-        public void stuntMana()
-        {
-            stunthack = true;
-            notify(new PlayerChangedArgs(this));
-        }
-
-        public void unstuntMana()
-        {
-            stunthack = false;
-            stunthackset = null;
-            notify(new PlayerChangedArgs(this));
-        }
-
-        public void stuntLoss(ManaSet l)
-        {
-            stunthackset = l;
-            notify(new PlayerChangedArgs(this));
-        }
-
         #endregion
 
-        public void notify(object o, PileChangedMessage t)
+    }
+
+    class PlayerChangedArgs
+    {
+        public readonly Player player;
+        public readonly PileLocation? pileChanged;
+
+        public PlayerChangedArgs(Player player)
         {
-            Pile p = (Pile)o;
-            notify(new PlayerChangedArgs(p.location.pile));
+            this.player = player;
+        }
+
+        public PlayerChangedArgs(PileLocation pileChanged)
+        {
+            this.pileChanged = pileChanged;
         }
     }
 }

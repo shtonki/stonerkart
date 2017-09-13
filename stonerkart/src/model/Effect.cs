@@ -25,37 +25,99 @@ namespace stonerkart
         {
         }
 
-        public TargetMatrix fillCast(HackStruct hs)
+        public TargetVector fillCast(HackStruct hs)
         {
             return ts.fillCast(hs);
         }
 
-        public TargetMatrix fillResolve(TargetMatrix tm, HackStruct hs)
+        public TargetVector fillResolve(HackStruct hs, TargetVector cached)
         {
-            var r = ts.fillResolve(tm, hs);
-            return r;
+            return ts.fillResolve(hs, cached);
         }
 
-        public bool possibleAsCost(HackStruct hs)
+        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetVector cached)
         {
-            var tm = ts.possible(hs);
-            var rs = tm.generateRows(straightRows);
-            var ps = doer.filterCostRows(rs);
-            return ps != null;
+            var rows = rowsFromSets(cached.targetSets);
+            return doer.act(hs, rows);
         }
 
-        public bool allowEmpty()
+        private TargetRow[] rowsFromSets(TargetSet[] ts)
         {
-            return ts.rules.Any(r => r.allowEmpty());
+            if (straightRows) return straightRowsx(ts);
+            if (ts.Length == 1) return rowsFrom1(ts);
+            if (ts.Length == 2) return rowsFrom2(ts);
+            if (ts.Length == 3) return rowsFrom3(ts);
+            throw new Exception();
         }
+
+        private TargetRow[] straightRowsx(TargetSet[] ts)
+        {
+            if (ts.Length == 0) throw new Exception();
+            int l = ts[0].targets.Length;
+            if (ts.Any(s => s.targets.Length != l)) throw new Exception();
+
+            var rt = new TargetRow[l];
+
+            for (int i = 0; i < l; i++)
+            {
+                int i1 = i;
+                rt[i] = new TargetRow(ts.Select(s => s.targets[i1]));
+            }
+
+            return rt;
+        }
+
+        private TargetRow[] rowsFrom1(TargetSet[] ts)
+        {
+            List<TargetRow> rt = new List<TargetRow>();
+            foreach (var a in ts[0].targets)
+            {
+                rt.Add(new TargetRow(a));
+            }
+            return rt.ToArray();
+        }
+
+        private TargetRow[] rowsFrom2(TargetSet[] ts)
+        {
+            List<TargetRow> rt = new List<TargetRow>();
+            foreach (var a in ts[0].targets)
+            {
+                foreach (var b in ts[1].targets)
+                {
+                    rt.Add(new TargetRow(a, b));
+                }
+            }
+            return rt.ToArray();
+        }
+
+        private TargetRow[] rowsFrom3(TargetSet[] ts)
+        {
+            List<TargetRow> rt = new List<TargetRow>();
+            foreach (var a in ts[0].targets)
+            {
+                foreach (var b in ts[1].targets)
+                {
+                    foreach (var c in ts[2].targets)
+                    {
+                        rt.Add(new TargetRow(a, b, c));
+                    }
+                }
+            }
+            return rt.ToArray();
+        }
+
 
         public static Effect summonTokensEffect(params CardTemplate[] templates)
         {
+            
             return new Effect(new TargetRuleSet(
                 new CreateTokenRule(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
                     templates),
-                new PryTileRule(t => t.card == null && !t.isEdgy,
-                    new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true, templates.Length, false)),
+                new ChooseRule<Tile>(
+                    ChooseRule<Tile>.ChooseAt.Resolve,
+                    t => t.passable && !t.isEdgy,
+                    templates.Length, 
+                    false)),
                 new SummonToTileDoer(),
                 true
                 );
@@ -70,8 +132,7 @@ namespace stonerkart
         }
 
         public abstract GameEvent[] act(HackStruct dkt, TargetRow[] ts);
-
-        public abstract IEnumerable<TargetRow> filterCostRows(IEnumerable<TargetRow> rs);
+        
     }
 
     abstract class SimpleDoer : Doer
@@ -91,17 +152,19 @@ namespace stonerkart
         }
 
         protected abstract GameEvent[] simpleAct(HackStruct dkt, TargetRow row);
+        
+    }
 
-        public override IEnumerable<TargetRow> filterCostRows(IEnumerable<TargetRow> rs)
+    class ShuffleDoer : SimpleDoer
+    {
+        public ShuffleDoer() : base(typeof(Player))
         {
-            var v = rs.Where(validCostRow).ToArray();
-            if (v.Length == 0) return null;
-            else return v;
         }
 
-        protected virtual bool validCostRow(TargetRow tr)
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
-            return true;
+            Player p = (Player)row[0];
+            return new GameEvent[] { new ShuffleDeckEvent(p), };
         }
     }
 
@@ -150,12 +213,7 @@ namespace stonerkart
             }
             return new GameEvent[] {new FatigueEvent(c, v)};
         }
-
-        protected override bool validCostRow(TargetRow tr)
-        {
-            Card c = (Card)tr[0];
-            return exhaust ? c.canExhaust : c.movement >= fatigueBy;
-        }
+        
     }
 
     class ModifyDoer : SimpleDoer
@@ -225,17 +283,6 @@ namespace stonerkart
             var v = rows.Select(r => ((ManaOrb)r[1]).colour);
             return new GameEvent[] { new PayManaEvent(p, new ManaSet(v)) };
         }
-
-        public override IEnumerable<TargetRow> filterCostRows(IEnumerable<TargetRow> rs)
-        {
-            var ra = rs.ToArray();
-            if (ra.Length == 0) return ra;
-            Player payer = (Player)ra[0][0];
-
-            var orbs = ra.Select(r => (ManaOrb)r[1]);
-
-            return payer.manaPool.covers(orbs) ? rs : null;
-        }
     }
 
     class DrawCardsDoer : SimpleDoer
@@ -286,7 +333,7 @@ namespace stonerkart
         }
     }
 
-    class ZepperDoer : SimpleDoer
+    class PingDoer : SimpleDoer
     {
         public int damage;
 
@@ -294,7 +341,7 @@ namespace stonerkart
         /// Card source, Card victim
         /// </summary>
         /// <param name="damage"></param>
-        public ZepperDoer(int damage) : base(typeof(Card), typeof(Card))
+        public PingDoer(int damage) : base(typeof(Card), typeof(Card))
         {
             this.damage = damage;
         }

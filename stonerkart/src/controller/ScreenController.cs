@@ -7,6 +7,7 @@ using stonerkart.src.view;
 
 namespace stonerkart
 {
+    /*
     static class ScreenController
     {
         public static Game transitionToGamePanel(NewGameStruct ngs, bool local)
@@ -16,7 +17,7 @@ namespace stonerkart
             GameController gc = new GameController(g, gp);
             g.gameController = gc;
             UIController.gameFrame.transitionTo(gp);
-            g.startGame();
+            g.startGameThread();
 
             return g;
         }
@@ -56,4 +57,5 @@ namespace stonerkart
             UIController.gameFrame.transitionTo(new PostGameScreen(g, ges));
         }
     }
+    */
 }

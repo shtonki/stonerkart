@@ -10,7 +10,7 @@ using System.Text;
 
 namespace stonerkart
 {
-    abstract class AsyncConnection
+    public abstract class AsyncConnection
     {
         protected Socket socket;
         private byte[] buffer = new byte[1024];
