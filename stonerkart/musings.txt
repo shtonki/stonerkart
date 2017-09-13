@@ -16,3 +16,4 @@ concede
 options
 post game screen
 autopass/turn stops
+timers

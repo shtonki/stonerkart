@@ -67,6 +67,10 @@ namespace stonerkart
         orbColourless11,
         orbColourless12,
 
+        artSinisterPact,
+        artGreatWhiteBuffalo,
+        artAlterFate2,
+        artSoothsay,
         artAberrantSacrifice,
         artAbolish,
         artAlterFate,
@@ -267,6 +271,10 @@ namespace stonerkart
             images[Textures.orbColourless11] = Resources.cl11;
             images[Textures.orbColourless12] = Resources.cl12;
 
+            images[Textures.artSoothsay] = Resources.artSoothsay;
+            images[Textures.artGreatWhiteBuffalo] = Resources.artGreatWhiteBuffalo;
+            images[Textures.artAlterFate2] = Resources.artAlterFate2;
+            images[Textures.artSinisterPact] = Resources.artSinisterPact;
             images[Textures.artAberrantSacrifice] = Resources.artAberrantSacrifice;
             images[Textures.artAbolish] = Resources.artAbolish;
             images[Textures.artAlterFate] = Resources.artAlterFate;
@@ -544,7 +552,7 @@ namespace stonerkart
                 case CardTemplate.Damage_sWard: return Textures.artDamageWard;
                 case CardTemplate.One_sWith_sNature: return Textures.artOneWithNature;
                 case CardTemplate.Graverobber_sSyrdin: return Textures.artGraverobberSyrdin;
-                case CardTemplate.Alter_sFate: return Textures.artAlterTime;
+                case CardTemplate.Sinister_sPact: return Textures.artSinisterPact;
                 case CardTemplate.Goblin_sGrenade: return Textures.artGoblinGrenade;
                 case CardTemplate.Cleansing_sFire: return Textures.artCleansingFire;
                 case CardTemplate.Bhewas: return Textures.artBelwas;
@@ -592,7 +600,9 @@ namespace stonerkart
                 case CardTemplate.Ravaging_sGreed: return Textures.artRavagingGreed;
                 case CardTemplate.Water_sBolt: return Textures.artWaterBolt;
                 case CardTemplate.Lone_sRanger: return Textures.artLoneRanger;
-                default: throw new Exception();
+                case CardTemplate.Alter_sFate: return Textures.artAlterFate2;
+                case CardTemplate.Great_sWhite_sBuffalo: return Textures.artGreatWhiteBuffalo;
+                default: return Textures.iconCross;
             }
         }
 

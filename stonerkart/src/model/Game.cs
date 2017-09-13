@@ -95,6 +95,7 @@ namespace stonerkart
             if (c == null) return;
 
             var v = gameState.wrapperStack.Where(w => w.stackCard == c).ToArray();
+            if (v.Length == 0) return; //it's probably resolving and has been popped from the stack but the UI isn't a believer
             if (v.Length != 1) throw new Exception();
             var targetMatrix = v[0].cachedTargets;
 

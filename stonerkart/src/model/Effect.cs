@@ -155,6 +155,19 @@ namespace stonerkart
         
     }
 
+    class ShuffleDoer : SimpleDoer
+    {
+        public ShuffleDoer() : base(typeof(Player))
+        {
+        }
+
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        {
+            Player p = (Player)row[0];
+            return new GameEvent[] { new ShuffleDeckEvent(p), };
+        }
+    }
+
     class FatigueDoer : SimpleDoer
     {
         private int fatigueBy;

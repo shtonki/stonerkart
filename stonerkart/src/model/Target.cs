@@ -239,6 +239,29 @@ namespace stonerkart
         void pickNone(Player chooser, HackStruct hs);
     }
 
+    class TargetOption : TargetRule
+    {
+        private TargetRule baserule;
+
+        public TargetOption(TargetRule baserule) : base(baserule.targetType)
+        {
+            this.baserule = baserule;
+        }
+
+        public override TargetSet fillCastTargets(HackStruct hs)
+        {
+            return baserule.fillCastTargets(hs);
+        }
+
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
+        {
+            var v = baserule.fillResolveTargets(hs, ts);
+            var option = hs.game.chooseButtonSynced(hs.resolveController, "placeholder", ButtonOption.Yes, ButtonOption.No);
+
+            return option == ButtonOption.Yes ? v : TargetSet.CreateEmpty();
+        }
+    }
+
     class ChooseRule<T> : TargetRule where T : Targetable
     {
         private chooserface<T> chooser = dflt();
@@ -437,11 +460,19 @@ namespace stonerkart
     {
         private Mode mode;
         private PileLocation pile;
+        private int count = -1;
 
         public SelectCardRule(PileLocation pile, Mode mode)
         {
             this.mode = mode;
             this.pile = pile;
+        }
+
+        public SelectCardRule(PileLocation pile, Mode mode, int count)
+        {
+            this.mode = mode;
+            this.pile = pile;
+            this.count = count;
         }
 
         public IEnumerable<Card> candidates(HackStruct hs, Player p)
@@ -463,7 +494,9 @@ namespace stonerkart
                 default: throw new Exception();
             }
 
-            return p.pileFrom(pile);
+            return count == -1 ? 
+                lookedAt.pileFrom(pile) : 
+                lookedAt.pileFrom(pile).Take(count);
         }
 
         private Player chooser(Player player, HackStruct hs)
@@ -833,15 +866,17 @@ namespace stonerkart
         }
     }
 
-    class ModifyPreviousRule<P, T> : TargetRule where P : Targetable where T : Targetable
+    class ModifyRule<P, T> : TargetRule where P : Targetable where T : Targetable
     {
         private int column;
+        private int vector;
         private Func<P, T> fn;
 
-        public ModifyPreviousRule(int column, Func<P, T> f) : base(typeof(T))
+        public ModifyRule(int vector, int column, Func<P, T> f) : base(typeof(T))
         {
             this.column = column;
             this.fn = f;
+            this.vector = vector;
         }
 
         public override TargetSet fillCastTargets(HackStruct hs)
@@ -851,7 +886,7 @@ namespace stonerkart
 
         public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
-            return new TargetSet(hs.previousTargets.targetSets[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
+            return new TargetSet(hs.previousTargets[vector].targetSets[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
         }
 
     }

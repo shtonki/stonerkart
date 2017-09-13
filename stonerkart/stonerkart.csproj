@@ -185,6 +185,10 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artGreatWhiteBuffalo.png" />
+    <None Include="Resources\artAlterFate2.png" />
+    <None Include="Resources\artSinisterPact.png" />
+    <None Include="Resources\artSoothsay.png" />
     <None Include="Resources\artSeethingRage.png" />
     <None Include="Resources\iconCheck.png" />
     <None Include="Resources\iconCross.png" />

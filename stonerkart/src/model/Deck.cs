@@ -75,17 +75,16 @@ namespace stonerkart
 
         private static CardTemplate[] test = new[]
         {
-            CardTemplate.Zap, 
-            CardTemplate.Zap, 
-            CardTemplate.Zap, 
-            CardTemplate.Zap, 
-            CardTemplate.Zap, 
-            CardTemplate.Zap, 
-            CardTemplate.Counterspell, 
-            CardTemplate.Counterspell, 
-            CardTemplate.Counterspell, 
-            CardTemplate.Counterspell, 
-            CardTemplate.Counterspell, 
+            CardTemplate.Alter_sFate, 
+            CardTemplate.Alter_sFate, 
+            CardTemplate.Alter_sFate, 
+            CardTemplate.Alter_sFate, 
+            CardTemplate.Primal_sChopter, 
+            CardTemplate.Overgrow, 
+            CardTemplate.Marilith, 
+            CardTemplate.One_sWith_sNature, 
+            CardTemplate.Water_sBolt, 
+            CardTemplate.Wilt, 
         };
 
         #region basicDNZombies
@@ -182,8 +181,8 @@ CardTemplate.Survival_sInstincts,
             CardTemplate.Raise_sDead,
             CardTemplate.Rider_sof_sDeath,
             CardTemplate.Rider_sof_sWar,
-            CardTemplate.Alter_sFate,
-            CardTemplate.Alter_sFate,
+            CardTemplate.Sinister_sPact,
+            CardTemplate.Sinister_sPact,
             CardTemplate.Cantrip,
             CardTemplate.Cantrip,
             CardTemplate.Counterspell,
@@ -225,10 +224,10 @@ CardTemplate.Survival_sInstincts,
             CardTemplate.Illegal_sGoblin_sLaboratory,
             CardTemplate.Illegal_sGoblin_sLaboratory,
             CardTemplate.Illegal_sGoblin_sLaboratory,
-            CardTemplate.Alter_sFate,
-            CardTemplate.Alter_sFate,
-            CardTemplate.Alter_sFate,
-            CardTemplate.Alter_sFate,
+            CardTemplate.Sinister_sPact,
+            CardTemplate.Sinister_sPact,
+            CardTemplate.Sinister_sPact,
+            CardTemplate.Sinister_sPact,
             CardTemplate.Cantrip,
             CardTemplate.Cantrip,
             CardTemplate.Cantrip,
@@ -259,7 +258,7 @@ CardTemplate.Survival_sInstincts,
 
     public class DeckContraints
     {
-        public int cardMin;
+        public int cardMin { get; }
         public int this[Rarity r]
         {
             get
@@ -283,7 +282,7 @@ CardTemplate.Survival_sInstincts,
             {
                 case Format.Test:
                 {
-                    cardMin = 10;
+                    cardMin = 5;
 
                     this[Rarity.Common]     = Int32.MaxValue;
                     this[Rarity.Uncommon]   = Int32.MaxValue;
@@ -294,7 +293,7 @@ CardTemplate.Survival_sInstincts,
 
                 case Format.Standard:
                 {
-                    cardMin = 30;
+                    cardMin = 40;
 
                     this[Rarity.Common] = 4;
                     this[Rarity.Uncommon] = 3;

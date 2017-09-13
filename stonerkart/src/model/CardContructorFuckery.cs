@@ -43,7 +43,59 @@ namespace stonerkart
 
             switch (ct)
             {
+                #region Great White Buffalo
+                case CardTemplate.Great_sWhite_sBuffalo:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Rare;
 
+                    lifeCost = 2;
+                    natureCost = 2;
+                    greyCost = 2;
+
+                    basePower = 7;
+                    baseToughness = 7;
+                    baseMovement = 3;
+                    
+                    etbLambda(
+                        "When Great White Buffalo enters the battlefield restore 5 toughness to your heroic creatures.",
+                        new Effect(
+                            new TargetRuleSet(
+                                new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                                new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
+                            new PingDoer(-5)));
+                } break;
+                #endregion
+                #region Alter Fate
+                case CardTemplate.Alter_sFate:
+                {
+                    cardType = CardType.Channel;
+                    rarity = Rarity.Common;
+
+                    orderCost = 1;
+
+                    castDescription =
+                        "Look at the top three cards of your deck then put them back in any order. You may shuffle your library. Draw a card.";
+                    castEffect = new Effect(
+                        new ChooseRule<Card>(
+                            new SelectCardRule(PileLocation.Deck, SelectCardRule.Mode.PlayerLooksAtPlayer, 3),
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                            ChooseRule<Card>.ChooseAt.Resolve, 
+                            c => true,
+                            3, 
+                            false
+                            ), 
+                        new MoveToPileDoer(PileLocation.Deck));
+
+                    additionalCastEffects.Add(new Effect(
+                        new TargetOption(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new ShuffleDoer()));
+                        
+                    additionalCastEffects.Add(new Effect(
+                        new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), 
+                        new DrawCardsDoer(1)));
+                } break;
+                #endregion
                 #region Illegal Goblin Laboratory
                 case CardTemplate.Illegal_sGoblin_sLaboratory:
                 {
@@ -477,14 +529,14 @@ namespace stonerkart
                 break;
 
                 #endregion
-                #region Alter Fate
+                #region Sinister Pact
 
-            case CardTemplate.Alter_sFate:
+            case CardTemplate.Sinister_sPact:
             {
                 cardType = CardType.Interrupt;
                 rarity = Rarity.Common;
 
-                orderCost = 1;
+                deathCost = 1;
 
                 castEffect =
                     new Effect(
@@ -493,6 +545,10 @@ namespace stonerkart
                                 new SelectCardRule(PileLocation.Deck, SelectCardRule.Mode.PlayerLooksAtPlayer),
                                 ChooseRule<Card>.ChooseAt.Resolve)),
                         new MoveToPileDoer(PileLocation.Deck));
+
+                additionalCastEffects.Add(new Effect(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new ShuffleDoer()));
+                additionalCastEffects.Add(new Effect(new ModifyRule<Card, Card>(0, 0, c => c), new MoveToPileDoer(PileLocation.Deck)));
+                   
                 castDescription =
                     "Search your deck for a card. Shuffle your deck then put the selected card on top.";
             }
@@ -553,7 +609,7 @@ namespace stonerkart
                             new CardResolveRule(CardResolveRule.Rule.ResolveCard), 
                             new ChooseRule<Card>()),
                         new PingDoer(-2));
-                additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(1, c => c),
+                additionalCastEffects.Add(new Effect(new ModifyRule<Card, Card>(0, 1, c => c),
                     new ModifyDoer(add(2), endOfTurn, ModifiableStats.Power)));
                 castDescription =
                     "Target creature is healed for 2 and gains 2 power until the end of this turn.";
@@ -1096,7 +1152,7 @@ namespace stonerkart
 
                     castDescription = "Deal 4 damage to target creature then exhaust it.";
                     castEffect = zepLambda(4);
-                    additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(1, c => c), new FatigueDoer(true)));
+                    additionalCastEffects.Add(new Effect(new ModifyRule<Card, Card>(0, 1, c => c), new FatigueDoer(true)));
                     castRange = 5;
 
                 } break;
@@ -1193,7 +1249,7 @@ namespace stonerkart
                         new Effect(
                             new TargetRuleSet(creature()),
                             new FatigueDoer(false));
-                    additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(0, c => c),
+                    additionalCastEffects.Add(new Effect(new ModifyRule<Card, Card>(0, 0, c => c),
                         new ModifyDoer(add(2), endOfTurn, ModifiableStats.Power)));
                     castRange = 3;
                 } break;
@@ -1333,8 +1389,8 @@ namespace stonerkart
                     castEffect = zepNonHeroicLambda(3);
                     additionalCastEffects.Add(new Effect(
                         new TargetRuleSet(
-                            new ModifyPreviousRule<Card, Card>(0, c => c),
-                            new ModifyPreviousRule<Card, Card>(1, c => c.controller.heroCard)),
+                            new ModifyRule<Card, Card>(0, 0, c => c),
+                            new ModifyRule<Card, Card>(0, 1, c => c.controller.heroCard)),
                         new PingDoer(3)
                         ));
                     castDescription = "Deal 3 damage to target non-heroic creature and 3 damage to that creatures controller.";
@@ -1535,7 +1591,7 @@ namespace stonerkart
 
                         Effect e1 = new Effect(nonheroicCreature(),
                             new ModifyDoer(add(2), never, ModifiableStats.Power));
-                        Effect e2 = new Effect(new ModifyPreviousRule<Card, Card>(0, c => c),
+                        Effect e2 = new Effect(new ModifyRule<Card, Card>(0, 0, c => c),
                             new ModifyDoer(add(2), never, ModifiableStats.Toughness));
 
                         addActivatedAbility(
@@ -1958,7 +2014,7 @@ namespace stonerkart
 
                     Effect e1 = new Effect(new ChooseRule<Card>(c => c.controller == this.controller && !c.isHeroic && c.race != Race.Spirit), new MoveToPileDoer(PileLocation.Displaced));
                         Effect e2 = new Effect(new TargetRuleSet(
-                    new ModifyPreviousRule<Card, Card>(0, c => c),
+                    new ModifyRule<Card, Card>(0, 0, c => c),
                     new ChooseRule<Tile>(
                         ChooseRule<Tile>.ChooseAt.Resolve,
                         t => t.passable && !t.isEdgy)),

@@ -550,7 +550,7 @@ namespace stonerkart
                     return Resources.artGraverobberSyrdin;
                 }
 
-                case CardTemplate.Alter_sFate:
+                case CardTemplate.Sinister_sPact:
                 {
                     return Resources.artAlterTime;
                 }

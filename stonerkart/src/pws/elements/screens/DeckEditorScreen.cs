@@ -27,6 +27,8 @@ namespace stonerkart
         private const int HERO_VIEW_WIDTH = PILE_VIEW_HEIGHT * 500 / 700;
 
 
+        private const int STATS_CARDCOUNTER_HEIGHT = 90;
+        private const int STATS_CARDCOUNTER_WIDTH = 90;
         private const int STATS_MAX_BAR_HEIGHT = 256;
         private const int STATS_BAR_WIDTH = 32;
         private const int STATS_BAR_SPACING = 16;
@@ -98,6 +100,7 @@ namespace stonerkart
         private List<Card> filteredCards;
         private CardView heroCardView;
         private Square cardViewPanel;
+        private Square cardCounter;
         private int currentPageNr = 0;
         private ToggleButton[] manaButtons { get; set; }
         private string searchString;
@@ -140,6 +143,13 @@ namespace stonerkart
                 tb.setLocation(barsX, barsY - STATS_TEXT_SPACING);
                 barChartPanel.addChild(tb);
             }
+
+
+            cardCounter = new Square(STATS_CARDCOUNTER_WIDTH, STATS_CARDCOUNTER_HEIGHT);
+            addElement(cardCounter);
+            cardCounter.X = barChartPanel.X - STATS_CARDCOUNTER_WIDTH;
+            cardCounter.Y = barChartPanel.Y;
+            cardCounter.Text = "0";
         }
 
         private void setupStatsThingy()
@@ -162,7 +172,7 @@ namespace stonerkart
                 int barHeight = 
                     cardList.Count == 0 ? 
                     0 : 
-                    -((STATS_MAX_BAR_HEIGHT-STATS_TEXT_SPACING-STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / cardList.Count;// + STATS_TEXT_SPACING + STATS_MANA_BUTTON_HEIGHT;
+                    -((STATS_MAX_BAR_HEIGHT-STATS_TEXT_SPACING-STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / nrOfCardsOfEachMana.Sum();// + STATS_TEXT_SPACING + STATS_MANA_BUTTON_HEIGHT;
                 bars[i] = new Square(i * (STATS_BAR_WIDTH + STATS_BAR_SPACING), barChartPanel.Height-STATS_MANA_BUTTON_HEIGHT-STATS_BAR_SPACING, STATS_BAR_WIDTH, barHeight, System.Drawing.Color.Black);
                 barChartPanel.addChild(bars[i]);
 
@@ -176,6 +186,9 @@ namespace stonerkart
                 tb.setLocation(bars[i].X, bars[i].Y + bars[i].Height - STATS_TEXT_SPACING);
                 barChartPanel.addChild(tb);
             }
+
+            cardCounter.Text = cardList.Count.ToString();
+            cardCounter.textColor = cardList.Count >= deckConstraints.cardMin ? Color.Green : Color.Red;
         }
 
         private void refilter()

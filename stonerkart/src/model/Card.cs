@@ -675,6 +675,8 @@ namespace stonerkart
 
     public enum CardTemplate
     {
+        Great_sWhite_sBuffalo,
+        Alter_sFate,
         Commander_sSparryz,
         Flamekindler,
         Moratian_sBattle_sStandard,
@@ -731,7 +733,7 @@ namespace stonerkart
         Damage_sWard,
         One_sWith_sNature,
         Graverobber_sSyrdin,
-        Alter_sFate,
+        Sinister_sPact,
         Goblin_sGrenade,
         Cleansing_sFire,
         Bhewas,
