@@ -24,7 +24,7 @@ namespace stonerkart
 
         private const string waiterPrompt = "Waiting for opponent.";
 
-        public Game(NewGameStruct ngs, bool local, GameScreen gameScreen)
+        public Game(NewGameStruct ngs, bool local, GameScreen gameScreen, Map map)
         {
             screen = gameScreen;
 
@@ -32,7 +32,7 @@ namespace stonerkart
             
             gameController = new GameController(null, null);
 
-            gameState = new GameState(ngs);
+            gameState = new GameState(ngs, map);
 
             if (local)
             {
@@ -61,6 +61,9 @@ namespace stonerkart
             gameState.hero.graveyard.addObserver(screen.heroGraveyard);
             screen.heroGraveyardWinduh.Title = String.Format("{0}'s Graveyard", gameState.hero.name);
 
+            gameState.villain.graveyard.addObserver(screen.villainGraveyard);
+            screen.villainGraveyardWinduh.Title = String.Format("{0}'s Graveyard", gameState.villain.name);
+
             gameState.hero.hand.addObserver(screen.heroPanel);
             gameState.hero.deck.addObserver(screen.heroPanel);
             gameState.hero.graveyard.addObserver(screen.heroPanel);
@@ -70,6 +73,70 @@ namespace stonerkart
             gameState.villain.deck.addObserver(screen.villainPanel);
             gameState.villain.graveyard.addObserver(screen.villainPanel);
             gameState.villain.displaced.addObserver(screen.villainPanel);
+
+            screen.stackView.mouseMove += a =>
+            {
+                var cv = screen.stackView.viewAtClick(a);
+                showTargets(cv);
+            };
+            screen.stackView.mouseExit += a => showTargets(null);
+
+
+        }
+
+        private Card showTargetsCard;
+        private void showTargets(CardView cv)
+        {
+            Card c = cv?.card;
+            if (c == showTargetsCard) return;
+
+            showTargetsCard = c;
+            screen.clearArrows();
+            if (c == null) return;
+
+            var v = gameState.wrapperStack.Where(w => w.stackCard == c).ToArray();
+            if (v.Length != 1) throw new Exception();
+            var targetMatrix = v[0].cachedTargets;
+
+            foreach (var vector in targetMatrix.targetVectors)
+            {
+                foreach (var set in vector.targetSets)
+                {
+                    foreach (var target in set.targets)
+                    {
+                        if (target == null) continue;
+                        if (target is Player)
+                        {
+                            screen.addArrow(cv, ((Player)target).heroCard.tile);
+                        }
+                        else if (target is Tile)
+                        {
+                            screen.addArrow(cv, (Tile)target);
+                        }
+                        else if (target is Card)
+                        {
+                            Card crd = (Card)target;
+                            switch (crd.location.pile)
+                            {
+                                case PileLocation.Field:
+                                {
+                                    screen.addArrow(cv, crd.tile);
+                                } break;
+
+                                case PileLocation.Stack:
+                                {
+                                    screen.addArrow(
+                                        cv,
+                                        screen.stackView.viewOf(crd));
+                                } break;
+
+                                default:
+                                    throw new Exception();
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public Card createToken(CardTemplate ct, Player owner)
@@ -107,7 +174,7 @@ namespace stonerkart
             return map.path(c, t);*/
         }
 
-        public void startGameThread()
+        public void start()
         {
             Thread t = new Thread(gameLoop);
             t.Start();
@@ -362,7 +429,7 @@ namespace stonerkart
                         !occupado.Any(p => p == path.last) //there isn't a card in the tile we want to move to
                         ).ToList();
                     if (options.Count == 1) break;
-                    var v = gameState.map.tyles.Where(t => t.card?.controller == mover.controller).ToArray();
+                    var v = gameState.map.Tiles.Where(t => t.card?.controller == mover.controller).ToArray();
                     if (movingPlayer.isHero) highlight(options.Select(p => p.to), Color.Green);
                     Tile to = chooseTileSynced(
                         movingPlayer, 
@@ -712,7 +779,7 @@ namespace stonerkart
 
                 var card = chooseCardSynced(
                     playerWithPriority, 
-                    c => c.controller == playerWithPriority,
+                    c => c.controller == playerWithPriority && !c.isDummy,
                     "You may cast a card.",
                     ButtonOption.Pass);
                 if (card == null) return false;

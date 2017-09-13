@@ -104,6 +104,7 @@
     <Compile Include="src\pws\elements\FriendsPanel.cs" />
     <Compile Include="src\pws\elements\GameMenuBar.cs" />
     <Compile Include="src\pws\elements\HexPanel.cs" />
+    <Compile Include="src\pws\elements\Line.cs" />
     <Compile Include="src\pws\elements\MemeButton.cs" />
     <Compile Include="src\model\User.cs" />
     <Compile Include="src\pws\elements\PileView.cs" />

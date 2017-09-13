@@ -37,13 +37,13 @@ namespace stonerkart
 
         private GameEventHandlerBuckets baseHandler = new GameEventHandlerBuckets();
 
-        public GameState(NewGameStruct ngs)
+        public GameState(NewGameStruct ngs, Map map)
         {
             //gameid = ngs.gameid;
 
 
             random = new Random(ngs.randomSeed);
-            map = new Map(11, 7, false, false);
+            this.map = map;
             cards = new List<Card>();
             players = new List<Player>();
 

@@ -13,12 +13,14 @@ namespace stonerkart
         public readonly int height;
         public int size => tiles.Length;
 
-        public IEnumerable<Tile> tyles => tiles;
+        public IEnumerable<Tile> Tiles => tiles;
 
         private Tile[] tiles;
         private Tile[][] cols;
 
-        public Map(int width, int height, bool fatLeft, bool fatRight)
+        public static Map DefaultMap => new Map(9, 7);
+
+        public Map(int width, int height)
         {
             this.width = width;
             this.height = height;
@@ -36,9 +38,6 @@ namespace stonerkart
                 cols[x] = col;
             }
         }
-
-
-
 
 
         public Tile tileAt(int x, int y)

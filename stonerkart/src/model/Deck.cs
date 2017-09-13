@@ -73,6 +73,21 @@ namespace stonerkart
             return sb.ToString();
         }
 
+        private static CardTemplate[] test = new[]
+        {
+            CardTemplate.Zap, 
+            CardTemplate.Zap, 
+            CardTemplate.Zap, 
+            CardTemplate.Zap, 
+            CardTemplate.Zap, 
+            CardTemplate.Zap, 
+            CardTemplate.Counterspell, 
+            CardTemplate.Counterspell, 
+            CardTemplate.Counterspell, 
+            CardTemplate.Counterspell, 
+            CardTemplate.Counterspell, 
+        };
+
         #region basicDNZombies
 
 
@@ -237,6 +252,7 @@ CardTemplate.Survival_sInstincts,
             new Deck(CardTemplate.Chieftain_sZ_aloot_aboks, basicMLNZooTs, "Basic MLN Zoo"),
             new Deck(CardTemplate.Shibby_sShtank, basicOLDRidersTs, "Basic OLD Riders"),
             new Deck(CardTemplate.Chieftain_sZ_aloot_aboks, basicJasinHomebrewTs, "Basic Jasin Homebrew"),
+            new Deck(CardTemplate.Shibby_sShtank, test, "Test Me"),
         };
     }
 

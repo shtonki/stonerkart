@@ -68,6 +68,7 @@ namespace stonerkart
 
         private void layoutstuff()
         {
+
             int manaSquareSize = Width;
             manaSquare.Height = manaSquareSize;
             manaSquare.Width = manaSquareSize;
@@ -103,6 +104,10 @@ namespace stonerkart
                         locationButtonPadding + j*(locationButtonSize + locationButtonPadding));
                 }
             }
+
+            buttonsSquare.Height = Height - manaSquareSize;
+            buttonsSquare.Width = Height - manaSquareSize;
+
         }
 
         public void notify(object o, ManaPoolChanged t)

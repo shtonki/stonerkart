@@ -14,13 +14,17 @@ namespace stonerkart
     {
         private int xcount;
         private int ycount;
-        private int hexsize;
+        public int hexsize { get; }
         private int hexsizethreequarters;
 
         private Color[][] bordercolors;
 
+        private Map colormeshocked;
+
         public HexPanel(int xcount, int ycount, int hexsize) : base()
         {
+            colormeshocked = new Map(xcount, ycount);
+
             hexsizethreequarters = (int)Math.Round(hexsize*0.75);
             width = hexsize+(int)((xcount-1)* hexsizethreequarters);
             height = ycount*hexsize + hexsize/2;
@@ -92,7 +96,7 @@ namespace stonerkart
         private void memeon(Card c, int x, int y)
         {
             if (rightclickview != null) throw new Exception();
-            rightclickview = new CardView(c);
+            rightclickview = new CardView(Card.fromTemplate(c.template));
             rightclickview.Height = 400;
             rightclickview.X = x;
             rightclickview.Y = y;
@@ -146,7 +150,7 @@ namespace stonerkart
             return null;
         }
 
-        private Point hexCoords(int column, int row)
+        public Point hexCoords(int column, int row)
         {
             int os = ((column + 1) % 2) * hexsize / 2;
             int hexX = (int)(hexsizethreequarters * column);
@@ -169,7 +173,9 @@ namespace stonerkart
                     
                     Color hl = bordercolors[i][j];
 
-                    dm.fillHexagon(hexX, hexY, hexsize, hl, Color.AntiqueWhite);
+                    var edgy = colormeshocked.tileAt(i, j).isEdgy;
+
+                    dm.fillHexagon(hexX, hexY, hexsize, hl, edgy ? Color.Silver : Color.AntiqueWhite);
                 }
             }
 

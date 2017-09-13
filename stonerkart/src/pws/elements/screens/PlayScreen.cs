@@ -18,6 +18,23 @@ namespace stonerkart
             backButton.Y = 20;
             backButton.Text = "Back";
             backButton.clicked += a => GUI.transitionToScreen(GUI.mainMenuScreen);
+
+            Button botgame = new Button(30, 30);
+            addElement(botgame);
+            botgame.setLocation(400, 400);
+            botgame.Text = "botgame";
+            botgame.clicked += a =>
+            {
+                Map map = Map.DefaultMap;
+                GameScreen gs = new GameScreen(map);
+                Game g = new Game(
+                    new NewGameStruct(0, 420,  new [] {"hero", "villain"}, 0), 
+                    true, 
+                    gs, 
+                    map);
+                GUI.transitionToScreen(gs);
+                g.start();
+            };
         }
     }
 }

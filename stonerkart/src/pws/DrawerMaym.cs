@@ -31,12 +31,12 @@ namespace stonerkart
             drawLine(org.X, org.Y, end.X, end.Y, c);
         }
 
-        public void drawLine(int xorg, int yorg, int xend, int yend, Color c)
+        public void drawLine(int xorg, int yorg, int xend, int yend, Color c, int thickness = 4)
         {
             var org = Frame.pixToGL(xorg, yorg);
             var end = Frame.pixToGL(xend, yend);
 
-            GL.LineWidth(4);
+            GL.LineWidth(thickness);
             GL.Color4(c);
             GL.Begin(BeginMode.Lines);
 

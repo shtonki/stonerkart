@@ -75,6 +75,11 @@ namespace stonerkart
             layoutCards();
         }
 
+        public CardView viewOf(Card card)
+        {
+            return cardViews.First(cv => cv.card == card);
+        }
+
         public void sub(PublicSaxophone sax)
         {
             sax.sub(this, (a, p) => viewAtClick(a)?.card);
