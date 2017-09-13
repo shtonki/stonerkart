@@ -675,6 +675,18 @@ namespace stonerkart
 
     public enum CardTemplate
     {
+        Arachosa,
+        Vincennes,
+        Ilatian_sGhoul,
+        Hungry_sFelhound,
+        Archfather,
+        Jabroni,
+        Iradj,
+        Hosro,
+        Warp,
+        Count_sFera_sII,
+        Seblastian,
+        Paralyzing_sSpider,
         Commander_sSparryz,
         Flamekindler,
         Moratian_sBattle_sStandard,
