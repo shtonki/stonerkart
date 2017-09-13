@@ -1083,6 +1083,16 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap artSeethingRage {
+            get {
+                object obj = ResourceManager.GetObject("artSeethingRage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap artSeraph {
             get {
                 object obj = ResourceManager.GetObject("artSeraph", resourceCulture);

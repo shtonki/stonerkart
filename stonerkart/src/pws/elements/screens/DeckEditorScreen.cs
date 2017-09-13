@@ -146,16 +146,23 @@ namespace stonerkart
         {
             barChartPanel.clearChildren();
             //Todo remove children but now i need to go work afk
+            //todo bolshevik revolution
             int[] nrOfCardsOfEachMana = new int[NR_OF_MANA_BUTTONS];
             foreach(var c in cardList)
             {
-                nrOfCardsOfEachMana[(int)c.colours.Max()] += 1;
+                foreach (var clr in c.colours)
+                {
+                    nrOfCardsOfEachMana[(int)clr]++;
+                }
             }
 
             Square[] bars = new Square[NR_OF_MANA_BUTTONS];
             for(int i = 0; i < NR_OF_MANA_BUTTONS; i++)
             {
-                int barHeight = -((STATS_MAX_BAR_HEIGHT-STATS_TEXT_SPACING-STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / nrOfCardsOfEachMana.Aggregate((a, b) => a + b);// + STATS_TEXT_SPACING + STATS_MANA_BUTTON_HEIGHT;
+                int barHeight = 
+                    cardList.Count == 0 ? 
+                    0 : 
+                    -((STATS_MAX_BAR_HEIGHT-STATS_TEXT_SPACING-STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / cardList.Count;// + STATS_TEXT_SPACING + STATS_MANA_BUTTON_HEIGHT;
                 bars[i] = new Square(i * (STATS_BAR_WIDTH + STATS_BAR_SPACING), barChartPanel.Height-STATS_MANA_BUTTON_HEIGHT-STATS_BAR_SPACING, STATS_BAR_WIDTH, barHeight, System.Drawing.Color.Black);
                 barChartPanel.addChild(bars[i]);
 
@@ -178,27 +185,26 @@ namespace stonerkart
 
         private bool filterx(Card c)
         {
-            bool x = (c.castManaCost[ManaColour.Chaos] > 0 && manaButtons[0].Toggled) ||
-                    (c.castManaCost[ManaColour.Death] > 0 && manaButtons[1].Toggled) ||
-                    (c.castManaCost[ManaColour.Might] > 0 && manaButtons[2].Toggled) ||
-                    (c.castManaCost[ManaColour.Order] > 0 && manaButtons[3].Toggled) ||
-                    (c.castManaCost[ManaColour.Life] > 0 && manaButtons[4].Toggled) ||
-                    (c.castManaCost[ManaColour.Nature] > 0 && manaButtons[5].Toggled) ||
-                    (c.castManaCost[ManaColour.Colourless] == c.convertedManaCost && c.convertedManaCost > 0 && manaButtons[6].Toggled && c.isToken == false) ||
-                    (c.isHeroic);
-            //&& c.ToString().StartsWith(searchString);
-            //if(c.isHeroic)
-             //System.Console.WriteLine(c +" "+ x);
-            return x;
+            bool colortest =
+                (c.castManaCost[ManaColour.Chaos] > 0 && manaButtons[0].Toggled) ||
+                (c.castManaCost[ManaColour.Death] > 0 && manaButtons[1].Toggled) ||
+                (c.castManaCost[ManaColour.Might] > 0 && manaButtons[2].Toggled) ||
+                (c.castManaCost[ManaColour.Order] > 0 && manaButtons[3].Toggled) ||
+                (c.castManaCost[ManaColour.Life] > 0 && manaButtons[4].Toggled) ||
+                (c.castManaCost[ManaColour.Nature] > 0 && manaButtons[5].Toggled) ||
+                (c.castManaCost[ManaColour.Colourless] == c.convertedManaCost && manaButtons[6].Toggled) ||
+                (c.isHeroic);
+
+            bool tokentest = c.isToken == false;
+
+            return colortest && tokentest;
         }
 
         #region setups
 
         private void setupCards()
         {
-            allCardsEver = new List<Card>();
-            var cardTemplates = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().ToList();
-            allCardsEver = cardTemplates.Select(c => new Card(c)).ToList();
+            allCardsEver = Card.flyweight.ToList();
             allCardsEver.Sort((c1, c2) =>
             {
                 var colourcountdiff = Math.Min(2, c1.colours.Count) - Math.Min(2, c2.colours.Count);
@@ -361,7 +367,7 @@ namespace stonerkart
             pv.mouseDown += (a) =>
             {
                 var cardView = pv.viewAtClick(a);
-                if (cardView != null) cardList.remove(cardView.card);
+                if (cardView != null) removeFromDeck(cardView.card);
             };
             pv.mouseMove += (__) =>
             {
@@ -522,6 +528,12 @@ namespace stonerkart
                 cardList.addTop(new Card(ct));
                 setupStatsThingy();
             }
+        }
+
+        private void removeFromDeck(Card card)
+        {
+            cardList.remove(card);
+            setupStatsThingy();
         }
 
         

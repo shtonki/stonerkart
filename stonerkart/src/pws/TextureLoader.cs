@@ -169,6 +169,7 @@ namespace stonerkart
         artSanguineArtisan,
         artScrollOfEarth,
         artSebasGambit,
+        artSeethingRage,
         artSeraph,
         artSereneDandelion,
         artShimmeringKoi,
@@ -368,6 +369,7 @@ namespace stonerkart
             images[Textures.artSanguineArtisan] = Resources.artSanguineArtisan;
             images[Textures.artScrollOfEarth] = Resources.artScrollOfEarth;
             images[Textures.artSebasGambit] = Resources.artSebasGambit;
+            images[Textures.artSeethingRage] = Resources.artSeethingRage;
             images[Textures.artSeraph] = Resources.artSeraph;
             images[Textures.artSereneDandelion] = Resources.artSereneDandelion;
             images[Textures.artShimmeringKoi] = Resources.artShimmeringKoi;
@@ -509,7 +511,7 @@ namespace stonerkart
                 case CardTemplate.Shotty_sContruct: return Textures.artShottyContruct;
                 case CardTemplate.Houndmaster: return Textures.artHoundmaster;
                 case CardTemplate.Marilith: return Textures.artMarilith;
-                case CardTemplate.Seething_sRage: return Textures.artEnragedDragon;
+                case CardTemplate.Seething_sRage: return Textures.artSeethingRage;
                 case CardTemplate.Ilas_sBargain: return Textures.artAberrantSacrifice;
                 case CardTemplate.Rapture: return Textures.artRapture;
                 case CardTemplate.Suspicious_sVortex: return Textures.artSuspiciousVortex;

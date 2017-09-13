@@ -358,7 +358,7 @@ namespace stonerkart
             return name;
         }
 
-        private static Card[] flyweight { get; } =
+        public static Card[] flyweight { get; } =
             Enum.GetValues(typeof (CardTemplate)).Cast<CardTemplate>().Select(ct => new Card(ct)).ToArray();
 
         public static Card fromTemplate(CardTemplate ct)
