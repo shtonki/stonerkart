@@ -50,6 +50,7 @@ namespace stonerkart
         public bool canRetaliate => !isHeroic;
 
         public string breadText => breadTextEx();
+        public string flavourText { get; }
 
         public Location location => locationEx();
 
