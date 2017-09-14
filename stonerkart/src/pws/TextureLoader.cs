@@ -590,6 +590,7 @@ namespace stonerkart
                 case CardTemplate.Ravaging_sGreed: return Textures.artRavagingGreed;
                 case CardTemplate.Water_sBolt: return Textures.artWaterBolt;
                 case CardTemplate.Lone_sRanger: return Textures.artLoneRanger;
+                case CardTemplate.Count_sFera_sII: return Textures.artAlterFate;
                 default: throw new Exception();
             }
         }

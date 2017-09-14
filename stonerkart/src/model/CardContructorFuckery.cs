@@ -43,7 +43,48 @@ namespace stonerkart
 
             switch (ct)
             {
-                #region Arachosa
+                
+                #region Count Fera II
+                case CardTemplate.Count_sFera_sII:
+                    {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Legendary;
+                        baseRace = Race.Undead;
+
+                        baseMovement = 3;
+                        basePower = 3;
+                        baseToughness = 3;
+                        deathCost = 4;
+                        greyCost = 1;
+
+                        addActivatedAbility("Sacrifice target non-undead creature you control: give Count Fera II +1/+1",
+                            new Effect(new TargetRuleSet(new ChooseRule<Card>(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero)), new MoveToPileDoer(PileLocation.Graveyard)),
+                            new Foo(),
+                            -1,
+                            PileLocation.Field,
+                            CastSpeed.Interrupt);
+
+                        /*
+                        addActivatedAbility("Sacrifice target non-undead creature you control: give Count Fera II +1/+1",
+                            new Foo(new Effect(new TargetRuleSet(new ChooseRule<Card>(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero))), new MoveToPileDoer(PileLocation.Graveyard),
+                            -1,
+                            PileLocation.Field,
+                            CastSpeed.Interrupt);
+
+
+                        addActivatedAbility("Sacrifice non-undead creature you control: give Count Fera II +1/+1.",
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
+                            new ModifyDoer(Card.add(1), Card.never, ModifiableStats.Power, ModifiableStats.Toughness),
+                            new Foo(killLambdaWhere(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero)),
+                            -1,
+                            PileLocation.Field,
+                            CastSpeed.Interrupt
+                        );*/
+                    }
+                    break;
+                #endregion
+                /*
+                 #region Arachosa
                 case CardTemplate.Arachosa:
                     {
                         cardType = CardType.Creature;
@@ -84,7 +125,7 @@ namespace stonerkart
                             "Whenever this Paralyzing Spider deals damage to a non-heroic creature, reduce that creature's movement speed by 2. This cannot reduce the targets movement below 1.",
                             new Effect(new TargetRuleSet(
                             new TriggeredTargetRule<DamageEvent, Card>(g => g.target)),
-                            new ModifyDoer(v => Math.Max(Math.Min(v, 1), v - 2), LL.never, ModifiableStats.Movement)),
+                            new ModifyDoer(v => Math.Max(Math.Min(v, 1), v - 2), Card.never, ModifiableStats.Movement)),
                             new Foo(),
                             new TypedGameEventFilter<DamageEvent>(damageEvent => damageEvent.source == this),
                             -1,
@@ -100,7 +141,7 @@ namespace stonerkart
                 case CardTemplate.Seblastian:
                     {
                         cardType = CardType.Creature;
-                        //rarity = Rarity.Rare;
+                        rarity = Rarity.Rare;
                         baseRace = Race.Human;
 
                         baseMovement = 2;
@@ -112,34 +153,10 @@ namespace stonerkart
                         addActivatedAbility(
                         String.Format("Sacrifice this creature: deal 3 damage to all creatures within 1 tile."),
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                        new AoeRule(t => true, 3, card => true)), new ZepperDoer(3), new Foo(killLambdaWhere(c => c.race != Race.Undead)),
+                        new AoeRule(t => true, 3, card => true)),  new PingDoer(3), new Foo(killLambdaWhere(c => c.race != Race.Undead)),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
-                        );
-                    }
-                    break;
-                #endregion
-                #region Count Fera II
-                case CardTemplate.Count_sFera_sII:
-                    {
-                        cardType = CardType.Creature;
-                        rarity = Rarity.Legendary;
-                        baseRace = Race.Undead;
-
-                        baseMovement = 3;
-                        basePower = 3;
-                        baseToughness = 3;
-                        deathCost = 4;
-                        greyCost = 1;
-
-                        addActivatedAbility("Sacrifice non-undead creature you control: give Count Fera II +1/+1.",
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                            new ModifyDoer(LL.add(1), LL.never, ModifiableStats.Power, ModifiableStats.Toughness),
-                            new Foo(killLambdaWhere(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero)),
-                            -1,
-                            PileLocation.Field,
-                            CastSpeed.Interrupt
                         );
                     }
                     break;
@@ -270,7 +287,7 @@ namespace stonerkart
                                 "{0}, Select a flying target within 5 tiles and deal 5 damage to it.",
                                 G.exhaustGhyph),
                             zepLambdaWhere(5, c => c.keywordAbilities.Contains(KeywordAbility.Flying)),
-                            new Foo(LL.exhaustThis),
+                            new Foo(Card.exhaustThis),
                             5,
                             PileLocation.Field,
                             CastSpeed.Channel);
@@ -296,7 +313,7 @@ namespace stonerkart
                             new PryTileRule(t => t.card == null && !t.isEdgy,
                                 new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
                         new SummonToTileDoer(),
-                        new Foo(LL.manaCost(new ManaSet(ManaColour.Colourless, ManaColour.Colourless, ManaColour.Death, ManaColour.Death))),
+                        new Foo(Card.manaCostEffect(new ManaSet(ManaColour.Colourless, ManaColour.Colourless, ManaColour.Death, ManaColour.Death))),
                         2,
                         PileLocation.Graveyard,
                         CastSpeed.Channel,
@@ -304,7 +321,7 @@ namespace stonerkart
                         );
                     }
                     break;
-                #endregion
+                #endregion*/
                 #region Illegal Goblin Laboratory
                 case CardTemplate.Illegal_sGoblin_sLaboratory:
                 {
@@ -2700,6 +2717,33 @@ namespace stonerkart
                 } break;
                 #endregion
 
+                /*#region Makaroni
+                case CardTemplate.Makaroni:
+                    {
+                        forceColour = ManaColour.Death;
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        baseRace = Race.Undead;
+                        isToken = true;
+                        baseMovement = 2;
+                        basePower = 2;
+                        baseToughness = 2;
+                    }
+                    break;
+                #endregion
+                #region Spiderling
+                case CardTemplate.Spiderling:
+                {
+                    forceColour = ManaColour.Nature;
+                    basePower = 1;
+                    baseToughness = 1;
+                    baseMovement = 2;
+                    baseRace = Race.Beast;
+                    isToken = true;
+                    keywordAbilities.Add(KeywordAbility.Fervor);
+                }
+                break;
+                #endregion*/
 
                 #endregion
 

@@ -675,6 +675,9 @@ namespace stonerkart
 
     public enum CardTemplate
     {
+        Count_sFera_sII,
+        /*Makaroni,
+        Spiderling,
         Arachosa,
         Vincennes,
         Ilatian_sGhoul,
@@ -684,9 +687,9 @@ namespace stonerkart
         Iradj,
         Hosro,
         Warp,
-        Count_sFera_sII,
+        
         Seblastian,
-        Paralyzing_sSpider,
+        Paralyzing_sSpider,*/
         Commander_sSparryz,
         Flamekindler,
         Moratian_sBattle_sStandard,
