@@ -289,7 +289,7 @@ namespace stonerkart
             images[Textures.artGreatWhiteBuffalo] = Resources.artGreatWhiteBuffalo;
             images[Textures.artAlterFate2] = Resources.artAlterFate2;
             images[Textures.artSinisterPact] = Resources.artSinisterPact;
-            images[Textures.artAberrantSacrifice] = Resources.artAberrantSacrifice;
+            images[Textures.artAberrantSacrifice] = Resources.artAberrant_sSacrifice;
             images[Textures.artAbolish] = Resources.artAbolish;
             images[Textures.artAlterFate] = Resources.artAlterFate;
             images[Textures.artAlterTime] = Resources.artAlterTime;

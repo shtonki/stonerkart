@@ -382,7 +382,7 @@ namespace stonerkart
 
                 case CardTemplate.Ilas_sBargain:
                 {
-                    return Resources.artAberrantSacrifice;
+                    return Resources.artAlterFate;
                 }
 
                 case CardTemplate.Suspicious_sVortex:
