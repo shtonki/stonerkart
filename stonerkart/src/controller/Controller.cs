@@ -91,10 +91,11 @@ namespace stonerkart
 
         public static Game startGame(NewGameStruct ngs)
         {
-            GameScreen gsc = new GameScreen();
-            Game g = new Game(ngs, false, gsc);
+            Map map = Map.DefaultMap;
+            GameScreen gsc = new GameScreen(map);
+            Game g = new Game(ngs, false, gsc, map);
             GUI.transitionToScreen(gsc);
-            g.startGameThread();
+            g.start();
             return g;
         }
 

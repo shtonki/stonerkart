@@ -17,8 +17,12 @@ namespace stonerkart
         public PlayerPanel heroPanel { get; }
         public PlayerPanel villainPanel { get; }
 
-        public PileView heroGraveyard { get; }
-        public Winduh heroGraveyardWinduh { get; }
+        public PileView heroGraveyard;
+        public Winduh heroGraveyardWinduh;
+
+        public PileView villainGraveyard;
+        public Winduh villainGraveyardWinduh;
+
 
         public HexPanel hexPanel { get; }
 
@@ -50,9 +54,6 @@ namespace stonerkart
         private const int hexPanelHeight = leftPanelHeight - handViewHeight - handAndHexPaddingY * 2;
         private const int hexPanelXPaddingToRightPanel = 100;
         private const int hexPanelY = 25;
-        private const int hexRows = 7;
-        private const int hexColumns = 11;
-        private int hexSize = (int)Math.Round((hexPanelHeight) / (hexRows + 0.5));
 
         private const int stackViewWidth = 200;
         private const int stackViewHeight = 400;
@@ -70,11 +71,15 @@ namespace stonerkart
         private const int villainPanelX = playerPanelPadding;
         private const int villainPanelY = playerPanelPadding;
 
-        private const int graveyardWidth = 200;
-        private const int graveyardHeight = 600;
+        private const int toggledviewWidth = 200;
+        private const int toggledHeight = 600;
 
-        public GameScreen() : base(new Imege(Textures.table0))
+        public GameScreen(Map map) : base(new Imege(Textures.table0))
         {
+            int hexColumns = map.width;
+            int hexRows = map.height;
+            int hexSize = (int)Math.Round((hexPanelHeight) / (hexRows + 0.5));
+
             Square leftPanel = new Square(leftPanelWidth, leftPanelHeight);
             leftPanel.X = 25;
             addElement(leftPanel);
@@ -117,14 +122,12 @@ namespace stonerkart
             addElement(turnIndicator);
             turnIndicator.setLocation(turnIndicatorX, turnIndicatorY);
 
-            heroGraveyard = new PileView();
-            heroGraveyard.setSize(graveyardWidth, graveyardHeight);
-            heroGraveyard.Columns = 1;
-            heroGraveyard.Backimege = new MemeImege(Textures.buttonbg2);
-            heroGraveyard.maxPadding = 30;
-            heroGraveyardWinduh = new Winduh(heroGraveyard, true, true);
-            addWinduh(heroGraveyardWinduh);
-            heroGraveyardWinduh.Visible = false;
+            makePanel(out heroGraveyard, out heroGraveyardWinduh);
+            heroPanel.graveyardButton.clicked += a => heroGraveyardWinduh.Visible = !heroGraveyardWinduh.Visible;
+
+            makePanel(out villainGraveyard, out villainGraveyardWinduh);
+            villainPanel.graveyardButton.clicked += a => villainGraveyardWinduh.Visible = !villainGraveyardWinduh.Visible;
+
 
             stackView = new PileView();
             stackView.setSize(stackViewWidth, stackViewHeight);
@@ -135,8 +138,53 @@ namespace stonerkart
             stackWinduh = new AutoHidePileWinduh(stackView, "The Stack");
             addWinduh(stackWinduh);
             stackWinduh.Visible = false;
+        }
 
-            heroPanel.graveyardButton.clicked += a => heroGraveyardWinduh.Visible = !heroGraveyardWinduh.Visible;
+        private void makePanel(out PileView pileview, out Winduh winduh)
+        {
+            pileview = new PileView();
+            pileview.setSize(toggledviewWidth, toggledHeight);
+            pileview.Columns = 1;
+            pileview.Backimege = new MemeImege(Textures.buttonbg2);
+            pileview.maxPadding = 30;
+            winduh = new Winduh(pileview, true, true);
+            addWinduh(winduh);
+            winduh.Visible = false;
+        }
+
+
+        private List<Line> targetLines = new List<Line>();
+        public void clearArrows()
+        {
+            foreach (var line in targetLines) removeElement(line);
+            targetLines.Clear();
+        }
+
+        public void addArrow(CardView from, CardView to)
+        {
+            Line l = new Line(
+                from.AbsoluteX + from.Width / 2,
+                from.AbsoluteY + from.Height / 2,
+                to.AbsoluteX + to.Width / 2,
+                to.AbsoluteY + to.Height / 20,
+                Color.Firebrick,
+                6);
+            targetLines.Add(l);
+            addElement(l);
+        }
+
+        public void addArrow(CardView from, Tile to)
+        {
+            var p = hexPanel.hexCoords(to.x, to.y);
+            Line l = new Line(
+                from.AbsoluteX + from.Width/2, 
+                from.AbsoluteY + from.Height/2, 
+                p.X + hexPanel.AbsoluteX + hexPanel.hexsize/2, 
+                p.Y + hexPanel.AbsoluteY + hexPanel.hexsize / 2,
+                Color.Firebrick, 
+                6);
+            targetLines.Add(l);
+            addElement(l);
         }
     }
 

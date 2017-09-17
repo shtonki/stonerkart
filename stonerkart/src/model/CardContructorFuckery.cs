@@ -43,7 +43,59 @@ namespace stonerkart
 
             switch (ct)
             {
-                
+                #region Great White Buffalo
+                case CardTemplate.Great_sWhite_sBuffalo:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Rare;
+
+                    lifeCost = 2;
+                    natureCost = 2;
+                    greyCost = 2;
+
+                    basePower = 7;
+                    baseToughness = 7;
+                    baseMovement = 3;
+                    
+                    etbLambda(
+                        "When Great White Buffalo enters the battlefield restore 5 toughness to your heroic creatures.",
+                        new Effect(
+                            new TargetRuleSet(
+                                new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                                new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
+                            new PingDoer(-5)));
+                } break;
+                #endregion
+                #region Alter Fate
+                case CardTemplate.Alter_sFate:
+                {
+                    cardType = CardType.Channel;
+                    rarity = Rarity.Common;
+
+                    orderCost = 1;
+
+                    castDescription =
+                        "Look at the top three cards of your deck then put them back in any order. You may shuffle your library. Draw a card.";
+                    castEffect = new Effect(
+                        new ChooseRule<Card>(
+                            new SelectCardRule(PileLocation.Deck, SelectCardRule.Mode.PlayerLooksAtPlayer, 3),
+                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
+                            ChooseRule<Card>.ChooseAt.Resolve, 
+                            c => true,
+                            3, 
+                            false
+                            ), 
+                        new MoveToPileDoer(PileLocation.Deck));
+
+                    additionalCastEffects.Add(new Effect(
+                        new TargetOption(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController)),
+                        new ShuffleDoer()));
+                        
+                    additionalCastEffects.Add(new Effect(
+                        new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), 
+                        new DrawCardsDoer(1)));
+                } break;
+                #endregion
                 #region Count Fera II
                 case CardTemplate.Count_sFera_sII:
                     {
@@ -57,40 +109,29 @@ namespace stonerkart
                         deathCost = 4;
                         greyCost = 1;
 
+                        Effect e1 = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
+                           new ModifyDoer(add(1), never, ModifiableStats.Power));
+                        Effect e2 = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
+                            new ModifyDoer(add(1), never, ModifiableStats.Toughness));
+
+                        //should be better considering its legendary, maybe create vampire instead of sacrificing? 
                         addActivatedAbility("Sacrifice target non-undead creature you control: give Count Fera II +1/+1",
-                            new Effect(new TargetRuleSet(new ChooseRule<Card>(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero)), new MoveToPileDoer(PileLocation.Graveyard)),
-                            new Foo(),
-                            -1,
+                            new Effect[] { e1, e2 },
+                            new Foo(new Effect(new TargetRuleSet(new ChooseRule<Card>(c => !c.isHeroic && c.race != Race.Undead && c.controller.isHero)), new MoveToPileDoer(PileLocation.Graveyard))),
+                            1,
                             PileLocation.Field,
                             CastSpeed.Interrupt);
-
-                        /*
-                        addActivatedAbility("Sacrifice target non-undead creature you control: give Count Fera II +1/+1",
-                            new Foo(new Effect(new TargetRuleSet(new ChooseRule<Card>(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero))), new MoveToPileDoer(PileLocation.Graveyard),
-                            -1,
-                            PileLocation.Field,
-                            CastSpeed.Interrupt);
-
-
-                        addActivatedAbility("Sacrifice non-undead creature you control: give Count Fera II +1/+1.",
-                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
-                            new ModifyDoer(Card.add(1), Card.never, ModifiableStats.Power, ModifiableStats.Toughness),
-                            new Foo(killLambdaWhere(c => !c.isHeroic && c.race != Race.Undead && c.owner.isHero)),
-                            -1,
-                            PileLocation.Field,
-                            CastSpeed.Interrupt
-                        );*/
                     }
                     break;
                 #endregion
-                /*
-                 #region Arachosa
+                
+                #region Arachosa
                 case CardTemplate.Arachosa:
                     {
                         cardType = CardType.Creature;
                         rarity = Rarity.Legendary;
                         baseRace = Race.Beast;
-
+                        
                         natureCost = 4;
 
                         basePower = 4;
@@ -107,6 +148,7 @@ namespace stonerkart
                     break;
 
                 #endregion
+                    
                 #region Paralyzing_sSpider
                 case CardTemplate.Paralyzing_sSpider:
                     {
@@ -118,8 +160,8 @@ namespace stonerkart
                         greyCost = 2;
 
                         basePower = 1;
-                        baseToughness = 4;
-                        baseMovement = 2;
+                        baseToughness = 5;
+                        baseMovement = 3;
 
                         addTriggeredAbility(
                             "Whenever this Paralyzing Spider deals damage to a non-heroic creature, reduce that creature's movement speed by 2. This cannot reduce the targets movement below 1.",
@@ -130,13 +172,14 @@ namespace stonerkart
                             new TypedGameEventFilter<DamageEvent>(damageEvent => damageEvent.source == this),
                             -1,
                             PileLocation.Field,
-                            true,
+                            false,
                             TriggeredAbility.Timing.Post
                         );
 
                     }
                     break;
                 #endregion
+                    
                 #region Seblastian
                 case CardTemplate.Seblastian:
                     {
@@ -151,9 +194,9 @@ namespace stonerkart
                         chaosCost = 0;
 
                         addActivatedAbility(
-                        String.Format("Sacrifice this creature: deal 3 damage to all creatures within 1 tile."),
+                        String.Format("Sacrifice this creature: deal 3 damage to all creatures within 2 tiles."),
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                        new AoeRule(t => true, 3, card => true)),  new PingDoer(3), new Foo(killLambdaWhere(c => c.race != Race.Undead)),
+                        new AoeRule(t => true, 2, card => true)),  new PingDoer(3), new Foo(new Effect(resolveCard, new MoveToPileDoer(PileLocation.Graveyard))),
                         0,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -161,6 +204,7 @@ namespace stonerkart
                     }
                     break;
                 #endregion
+                    
                 #region Warp
 
                 case CardTemplate.Warp:
@@ -169,14 +213,12 @@ namespace stonerkart
                         orderCost = 1;
                         rarity = Rarity.Common;
                         castRange = 5;
-                        castEffect = new Effect(
-                            new TargetRuleSet(new PryCardRule(t => !t.isHeroic),
-                            new PryTileRule(f => f.passable,
-                            new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController))), new MoveToTileDoer(true));
+                        castEffect = new Effect(new TargetRuleSet(new ChooseRule<Card>(c => c.isHeroic == false), new ChooseRule<Tile>(t => t.passable)), new MoveToTileDoer(true));
                         castDescription = "Move target non-heroic creature to target tile.";
                     }
                     break;
                 #endregion    
+                    
                 #region Hosro
                 case CardTemplate.Hosro:
                     {
@@ -192,6 +234,7 @@ namespace stonerkart
                     }
                     break;
                 #endregion
+                    
                 #region Iradj
                 case CardTemplate.Iradj:
                     {
@@ -226,12 +269,13 @@ namespace stonerkart
                     }
                     break;
                 #endregion
+                    
                 #region Archfather
                 case CardTemplate.Archfather:
                     {
                         cardType = CardType.Creature;
-                        rarity = Rarity.Uncommon;
-                        baseRace = Race.Human;
+                        rarity = Rarity.Rare;
+                        baseRace = Race.Vampire;
 
                         baseMovement = 2;
                         basePower = 2;
@@ -256,6 +300,7 @@ namespace stonerkart
                     }
                     break;
                 #endregion
+                    
                 #region Hungry Felhound
                 case CardTemplate.Hungry_sFelhound:
                     {
@@ -271,6 +316,7 @@ namespace stonerkart
                     }
                     break;
                 #endregion
+                    
                 #region Vincennes
                 case CardTemplate.Vincennes:
                     {
@@ -284,16 +330,17 @@ namespace stonerkart
                         basePower = 2;
                         baseToughness = 3;
                         addActivatedAbility(String.Format(
-                                "{0}, Select a flying target within 5 tiles and deal 5 damage to it.",
+                                "{0}, Select a flying creature within 5 tiles and deal 5 damage to it.",
                                 G.exhaustGhyph),
-                            zepLambdaWhere(5, c => c.keywordAbilities.Contains(KeywordAbility.Flying)),
-                            new Foo(Card.exhaustThis),
-                            5,
-                            PileLocation.Field,
-                            CastSpeed.Channel);
+                                new Effect(new TargetRuleSet(resolveCard, new ChooseRule<Card>(c => c.hasAbility(KeywordAbility.Flying))), new PingDoer(5)),
+                                new Foo(),
+                                5,
+                                PileLocation.Field,
+                                CastSpeed.Channel);
                     }
                     break;
                 #endregion
+                    
                 #region Ilatian Ghoul
                 case CardTemplate.Ilatian_sGhoul:
                     {
@@ -310,10 +357,11 @@ namespace stonerkart
                         addActivatedAbility(
                         "You may cast Ilatian Ghoul from the graveyard.",
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                            new PryTileRule(t => t.card == null && !t.isEdgy,
-                                new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), true)),
+                            new ChooseRule<Tile>(
+                                ChooseRule<Tile>.ChooseAt.Resolve,
+                                t => t.passable && !t.isEdgy)),
                         new SummonToTileDoer(),
-                        new Foo(Card.manaCostEffect(new ManaSet(ManaColour.Colourless, ManaColour.Colourless, ManaColour.Death, ManaColour.Death))),
+                        new Foo(manaCostEffect(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
                         2,
                         PileLocation.Graveyard,
                         CastSpeed.Channel,
@@ -321,7 +369,7 @@ namespace stonerkart
                         );
                     }
                     break;
-                #endregion*/
+                #endregion
                 #region Illegal Goblin Laboratory
                 case CardTemplate.Illegal_sGoblin_sLaboratory:
                 {
@@ -755,14 +803,14 @@ namespace stonerkart
                 break;
 
                 #endregion
-                #region Alter Fate
+                #region Sinister Pact
 
-            case CardTemplate.Alter_sFate:
+            case CardTemplate.Sinister_sPact:
             {
                 cardType = CardType.Interrupt;
                 rarity = Rarity.Common;
 
-                orderCost = 1;
+                deathCost = 1;
 
                 castEffect =
                     new Effect(
@@ -771,6 +819,10 @@ namespace stonerkart
                                 new SelectCardRule(PileLocation.Deck, SelectCardRule.Mode.PlayerLooksAtPlayer),
                                 ChooseRule<Card>.ChooseAt.Resolve)),
                         new MoveToPileDoer(PileLocation.Deck));
+
+                additionalCastEffects.Add(new Effect(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController), new ShuffleDoer()));
+                additionalCastEffects.Add(new Effect(new ModifyRule<Card, Card>(0, 0, c => c), new MoveToPileDoer(PileLocation.Deck)));
+                   
                 castDescription =
                     "Search your deck for a card. Shuffle your deck then put the selected card on top.";
             }
@@ -831,7 +883,7 @@ namespace stonerkart
                             new CardResolveRule(CardResolveRule.Rule.ResolveCard), 
                             new ChooseRule<Card>()),
                         new PingDoer(-2));
-                additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(1, c => c),
+                additionalCastEffects.Add(new Effect(new ModifyRule<Card, Card>(0, 1, c => c),
                     new ModifyDoer(add(2), endOfTurn, ModifiableStats.Power)));
                 castDescription =
                     "Target creature is healed for 2 and gains 2 power until the end of this turn.";
@@ -1374,7 +1426,7 @@ namespace stonerkart
 
                     castDescription = "Deal 4 damage to target creature then exhaust it.";
                     castEffect = zepLambda(4);
-                    additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(1, c => c), new FatigueDoer(true)));
+                    additionalCastEffects.Add(new Effect(new ModifyRule<Card, Card>(0, 1, c => c), new FatigueDoer(true)));
                     castRange = 5;
 
                 } break;
@@ -1471,7 +1523,7 @@ namespace stonerkart
                         new Effect(
                             new TargetRuleSet(creature()),
                             new FatigueDoer(false));
-                    additionalCastEffects.Add(new Effect(new ModifyPreviousRule<Card, Card>(0, c => c),
+                    additionalCastEffects.Add(new Effect(new ModifyRule<Card, Card>(0, 0, c => c),
                         new ModifyDoer(add(2), endOfTurn, ModifiableStats.Power)));
                     castRange = 3;
                 } break;
@@ -1611,8 +1663,8 @@ namespace stonerkart
                     castEffect = zepNonHeroicLambda(3);
                     additionalCastEffects.Add(new Effect(
                         new TargetRuleSet(
-                            new ModifyPreviousRule<Card, Card>(0, c => c),
-                            new ModifyPreviousRule<Card, Card>(1, c => c.controller.heroCard)),
+                            new ModifyRule<Card, Card>(0, 0, c => c),
+                            new ModifyRule<Card, Card>(0, 1, c => c.controller.heroCard)),
                         new PingDoer(3)
                         ));
                     castDescription = "Deal 3 damage to target non-heroic creature and 3 damage to that creatures controller.";
@@ -1754,6 +1806,7 @@ namespace stonerkart
                     }
                     break;
                 #endregion
+
                 #region Stark Lily
                 case CardTemplate.Stark_sLily:
                 {
@@ -1813,7 +1866,7 @@ namespace stonerkart
 
                         Effect e1 = new Effect(nonheroicCreature(),
                             new ModifyDoer(add(2), never, ModifiableStats.Power));
-                        Effect e2 = new Effect(new ModifyPreviousRule<Card, Card>(0, c => c),
+                        Effect e2 = new Effect(new ModifyRule<Card, Card>(0, 0, c => c),
                             new ModifyDoer(add(2), never, ModifiableStats.Toughness));
 
                         addActivatedAbility(
@@ -2236,7 +2289,7 @@ namespace stonerkart
 
                     Effect e1 = new Effect(new ChooseRule<Card>(c => c.controller == this.controller && !c.isHeroic && c.race != Race.Spirit), new MoveToPileDoer(PileLocation.Displaced));
                         Effect e2 = new Effect(new TargetRuleSet(
-                    new ModifyPreviousRule<Card, Card>(0, c => c),
+                    new ModifyRule<Card, Card>(0, 0, c => c),
                     new ChooseRule<Tile>(
                         ChooseRule<Tile>.ChooseAt.Resolve,
                         t => t.passable && !t.isEdgy)),
@@ -2523,7 +2576,7 @@ namespace stonerkart
                 } break;
                 #endregion
                 #region Lord Plevin
-                case CardTemplate.Lord_sPlevin:
+                case CardTemplate.Lord_sPlombie:
                 {
                     cardType = CardType.Creature;
                     rarity = Rarity.Legendary;
@@ -2539,7 +2592,7 @@ namespace stonerkart
                     addActivatedAbility(
                         String.Format("{1}, {0}: Deal 1 damage to target creature within 1 tile.", G.exhaustGhyph, G.colouredGlyph(ManaColour.Might)),
                         zepLambda(1),
-                        new Foo(exhaustThis, manaCostEffect()),
+                        new Foo(exhaustThis, manaCostEffect(ManaColour.Might)),
                         1,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -2716,8 +2769,8 @@ namespace stonerkart
                     isToken = true;
                 } break;
                 #endregion
-
-                /*#region Makaroni
+                    
+                #region Makaroni
                 case CardTemplate.Makaroni:
                     {
                         forceColour = ManaColour.Death;
@@ -2731,6 +2784,7 @@ namespace stonerkart
                     }
                     break;
                 #endregion
+                    
                 #region Spiderling
                 case CardTemplate.Spiderling:
                 {
@@ -2743,7 +2797,7 @@ namespace stonerkart
                     keywordAbilities.Add(KeywordAbility.Fervor);
                 }
                 break;
-                #endregion*/
+                #endregion
 
                 #endregion
 

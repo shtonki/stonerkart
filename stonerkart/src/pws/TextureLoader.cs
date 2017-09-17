@@ -67,6 +67,10 @@ namespace stonerkart
         orbColourless11,
         orbColourless12,
 
+        artSinisterPact,
+        artGreatWhiteBuffalo,
+        artAlterFate2,
+        artSoothsay,
         artAberrantSacrifice,
         artAbolish,
         artAlterFate,
@@ -169,6 +173,7 @@ namespace stonerkart
         artSanguineArtisan,
         artScrollOfEarth,
         artSebasGambit,
+        artSeethingRage,
         artSeraph,
         artSereneDandelion,
         artShimmeringKoi,
@@ -203,6 +208,20 @@ namespace stonerkart
         artYungLich,
         artZap,
         artZombieToken,
+        artIradj,
+        artSeblastian,
+        artArachosa,
+        artSpiderling,
+        artCount_sFera_sII,
+        artWarp,
+        artHosro,
+        artJabroni,
+        artParalyzing_sSpider,
+        artMakaroni,
+        artArchfather,
+        artHungry_sFelhound,
+        artVincennes,
+        artIlatian_sGhoul,
     };
 
     public static class TextureLoader
@@ -266,6 +285,10 @@ namespace stonerkart
             images[Textures.orbColourless11] = Resources.cl11;
             images[Textures.orbColourless12] = Resources.cl12;
 
+            images[Textures.artSoothsay] = Resources.artSoothsay;
+            images[Textures.artGreatWhiteBuffalo] = Resources.artGreatWhiteBuffalo;
+            images[Textures.artAlterFate2] = Resources.artAlterFate2;
+            images[Textures.artSinisterPact] = Resources.artSinisterPact;
             images[Textures.artAberrantSacrifice] = Resources.artAberrantSacrifice;
             images[Textures.artAbolish] = Resources.artAbolish;
             images[Textures.artAlterFate] = Resources.artAlterFate;
@@ -368,6 +391,7 @@ namespace stonerkart
             images[Textures.artSanguineArtisan] = Resources.artSanguineArtisan;
             images[Textures.artScrollOfEarth] = Resources.artScrollOfEarth;
             images[Textures.artSebasGambit] = Resources.artSebasGambit;
+            images[Textures.artSeethingRage] = Resources.artSeethingRage;
             images[Textures.artSeraph] = Resources.artSeraph;
             images[Textures.artSereneDandelion] = Resources.artSereneDandelion;
             images[Textures.artShimmeringKoi] = Resources.artShimmeringKoi;
@@ -402,7 +426,21 @@ namespace stonerkart
             images[Textures.artYungLich] = Resources.artYungLich;
             images[Textures.artZap] = Resources.artZap;
             images[Textures.artZombieToken] = Resources.artZombieToken;
-
+            images[Textures.artIradj] = Resources.artIradj;
+            images[Textures.artSeblastian] = Resources.artSeblastian;
+            images[Textures.artArachosa] = Resources.artArachosa;
+            images[Textures.artSpiderling] = Resources.artIradj;
+            images[Textures.artCount_sFera_sII] = Resources.artCount_sFera_sII;
+            images[Textures.artWarp] = Resources.artWarp;
+            images[Textures.artHosro] = Resources.artHosro;
+            images[Textures.artParalyzing_sSpider] = Resources.artParalyzing_sSpider;
+            images[Textures.artWarp] = Resources.artWarp;
+            images[Textures.artJabroni] = Resources.artJabroni;
+            images[Textures.artMakaroni] = Resources.artMakaroni;
+            images[Textures.artArchfather] = Resources.artArchfather;
+            images[Textures.artHungry_sFelhound] = Resources.artHungry_sFelhound;
+            images[Textures.artVincennes] = Resources.artVincennes;
+            images[Textures.artIlatian_sGhoul] = Resources.artIlatian_sGhoul;                 
             sizes = new Dictionary<Textures, Size>();
             foreach (var i in images)
             {
@@ -509,7 +547,7 @@ namespace stonerkart
                 case CardTemplate.Shotty_sContruct: return Textures.artShottyContruct;
                 case CardTemplate.Houndmaster: return Textures.artHoundmaster;
                 case CardTemplate.Marilith: return Textures.artMarilith;
-                case CardTemplate.Seething_sRage: return Textures.artEnragedDragon;
+                case CardTemplate.Seething_sRage: return Textures.artSeethingRage;
                 case CardTemplate.Ilas_sBargain: return Textures.artAberrantSacrifice;
                 case CardTemplate.Rapture: return Textures.artRapture;
                 case CardTemplate.Suspicious_sVortex: return Textures.artSuspiciousVortex;
@@ -542,7 +580,7 @@ namespace stonerkart
                 case CardTemplate.Damage_sWard: return Textures.artDamageWard;
                 case CardTemplate.One_sWith_sNature: return Textures.artOneWithNature;
                 case CardTemplate.Graverobber_sSyrdin: return Textures.artGraverobberSyrdin;
-                case CardTemplate.Alter_sFate: return Textures.artAlterTime;
+                case CardTemplate.Sinister_sPact: return Textures.artSinisterPact;
                 case CardTemplate.Goblin_sGrenade: return Textures.artGoblinGrenade;
                 case CardTemplate.Cleansing_sFire: return Textures.artCleansingFire;
                 case CardTemplate.Bhewas: return Textures.artBelwas;
@@ -585,13 +623,28 @@ namespace stonerkart
                 case CardTemplate.Maleficent_sSpirit: return Textures.artMaleficentSpirit;
                 case CardTemplate.Thirstclaw: return Textures.artBloodclaw;
                 case CardTemplate.Flameheart_sPhoenix: return Textures.artFireheartPheonix;
-                case CardTemplate.Lord_sPlevin: return Textures.artLordPlevin;
+                case CardTemplate.Lord_sPlombie: return Textures.artLordPlevin;
                 case CardTemplate.Gryphon_sRider: return Textures.artGryphonRider;
                 case CardTemplate.Ravaging_sGreed: return Textures.artRavagingGreed;
                 case CardTemplate.Water_sBolt: return Textures.artWaterBolt;
                 case CardTemplate.Lone_sRanger: return Textures.artLoneRanger;
-                case CardTemplate.Count_sFera_sII: return Textures.artAlterFate;
-                default: throw new Exception();
+                case CardTemplate.Alter_sFate: return Textures.artAlterFate2;
+                case CardTemplate.Great_sWhite_sBuffalo: return Textures.artGreatWhiteBuffalo;
+                case CardTemplate.Count_sFera_sII: return Textures.artCount_sFera_sII;
+                case CardTemplate.Arachosa: return Textures.artArachosa;
+                case CardTemplate.Spiderling: return Textures.artSpiderling;
+                case CardTemplate.Paralyzing_sSpider: return Textures.artParalyzing_sSpider;
+                case CardTemplate.Seblastian: return Textures.artSeblastian;
+                case CardTemplate.Warp: return Textures.artWarp;
+                case CardTemplate.Hosro: return Textures.artHosro;
+                case CardTemplate.Iradj: return Textures.artIradj;
+                case CardTemplate.Jabroni: return Textures.artJabroni;
+                case CardTemplate.Makaroni: return Textures.artMakaroni;
+                case CardTemplate.Archfather: return Textures.artArchfather;
+                case CardTemplate.Hungry_sFelhound: return Textures.artHungry_sFelhound;
+                case CardTemplate.Vincennes: return Textures.artVincennes;
+                case CardTemplate.Ilatian_sGhoul: return Textures.artIlatian_sGhoul;
+                default: return Textures.iconCross;
             }
         }
 

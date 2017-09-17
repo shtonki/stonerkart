@@ -98,4 +98,16 @@ namespace stonerkart
             this.filter = filter;
         }
     }
+
+    struct RaceModifierStruct
+    {
+        public readonly Race race;
+        public readonly GameEventFilter filter;
+
+        public RaceModifierStruct(Race race, GameEventFilter filter)
+        {
+            this.race = race;
+            this.filter = filter;
+        }
+    }
 }

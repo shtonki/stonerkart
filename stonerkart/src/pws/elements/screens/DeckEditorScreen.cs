@@ -27,6 +27,8 @@ namespace stonerkart
         private const int HERO_VIEW_WIDTH = (FRAME_HEIGHT - 2 * DOWN_PAGE_BUTTON_HEIGHT) * 5 / 7;//erf//PILE_VIEW_HEIGHT * 5 / 7;
 
 
+        private const int STATS_CARDCOUNTER_HEIGHT = 90;
+        private const int STATS_CARDCOUNTER_WIDTH = 90;
         private const int STATS_MAX_BAR_HEIGHT = 256;
         private const int STATS_BAR_WIDTH = 32;
         private const int STATS_BAR_SPACING = 16;
@@ -98,6 +100,7 @@ namespace stonerkart
         private List<Card> filteredCards;
         private CardView heroCardView;
         private Square cardViewPanel;
+        private Square cardCounter;
         private int currentPageNr = 0;
         private ToggleButton[] manaButtons { get; set; }
         private string searchString;
@@ -178,6 +181,7 @@ namespace stonerkart
         {
             barChartPanel.clearChildren();
 
+            //todo bolshevik revolution
             int[] nrOfCardsOfEachMana = new int[NR_OF_MANA_BUTTONS];
             foreach(var c in cardList)
             {
@@ -216,27 +220,26 @@ namespace stonerkart
 
         private bool filterx(Card c)
         {
-            bool x = (c.castManaCost[ManaColour.Chaos] > 0 && manaButtons[0].Toggled) ||
-                    (c.castManaCost[ManaColour.Death] > 0 && manaButtons[1].Toggled) ||
-                    (c.castManaCost[ManaColour.Might] > 0 && manaButtons[2].Toggled) ||
-                    (c.castManaCost[ManaColour.Order] > 0 && manaButtons[3].Toggled) ||
-                    (c.castManaCost[ManaColour.Life] > 0 && manaButtons[4].Toggled) ||
-                    (c.castManaCost[ManaColour.Nature] > 0 && manaButtons[5].Toggled) ||
-                    (c.castManaCost[ManaColour.Colourless] == c.convertedManaCost && c.convertedManaCost > 0 && manaButtons[6].Toggled && c.isToken == false) ||
-                    (c.isHeroic);
-            //&& c.ToString().StartsWith(searchString);
-            //if(c.isHeroic)
-             //System.Console.WriteLine(c +" "+ x);
-            return x;
+            bool colortest =
+                (c.castManaCost[ManaColour.Chaos] > 0 && manaButtons[0].Toggled) ||
+                (c.castManaCost[ManaColour.Death] > 0 && manaButtons[1].Toggled) ||
+                (c.castManaCost[ManaColour.Might] > 0 && manaButtons[2].Toggled) ||
+                (c.castManaCost[ManaColour.Order] > 0 && manaButtons[3].Toggled) ||
+                (c.castManaCost[ManaColour.Life] > 0 && manaButtons[4].Toggled) ||
+                (c.castManaCost[ManaColour.Nature] > 0 && manaButtons[5].Toggled) ||
+                (c.castManaCost[ManaColour.Colourless] == c.convertedManaCost && manaButtons[6].Toggled) ||
+                (c.isHeroic);
+
+            bool tokentest = c.isToken == false;
+
+            return colortest && tokentest;
         }
 
         #region setups
 
         private void setupCards()
         {
-            allCardsEver = new List<Card>();
-            var cardTemplates = Enum.GetValues(typeof(CardTemplate)).Cast<CardTemplate>().ToList();
-            allCardsEver = cardTemplates.Select(c => new Card(c)).ToList();
+            allCardsEver = Card.flyweight.ToList();
             allCardsEver.Sort((c1, c2) =>
             {
                 var colourcountdiff = Math.Min(2, c1.colours.Count) - Math.Min(2, c2.colours.Count);
@@ -572,6 +575,12 @@ namespace stonerkart
                 cardList.addTop(new Card(ct));
                 setupStatsThingy();
             }
+        }
+
+        private void removeFromDeck(Card card)
+        {
+            cardList.remove(card);
+            setupStatsThingy();
         }
 
         

@@ -239,6 +239,29 @@ namespace stonerkart
         void pickNone(Player chooser, HackStruct hs);
     }
 
+    class TargetOption : TargetRule
+    {
+        private TargetRule baserule;
+
+        public TargetOption(TargetRule baserule) : base(baserule.targetType)
+        {
+            this.baserule = baserule;
+        }
+
+        public override TargetSet fillCastTargets(HackStruct hs)
+        {
+            return baserule.fillCastTargets(hs);
+        }
+
+        public override TargetSet fillResolveTargets(HackStruct hs, TargetSet ts)
+        {
+            var v = baserule.fillResolveTargets(hs, ts);
+            var option = hs.game.chooseButtonSynced(hs.resolveController, "placeholder", ButtonOption.Yes, ButtonOption.No);
+
+            return option == ButtonOption.Yes ? v : TargetSet.CreateEmpty();
+        }
+    }
+
     class ChooseRule<T> : TargetRule where T : Targetable
     {
         private chooserface<T> chooser = dflt();
@@ -343,13 +366,15 @@ namespace stonerkart
 
         private TargetSet choose(IEnumerable<Player> players, HackStruct hs)
         {
-            if (players.Count() != 1) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-
+            List<Targetable> targets = new List<Targetable>();
             foreach (var player in players)
             {
-                return playerChooses(player, hs);
+                var ts = playerChooses(player, hs);
+                if (ts.Cancelled || ts.Fizzled) return ts;
+                targets.AddRange(ts.targets);
             }
-            throw new Exception();
+
+            return new TargetSet(targets);
         }
 
         private TargetSet playerChooses(Player player, HackStruct hs)
@@ -435,11 +460,19 @@ namespace stonerkart
     {
         private Mode mode;
         private PileLocation pile;
+        private int count = -1;
 
         public SelectCardRule(PileLocation pile, Mode mode)
         {
             this.mode = mode;
             this.pile = pile;
+        }
+
+        public SelectCardRule(PileLocation pile, Mode mode, int count)
+        {
+            this.mode = mode;
+            this.pile = pile;
+            this.count = count;
         }
 
         public IEnumerable<Card> candidates(HackStruct hs, Player p)
@@ -461,7 +494,9 @@ namespace stonerkart
                 default: throw new Exception();
             }
 
-            return p.pileFrom(pile);
+            return count == -1 ? 
+                lookedAt.pileFrom(pile) : 
+                lookedAt.pileFrom(pile).Take(count);
         }
 
         private Player chooser(Player player, HackStruct hs)
@@ -487,9 +522,10 @@ namespace stonerkart
             var chsr = chooser(player, hs);
             var cs = candidates(hs, player);
             return hs.game.chooseCardsFromCardsSynced(
-                chsr, cs, filter,
+                chsr, 
+                cs, 
+                filter,
                 String.Format("Choose target for {0}.", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}.", player.name, hs.resolveCard),
                 ButtonOption.Cancel,
                 String.Format("{0}'s {1}", player.name, pile.ToString()));
         }
@@ -499,9 +535,10 @@ namespace stonerkart
             var chsr = chooser(player, hs);
             var cs = candidates(hs, player);
             var v = hs.game.chooseCardsFromCardsSynced(
-                chsr, cs, _ => false,
+                chsr, 
+                cs, 
+                _ => false,
                 String.Format("Not enough valid targets for {0}.", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}.", player.name, hs.resolveCard),
                 ButtonOption.OK,
                 String.Format("{0}'s {1}", player.name, pile.ToString()));
         }
@@ -523,14 +560,18 @@ namespace stonerkart
 
         public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
         {
-            return hs.game.chooseCardSynced(chooser, filter, "sfgjflk", "flvkxv", ButtonOption.Cancel);
+            return hs.game.chooseCardSynced(
+                chooser, 
+                filter, 
+                "Placeholder xd", 
+                ButtonOption.Cancel);
         }
 
         public void pickNone(Player chooser, HackStruct hs)
         {
-            hs.game.chooseButtonSynced(chooser,
+            hs.game.chooseButtonSynced(
+                chooser,
                 String.Format("Not enough valid targets for {0}.", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
                 ButtonOption.OK);
         }
     }
@@ -544,10 +585,10 @@ namespace stonerkart
 
         public Card pickOne(Player chooser, Func<Card, bool> filter, HackStruct hs)
         {
-            Tile tl = hs.game.chooseTileSynced(chooser,
+            Tile tl = hs.game.chooseTileSynced(
+                chooser,
                 t => hs.tilesInRange.Contains(t) && t.card != null && filter(t.card),
                 String.Format("Choose target for {0}", hs.resolveCard),
-                String.Format("{0} is choosing a target.", chooser.name),
                 ButtonOption.Cancel);
             if (tl == null) return null;
             return (tl.card);
@@ -555,9 +596,9 @@ namespace stonerkart
 
         public void pickNone(Player chooser, HackStruct hs)
         {
-            hs.game.chooseButtonSynced(chooser,
+            hs.game.chooseButtonSynced(
+                chooser,
                 String.Format("Not enough valid targets for {0}.", hs.resolveCard),
-                String.Format("{0} is choosing a target.", chooser.name),
                 ButtonOption.OK);
         }
     }
@@ -571,17 +612,18 @@ namespace stonerkart
 
         public Tile pickOne(Player chooser, Func<Tile, bool> filter, HackStruct hs)
         {
-            return hs.game.chooseTileSynced(chooser, t => hs.tilesInRange.Contains(t) && filter(t),
+            return hs.game.chooseTileSynced(
+                chooser, 
+                t => hs.tilesInRange.Contains(t) && filter(t),
                 String.Format("Choose target for {0}", hs.resolveCard),
-                String.Format("{0} is choosing a target.", chooser.name),
                 ButtonOption.Cancel);
         }
 
         public void pickNone(Player chooser, HackStruct hs)
         {
-            hs.game.chooseButtonSynced(chooser,
+            hs.game.chooseButtonSynced(
+                chooser,
                 String.Format("Not enough valid targets for {0}.", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
                 ButtonOption.OK);
         }
     }
@@ -595,18 +637,19 @@ namespace stonerkart
 
         public Player pickOne(Player chooser, Func<Player, bool> filter, HackStruct hs)
         {
-            Tile tl = hs.game.chooseTileSynced(chooser, t => t.card != null && t.card.isHeroic && filter(t.card.owner),
+            Tile tl = hs.game.chooseTileSynced(
+                chooser, 
+                t => t.card != null && t.card.isHeroic && filter(t.card.owner),
                 String.Format("Choose target for {0}", hs.resolveCard),
-                String.Format("{0} is choosing a target.", chooser.name),
                 ButtonOption.Cancel);
             if (tl == null) return null;
             return tl.card.owner;
         }
         public void pickNone(Player chooser, HackStruct hs)
         {
-            hs.game.chooseButtonSynced(chooser,
+            hs.game.chooseButtonSynced(
+                chooser,
                 String.Format("Not enough valid targets for {0}.", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
                 ButtonOption.OK);
         }
     }
@@ -620,16 +663,20 @@ namespace stonerkart
 
         public ManaOrb pickOne(Player chooser, Func<ManaOrb, bool> filter, HackStruct hs)
         {
-            var v = hs.game.chooseManaColourSynced(chooser, c => filter(new ManaOrb(c)), "", "", ButtonOption.Cancel);
+            var v = hs.game.chooseManaColourSynced(
+                chooser, 
+                c => filter(new ManaOrb(c)), 
+                "Placeholder", 
+                ButtonOption.Cancel);
             if (v == null) return null;
             return new ManaOrb(v.Value);
         }
 
         public void pickNone(Player chooser, HackStruct hs)
         {
-            hs.game.chooseButtonSynced(chooser,
+            hs.game.chooseButtonSynced(
+                chooser,
                 String.Format("Not enough valid targets for {0}.", hs.resolveCard),
-                String.Format("{0} is choosing a target for {1}.", chooser.name, hs.resolveCard),
                 ButtonOption.OK);
         }
     }
@@ -679,8 +726,11 @@ namespace stonerkart
 
             while ((diff = colourlessToPay - paid.Count) > 0)
             {
-                var chosen = hs.game.chooseManaColourSynced(p, c => playerMana.orbs.Any(o => o.colour == c),
-                    String.Format("Pay {0}", G.colourlessGlyph(diff)), String.Format("{0} is paying mana.", p.name), ButtonOption.Cancel);
+                var chosen = hs.game.chooseManaColourSynced(
+                    p, 
+                    c => playerMana.orbs.Any(o => o.colour == c),
+                    String.Format("Pay {0}", G.colourlessGlyph(diff)), 
+                    ButtonOption.Cancel);
                 if (chosen == null) break;
                 paid.Add(new ManaOrb(chosen.Value));
                 playerMana.pay(new ManaSet(chosen.Value));
@@ -816,15 +866,17 @@ namespace stonerkart
         }
     }
 
-    class ModifyPreviousRule<P, T> : TargetRule where P : Targetable where T : Targetable
+    class ModifyRule<P, T> : TargetRule where P : Targetable where T : Targetable
     {
         private int column;
+        private int vector;
         private Func<P, T> fn;
 
-        public ModifyPreviousRule(int column, Func<P, T> f) : base(typeof(T))
+        public ModifyRule(int vector, int column, Func<P, T> f) : base(typeof(T))
         {
             this.column = column;
             this.fn = f;
+            this.vector = vector;
         }
 
         public override TargetSet fillCastTargets(HackStruct hs)
@@ -834,7 +886,7 @@ namespace stonerkart
 
         public override TargetSet fillResolveTargets(HackStruct hs, TargetSet c)
         {
-            return new TargetSet(hs.previousTargets.targetSets[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
+            return new TargetSet(hs.previousTargets[vector].targetSets[column].targets.Cast<P>().Select(p => fn(p)).Cast<Targetable>());
         }
 
     }

@@ -358,7 +358,7 @@ namespace stonerkart
             return name;
         }
 
-        private static Card[] flyweight { get; } =
+        public static Card[] flyweight { get; } =
             Enum.GetValues(typeof (CardTemplate)).Cast<CardTemplate>().Select(ct => new Card(ct)).ToArray();
 
         public static Card fromTemplate(CardTemplate ct)
@@ -675,21 +675,22 @@ namespace stonerkart
 
     public enum CardTemplate
     {
+    	Great_sWhite_sBuffalo,
+    	Alter_sFate,
         Count_sFera_sII,
-        /*Makaroni,
         Spiderling,
         Arachosa,
-        Vincennes,
-        Ilatian_sGhoul,
-        Hungry_sFelhound,
-        Archfather,
+        Paralyzing_sSpider,
+        Seblastian,
+        Warp,
+        Hosro,
         Jabroni,
         Iradj,
-        Hosro,
-        Warp,
-        
-        Seblastian,
-        Paralyzing_sSpider,*/
+        Makaroni,
+        Archfather,
+        Hungry_sFelhound,
+        Vincennes,
+        Ilatian_sGhoul,
         Commander_sSparryz,
         Flamekindler,
         Moratian_sBattle_sStandard,
@@ -746,7 +747,7 @@ namespace stonerkart
         Damage_sWard,
         One_sWith_sNature,
         Graverobber_sSyrdin,
-        Alter_sFate,
+        Sinister_sPact,
         Goblin_sGrenade,
         Cleansing_sFire,
         Bhewas,
@@ -789,7 +790,7 @@ namespace stonerkart
         Maleficent_sSpirit,
         Thirstclaw,
         Flameheart_sPhoenix,
-        Lord_sPlevin,
+        Lord_sPlombie,
         Gryphon_sRider,
         Ravaging_sGreed,
         Water_sBolt,

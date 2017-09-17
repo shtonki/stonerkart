@@ -130,7 +130,7 @@ namespace stonerkart
                     return Resources.artGryphonRider;
                 }
 
-                case CardTemplate.Lord_sPlevin:
+                case CardTemplate.Lord_sPlombie:
                 {
                     return Resources.artLordPlevin;
                 }
@@ -550,7 +550,7 @@ namespace stonerkart
                     return Resources.artGraverobberSyrdin;
                 }
 
-                case CardTemplate.Alter_sFate:
+                case CardTemplate.Sinister_sPact:
                 {
                     return Resources.artAlterTime;
                 }

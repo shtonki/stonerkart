@@ -14,13 +14,17 @@ namespace stonerkart
     {
         private int xcount;
         private int ycount;
-        private int hexsize;
+        public int hexsize { get; }
         private int hexsizethreequarters;
 
         private Color[][] bordercolors;
 
+        private Map colormeshocked;
+
         public HexPanel(int xcount, int ycount, int hexsize) : base()
         {
+            colormeshocked = new Map(xcount, ycount);
+
             hexsizethreequarters = (int)Math.Round(hexsize*0.75);
             width = hexsize+(int)((xcount-1)* hexsizethreequarters);
             height = ycount*hexsize + hexsize/2;
@@ -48,12 +52,65 @@ namespace stonerkart
             });
         }
 
+        private CardView rightclickview;
+
         public override void onMouseDown(MouseButtonEventArgs args)
         {
             base.onMouseDown(args);
 
-            var v = findHexagon(args.Position.X, args.Position.Y);
+            if (args.Button == MouseButton.Right)
+            {
+                if (drawme == null || drawme.Count == 0) return;
+                var v = findHexagon(args.Position.X, args.Position.Y);
+                if (v != null)
+                {
+                    lock (drawme)
+                    {
+                        foreach (var c in drawme)
+                        {
+                            if (c.tile.x == v.Item1 && c.tile.y == v.Item2)
+                            {
+                                memeon(c, args.X - AbsoluteX, args.Y - AbsoluteY);
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        public override void onMouseUp(MouseButtonEventArgs args)
+        {
+            base.onMouseUp(args);
+
+            memeoff();
+        }
+
+        public override void onMouseExit(MouseMoveEventArgs args)
+        {
+            base.onMouseExit(args);
+
+            memeoff();
+        }
+
+
+        private void memeon(Card c, int x, int y)
+        {
+            if (rightclickview != null) throw new Exception();
+            rightclickview = new CardView(Card.fromTemplate(c.template));
+            rightclickview.Height = 400;
+            rightclickview.X = x;
+            rightclickview.Y = y;
+            rightclickview.Hoverable = false;
+            addChild(rightclickview);
+        }
+
+        private void memeoff()
+        {
+            if (rightclickview == null) return;
+            removeChild(rightclickview);
+            rightclickview = null;
+        }
+
 
         private Tuple<int, int> findHexagon(int mousex, int mousey)
         {
@@ -93,7 +150,7 @@ namespace stonerkart
             return null;
         }
 
-        private Point hexCoords(int column, int row)
+        public Point hexCoords(int column, int row)
         {
             int os = ((column + 1) % 2) * hexsize / 2;
             int hexX = (int)(hexsizethreequarters * column);
@@ -116,7 +173,9 @@ namespace stonerkart
                     
                     Color hl = bordercolors[i][j];
 
-                    dm.fillHexagon(hexX, hexY, hexsize, hl, Color.AntiqueWhite);
+                    var edgy = colormeshocked.tileAt(i, j).isEdgy;
+
+                    dm.fillHexagon(hexX, hexY, hexsize, hl, edgy ? Color.Silver : Color.AntiqueWhite);
                 }
             }
 

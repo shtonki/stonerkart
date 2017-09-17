@@ -14,8 +14,11 @@ namespace stonerkart
         public int b => abcCoord.b;
         public int c => abcCoord.c;
         public int ord => map.ord(this);
-        public Tile[] neighbours => atDistance(1).ToArray();
-        public bool isEdgy => neighbours.Length != 6;
+
+        public bool isEdgy => x < edgelordLimit || x >= map.width - edgelordLimit ||
+                              y < edgelordLimit + 1 || y >= map.height - edgelordLimit - 1;
+
+        public const int edgelordLimit = 1;
 
         public Card card { get; private set; }
 
@@ -59,7 +62,7 @@ namespace stonerkart
 
         public List<Tile> withinDistance(int distance, int mindistance = 0)
         {
-            if (distance == -1) return map.tyles.ToList();
+            if (distance == -1) return map.Tiles.ToList();
 
             IEnumerable<Tile> r = new List<Tile>(3*(distance*(distance + 1)) + 1);
 
@@ -74,7 +77,7 @@ namespace stonerkart
         public List<Tile> atDistance(int distance)
         {
             List<Tile> ta = new List<Tile>();
-            foreach (var t in map.tyles)
+            foreach (var t in map.Tiles)
             {
                 int da = Math.Abs(a - t.a);
                 int db = Math.Abs(b - t.b);

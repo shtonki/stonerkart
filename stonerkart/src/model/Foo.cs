@@ -41,6 +41,7 @@ namespace stonerkart
             if (effects.Length != cache.targetVectors.Length) throw new Exception();
 
             TargetVector[] vectors = new TargetVector[effects.Length];
+            hs.previousTargets = vectors;
 
             for (int i = 0; i < effects.Length; i++)
             {
@@ -48,7 +49,6 @@ namespace stonerkart
                 if (newcache.Cancelled) return TargetMatrix.CreateCancelled();
                 if (newcache.Fizzled) return TargetMatrix.CreateFizzled();
                 vectors[i] = newcache;
-                hs.previousTargets = newcache;
             }
 
             return new TargetMatrix(vectors);

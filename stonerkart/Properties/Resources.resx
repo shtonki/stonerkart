@@ -754,4 +754,19 @@ z 2661 39
   <data name="iconCross" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\iconCross.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="artSeethingRage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artSeethingRage.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artSoothsay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artSoothsay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artSinisterPact" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artSinisterPact.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artAlterFate2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artAlterFate2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artGreatWhiteBuffalo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\artGreatWhiteBuffalo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

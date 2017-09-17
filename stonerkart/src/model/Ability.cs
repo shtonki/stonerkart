@@ -117,7 +117,6 @@ namespace stonerkart
             {
                 ButtonOption opt = hs.game.chooseButtonSynced(hs.resolveController,
                     "Do you want to use this ability?",
-                    "Opponent is deciding whether to use optional ability.",
                     ButtonOption.Yes, ButtonOption.No);
 
                 if (opt == ButtonOption.No) return new GameEvent[] {};
