@@ -187,17 +187,17 @@ namespace stonerkart
                         rarity = Rarity.Rare;
                         baseRace = Race.Human;
 
-                        baseMovement = 2;
+                        baseMovement = 3;
                         basePower = 0;
-                        baseToughness = 5;
+                        baseToughness = 3;
 
-                        chaosCost = 0;
+                        mightCost = 1;
 
                         addActivatedAbility(
-                        String.Format("Sacrifice this creature: deal 3 damage to all creatures within 2 tiles."),
+                        String.Format("Sacrifice this creature: deal 3 damage to target creature within 1 tile."),
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                        new AoeRule(t => true, 2, card => true)),  new PingDoer(3), new Foo(new Effect(resolveCard, new MoveToPileDoer(PileLocation.Graveyard))),
-                        0,
+                        new ChooseRule<Card>(t => true)),  new PingDoer(3), new Foo(new Effect(resolveCard, new MoveToPileDoer(PileLocation.Graveyard))),
+                        1,
                         PileLocation.Field,
                         CastSpeed.Interrupt
                         );
@@ -2871,7 +2871,7 @@ namespace stonerkart
 
             name = G.replaceUnderscoresAndShit(ct.ToString());
 
-            eventHandler = generatedlft();
+            eventHandler = generateDefaultEventHandlers();
         }
 
         private void addTriggeredAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, bool optional, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)

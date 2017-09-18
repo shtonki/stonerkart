@@ -120,7 +120,7 @@ namespace stonerkart
             deckConstraints = new DeckContraints(Format.Standard);
 
 
-            initTest();
+            //initTest();
             
         }
 
@@ -129,8 +129,8 @@ namespace stonerkart
             Square panel = new Square(0, 0, FRAME_WIDTH, FRAME_HEIGHT, Color.AliceBlue);
             addElement(panel);
 
-            TimerSetting ts = new TimerSetting(15, 40, Color.Black, Color.IndianRed);
-            panel.addChild(new Taimer(500, 0, 800, 400, ts));
+            //TimerSetting ts = new TimerSetting(15, 40, Color.Black, Color.IndianRed);
+            //panel.addChild(new Taimer(500, 0, 800, 400, ts));
 
         }
         private void updateTimer(Square s)

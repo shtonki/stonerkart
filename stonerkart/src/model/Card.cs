@@ -368,7 +368,7 @@ namespace stonerkart
 
         private TypedGameEventHandler<StartOfStepEvent> shitterhack;
 
-        private GameEventHandlerBuckets generatedlft()
+        private GameEventHandlerBuckets generateDefaultEventHandlers()
         {
             GameEventHandlerBuckets r = new GameEventHandlerBuckets();
 
