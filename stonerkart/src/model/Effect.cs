@@ -269,6 +269,21 @@ namespace stonerkart
         }
     }
 
+    class RaceChangeDoer : SimpleDoer
+    {
+        public Race race;
+        public RaceChangeDoer(Race race) : base(typeof(Card))
+        {
+            this.race = race;
+        }
+
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        {
+            Card card = (Card)row[0];
+            return new GameEvent[] { new RaceModifyEvent(card, new RaceModifierStruct(race, new StaticGameEventFilter(() => false))) };
+        }
+    }
+
     class PayManaDoer : Doer
     {
         public PayManaDoer() : base(typeof(Player), typeof(ManaOrb))
@@ -303,7 +318,7 @@ namespace stonerkart
     
     class MoveToTileDoer : SimpleDoer
     {
-        private bool dontExhaust;
+        private bool dontExhaust; //whats wrong with private bool exhaust
 
         public MoveToTileDoer(bool dontExhaust = false) : base(typeof(Card), typeof(Tile))
         {

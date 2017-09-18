@@ -21,10 +21,10 @@ namespace stonerkart
         private const int NR_OF_CARD_VIEWS = NR_OF_CARDS_PER_ROW * NR_OF_CARDS_PER_COLLUMN;
         private const int DECK_SCREEN_ITEMS_PER_ROW = 2; //load button and save button
         private const int CARD_VIEW_WIDTH = Frame.BACKSCREENWIDTH / 12;
-        private const int CARD_VIEW_HEIGHT = CARD_VIEW_WIDTH * 700 / 500;
+        private const int CARD_VIEW_HEIGHT = CARD_VIEW_WIDTH * 7 / 5;
         private const int FRAME_WIDTH = Frame.BACKSCREENWIDTH;
         private const int FRAME_HEIGHT = Frame.AVAILABLEHEIGHT;
-        private const int HERO_VIEW_WIDTH = PILE_VIEW_HEIGHT * 500 / 700;
+        private const int HERO_VIEW_WIDTH = (FRAME_HEIGHT - 2 * DOWN_PAGE_BUTTON_HEIGHT) * 5 / 7;//erf//PILE_VIEW_HEIGHT * 5 / 7;
 
 
         private const int STATS_CARDCOUNTER_HEIGHT = 90;
@@ -42,7 +42,7 @@ namespace stonerkart
         private const int HOVER_VIEW_Y = CARD_VIEW_PANEL_Y;
         private const int PILE_VIEW_X = 0;
         private const int PILE_VIEW_Y = 0;
-        private const int PILE_VIEW_WIDTH = CARD_VIEW_PANEL_WIDTH;//-HERO_VIEW_WIDTH;
+        private const int PILE_VIEW_WIDTH = CARD_VIEW_PANEL_WIDTH + DOWN_PAGE_BUTTON_WIDTH-HERO_VIEW_WIDTH;
         private const int PILE_VIEW_HEIGHT = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT - MANA_BUTTON_HEIGHT <= 0 ? CARD_VIEW_PANEL_HEIGHT : FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT - MANA_BUTTON_HEIGHT;//FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT <= 0 ? CARD_VIEW_PANEL_HEIGHT : FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT;
         private const int CARD_VIEW_PANEL_X = 0;
         private const int CARD_VIEW_PANEL_Y = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT;
@@ -63,9 +63,9 @@ namespace stonerkart
         private const int MANA_BUTTON_HEIGHT = MANA_BUTTON_WIDTH;
 
         //private const int CARD_VIEW_PANEL_HEIGHT = CARD_VIEW_PANEL_NUMBER_OF_ROWS * CARD_VIEW_HEIGHT;
-        private const int DECK_NAME_BOX_X = CARD_VIEW_PANEL_WIDTH + HERO_VIEW_WIDTH;
+        private const int DECK_NAME_BOX_X = PILE_VIEW_WIDTH + HERO_VIEW_WIDTH;
         private const int DECK_NAME_BOX_Y = 0;
-        private const int DECK_NAME_BOX_WIDTH = FRAME_WIDTH - PILE_VIEW_WIDTH - HERO_VIEW_WIDTH;
+        private const int DECK_NAME_BOX_WIDTH = HOVER_VIEW_WIDTH;//FRAME_WIDTH - PILE_VIEW_WIDTH - HERO_VIEW_WIDTH;
         private const int DECK_NAME_BOX_HEIGHT = (int)(Frame.BACKSCREENHEIGHT * 0.05);
         private const int BUTTON_HEIGHT = DECK_NAME_BOX_HEIGHT / 2;
         private const int BUTTON_WIDTH = DECK_NAME_BOX_WIDTH / 2;
@@ -107,7 +107,7 @@ namespace stonerkart
         private Square barChartPanel;
 
 
-        //todo fix hero and search and deckinfo
+        //´todo fix search and deckinfo and add clear button
         public DeckEditorScreen() : base(new Imege(Textures.artCallToArms))
         {
             searchString = "";
@@ -119,15 +119,53 @@ namespace stonerkart
             cardList = setupCardList(pileView);
             deckConstraints = new DeckContraints(Format.Standard);
 
+
+            //initTest();
             
         }
 
+        private void initTest()
+        {
+            Square panel = new Square(0, 0, FRAME_WIDTH, FRAME_HEIGHT, Color.AliceBlue);
+            addElement(panel);
+
+            //TimerSetting ts = new TimerSetting(15, 40, Color.Black, Color.IndianRed);
+            //panel.addChild(new Taimer(500, 0, 800, 400, ts));
+
+        }
+        private void updateTimer(Square s)
+        {
+            /*s.X += 1;
+            s.Width -= 5;
+
+            if (s.Width < 0) s.Backcolor = Color.DarkRed;*/
+        }
+
+
         private void initStatsThingy()
         {
+            Square statsBox = new Square(HOVER_VIEW_WIDTH, FRAME_HEIGHT); //todo dont frame_height
+            statsBox.Backcolor = Color.CadetBlue;
+
+            //types todo: maybe have them as barcharts too
+            const int TYPE_TEXT_WIDTH = 64;
+            const int TYPE_TEXT_HEIGHT = 48;
+            var types = Enum.GetValues(typeof(CardType)).Cast<CardType>().Select(l => l.ToString()).ToList();
+            types.Add("total");
+            for (int i = 0; i < types.Count(); i++)
+            {
+                var t = types.ElementAt(i);
+                Button tb = new Button(TYPE_TEXT_WIDTH, TYPE_TEXT_HEIGHT);
+                tb.Text = t.ToString();
+                tb.setLocation(0, TYPE_TEXT_HEIGHT * i);
+                statsBox.addChild(tb);
+            }
+
+            //barChart
             barChartPanel = new Square(NR_OF_MANA_BUTTONS * (STATS_BAR_WIDTH + STATS_BAR_SPACING), STATS_MAX_BAR_HEIGHT + STATS_TEXT_SPACING);
-            barChartPanel.setLocation(FRAME_WIDTH - barChartPanel.Width, SAVE_LOAD_BUTTON_Y + BUTTON_HEIGHT);
-            barChartPanel.Backcolor = System.Drawing.Color.CadetBlue;
-            elements.Add(barChartPanel);
+            barChartPanel.setLocation(150, 0);//(FRAME_WIDTH - barChartPanel.Width, SAVE_LOAD_BUTTON_Y + BUTTON_HEIGHT);
+            barChartPanel.Backcolor = Color.Purple;
+            statsBox.addChild(barChartPanel);
 
             for (int i = 0; i < NR_OF_MANA_BUTTONS; i++)
             {
@@ -144,38 +182,35 @@ namespace stonerkart
                 barChartPanel.addChild(tb);
             }
 
+            
 
-            cardCounter = new Square(STATS_CARDCOUNTER_WIDTH, STATS_CARDCOUNTER_HEIGHT);
-            addElement(cardCounter);
-            cardCounter.X = barChartPanel.X - STATS_CARDCOUNTER_WIDTH;
-            cardCounter.Y = barChartPanel.Y;
-            cardCounter.Text = "0";
+            statsBox.setLocation(HOVER_VIEW_X, SAVE_LOAD_BUTTON_Y + BUTTON_HEIGHT);
+            addElement(statsBox);
         }
 
         private void setupStatsThingy()
         {
             barChartPanel.clearChildren();
-            //Todo remove children but now i need to go work afk
+
             //todo bolshevik revolution
             int[] nrOfCardsOfEachMana = new int[NR_OF_MANA_BUTTONS];
             foreach(var c in cardList)
             {
-                foreach (var clr in c.colours)
-                {
-                    nrOfCardsOfEachMana[(int)clr]++;
-                }
+                nrOfCardsOfEachMana[(int)c.colours.Max()] += 1; //this aint doin it 
             }
 
             Square[] bars = new Square[NR_OF_MANA_BUTTONS];
             for(int i = 0; i < NR_OF_MANA_BUTTONS; i++)
             {
-                int barHeight = 
-                    cardList.Count == 0 ? 
-                    0 : 
-                    -((STATS_MAX_BAR_HEIGHT-STATS_TEXT_SPACING-STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / nrOfCardsOfEachMana.Sum();// + STATS_TEXT_SPACING + STATS_MANA_BUTTON_HEIGHT;
-                bars[i] = new Square(i * (STATS_BAR_WIDTH + STATS_BAR_SPACING), barChartPanel.Height-STATS_MANA_BUTTON_HEIGHT-STATS_BAR_SPACING, STATS_BAR_WIDTH, barHeight, System.Drawing.Color.Black);
-                barChartPanel.addChild(bars[i]);
+                int totalNumberOfCards = nrOfCardsOfEachMana.Aggregate((a, b) => a + b);
+                int relativeBarHeight = 0;
+                if (totalNumberOfCards != 0)
+                {
+                    relativeBarHeight = -((STATS_MAX_BAR_HEIGHT - STATS_TEXT_SPACING - STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / totalNumberOfCards;
+                }
 
+                bars[i] = new Square(i * (STATS_BAR_WIDTH + STATS_BAR_SPACING), barChartPanel.Height - STATS_MANA_BUTTON_HEIGHT - STATS_BAR_SPACING, STATS_BAR_WIDTH, relativeBarHeight, Color.Black);
+                barChartPanel.addChild(bars[i]);
                 Button mb = new Button(STATS_BAR_WIDTH, STATS_BAR_WIDTH);
                 mb.Backimege = new Imege(TextureLoader.orbTexture((ManaColour)i));
                 mb.setLocation(bars[i].X, bars[i].Y);
@@ -185,10 +220,8 @@ namespace stonerkart
                 tb.Text = nrOfCardsOfEachMana[i].ToString();
                 tb.setLocation(bars[i].X, bars[i].Y + bars[i].Height - STATS_TEXT_SPACING);
                 barChartPanel.addChild(tb);
-            }
 
-            cardCounter.Text = cardList.Count.ToString();
-            cardCounter.textColor = cardList.Count >= deckConstraints.cardMin ? Color.Green : Color.Red;
+            }
         }
 
         private void refilter()
@@ -348,7 +381,7 @@ namespace stonerkart
             back.Border = new SolidBorder(4, Color.Black);
             back.clicked += a => GUI.transitionToScreen(GUI.mainMenuScreen);
             addElement(back);
-            back.setLocation(1350, 310);
+            back.setLocation(1000, 310);
             #endregion
             return bs;
         }
@@ -358,6 +391,7 @@ namespace stonerkart
             cardList.clear();
             var cards = deck.templates.Select(t => new Card(t)).ToArray();
             cardList.addRange(cards);
+            removeCard();
         }
 
         private CardList setupCardList(PileView pv)
@@ -380,7 +414,7 @@ namespace stonerkart
             pv.mouseDown += (a) =>
             {
                 var cardView = pv.viewAtClick(a);
-                if (cardView != null) removeFromDeck(cardView.card);
+                if (cardView != null) removeCard(cardView.card); 
             };
             pv.mouseMove += (__) =>
             {
@@ -392,6 +426,17 @@ namespace stonerkart
 
             return pv;
         }
+
+        private void removeCard(Card card)
+        {
+            cardList.remove(card);
+            setupStatsThingy();
+        }
+        private void removeCard()
+        {
+            setupStatsThingy();
+        }
+
         private void setupCardViews()
         {
             cardViewPanel.clearChildren();

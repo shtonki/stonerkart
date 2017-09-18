@@ -78,6 +78,26 @@ namespace stonerkart
         }
     }
 
+    struct RaceModifyEvent : GameEvent, CardedEvent
+    {
+        public Card card { get; }
+        public Race race => rmodifier.race;
+        public GameEventFilter filter => rmodifier.filter;
+        private RaceModifierStruct rmodifier { get; }
+
+        public RaceModifyEvent(Card card, RaceModifierStruct rmodifier)
+        {
+            this.card = card;
+            this.rmodifier = rmodifier;
+        }
+
+        public Card getCard()
+        {
+            return card;
+        }
+    }
+
+
     struct MoveToPileEvent : GameEvent, CardedEvent
     {
         public Pile to { get; }
