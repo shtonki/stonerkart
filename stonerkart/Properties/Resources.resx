@@ -766,9 +766,6 @@ z 2661 39
   <data name="artGreatWhiteBuffalo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artGreatWhiteBuffalo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AberrantSacrifice" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AberrantSacrifice.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="artIlatian_sGhoul" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artIlatian_sGhoul.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
