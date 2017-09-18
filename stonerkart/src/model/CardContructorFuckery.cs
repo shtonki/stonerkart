@@ -21,6 +21,7 @@ namespace stonerkart
             int baseToughness = -1;
             int baseMovement = -1;
 
+
             int chaosCost = 0,
                 deathCost = 0,
                 lifeCost = 0,
@@ -113,12 +114,35 @@ namespace stonerkart
                            new ModifyDoer(add(1), never, ModifiableStats.Power));
                         Effect e2 = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
                             new ModifyDoer(add(1), never, ModifiableStats.Toughness));
+                        Effect e3 = new Effect(new ChooseRule<Card>(ChooseRule<Card>.ChooseAt.Cast, c => !c.isHeroic),
+                            new ModifyDoer(add(-1), never, ModifiableStats.Power));
+                        Effect e4 = new Effect(new ModifyRule<Card, Card>(2, 0, c => c),
+                            new ModifyDoer(add(-1), never, ModifiableStats.Toughness));
 
                         //should be better considering its legendary, maybe create vampire instead of sacrificing? 
-                        addActivatedAbility("Sacrifice target non-undead creature you control: give Count Fera II +1/+1",
-                            new Effect[] { e1, e2 },
-                            new Foo(new Effect(new TargetRuleSet(new ChooseRule<Card>(c => !c.isHeroic && c.race != Race.Undead && c.controller.isHero)), new MoveToPileDoer(PileLocation.Graveyard))),
-                            1,
+                        addActivatedAbility(String.Format("{0}, Exhaust: Target non-Heroic creature becomes Undead and gets -1/-1. Count Fera II gets +1/+1.", G.colouredGlyph(ManaColour.Death)),
+                            new Effect[] {e1, e2, e3, e4},
+                            new Foo(exhaustThis, manaCostEffect(ManaColour.Death)),//new Foo(new Effect(new TargetRuleSet(new ChooseRule<Card>(c => !c.isHeroic)), new MoveToPileDoer(PileLocation.Graveyard))),
+                            -1,
+                            PileLocation.Field,
+                            CastSpeed.Interrupt);
+
+                        Effect e5 = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
+                           new ModifyDoer(add(-3), never, ModifiableStats.Power));
+                        Effect e6 = new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard)),
+                            new ModifyDoer(add(-3), never, ModifiableStats.Toughness));
+                        Effect e7 = new Effect(new ChooseRule<Card>(ChooseRule<Card>.ChooseAt.Cast, c => !c.isHeroic),
+                            new ModifyDoer(add(-3), never, ModifiableStats.Power));
+                        Effect e8 = new Effect(new ModifyRule<Card, Card>(2, 0, c => c),
+                            new ModifyDoer(add(-3), never, ModifiableStats.Toughness));
+
+                        addActivatedAbility(
+                            String.Format(
+                                "{0}{0}, Exhaust: Target non-Undead, non-Heroic creature gets -3/-3. Count Fera II gets -3/-3.",
+                                G.colouredGlyph(ManaColour.Death)),
+                            new Effect[] {e5, e6, e7, e8},
+                            new Foo(exhaustThis, manaCostEffect(ManaColour.Death, ManaColour.Death)),//manaCostFoo(ManaColour.Chaos), 
+                            -1,
                             PileLocation.Field,
                             CastSpeed.Interrupt);
                     }
@@ -139,7 +163,7 @@ namespace stonerkart
                         baseMovement = 2;
 
                         diesLambda(
-                        "When Arachosa enters the graveyard from the battlefield spawn two spiderlings",
+                        "When Arachosa enters the Graveyard from the Battlefield summon two Green 1/1 Spiderling Tokens with 3 Movement.",
                         Effect.summonTokensEffect(CardTemplate.Spiderling, CardTemplate.Spiderling),
                         1);
 
@@ -164,7 +188,7 @@ namespace stonerkart
                         baseMovement = 3;
 
                         addTriggeredAbility(
-                            "Whenever this Paralyzing Spider deals damage to a non-heroic creature, reduce that creature's movement speed by 2. This cannot reduce the targets movement below 1.",
+                            "Whenever Paralyzing Spider deals damage to a non-Heroic Creature reduce that Creature's movement speed by 2. This cannot reduce the Creature's Movement below 1.",
                             new Effect(new TargetRuleSet(
                             new TriggeredTargetRule<DamageEvent, Card>(g => g.target)),
                             new ModifyDoer(v => Math.Max(Math.Min(v, 1), v - 2), Card.never, ModifiableStats.Movement)),
@@ -194,9 +218,9 @@ namespace stonerkart
                         mightCost = 1;
 
                         addActivatedAbility(
-                        String.Format("Sacrifice this creature: deal 3 damage to target creature within 1 tile."),
+                        String.Format("Sacrifice this creature: deal 3 damage to another target creature within 1 tile."),
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                        new ChooseRule<Card>(t => true)),  new PingDoer(3), new Foo(new Effect(resolveCard, new MoveToPileDoer(PileLocation.Graveyard))),
+                        new ChooseRule<Card>(c => c != this)),  new PingDoer(3), new Foo(new Effect(resolveCard, new MoveToPileDoer(PileLocation.Graveyard))),
                         1,
                         PileLocation.Field,
                         CastSpeed.Interrupt
@@ -226,11 +250,11 @@ namespace stonerkart
                         rarity = Rarity.Uncommon;
                         baseRace = Race.Human;
 
-                        baseMovement = 2;
-                        basePower = 2;
-                        baseToughness = 3;
+                        baseMovement = 3;
+                        basePower = 3;
+                        baseToughness = 1;
                         chaosCost = 2;
-
+                        keywordAbilities.Add(KeywordAbility.Ambush);
                     }
                     break;
                 #endregion
@@ -255,17 +279,17 @@ namespace stonerkart
                 case CardTemplate.Jabroni:
                     {
                         cardType = CardType.Creature;
-                        rarity = Rarity.Rare;
+                        rarity = Rarity.Legendary;
                         baseRace = Race.Human;
 
                         baseMovement = 2;
                         basePower = 3;
                         baseToughness = 3;
 
-                        deathCost = 4;
-                        diesLambda(
-                            "Whenever Jabroni enters the graveyard from the battlefield under your control, spawn a Makaroni token.",
-                            Effect.summonTokensEffect(CardTemplate.Makaroni), 0, false);
+                        natureCost = 4;
+                        etbLambda(
+                            "Whenever Jabroni enters the Field from the battlefield under your control, spawn a 2/2 Makaroni token with Flying.",
+                            Effect.summonTokensEffect(CardTemplate.Makaroni), 2, false);
                     }
                     break;
                 #endregion
@@ -283,20 +307,16 @@ namespace stonerkart
 
                         deathCost = 2;
 
-                        auras.Add(new Aura(
-                            "Archfather gets +1/+1 for for every loyal undead creature.",
-                            v => v + (owner.game.activePlayer.field.Count(c => c.race == Race.Undead)),
-                            ModifiableStats.Toughness,
-                            c => c == this,
-                            PileLocation.Field
-                            ));
-                        auras.Add(new Aura(
-                            "",
-                            v => v + (owner.game.activePlayer.field.Count(c => c.race == Race.Undead)),
-                            ModifiableStats.Power,
-                            c => c == this,
-                            PileLocation.Field
-                            ));
+                        Effect e1 = new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new ModifyDoer(add(2), never, ModifiableStats.Power, ModifiableStats.Toughness));
+
+                        addTriggeredAbility("Whenever a Black creature enters the Field under your control Archfather gets +2/+2.", e1, 
+                            new Foo(),
+                            new TypedGameEventFilter<MoveToPileEvent>(e => e.card.colours.Contains(ManaColour.Death) && e.card.controller.isHero && e.to.location.pile == PileLocation.Field),
+                            -1,
+                            PileLocation.Field,
+                            false, 
+                            TriggeredAbility.Timing.Post);
                     }
                     break;
                 #endregion
@@ -323,18 +343,19 @@ namespace stonerkart
                         cardType = CardType.Creature;
                         rarity = Rarity.Rare;
                         baseRace = Race.Mecha;
-                        lifeCost = 2;
-                        greyCost = 2;
+
+                        greyCost = 4;
 
                         baseMovement = 1;
                         basePower = 2;
                         baseToughness = 3;
+
                         addActivatedAbility(String.Format(
-                                "{0}, Select a flying creature within 5 tiles and deal 5 damage to it.",
-                                G.exhaustGhyph),
+                                "{1}, {0}: Vincennes deals 3 damage to Target Flying creature within 3 tiles.",
+                                G.exhaustGhyph, G.colourlessGlyph(2)),
                                 new Effect(new TargetRuleSet(resolveCard, new ChooseRule<Card>(c => c.hasAbility(KeywordAbility.Flying))), new PingDoer(5)),
-                                new Foo(),
-                                5,
+                                new Foo(exhaustThis, manaCostEffect(ManaColour.Colourless, ManaColour.Colourless)),
+                                3,
                                 PileLocation.Field,
                                 CastSpeed.Channel);
                     }
@@ -2773,14 +2794,14 @@ namespace stonerkart
                 #region Makaroni
                 case CardTemplate.Makaroni:
                     {
-                        forceColour = ManaColour.Death;
+                        forceColour = ManaColour.Nature;
                         cardType = CardType.Creature;
-                        rarity = Rarity.Uncommon;
-                        baseRace = Race.Undead;
+                        baseRace = Race.Beast;
                         isToken = true;
                         baseMovement = 2;
                         basePower = 2;
                         baseToughness = 2;
+                        keywordAbilities.Add(KeywordAbility.Flying);
                     }
                     break;
                 #endregion
@@ -2791,10 +2812,9 @@ namespace stonerkart
                     forceColour = ManaColour.Nature;
                     basePower = 1;
                     baseToughness = 1;
-                    baseMovement = 2;
+                    baseMovement = 3;
                     baseRace = Race.Beast;
                     isToken = true;
-                    keywordAbilities.Add(KeywordAbility.Fervor);
                 }
                 break;
                 #endregion
@@ -2827,12 +2847,14 @@ namespace stonerkart
             Power = new Modifiable(basePower, 0);
             Toughness = new Modifiable(baseToughness, 0);
             Movement = new Modifiable(baseMovement, 0);
+            forceRace = new Modifiable(-1);
 
             modifiables = new Modifiable[]
             {
                 Power,
                 Toughness,
                 Movement,
+                forceRace,
             };
 
 

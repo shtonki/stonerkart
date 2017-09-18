@@ -39,9 +39,16 @@ namespace stonerkart
         public CardType cardType { get; }
         public Rarity rarity { get; set; }
         public CardSet set { get; }
-        public Race race => forceRace.HasValue ? forceRace.Value : baseRace;
+        public Race race => ForceRace.HasValue ? ForceRace.Value : baseRace;
         private Race baseRace { get; }
-        private Race? forceRace { get; set; }
+        private Race? ForceRace => getForceRace();
+        private Modifiable forceRace { get; set; }
+
+        private Race? getForceRace()
+        {
+            if (forceRace.value >= 0) return (Race)forceRace.value;
+            return null;
+        }
 
         public Subtype? subtype { get; }
         public int convertedManaCost => castManaCost.colours.Count();
@@ -87,9 +94,9 @@ namespace stonerkart
         public int toughness => Toughness - damageTaken;
         public int movement => Movement - fatigue;
 
-        private Modifiable Power;
-        private Modifiable Toughness;
-        private Modifiable Movement;
+        private Modifiable Power { get; }
+        private Modifiable Toughness { get; }
+        private Modifiable Movement { get; }
 
         private int damageTaken;
         public int fatigue { get; private set; }
@@ -377,7 +384,14 @@ namespace stonerkart
                     new TypedGameEventFilter<StartOfStepEvent>(
                         a => a.step == Steps.Replenish && a.activePlayer == controller
                         ), e => fatigue = 0);
-
+            
+            r.add(new TypedGameEventHandler<RaceModifyEvent>(e =>
+            {
+                e.card.forceRace.modify(new ModifierStruct(setTo((int)e.race), e.filter));
+                int i = (int)e.card.forceRace.value;
+                int j = (int)e.card.race;
+                int xd = setTo((int)e.race)(0);
+            }));
 
             r.add(new TypedGameEventHandler<ModifyEvent>(e =>
             {
@@ -670,7 +684,7 @@ namespace stonerkart
         }
     }
 
-    enum ModifiableStats { Power, Toughness, Movement };
+    enum ModifiableStats { Power, Toughness, Movement, Race };
 
 
     public enum CardTemplate

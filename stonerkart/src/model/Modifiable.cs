@@ -16,7 +16,7 @@ namespace stonerkart
 
         private List<ModifierStruct> modifiers = new List<ModifierStruct>();
         private int cachedValue;
-        private bool dirty = true;
+        private bool dirty { get; set; } = true;
 
 
         public Modifiable(int baseValue, int? minValue = null, int? maxValue = null)
@@ -55,6 +55,7 @@ namespace stonerkart
         public void modify(ModifierStruct ms)
         {
             modifiers.Add(ms);
+            //dirty = true;
         }
 
         public void recount()

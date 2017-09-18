@@ -280,7 +280,7 @@ namespace stonerkart
         protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
         {
             Card card = (Card)row[0];
-            return new GameEvent[] { new RaceModifyEvent(card, race, new RaceModifierStruct(race, new StaticGameEventFilter(() => false))) };
+            return new GameEvent[] { new RaceModifyEvent(card, new RaceModifierStruct(race, new StaticGameEventFilter(() => false))) };
         }
     }
 
