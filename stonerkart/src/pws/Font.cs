@@ -91,5 +91,6 @@ namespace stonerkart
         }
 
         public static FontFamille font1 = new FontFamille(Textures.font0, Properties.Resources.font1);
+        public static FontFamille font2 = new FontFamille(Textures.font1, Properties.Resources.font2);
     }
 }

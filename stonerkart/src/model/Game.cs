@@ -132,7 +132,8 @@ namespace stonerkart
                                 } break;
 
                                 default:
-                                    throw new Exception();
+                                    break;
+                                //throw new Exception();
                             }
                         }
                     }

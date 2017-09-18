@@ -185,6 +185,8 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\AberrantSacrifice.png" />
+    <None Include="Resources\font1.png" />
     <None Include="Resources\artGreatWhiteBuffalo.png" />
     <None Include="Resources\artAlterFate2.png" />
     <None Include="Resources\artSinisterPact.png" />
@@ -367,7 +369,6 @@
     <None Include="Resources\AlterTime.png" />
     <None Include="Resources\AlterFate.png" />
     <None Include="Resources\Abolish.png" />
-    <None Include="Resources\AberrantSacrifice.png" />
     <None Include="Resources\red3.png" />
     <None Include="Resources\multi3.png" />
     <None Include="Resources\grey3.png" />

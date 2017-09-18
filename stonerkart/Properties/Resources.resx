@@ -766,14 +766,88 @@ z 2661 39
   <data name="artGreatWhiteBuffalo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artGreatWhiteBuffalo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AberrantSacrifice" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AberrantSacrifice.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="font11" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\font1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="font2" xml:space="preserve">
+    <value>A 0 53
+B 53 42
+C 95 51
+D 146 53
+E 199 39
+F 238 37
+G 275 52
+H 327 53
+I 380 16
+J 396 27
+K 423 45
+L 468 36
+M 504 65
+N 569 55
+O 624 62
+P 686 42
+Q 728 62
+R 790 42
+S 832 38
+T 870 43
+U 913 48
+V 961 50
+W 1011 72
+X 1083 42
+Y 1125 45
+Z 1170 45
+a 1215 38
+b 1253 45
+c 1298 36
+d 1334 42
+e 1376 40
+f 1416 26
+g 1442 41
+h 1483 42
+i 1525 16
+j 1541 18
+k 1559 36
+l 1595 14
+m 1609 66
+n 1675 42
+o 1717 46
+p 1763 43
+q 1806 44
+r 1850 29
+s 1879 26
+t 1905 28
+u 1933 38
+v 1971 38
+w 2009 54
+x 2063 32
+y 2095 38
+z 2133 37
+0 2170 39
+1 2209 27
+2 2236 42
+3 2278 38
+4 2316 47
+5 2363 39
+6 2402 40
+7 2442 41
+8 2483 39
+9 2522 42
+, 2564 16
+" 2588 24
+' 2612 18
+( 2630 22
+) 2652 20
+. 2672 20
+! 2692 20
+? 2712 34
+/ 2746 34
++ 2780 44
+* 2824 38
+- 2862 30
+&amp; 2892 58</value>
   </data>
   <data name="artIlatian_sGhoul" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artIlatian_sGhoul.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="artAberrant_sSacrifice" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\artAberrant_sSacrifice.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="artArachosa" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artArachosa.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -816,5 +890,8 @@ z 2661 39
   </data>
   <data name="artWarp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\artWarp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="artAberrantSacrifice" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AberrantSacrifice.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
