@@ -2,16 +2,16 @@
 solid:
 aoe exhaust
 mana leak/spell pierce
-ponder/
 
 loose:
 CC1 5/2/1, N: +1 mvmt til eot
 
 martin loose:
 
-
-
 missing features:
+ranked play
+enforce deck rules when choosing decks
+enforce hero colour rule
 concede
 options
 post game screen
