@@ -319,6 +319,9 @@ namespace stonerkart
 
         private void untapStep()
         {
+            screen.passUntilEOT.Toggled = false;
+            screen.passUntilEOTOnEmptyStack.Toggled = false;
+
             gameState.activePlayer.resetMana();
 
             if (!skipFirstDraw)
@@ -770,6 +773,19 @@ namespace stonerkart
 
             do
             {
+                bool autopass;
+                if (playerWithPriority.isHero)
+                {
+                    autopass = screen.passUntilEOT.Toggled ||
+                               screen.passUntilEOTOnEmptyStack.Toggled && !gameState.stack.Any();
+                    connection.sendChoice(autopass ? 1 : 0);
+                }
+                else
+                {
+                    autopass = 1 == connection.receiveChoice();
+                }
+
+                if (autopass) return false;
 
                 /*
                 if (!(gameState.stack.Any() ||

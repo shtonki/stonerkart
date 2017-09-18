@@ -230,6 +230,7 @@ namespace stonerkart
         protected override LaidText layout(string[] text, int width, int height, FontFamille ff)
         {
             var words = wordify(text);
+            if (words.Length == 0) return new LaidText(new List<charLayout>(), 1);
 
             var sz = TextureLoader.sizeOf(ff.fontImage);
             double w = sz.Width;
