@@ -904,11 +904,11 @@ namespace stonerkart
             {
                 stackpopped.pile.remove(stackpopped);
             }
-            else if (stackpopped.cardType == CardType.Creature || stackpopped.cardType == CardType.Relic)
+            else if ((finalTargets.Fizzled) && (stackpopped.cardType == CardType.Creature || stackpopped.cardType == CardType.Relic))
             {
-                //gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.controller.field, false));
+                gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.controller.field, false));
             }
-            else
+            else if (stackpopped.cardType == CardType.Channel || stackpopped.cardType == CardType.Interrupt)
             {
                 gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.owner.graveyard, false));
             }
