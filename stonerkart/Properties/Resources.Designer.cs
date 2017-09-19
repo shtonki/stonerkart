@@ -63,19 +63,9 @@ namespace stonerkart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap AberrantSacrifice {
+        public static System.Drawing.Bitmap artAberrantSacrifice {
             get {
-                object obj = ResourceManager.GetObject("AberrantSacrifice", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap artAberrant_sSacrifice {
-            get {
-                object obj = ResourceManager.GetObject("artAberrant_sSacrifice", resourceCulture);
+                object obj = ResourceManager.GetObject("artAberrantSacrifice", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1964,6 +1954,73 @@ namespace stonerkart.Properties {
         public static string font1 {
             get {
                 return ResourceManager.GetString("font1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap font11 {
+            get {
+                object obj = ResourceManager.GetObject("font11", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A 0 53
+        ///B 53 42
+        ///C 95 51
+        ///D 146 53
+        ///E 199 39
+        ///F 238 37
+        ///G 275 52
+        ///H 327 53
+        ///I 380 16
+        ///J 396 27
+        ///K 423 45
+        ///L 468 36
+        ///M 504 65
+        ///N 569 55
+        ///O 624 62
+        ///P 686 42
+        ///Q 728 62
+        ///R 790 42
+        ///S 832 38
+        ///T 870 43
+        ///U 913 48
+        ///V 961 50
+        ///W 1011 72
+        ///X 1083 42
+        ///Y 1125 45
+        ///Z 1170 45
+        ///a 1215 38
+        ///b 1253 45
+        ///c 1298 36
+        ///d 1334 42
+        ///e 1376 40
+        ///f 1416 26
+        ///g 1442 41
+        ///h 1483 42
+        ///i 1525 16
+        ///j 1541 18
+        ///k 1559 36
+        ///l 1595 14
+        ///m 1609 66
+        ///n 1675 42
+        ///o 1717 46
+        ///p 1763 43
+        ///q 1806 44
+        ///r 1850 29
+        ///s 1879 26
+        ///t 1905 28
+        ///u 1933 38
+        ///v 1971 38
+        ///w 2009 54        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string font2 {
+            get {
+                return ResourceManager.GetString("font2", resourceCulture);
             }
         }
         

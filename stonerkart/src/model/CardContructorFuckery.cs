@@ -35,6 +35,7 @@ namespace stonerkart
             Effect castEffect = null;
             List<Effect> additionalCastEffects = new List<Effect>();
             string castDescription = "";
+            flavourText = "";
             CastSpeed castSpeed;
             List<Effect> additionalCastCosts = new List<Effect>();
             keywordAbilities = new List<KeywordAbility>();
@@ -65,6 +66,7 @@ namespace stonerkart
                                 new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                                 new CardResolveRule(CardResolveRule.Rule.ResolveControllerCard)),
                             new PingDoer(-5)));
+                    flavourText = "They only took what they needed, millions of buffalo were the proof.";
                 } break;
                 #endregion
                 #region Alter Fate
@@ -2619,7 +2621,9 @@ namespace stonerkart
                         CastSpeed.Interrupt
                         );
 
-                    } break;
+                    flavourText =
+                        "\"What he lacks in brains he makes up for in... Well you get my point.\" -- Shibby Shtank";
+                } break;
                 #endregion
                 #region Gryphon Rider
                 case CardTemplate.Gryphon_sRider:

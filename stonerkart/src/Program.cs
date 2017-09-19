@@ -17,7 +17,6 @@ namespace stonerkart
         static void Main(string[] args)
         {
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
-
             Controller.launchGame();
         }
     }

@@ -16,6 +16,7 @@ namespace stonerkart
     public enum Textures
     {
         font0,
+        font1,
 
         background3,
         background0,
@@ -234,6 +235,7 @@ namespace stonerkart
             images = new Dictionary<Textures, Image>();
 
             images[Textures.font0] = Resources.font0;
+            images[Textures.font1] = Resources.font11;
 
             images[Textures.background3] = Resources.background3;
             images[Textures.background0] = Resources.background0;
@@ -289,7 +291,7 @@ namespace stonerkart
             images[Textures.artGreatWhiteBuffalo] = Resources.artGreatWhiteBuffalo;
             images[Textures.artAlterFate2] = Resources.artAlterFate2;
             images[Textures.artSinisterPact] = Resources.artSinisterPact;
-            images[Textures.artAberrantSacrifice] = Resources.artAberrant_sSacrifice;
+            images[Textures.artAberrantSacrifice] = Resources.artAberrantSacrifice;
             images[Textures.artAbolish] = Resources.artAbolish;
             images[Textures.artAlterFate] = Resources.artAlterFate;
             images[Textures.artAlterTime] = Resources.artAlterTime;

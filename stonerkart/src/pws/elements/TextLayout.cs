@@ -99,7 +99,7 @@ namespace stonerkart
     public enum Justify
     {
         Left,
-        Middle
+        Middle,
     };
 
     class SingleLineFitLayout : TextLayout
@@ -125,7 +125,7 @@ namespace stonerkart
 
             var yscale = height/h;
             var scaledTextWidth = text.Sum(c => yscale*ff.widthOf(c));
-            int xpos = jstfy(width, scaledTextWidth);
+            int xpos = justifyX(width, scaledTextWidth);
             double ws = Math.Min((width - 1)/scaledTextWidth, 1);
 
             foreach (string c in text)
@@ -137,7 +137,7 @@ namespace stonerkart
             if (xpos >= width) throw new Exception();
             return new LaidText(xs, height);
         }
-        private int jstfy(int width, double tw)
+        private int justifyX(int width, double textwidth)
         {
             switch (justify)
             {
@@ -148,9 +148,9 @@ namespace stonerkart
 
                 case Justify.Middle:
                 {
-                    if (tw < width)
+                    if (textwidth < width)
                     {
-                        return (int)((width - tw) / 2);
+                        return (int)((width - textwidth) / 2);
                     }
                     else
                     {
@@ -158,7 +158,8 @@ namespace stonerkart
                     }
                 }
 
-                default: throw new Exception();
+                default:
+                    return 0;
             }
         }
     }
@@ -229,6 +230,7 @@ namespace stonerkart
         protected override LaidText layout(string[] text, int width, int height, FontFamille ff)
         {
             var words = wordify(text);
+            if (words.Length == 0) return new LaidText(new List<charLayout>(), 1);
 
             var sz = TextureLoader.sizeOf(ff.fontImage);
             double w = sz.Width;

@@ -30,6 +30,9 @@ namespace stonerkart
 
         public TurnIndicator turnIndicator { get; }
 
+        public ToggleButton passUntilEOT { get; }
+        public ToggleButton passUntilEOTOnEmptyStack { get; }
+
         private const int panelMargin = 30;
         private const int panelWidthPreMargin = 500;
 
@@ -58,10 +61,13 @@ namespace stonerkart
         private const int stackViewWidth = 200;
         private const int stackViewHeight = 400;
 
+        private const int passUntilEOTY = 380;
+        private const int passUntilHeight = 100;
+
         private const int turnIndicatorWidth = 175;
         private const int turnIndicatorHeight = 300;
         private const int turnIndicatorX = leftPanelX + leftPanelWidth + 30;
-        private const int turnIndicatorY = 200;
+        private const int turnIndicatorY = 100;
 
         private const int playerPanelPadding = 25;
         private const int playerPanelHeight = (rightPanelHeight - playerPanelPadding * 3) / 2;
@@ -138,6 +144,26 @@ namespace stonerkart
             stackWinduh = new AutoHidePileWinduh(stackView, "The Stack");
             addWinduh(stackWinduh);
             stackWinduh.Visible = false;
+
+            passUntilEOT = new ToggleButton(turnIndicatorWidth, passUntilHeight);
+            passUntilEOT.X = turnIndicatorX;
+            passUntilEOT.Y = passUntilEOTY;
+            addElement(passUntilEOT);
+            passUntilEOT.TextLayout = new MultiLineFitLayout();
+            passUntilEOT.Text = "Auto Pass Until End Of Turn";
+            passUntilEOT.Backcolor = Color.FloralWhite;
+            passUntilEOT.Border = new SolidBorder(2, Color.Black);
+            passUntilEOT.Toggled = false;
+
+            passUntilEOTOnEmptyStack = new ToggleButton(turnIndicatorWidth, passUntilHeight);
+            passUntilEOTOnEmptyStack.X = turnIndicatorX;
+            passUntilEOTOnEmptyStack.Y = passUntilEOTY + passUntilHeight;
+            addElement(passUntilEOTOnEmptyStack);
+            passUntilEOTOnEmptyStack.TextLayout = new MultiLineFitLayout();
+            passUntilEOTOnEmptyStack.Text = "Auto Pass Empty Stack Until End Of Turn";
+            passUntilEOTOnEmptyStack.Backcolor = Color.FloralWhite;
+            passUntilEOTOnEmptyStack.Border = new SolidBorder(2, Color.Black);
+            passUntilEOTOnEmptyStack.Toggled = false;
         }
 
         private void makePanel(out PileView pileview, out Winduh winduh)

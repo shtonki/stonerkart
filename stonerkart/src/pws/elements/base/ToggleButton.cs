@@ -35,6 +35,8 @@ namespace stonerkart
 
         private void setGreying()
         {
+            textColor = Toggled ? Color.Black : Color.Gray;
+
             if (Backimege == null) return;
             Backimege.Alpha = Toggled ? 255 : 150;
         }

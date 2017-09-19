@@ -27,6 +27,11 @@ namespace stonerkart
             breadbox.Hoverable = false;
             addChild(breadbox);
 
+            flavourbox = new Square();
+            flavourbox.Hoverable = false;
+            flavourbox.FontFamily = FontFamille.font2;
+            addChild(flavourbox);
+
             movementbox = new Square();
             movementbox.TextLayout = new SingleLineFitLayout();
             movementbox.Hoverable = false;
@@ -71,11 +76,15 @@ namespace stonerkart
         private const int nameboxOrigY = 17;
         private const int nameboxOrigH = 40;
 
+
+        private const int flavourandbreadH = 236;
         private Square breadbox;
         private const int breadboxOrigX = 44;
         private const int breadboxOrigY = 402;
         private const int breadboxOrigW = 408;
-        private const int breadboxOrigH = 236;
+        private Square flavourbox;
+        private const int flavourboxOrigX = 44;
+        private const int flavourboxOrigW = 408;
 
         private Square movementbox;
         private const int movementboxOrigX = 420;
@@ -123,6 +132,7 @@ namespace stonerkart
 
             namebox.Text = c.name;
             breadbox.Text = c.breadText;
+            flavourbox.Text = G.newlineGlyph + c.flavourText;
             ptbox.Text = c.power + "/" + c.toughness;
             artbox.Backimege = new Imege(TextureLoader.cardArt(c.template));
             raritybox.Backimege = new Imege(TextureLoader.setIcon(c.set), TextureLoader.rarityColor(c.rarity));
@@ -221,11 +231,25 @@ namespace stonerkart
                 (int)Math.Round((scale * nameboxOrigH))
                 );
 
+            double breadboxtextlength = 1 + breadbox.Text.Length;
+            double flavourtextlength = 1 + flavourbox.Text.Length;
+            double breadboxratio = breadboxtextlength/(breadboxtextlength + flavourtextlength);
+            int breadboxH = (int)Math.Round(breadboxratio*flavourandbreadH);
+            int flavourboxH = (int)Math.Round((1 - breadboxratio)*flavourandbreadH);
+
             breadbox.X = (int)Math.Round((scale * breadboxOrigX));
             breadbox.Y = (int)Math.Round((scale * breadboxOrigY));
             breadbox.setSize(
                 (int)Math.Round((scale * breadboxOrigW)),
-                (int)Math.Round((scale * breadboxOrigH)),
+                (int)Math.Round((scale * breadboxH)),
+                new MultiLineFitLayout(height / 17)
+                );
+
+            flavourbox.X = (int)Math.Round((scale * flavourboxOrigX));
+            flavourbox.Y = breadbox.Y + breadbox.Height;
+            flavourbox.setSize(
+                (int)Math.Round((scale * flavourboxOrigW)),
+                (int)Math.Round((scale * flavourboxH)),
                 new MultiLineFitLayout(height / 17)
                 );
 
