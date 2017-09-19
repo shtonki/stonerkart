@@ -21,21 +21,18 @@ namespace stonerkart
             }
         }
 
-        private Square greySquare;
 
 
         public ToggleButton(int width, int height) : base(width, height)
         {
             clicked += a => Toggled = !Toggled;
-            greySquare = new Square(width, height);
-            greySquare.Hoverable = false;
-            addChild(greySquare);
             Toggled = true;
         }
 
         private void setGreying()
         {
             textColor = Toggled ? Color.Black : Color.Gray;
+            TintColor = Toggled ? Color.Transparent : Color.FromArgb(100, 100, 100, 100);
 
             if (Backimege == null) return;
             Backimege.Alpha = Toggled ? 255 : 150;

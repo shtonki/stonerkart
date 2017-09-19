@@ -9,7 +9,9 @@ namespace stonerkart
 {
     class GameScreen : Screen
     {
-        public PromptPanel promptPanel { get; }
+        public int gameID { get; }
+
+        public GamePromptPanel gamePromptPanel { get; }
 
         public PileView handView { get; }
         public PileView stackView { get; }
@@ -80,8 +82,10 @@ namespace stonerkart
         private const int toggledviewWidth = 200;
         private const int toggledHeight = 600;
 
-        public GameScreen(Map map) : base(new Imege(Textures.table0))
+        public GameScreen(Map map, int gameID) : base(new Imege(Textures.table0))
         {
+            this.gameID = gameID;
+
             int hexColumns = map.width;
             int hexRows = map.height;
             int hexSize = (int)Math.Round((hexPanelHeight) / (hexRows + 0.5));
@@ -93,8 +97,8 @@ namespace stonerkart
             leftPanel.Border = new SolidBorder(2, Color.Black);
             leftPanel.setLocation(leftPanelX, leftPanelY);
 
-            promptPanel = new PromptPanel(leftPanelWidth, 500);
-            leftPanel.addChild(promptPanel);
+            gamePromptPanel = new GamePromptPanel(leftPanelWidth, 500);
+            leftPanel.addChild(gamePromptPanel);
 
 
             handView = new PileView();
@@ -211,6 +215,12 @@ namespace stonerkart
                 6);
             targetLines.Add(l);
             addElement(l);
+        }
+
+        protected override IEnumerable<MenuEntry> generateMenuEntries()
+        {
+            Console.WriteLine(gameID);
+            return new MenuEntry[] { new ConcedeEntry(gameID), };
         }
     }
 

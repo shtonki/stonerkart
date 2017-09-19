@@ -52,5 +52,10 @@ namespace stonerkart
             deckeditorbutton.Text = "Deck Editor";
             deckeditorbutton.clicked += a => GUI.transitionToScreen(GUI.deckeditorScreen);
         }
+
+        protected override IEnumerable<MenuEntry> generateMenuEntries()
+        {
+            return new MenuEntry[] { };
+        }
     }
 }

@@ -385,7 +385,7 @@ namespace stonerkart
                     new TypedGameEventFilter<StartOfStepEvent>(
                         a => a.step == Steps.Replenish && a.activePlayer == controller
                         ), e => fatigue = 0);
-            
+
             r.add(new TypedGameEventHandler<RaceModifyEvent>(e =>
             {
                 e.card.forceRace.modify(new ModifierStruct(setTo((int)e.race), e.filter));

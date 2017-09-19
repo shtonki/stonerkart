@@ -182,6 +182,11 @@ namespace stonerkart
             t.Start();
         }
 
+        public void concede(GameEndStateReason reason)
+        {
+            connection.surrender(reason);
+        }
+
         private void initGame()
         {
             Deck d = DeckController.chooseDeck();
@@ -569,6 +574,11 @@ namespace stonerkart
                 handlePendingTrigs();
                 trashcanDeadCreatures();
             } while (gameState.pendingTriggeredAbilities.Count > 0);
+
+            if (!gameState.hero.field.Any(c => c.isHeroic))
+            {
+                concede(GameEndStateReason.Flop);
+            }
         }
 
         private void handlePendingTrigs()
@@ -906,15 +916,9 @@ namespace stonerkart
             handleTransaction(gt);
         }
 
-        public void forfeit(GameEndStateReason r)
-        {
-            connection.surrender(r);
-        }
-
         public void endGame(GameEndStruct ras)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            ScreenController.transtitionToPostGameScreen(this, ras);*/
+            GUI.transitionToScreen(new PostGameScreen(this, ras));
         }
 
         private Card chooseCardUnsynced(Func<Card, bool> filter)
@@ -939,7 +943,7 @@ namespace stonerkart
                 return false;
             });
 
-            screen.promptPanel.sub(sax);
+            screen.gamePromptPanel.sub(sax);
             screen.handView.sub(sax);
             screen.stackView.sub(sax);
             screen.hexPanel.subTile(sax, gameState.map.tileAt);
@@ -966,15 +970,15 @@ namespace stonerkart
             Card rt;
             if (chooser.isHero)
             {
-                screen.promptPanel.prompt(chooserPrompt);
-                if (button.HasValue) screen.promptPanel.promptButtons(button.Value);
+                screen.gamePromptPanel.prompt(chooserPrompt);
+                if (button.HasValue) screen.gamePromptPanel.promptButtons(button.Value);
                 rt = chooseCardUnsynced(filter);
                 if (rt == null) connection.sendChoice(null);
                 else connection.sendChoice(gameState.ord(rt));
             }
             else
             {
-                screen.promptPanel.prompt(waiterPrompt);
+                screen.gamePromptPanel.prompt(waiterPrompt);
                 int? choice = connection.receiveChoice();
                 if (choice.HasValue) rt = gameState.cardFromOrd(choice.Value);
                 else rt = null;
@@ -987,14 +991,14 @@ namespace stonerkart
             ButtonOption rt;
             if (chooser.isHero)
             {
-                screen.promptPanel.prompt(chooserPrompt);
-                screen.promptPanel.promptButtons(options);
+                screen.gamePromptPanel.prompt(chooserPrompt);
+                screen.gamePromptPanel.promptButtons(options);
                 rt = chooseButtonUnsynced(options);
                 connection.sendChoice((int)rt);
             }
             else
             {
-                screen.promptPanel.prompt(waiterPrompt);
+                screen.gamePromptPanel.prompt(waiterPrompt);
                 var choice = connection.receiveChoice();
                 rt = (ButtonOption)choice;
             }
@@ -1005,7 +1009,7 @@ namespace stonerkart
         private ButtonOption chooseButtonUnsynced(params ButtonOption[] options)
         {
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption);
-            screen.promptPanel.sub(sax);
+            screen.gamePromptPanel.sub(sax);
             var v = (ButtonOption)sax.call();
             return v;
         }
@@ -1015,15 +1019,15 @@ namespace stonerkart
             Tile rt;
             if (chooser.isHero)
             {
-                screen.promptPanel.prompt(chooserPrompt);
-                if (button.HasValue) screen.promptPanel.promptButtons(button.Value);
+                screen.gamePromptPanel.prompt(chooserPrompt);
+                if (button.HasValue) screen.gamePromptPanel.promptButtons(button.Value);
                 rt = chooseTileUnsynced(filter);
                 if (rt == null) connection.sendChoice(null);
                 else connection.sendChoice(gameState.ord(rt));
             }
             else
             {
-                screen.promptPanel.prompt(waiterPrompt);
+                screen.gamePromptPanel.prompt(waiterPrompt);
                 var choice = connection.receiveChoice();
                 if (choice.HasValue) rt = gameState.tileFromOrd(choice.Value);
                 else rt = null;
@@ -1035,7 +1039,7 @@ namespace stonerkart
         {
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Tile && filter((Tile)o)));
             screen.hexPanel.subTile(sax, gameState.map.tileAt);
-            screen.promptPanel.sub(sax);
+            screen.gamePromptPanel.sub(sax);
             var v = sax.call();
 
             if (v is ButtonOption) return null;
@@ -1051,16 +1055,16 @@ namespace stonerkart
                 {
                     ManaColour.Chaos, ManaColour.Death, ManaColour.Life, ManaColour.Might, ManaColour.Nature, ManaColour.Order,
                 };
-                screen.promptPanel.prompt(chooserPrompt);
-                if (button.HasValue) screen.promptPanel.promptButtons(ButtonOption.NOTHING, ButtonOption.NOTHING, button.Value);
-                screen.promptPanel.promptManaChoice(!button.HasValue, cs.Where(filter).ToArray());
+                screen.gamePromptPanel.prompt(chooserPrompt);
+                if (button.HasValue) screen.gamePromptPanel.promptButtons(ButtonOption.NOTHING, ButtonOption.NOTHING, button.Value);
+                screen.gamePromptPanel.promptManaChoice(!button.HasValue, cs.Where(filter).ToArray());
                 clr = chooseManaColourUnsynced(filter);
                 if (!clr.HasValue) connection.sendChoice(null);
                 else connection.sendChoice((int)clr.Value);
             }
             else
             {
-                screen.promptPanel.prompt(waiterPrompt);
+                screen.gamePromptPanel.prompt(waiterPrompt);
                 var received = connection.receiveChoice();
                 if (received.HasValue) clr = (ManaColour)received;
                 else clr = null;
@@ -1071,7 +1075,7 @@ namespace stonerkart
         private ManaColour? chooseManaColourUnsynced(Func<ManaColour, bool> filter)
         {
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is ManaColour && filter((ManaColour)o)));
-            screen.promptPanel.sub(sax);
+            screen.gamePromptPanel.sub(sax);
             var v = sax.call();
             if (v is ButtonOption) return null;
             if (v is ManaColour) return (ManaColour)v;
@@ -1085,15 +1089,15 @@ namespace stonerkart
             Card rt;
             if (chooser.isHero)
             {
-                screen.promptPanel.prompt(chooserPrompt);
-                if (button.HasValue) screen.promptPanel.promptButtons(button.Value);
+                screen.gamePromptPanel.prompt(chooserPrompt);
+                if (button.HasValue) screen.gamePromptPanel.promptButtons(button.Value);
                 rt = chooseCardsFromCardsUnsynced(cardList, filter, title);
                 if (rt == null) connection.sendChoice(null);
                 else connection.sendChoice(cardList.IndexOf(rt));
             }
             else
             {
-                screen.promptPanel.prompt(waiterPrompt);
+                screen.gamePromptPanel.prompt(waiterPrompt);
                 var cs = connection.receiveChoice();
                 if (cs.HasValue)
                 {
@@ -1117,7 +1121,7 @@ namespace stonerkart
 
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Card) && filter((Card)o));
             pv.sub(sax);
-            screen.promptPanel.sub(sax);
+            screen.gamePromptPanel.sub(sax);
 
             var v = sax.call();
 

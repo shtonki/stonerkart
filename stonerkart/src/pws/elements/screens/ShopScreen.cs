@@ -38,8 +38,9 @@ namespace stonerkart
 
         public void ripPack(IEnumerable<CardTemplate> ripped)
         {
-            var ripper = new RipperOverlay(Frame.BACKSCREENWIDTH, Frame.AVAILABLEHEIGHT, ripped);
-            addElement(ripper);
+            var ripper = new RipperPanel(600, 600, ripped);
+            //addElement(ripper);
+            freeze(ripper);
         }
 
         public void populate(IEnumerable<Packs> ownedPacks)
@@ -56,60 +57,51 @@ namespace stonerkart
             }
 
         }
+
+        protected override IEnumerable<MenuEntry> generateMenuEntries()
+        {
+            return new MenuEntry[] {};
+        }
     }
 
-    class RipperOverlay : Square
+    class RipperPanel : Square
     {
-        private Square goodstuff;
-
         private PileView viewed;
         private CardList viewedlist = new CardList();
 
-        private const int goodstuffHeight = 600;
-        private const int goodstuffWidth = 600;
-        private int cardWidth = CardView.widthFromHeight(goodstuffHeight);
 
-
-        public RipperOverlay(int width, int height, IEnumerable<CardTemplate> ripped) : base(width, height)
+        public RipperPanel(int width, int height, IEnumerable<CardTemplate> ripped) : base(width, height)
         {
-            Backcolor = Color.FromArgb(150, 150, 150, 150);
+            int cardWidth = CardView.widthFromHeight(Height);
 
-            var xd = new Square(goodstuffWidth + 10, goodstuffHeight + 10);
-            addChild(xd);
-            xd.moveTo(MoveTo.Center, MoveTo.Center);
-            xd.Border = new AnimatedBorder(Textures.border0, 5);
-
-            goodstuff = new Square(goodstuffWidth, goodstuffHeight);
-            addChild(goodstuff);
-            goodstuff.moveTo(MoveTo.Center, MoveTo.Center);
-            goodstuff.Backimege = new MemeImege(Textures.buttonbg0, 4357987);
+            Backimege = new MemeImege(Textures.buttonbg0, 4357987);
 
             viewed = new PileView();
             viewedlist.addObserver(viewed);
-            goodstuff.addChild(viewed);
-            viewed.Width = goodstuffWidth - cardWidth;
-            viewed.Height = goodstuffHeight;
+            addChild(viewed);
+            viewed.Width = Width - cardWidth;
+            viewed.Height = Height;
             viewed.Columns = 1;
             viewed.maxPadding = 35;
             viewed.X = cardWidth;
 
             Button done = new Button(cardWidth, 100);
-            goodstuff.addChild(done);
+            addChild(done);
             done.Backimege = new MemeImege(Textures.buttonbg2, 53896735);
-            done.Y = goodstuffHeight / 3;
+            done.Y = Height / 3;
             done.Text = "Rip'd";
-            done.clicked += a => screen.removeElement(this);
+            done.clicked += a => Screen.unfreeze();
 
             foreach (var rip in ripped.Reverse())
             {
                 Card c = new Card(rip);
                 CardView cv = new CardView(c);
-                goodstuff.addChild(cv);
-                cv.Height = goodstuffHeight;
+                addChild(cv);
+                cv.Height = Height;
                 cv.clicked += a =>
                 {
                     viewedlist.addTop(c);
-                    goodstuff.removeChild(cv);
+                    removeChild(cv);
                 };
             }
 

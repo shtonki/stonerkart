@@ -13,6 +13,7 @@ namespace stonerkart
         public Button addFriendsButton { get; }
         private PlayerFlarePanel playerFlarePanel;
         private PricePanel shekelsCount { get; }
+        public Button menuButton { get; }
 
         #region layout
 
@@ -23,7 +24,9 @@ namespace stonerkart
         private const int addFriendsButtonX = 300;
 
         private const int shekelSquareWidth = 200;
-        private const int shekelSquareX = Frame.BACKSCREENWIDTH - shekelSquareWidth - 50;
+        private const int shekelSquareX = 420;
+
+        private const int menuButtonX = Frame.BACKSCREENWIDTH - 100;
 
         #endregion
 
@@ -31,6 +34,13 @@ namespace stonerkart
         {
             Backimege = new MemeImege(Textures.buttonbg2, 1);
             Y = Frame.BACKSCREENHEIGHT - Frame.MENUHEIGHT;
+
+            menuButton = new Button(90, Height);
+            addChild(menuButton);
+            menuButton.X = menuButtonX;
+            menuButton.Backcolor = Color.PapayaWhip;
+            menuButton.Border = new SolidBorder(2, Color.Black);
+            menuButton.Text = "Menu";
 
             shekelsCount = new PricePanel(shekelSquareWidth, Height - 10);
             addChild(shekelsCount);

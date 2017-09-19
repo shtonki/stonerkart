@@ -69,9 +69,9 @@ namespace stonerkart
             }
         }
 
-        public override void setSize(int width, int height, TextLayout layout = null)
+        public override void setSize(int newWidth, int newHeight, TextLayout layout = null)
         {
-            base.setSize(width, height, layout);
+            base.setSize(newWidth, newHeight, layout);
             layoutCards();
         }
 

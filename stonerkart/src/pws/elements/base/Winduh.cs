@@ -96,7 +96,7 @@ namespace stonerkart
             }
             else
             {
-                screen.removeElement(this);
+                Screen.removeElement(this);
             }
         }
     }

@@ -86,13 +86,13 @@ namespace stonerkart
 
         public static void setShekelBalance(int i)
         {
-            GUI.frame.menu.setShekelCount(i);
+            GUI.frame.menuBar.setShekelCount(i);
         }
 
         public static Game startGame(NewGameStruct ngs)
         {
             Map map = Map.DefaultMap;
-            GameScreen gsc = new GameScreen(map);
+            GameScreen gsc = new GameScreen(map, ngs.gameid);
             Game g = new Game(ngs, false, gsc, map);
             GUI.transitionToScreen(gsc);
             g.start();

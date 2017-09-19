@@ -27,26 +27,32 @@ namespace stonerkart
 
         #region FrameElements
         private List<GuiElement> frameElements;
-        public GameMenuBar menu { get; private set; }
+        public GameMenuBar menuBar { get; private set; }
         public FriendsPanel friendsPanel { get; private set; }
         public Winduh friendsWinduh { get; private set; }
         public PendingFriendsPanel addFriendsPanel { get; private set; }
         public Winduh addFriendsWinduh { get; private set; }
+        public MenuPanel menuPanel { get; private set; }
+        public FreezePanel menuFreezer { get; private set; }
 
         private void generateFrameElements()
         {
             frameElements = new List<GuiElement>();
 
-            menu = new GameMenuBar();
-            frameElements.Add(menu);
-            menu.Visible = false;
-            menu.showFriendsButton.clicked += a =>
+            menuBar = new GameMenuBar();
+            frameElements.Add(menuBar);
+            menuBar.Visible = false;
+            menuBar.showFriendsButton.clicked += a =>
             {
                 friendsWinduh.Visible = !friendsWinduh.Visible;
             };
-            menu.addFriendsButton.clicked += a =>
+            menuBar.addFriendsButton.clicked += a =>
             {
                 addFriendsWinduh.Visible = !addFriendsWinduh.Visible;
+            };
+            menuBar.menuButton.clicked += a =>
+            {
+                menuFreezer.Visible = !menuFreezer.Visible;
             };
 
             friendsPanel = new FriendsPanel(300, 500);
@@ -61,10 +67,18 @@ namespace stonerkart
             addFriendsWinduh.Backimege = new MemeImege(Textures.buttonbg2, 6845324);
             addFriendsWinduh.Visible = false;
             frameElements.Add(addFriendsWinduh);
+
+            menuPanel = new MenuPanel(200, 500);
+            menuFreezer = new FreezePanel(menuPanel);
+            frameElements.Add(menuFreezer);
+            menuFreezer.Visible = false;
         }
 
-        #endregion
+        public IEnumerable<MenuEntry> DefaultMenuEntries => defaultMenuEntries;
 
+        private MenuEntry[] defaultMenuEntries = new[] {new QuitEntry(),};
+
+        #endregion
 
         public Frame(int width, int height, ManualResetEventSlim ld = null, bool design = false) : base(width, height, new GraphicsMode(32,24,0,32), "StonerKart")
         {
@@ -94,8 +108,8 @@ namespace stonerkart
 
         public void loginAs(User user)
         {
-            menu.setFlare(user);
-            menu.Visible = true;
+            menuBar.setFlare(user);
+            menuBar.Visible = true;
             user.addObserver(friendsPanel);
         }
 
@@ -154,7 +168,7 @@ namespace stonerkart
 
                 if (activeScreen.background != null) dm.drawImege(activeScreen.background, 0, 0, BACKSCREENWIDTH, BACKSCREENHEIGHT);
 
-                lock (activeScreen.elements)
+                lock (activeScreen.Elements)
                 {
                     foreach (var elem in activeElements)
                     {
@@ -230,6 +244,9 @@ namespace stonerkart
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
         {
             base.OnKeyDown(e);
+
+            if (e.Key == Key.W) { Console.WriteLine("{0} at {1}:{2}", hovered?.GetType(), hovered?.X, hovered?.Y); }
+
             focused?.onKeyDown(e);
         }
 
@@ -299,6 +316,7 @@ namespace stonerkart
         public const int BACKSCREENHEIGHTd2 = BACKSCREENHEIGHT/2;
         public const int MENUHEIGHT = 50;
         public const int AVAILABLEHEIGHT = BACKSCREENHEIGHT - MENUHEIGHT;
+        public const int AVAILABLEWIDTH = BACKSCREENWIDTH;
 
         protected override void OnResize(EventArgs e)
         {
