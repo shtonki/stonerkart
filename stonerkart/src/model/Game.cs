@@ -1212,8 +1212,14 @@ namespace stonerkart
 
         public void nextStep()
         {
-            if (step == Steps.End) step = Steps.Replenish;
-            else step = (Steps)(((int)step)+1);
+            if (step == Steps.End)
+            {
+                step = Steps.Replenish;
+            }
+            else
+            {
+                step = (Steps)(((int)step) + 1);
+            }
             notify(step);
         }
     }

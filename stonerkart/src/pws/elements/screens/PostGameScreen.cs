@@ -25,8 +25,18 @@ namespace stonerkart
             bread.moveTo(MoveTo.Center, 200);
             bread.Backimege = new MemeImege(Textures.buttonbg2);
             bread.textColor = Color.MintCream;
-            bread.Text = String.Format("{0} won by {1}!", gameEndStruct.winningPlayer, gameEndStruct.reason);
             bread.TextPaddingTop = bread.TextPaddingLeft = 5;
+
+            StringBuilder breadwinner = new StringBuilder();
+
+            breadwinner.Append(String.Format("{0} won by {1}!", gameEndStruct.winningPlayer, gameEndStruct.reason));
+            breadwinner.Append(G.newlineGlyph);
+
+            breadwinner.Append("Total damage dealt: " + game.gameState.statistics.totalDamageDealt().ToString());
+            breadwinner.Append(G.newlineGlyph);
+
+            bread.Text = breadwinner.ToString();
+
         }
 
         protected override IEnumerable<MenuEntry> generateMenuEntries()

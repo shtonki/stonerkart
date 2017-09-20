@@ -34,6 +34,7 @@ namespace stonerkart
 
         public Random random;
 
+        public GameStatistics statistics { get; private set; }= new GameStatistics();
 
         private GameEventHandlerBuckets baseHandler = new GameEventHandlerBuckets();
 
@@ -155,6 +156,7 @@ namespace stonerkart
         public void handleTransaction(GameTransaction t)
         {
             var gameEvents = t.events;
+            foreach (var e in gameEvents) statistics.LogEvent(e);
 
             foreach (GameEvent e in gameEvents)
             {
@@ -189,5 +191,25 @@ namespace stonerkart
             pendingTriggeredAbilities.AddRange(tas.Select(ta => new TriggerGlueHack(ta, trigger)));
         }
 
+    }
+
+    interface GameLogger
+    {
+        void LogEvent(GameEvent e);
+    }
+
+    class GameStatistics : GameLogger
+    {
+        private List<GameEvent> events = new List<GameEvent>();
+
+        public void LogEvent(GameEvent e)
+        {
+            events.Add(e);
+        }
+
+        public int totalDamageDealt()
+        {
+            return events.Where(e => e is DamageEvent).Cast<DamageEvent>().Sum(e => e.amount);
+        }
     }
 }
