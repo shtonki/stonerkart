@@ -112,7 +112,14 @@ namespace stonerkart
             goodstuff = new UserPromptPanel(400, 200, 80, "Really concede?", new[] { ButtonOption.Yes, ButtonOption.No, });
             goodstuff.buttons[0].clicked += a => 
             {
-                Network.surrender(gameid, GameEndStateReason.Surrender);
+                if (gameid == -1)
+                {
+                    Network.handle(new Message("", Message.MessageType.ENDGAME, new EndGameMessageBody(-1, new GameEndStruct("villain", GameEndStateReason.Surrender))));
+                }
+                else
+                {
+                    Network.surrender(gameid, GameEndStateReason.Surrender);
+                }
                 doneWithMyBusiness?.Invoke();
             };
             goodstuff.buttons[1].clicked += a => doneWithMyBusiness?.Invoke();

@@ -17,7 +17,6 @@ namespace stonerkart
         private static ManualResetEvent messageReceived = new ManualResetEvent(false);
         private static Message receivedMessage;
 
-        private static List<Game> activeGames = new List<Game>();
 
         public static bool connectToServer()
         {
@@ -58,21 +57,19 @@ namespace stonerkart
                 {
                     NewGameBody b = new NewGameBody(m.body);
                     Game g = Controller.startGame(b.newGameStruct);
-                    activeGames.Add(g);
-                    
                 } break;
 
                 case Message.MessageType.GAMEMESSAGE:
                 {
                     GameMessageBody b = new GameMessageBody(m.body);
-                    var gm = activeGames.First(g => g.gameid == b.gameid);
+                    var gm = Controller.GetActiveGame(b.gameid);
                     gm.enqueueGameMessage(b.message);
                 } break;
 
                 case Message.MessageType.ENDGAME:
                 {
                     EndGameMessageBody b = new EndGameMessageBody(m.body);
-                    var gm = activeGames.First(g => g.gameid == b.gameid);
+                    var gm = Controller.GetActiveGame(b.gameid);
                     gm.endGame(b.ges);
                 } break;
 
