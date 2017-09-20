@@ -2718,7 +2718,44 @@ namespace stonerkart
                         ));
                     } break;
                 #endregion
+                #region AOE_EXHAUST
+                case CardTemplate.AOE_sEXHAUST:
+                    {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        baseRace = Race.Human;
+                        subtype = Subtype.Hunter;
+                        natureCost = 1;
 
+                        basePower = 0;
+                        baseToughness = 3;
+                        baseMovement = 0;
+
+                        etbLambda("Deal 2 damage to self.", new Effect(new TargetRuleSet(resolveCard, resolveCard), new PingDoer(2)), 0);
+
+                        addTriggeredAbility(
+                            "Exhaust: Heal AOE EXHAUST one hp at the end of your turn. "//{0} Whenever a creature enters the graveyard from the battlefield under your control, Sanguine Artisan deals 1 damage to target heroic creature.",
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                                player),
+                            new PingDoer(1),
+                            new Foo(),
+                            new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
+                                moveEvent.card.controller == controller &&
+                                moveEvent.to.location.pile == PileLocation.Graveyard &&
+                                moveEvent.card.location.pile == PileLocation.Field),
+                            -1,
+                            PileLocation.Field,
+                            false
+                            );
+                        addActivatedAbility(String.Format("{0}, Exhaust: Target non-Heroic creature becomes Undead and gets -1/-1. Count Fera II gets +1/+1.", G.colouredGlyph(ManaColour.Death)),
+                            new Effect[] { e1, e2, e3, e4 },
+                            new Foo(exhaustThis, manaCostEffect(ManaColour.Death)),//new Foo(new Effect(new TargetRuleSet(new ChooseRule<Card>(c => !c.isHeroic)), new MoveToPileDoer(PileLocation.Graveyard))),
+                            -1,
+                            PileLocation.Field,
+                            CastSpeed.Interrupt);
+                    }
+                    break;
+                #endregion
 
                 #region tokens
 
