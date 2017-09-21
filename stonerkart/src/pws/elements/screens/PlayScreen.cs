@@ -25,6 +25,8 @@ namespace stonerkart
             botgame.Text = "botgame";
             botgame.clicked += a =>
             {
+
+                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
                 Map map = Map.DefaultMap;
                 GameScreen gs = new GameScreen(map, -1);
                 Game g = new Game(
@@ -33,7 +35,7 @@ namespace stonerkart
                     gs, 
                     map);
                 GUI.transitionToScreen(gs);
-                g.start();
+                g.start();*/
             };
         }
 

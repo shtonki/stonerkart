@@ -10,6 +10,10 @@ namespace stonerkart
 {
     class ServerConnection : AsyncConnection
     {
+        private const string serverIp =
+            "127.0.0.1";
+            //"46.239.124.155";
+
         public ServerConnection() : base(generateSocket())
         {
         }
@@ -28,7 +32,7 @@ namespace stonerkart
         {
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            IAsyncResult result = socket.BeginConnect("46.239.124.155", 420, null, null);
+            IAsyncResult result = socket.BeginConnect(serverIp, 420, null, null);
 
             bool success = result.AsyncWaitHandle.WaitOne(2500, true);
 

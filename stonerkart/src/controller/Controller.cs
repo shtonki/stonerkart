@@ -32,8 +32,6 @@ namespace stonerkart
             activeGames.Add(g);
         }
 
-
-
         public static User user { get; private set; }
 
         public static void launchGame()
@@ -45,8 +43,19 @@ namespace stonerkart
 
         public static void attemptLogin(string username, string password)
         {
-            if (Network.login(username, password))
+            var lrm = Network.login(username, password);
+            if (lrm.Success)
             {
+                var myUser = lrm.loggedInUserFullJist.ToUser();
+
+                user = myUser;
+                GUI.frame.loginAs(user);
+                GUI.transitionToScreen(GUI.mainMenuScreen);
+
+                return;
+
+                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+                /*
                 user = Network.queryMyUser();
                 GUI.frame.loginAs(user);
 
@@ -65,7 +74,7 @@ namespace stonerkart
                 var ownedPacks = Network.queryOwnedPacks();
                 GUI.shopScreen.populate(ownedPacks);
 
-                GUI.transitionToScreen(GUI.mainMenuScreen);
+                */
             }
             else
             {
@@ -90,7 +99,7 @@ namespace stonerkart
             }
         }
 
-        public static bool makePurchase(ProductUnion product)
+        public static bool makePurchase(Product product)
         {
             int newbalance = Network.makePurchase(product);
             if (newbalance == -1) return false; //purchase failed
@@ -103,11 +112,10 @@ namespace stonerkart
             GUI.frame.menuBar.setShekelCount(i);
         }
 
-        public static Game startGame(NewGameStruct ngs)
+        public static Game startGame(GameSetupInfo gsi)
         {
-            Map map = Map.DefaultMap;
-            GameScreen gsc = new GameScreen(map, ngs.gameid);
-            Game g = new Game(ngs, false, gsc, map);
+            Game g = new Game(gsi);
+            GameScreen gsc = new GameScreen(gsi);
             GUI.transitionToScreen(gsc);
             addActiveGame(g);
             g.start();

@@ -24,25 +24,29 @@ namespace stonerkart
 
         private const string waiterPrompt = "Waiting for opponent.";
 
-        public Game(NewGameStruct ngs, bool local, GameScreen gameScreen, Map map)
+        public Game(GameSetupInfo gsi)
         {
-            screen = gameScreen;
-
-            gameid = ngs.gameid;
+            gameid = gsi.gameid;
             
             gameController = new GameController(null, null);
 
-            gameState = new GameState(ngs, map);
+            gameState = new GameState(gsi);
 
-            if (local)
+            if (gsi.local)
             {
                 connection = new DummyConnection();
             }
             else
             {
-                connection = new MultiplayerConnection(this, ngs);
+                connection = new MultiplayerConnection(this);
             }
 
+            observe();
+        }
+
+        public void coupleToScreen(GameScreen gsc)
+        {
+            screen = gsc;
             observe();
         }
 
@@ -916,11 +920,6 @@ namespace stonerkart
             handleTransaction(gt);
         }
 
-        public void endGame(GameEndStruct ras)
-        {
-            GUI.transitionToScreen(new PostGameScreen(this, ras));
-        }
-
         private Card chooseCardUnsynced(Func<Card, bool> filter)
         {
             PublicSaxophone sax = new PublicSaxophone(o =>
@@ -1186,6 +1185,17 @@ namespace stonerkart
         }
     }
 
+    public class GameSetupInfo
+    {
+        public int gameid { get; }
+        public int randSeed { get; }
+        public bool local { get; }
+
+        public MapConfiguration mapConfiguration { get; }
+
+        public string[] playerNames { get; }
+        public int heroIndex { get;  }
+    }
 
     class StackWrapper
     {

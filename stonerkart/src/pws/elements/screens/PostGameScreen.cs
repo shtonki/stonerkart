@@ -9,7 +9,7 @@ namespace stonerkart
 {
     class PostGameScreen : Screen
     {
-        public PostGameScreen(Game game, GameEndStruct gameEndStruct) : base(new Imege(Textures.background3))
+        public PostGameScreen(Game game) : base(new Imege(Textures.background3))
         {
             Button exit = new Button(150, 100);
             exit.Backcolor = Color.FloralWhite;
@@ -29,8 +29,8 @@ namespace stonerkart
 
             StringBuilder breadwinner = new StringBuilder();
 
-            breadwinner.Append(String.Format("{0} won by {1}!", gameEndStruct.winningPlayer, gameEndStruct.reason));
-            breadwinner.Append(G.newlineGlyph);
+            //breadwinner.Append(String.Format("{0} won by {1}!", gameEndStruct.winningPlayer, gameEndStruct.reason));
+            //breadwinner.Append(G.newlineGlyph);
 
             breadwinner.Append("Total damage dealt: " + game.gameState.statistics.totalDamageDealt().ToString());
             breadwinner.Append(G.newlineGlyph);

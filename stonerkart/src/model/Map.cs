@@ -8,7 +8,6 @@ namespace stonerkart
 {
     internal class Map
     {
-
         public readonly int width;
         public readonly int height;
         public int size => tiles.Length;
@@ -18,7 +17,14 @@ namespace stonerkart
         private Tile[] tiles;
         private Tile[][] cols;
 
-        public static Map DefaultMap => new Map(9, 7);
+        public static Map MapFromConfiguration(MapConfiguration mc)
+        {
+            switch (mc)
+            {
+                case MapConfiguration.Default: return new Map(9, 7);
+                default: throw new Exception();
+            }
+        }
 
         public Map(int width, int height)
         {
@@ -38,7 +44,6 @@ namespace stonerkart
                 cols[x] = col;
             }
         }
-
 
         public Tile tileAt(int x, int y)
         {
@@ -122,6 +127,11 @@ namespace stonerkart
         {
             return Array.IndexOf(tiles, t);
         }
+    }
+
+    public enum MapConfiguration
+    {
+        Default,
     }
 
     class Path

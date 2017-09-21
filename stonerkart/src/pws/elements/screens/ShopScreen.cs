@@ -51,7 +51,7 @@ namespace stonerkart
             {
                 if (i >= displayedPacks.Length) break;
                 Packs pack = displayedPacks[i];
-                var pp = new PackProductPanel(packWidth, packSquareHeight, new ProductUnion(displayedPacks[i]), ownedPacks.Count(p => p == pack));
+                var pp = new PackPanel(packWidth, packSquareHeight, new Pack(displayedPacks[i]), ownedPacks.Count(p => p == pack));
                 packsSquare.addChild(pp);
                 pp.X = packPadding + i*(packWidth + packPadding);
             }
@@ -108,7 +108,7 @@ namespace stonerkart
         }
     }
 
-    class PackProductPanel : Square
+    class PackPanel : Square
     {
         private Square productImege { get; }
         private PricePanel pricePanel { get; }
@@ -118,9 +118,8 @@ namespace stonerkart
 
         private int ownedCount;
 
-        public PackProductPanel(int width, int height, ProductUnion product, int initialCount) : base(width, height)
+        public PackPanel(int width, int height, Pack product, int initialCount) : base(width, height)
         {
-            if (!product.isPack) throw new Exception();
             ownedCount = initialCount;
             //Backimege = new MemeImege(Textures.buttonbg0, 23579485);
 
@@ -133,7 +132,7 @@ namespace stonerkart
 
             pricePanel = new PricePanel(priceWidth, priceHeight);
             addChild(pricePanel);
-            pricePanel.setPrice(product.price);
+            pricePanel.setPrice(product.Price);
             pricePanel.Backcolor = backer;
 
             buyButton = new Button(width - priceWidth, priceHeight);
@@ -154,7 +153,7 @@ namespace stonerkart
             productImege = new Square(width, height - priceHeight*2 - paddings*2);
             addChild(productImege);
             productImege.Y = pricePanel.Height + paddings;
-            productImege.Backimege = new Imege(TextureLoader.packDisplayImage(product.Pack));
+            productImege.Backimege = new Imege(TextureLoader.packDisplayImage(product.pack));
 
             ownedCounter = new Square(width - priceWidth, priceHeight);
             addChild(ownedCounter);
@@ -169,7 +168,7 @@ namespace stonerkart
             ripem.Text = "Rip One";
             ripem.clicked += a =>
             {
-                if (Controller.ripPack(product.Pack))
+                if (Controller.ripPack(product.pack))
                 {
                     ownedCount--;
                     ownedCounter.Text = ownedCount.ToString();

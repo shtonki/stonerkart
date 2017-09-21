@@ -14,6 +14,7 @@ namespace stonerkart
         private static ServerConnection serverConnection;
         private const string servername = "_server";
 
+        //todo change this
         private static ManualResetEvent messageReceived = new ManualResetEvent(false);
         private static Message receivedMessage;
 
@@ -36,15 +37,16 @@ namespace stonerkart
 
         public static void handle(Message m)
         {
-            switch (m.messageType)
+            if (m.demandsResponse)
             {
-                case Message.MessageType.QUERYRESPONSE:
-                case Message.MessageType.RESPONSE:
-                {
-                    receivedMessage = m;
-                    messageReceived.Set();
-                } break;
+                receivedMessage = m;
+                messageReceived.Set();
+                return;
+            }
 
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+
+            /*
                 case Message.MessageType.CHALLENGE:
                 {
                     ChallengeBody cb = new ChallengeBody(m.body);
@@ -96,13 +98,22 @@ namespace stonerkart
 
                 default:
                     throw new Exception(m.messageType.ToString());
-            }
+            } */
+        }
+
+        public static UserQueryResponseMessage userQuery(string username)
+        {
+
+            UserQueryMessage qm = new UserQueryMessage();
+            qm.username = username;
+            return (UserQueryResponseMessage)askServer(qm);
         }
 
         public static void sendGameMessage(int gameid, string message)
         {
-            GameMessageBody b = new GameMessageBody(gameid, message);
-            Message m = new Message(servername, Message.MessageType.GAMEMESSAGE, b);
+            GameMessage m = new GameMessage();
+            m.gameid = gameid;
+            m.message = message;
             serverConnection.send(m);
         }
 
@@ -115,15 +126,19 @@ namespace stonerkart
             return r;
         }
 
-        private static ResponseBody askServer(Message.MessageType messageType, MessageBody body)
+        static Random msgresponseidgenerator = new Random();
+
+        private static Message askServer(Message msg)
         {
-            tellServer(messageType, body);
-            Message message = awaitResponseMessage();
-            if (message.messageType != Message.MessageType.RESPONSE) throw new Exception();
-            ResponseBody rb = new ResponseBody(message.body);
-            return rb;
+            var rid = msgresponseidgenerator.Next();
+            msg.responseID = rid;
+            tellServer(msg);
+            Message response = awaitResponseMessage();
+            if (response.responseID != rid) throw new Exception();
+            return response;
         }
 
+        /*
         private static QueryResponseBody queryServer(Queries query)
         {
             tellServer(Message.MessageType.QUERY, new QueryBody(query));
@@ -132,60 +147,47 @@ namespace stonerkart
             QueryResponseBody rb = new QueryResponseBody(message.body);
             return rb;
         }
-
-        private static bool tellServer(Message.MessageType messageType, MessageBody body)
+        */
+        private static bool tellServer(Message msg)
         {
-            serverConnection.send(new Message(servername, messageType, body));
+            serverConnection.send(msg);
             return true;
         } 
 
-        public static bool login(string username, string password)
-        {
-            ResponseBody rb = askServer(
-                Message.MessageType.LOGIN,
-                new LoginBody(username, password));
+        public static LoginResponseMessage login(string username, string password)
+        { 
+            var loginMessage = new LoginMessage();
+            loginMessage.username = username;
+            loginMessage.password = password;
 
-            if (rb.code == ResponseBody.ResponseCode.OK)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public static bool register(string username, string password)
-        {
-            LoginBody b = new LoginBody(username, password);
-            tellServer(Message.MessageType.REGISTER, b);
-            return false;
+            return (LoginResponseMessage)askServer(loginMessage);
         }
 
         public static bool sendFriendRequest(string username)
         {
-            AddFriendBody b = new AddFriendBody(username);
-            ResponseBody rb = askServer(Message.MessageType.FRIENDREQUEST, b);
-            return rb.code == ResponseBody.ResponseCode.OK;
+            var addFriendMessage = new FriendRequestMessage();
+            addFriendMessage.username = username;
+            var response = (ResponseMessage)askServer(addFriendMessage);
+            return response.code == ResponseMessage.Code.OK;
         }
 
-        public static void respondToFriendRequest(string username, bool accept)
+        public static void respondToFriendRequest(string requester, bool accept)
         {
-            AddFriendBody b = new AddFriendBody(username);
-            Message.MessageType mt = accept ? Message.MessageType.ACCEPTFRIEND : Message.MessageType.DECLINEFRIEND;
-            tellServer(mt, b);
+            var respondToFriendRequestMessage = new RespondToFriendRequestMessage();
+            respondToFriendRequestMessage.requester = requester;
+            respondToFriendRequestMessage.accept = accept;
+            tellServer(respondToFriendRequestMessage);
         }
 
-        public static bool challenge(string username)
+        public static bool challenge(string challengee)
         {
-            ChallengeBody b = new ChallengeBody(username);
-            serverConnection.send(new Message(servername, Message.MessageType.CHALLENGE, b));
-            Message m = awaitResponseMessage();
-            ResponseBody rb = new ResponseBody(m.body);
-            return rb.code == ResponseBody.ResponseCode.OK;
+            ChallengeMessage b = new ChallengeMessage();
+            b.challengee = challengee;
+            ResponseMessage rm = (ResponseMessage)askServer(b);
+            return rm.code == ResponseMessage.Code.OK;
         }
 
-        public static User queryMyUser()
+        /*public static User queryMyUser()
         {
             var rb = queryServer(Queries.MYCOSMETICS);
             if (rb.values.Length != 1) throw new Exception();
@@ -222,9 +224,12 @@ namespace stonerkart
             var rv = queryServer(Queries.OWNEDPACKS);
             return rv.values.Select(i => (Packs)Int32.Parse(i)).ToArray();
         }
-
-        public static int makePurchase(ProductUnion product)
+        */
+        public static int makePurchase(Product product)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            /*
             ProductBody pb = new ProductBody(product);
             var response = askServer(Message.MessageType.MAKEPURCHASE, pb);
             if (response.code == ResponseBody.ResponseCode.OK)
@@ -235,11 +240,14 @@ namespace stonerkart
             {
                 Console.WriteLine(response.text);
                 return -1;
-            }
+            } */
         }
 
         public static IEnumerable<CardTemplate> ripPack(Packs pack)
         {
+
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            /*
             var v = askServer(Message.MessageType.RIPPACK, new ProductBody(new ProductUnion(pack)));
             if (v.code == ResponseBody.ResponseCode.FAILEDGENERIC) return null;
             else
@@ -248,28 +256,19 @@ namespace stonerkart
                 var ss = body.Split(':');
                 return ss.Select(s => (CardTemplate)Int32.Parse(s));
             }
+            */
         }
 
-        public static bool matchmake()
-        {
-            MatchmakemeBody mmb = new MatchmakemeBody();
-            serverConnection.send(new Message(servername, Message.MessageType.MATCHMAKEME, mmb));
-            return true;
-        }
 
         public static void surrender(int gameid, GameEndStateReason reason)
         {
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            /*
             SurrenderMessageBody egmb = new SurrenderMessageBody(gameid, reason);
             serverConnection.send(new Message(servername, Message.MessageType.SURRENDER, egmb));
-        }
-
-        public static bool submitBug(string s)
-        {
-            BugReportBody b = new BugReportBody(s);
-            serverConnection.send(new Message(servername, Message.MessageType.BUGREPORT, b));
-            Message m = awaitResponseMessage();
-            ResponseBody rb = new ResponseBody(m.body);
-            return rb.code == ResponseBody.ResponseCode.OK;
+            */
         }
     }
+    public enum GameEndStateReason { Flop, Surrender, }
+
 }

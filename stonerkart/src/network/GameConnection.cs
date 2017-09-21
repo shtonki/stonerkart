@@ -10,7 +10,7 @@ namespace stonerkart
     {
         private Game game;
 
-        public MultiplayerConnection(Game g, NewGameStruct ngs)
+        public MultiplayerConnection(Game g)
         {
             game = g;
         }

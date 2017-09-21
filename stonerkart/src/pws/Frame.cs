@@ -109,6 +109,7 @@ namespace stonerkart
         public void loginAs(User user)
         {
             menuBar.setFlare(user);
+            menuBar.setShekelCount(user.Shekels);
             menuBar.Visible = true;
             user.addObserver(friendsPanel);
         }
