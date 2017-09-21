@@ -43,15 +43,17 @@ namespace stonerkart
             freeze(ripper);
         }
 
-        public void populate(IEnumerable<Packs> ownedPacks)
+        public void populatex(IEnumerable<Product> ownedProducts)
         {
+            var ownedPacks = ownedProducts.Where(p => p is Pack).Cast<Pack>().ToArray();
+
             packsSquare.clearChildren();
 
             for (int i = 0; i < packSquareWidth/(packWidth); i++)
             {
                 if (i >= displayedPacks.Length) break;
                 Packs pack = displayedPacks[i];
-                var pp = new PackPanel(packWidth, packSquareHeight, new Pack(displayedPacks[i]), ownedPacks.Count(p => p == pack));
+                var pp = new PackPanel(packWidth, packSquareHeight, new Pack(displayedPacks[i]), ownedPacks.Count(p => p.pack == pack));
                 packsSquare.addChild(pp);
                 pp.X = packPadding + i*(packWidth + packPadding);
             }
@@ -111,7 +113,7 @@ namespace stonerkart
     class PackPanel : Square
     {
         private Square productImege { get; }
-        private PricePanel pricePanel { get; }
+        private ShekelPanel pricePanel { get; }
         private Button buyButton { get; }
         private Square ownedCounter { get; }
         private Button ripem { get; }
@@ -130,7 +132,7 @@ namespace stonerkart
             int priceHeight = (int)Math.Round(height/10.0);
             int priceWidth = (int)Math.Round(width/1.5);
 
-            pricePanel = new PricePanel(priceWidth, priceHeight);
+            pricePanel = new ShekelPanel(priceWidth, priceHeight);
             addChild(pricePanel);
             pricePanel.setPrice(product.Price);
             pricePanel.Backcolor = backer;

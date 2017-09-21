@@ -134,6 +134,11 @@ namespace stonerkart
         public int Shekels
         {
             get { return shekels; }
+            set
+            {
+                shekels = value;
+                notify(new UserChanged(this));
+            }
         }
 
         public List<CardTemplate> CardCollection

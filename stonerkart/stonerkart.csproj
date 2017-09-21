@@ -113,7 +113,7 @@
     <Compile Include="src\pws\elements\PileView.cs" />
     <Compile Include="src\pws\elements\PlayerFlarePanel.cs" />
     <Compile Include="src\pws\elements\PlayerPanel.cs" />
-    <Compile Include="src\pws\elements\PricePanel.cs" />
+    <Compile Include="src\pws\elements\ShekelPanel.cs" />
     <Compile Include="src\pws\elements\UserPromptPanel.cs" />
     <Compile Include="src\pws\elements\GamePromptPanel.cs" />
     <Compile Include="src\pws\elements\screens\DeckEditorScreen.cs" />

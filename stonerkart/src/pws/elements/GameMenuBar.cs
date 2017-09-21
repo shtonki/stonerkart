@@ -11,8 +11,8 @@ namespace stonerkart
     {
         public Button showFriendsButton { get; }
         public Button addFriendsButton { get; }
-        private PlayerFlarePanel playerFlarePanel;
-        private PricePanel shekelsCount { get; }
+        public PlayerFlarePanel playerFlarePanel { get; }
+        public PlayerShekelPanel shekelsCount { get; }
         public Button menuButton { get; }
 
         #region layout
@@ -42,7 +42,7 @@ namespace stonerkart
             menuButton.Border = new SolidBorder(2, Color.Black);
             menuButton.Text = "Menu";
 
-            shekelsCount = new PricePanel(shekelSquareWidth, Height - 10);
+            shekelsCount = new PlayerShekelPanel(shekelSquareWidth, Height - 10);
             addChild(shekelsCount);
             shekelsCount.Y = 5;
             shekelsCount.X = shekelSquareX;
@@ -58,19 +58,17 @@ namespace stonerkart
             addFriendsButton.X = addFriendsButtonX;
             addChild(addFriendsButton);
         }
+    }
 
-        public void setFlare(User user)
+    class PlayerShekelPanel : ShekelPanel, Observer<UserChanged>
+    {
+        public PlayerShekelPanel(int width, int height) : base(width, height)
         {
-            if (playerFlarePanel != null) throw new Exception();
-            playerFlarePanel = new PlayerFlarePanel(user, playerFlareWidth, Height);
-            playerFlarePanel.Backcolor = Color.Silver;
-            addChild(playerFlarePanel);
-            playerFlarePanel.X = playerFlareX;
         }
 
-        public void setShekelCount(int shekels)
+        public void notify(object o, UserChanged t)
         {
-            shekelsCount.setPrice(shekels);
+            setPrice(t.user.Shekels);
         }
     }
 }

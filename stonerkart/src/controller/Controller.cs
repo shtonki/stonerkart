@@ -48,8 +48,9 @@ namespace stonerkart
             {
                 var myUser = lrm.loggedInUserFullJist.ToUser();
 
+                if (user != null) throw new Exception();
                 user = myUser;
-                GUI.frame.loginAs(user);
+                GUI.frame.SetUser(user);
                 GUI.transitionToScreen(GUI.mainMenuScreen);
 
                 return;
@@ -103,14 +104,10 @@ namespace stonerkart
         {
             int newbalance = Network.makePurchase(product);
             if (newbalance == -1) return false; //purchase failed
-            setShekelBalance(newbalance);
+            user.Shekels = newbalance;
             return true;
         }
 
-        public static void setShekelBalance(int i)
-        {
-            GUI.frame.menuBar.setShekelCount(i);
-        }
 
         public static Game startGame(GameSetupInfo gsi)
         {

@@ -7,15 +7,18 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class PlayerFlarePanel : Square
+    class PlayerFlarePanel : Square, Observer<UserChanged>
     {
         private Square flare; //rhyme = accidental
         private Square name;
 
-
-        public PlayerFlarePanel(User user, int width, int height) : base(width, height)
+        public PlayerFlarePanel(int width, int height) : base(width, height)
         {
-            if (width < height) throw new Exception();
+        }
+
+        private void updatestuff(User user)
+        {
+            if (Width < Height) throw new Exception();
             var icon = user.Icon;
             var playername = user.Name;
 
@@ -26,11 +29,16 @@ namespace stonerkart
             flare.Backimege = new Imege(TextureLoader.cardArt(icon));
             flare.Border = new AnimatedBorder(Textures.border0, 4);
 
-            int namepadding = height/5;
+            int namepadding = height / 5;
             name = new Square(width - height - namepadding, height);
             addChild(name);
             name.Text = playername;
             name.X = flare.Width + namepadding;
+        }
+
+        public void notify(object o, UserChanged t)
+        {
+            updatestuff(t.user);
         }
     }
 }

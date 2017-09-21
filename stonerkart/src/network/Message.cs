@@ -57,6 +57,7 @@ namespace stonerkart
 
         public static ResponseMessage OK => new ResponseMessage(Code.OK, "");
         public static ResponseMessage Failed(string message) { return new ResponseMessage(Code.FAILED, message); }
+        public static ResponseMessage OKWithMessage(string message) { return new ResponseMessage(Code.OK, message); }
     }
 
     public class UserQueryMessage : Message
@@ -129,5 +130,11 @@ namespace stonerkart
     public class PurchaseMessage : Message
     {
         public Product product { get; set; }
+    }
+    [Serializable]
+    public class PurchaseResponseMessage : Message
+    {
+        public bool Success => newBalance >= 0;
+        public int newBalance { get; set; }
     }
 }

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class PricePanel : Square
+    class ShekelPanel : Square
     {
         private Square shekelsCount { get; }
 
-        public PricePanel(int width, int height) : base(width, height)
+        public ShekelPanel(int width, int height) : base(width, height)
         {
             var shekelIcon = new Square(height, height);
             addChild(shekelIcon);

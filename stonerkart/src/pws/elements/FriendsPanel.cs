@@ -20,17 +20,19 @@ namespace stonerkart
 
         public void notify(object o, UserChanged t)
         {
+            //todo 210917 this leaves dead observers in friends
             var newfriends = t.user.Friends;
             clearChildren();
             friends.Clear();
             addFriends(newfriends);
         }
 
-        public void addFriends(IEnumerable<User> newFriends)
+        private void addFriends(IEnumerable<User> newFriends)
         {
             foreach (var friend in newFriends)
             {
                 FriendBar fb = new FriendBar(Width, friendBarHeight, friend);
+                friend.addObserver(fb);
                 friends.Add(fb);
                 addChild(fb);
             }
@@ -80,7 +82,8 @@ namespace stonerkart
             challenge.Visible = friend.Status != UserStatus.Offline;
             challenge.clicked += a => Controller.challengePlayer(friend.Name);
 
-            playerflare = new PlayerFlarePanel(friend, width - height, height);
+            playerflare = new PlayerFlarePanel(width - height, height);
+            friend.addObserver(playerflare);
             addChild(playerflare);
         }
 

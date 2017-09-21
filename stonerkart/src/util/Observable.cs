@@ -25,6 +25,8 @@ namespace stonerkart
                 if (w != null && w == o) return;
             }
             observers.Add(new WeakReference<Observer<T>>(o));
+
+            o.notify(this, default(T));
         }
 
         public void removeObserver(Observer<T> o)

@@ -106,12 +106,19 @@ namespace stonerkart
             activeScreen = screen;
         }
 
-        public void loginAs(User user)
+        public void SetUser(User user)
         {
-            menuBar.setFlare(user);
-            menuBar.setShekelCount(user.Shekels);
-            menuBar.Visible = true;
+            //todo 210917 make all this observe
+
+            //GUI.shopScreen.populate(user.ProductCollection.Where(p => p is Pack).Cast<Pack>());
+
+            user.addObserver(menuBar.playerFlarePanel);
+            user.addObserver(menuBar.shekelsCount);
             user.addObserver(friendsPanel);
+
+            //menuBar.setFlare(user);
+            //menuBar.setShekelCount(user.Shekels);
+            menuBar.Visible = true;
         }
 
         protected override void OnLoad(EventArgs e)

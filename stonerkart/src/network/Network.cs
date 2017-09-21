@@ -227,20 +227,11 @@ namespace stonerkart
         */
         public static int makePurchase(Product product)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-            /*
-            ProductBody pb = new ProductBody(product);
-            var response = askServer(Message.MessageType.MAKEPURCHASE, pb);
-            if (response.code == ResponseBody.ResponseCode.OK)
-            {
-                return Int32.Parse(response.text);
-            }
-            else
-            {
-                Console.WriteLine(response.text);
-                return -1;
-            } */
+            PurchaseMessage pm = new PurchaseMessage();
+            pm.product = product;
+            var sr = askServer(pm);
+            var response = (PurchaseResponseMessage)sr;
+            return response.newBalance;
         }
 
         public static IEnumerable<CardTemplate> ripPack(Packs pack)
