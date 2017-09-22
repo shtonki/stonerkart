@@ -2718,9 +2718,45 @@ namespace stonerkart
                         ));
                     } break;
                 #endregion
+                #region Charging Bull
+                case CardTemplate.Charging_sBull:
+                    {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        baseRace = Race.Beast;
+
+                        natureCost = 2;
+                        basePower = 4;
+                        baseToughness = 3;
+                        baseMovement = 0;
+
+                        keywordAbilities.Add(KeywordAbility.Fervor);
+
+                        addTriggeredAbility(
+                        "Whenever Charging Bull takes damage set Charging Bull's movement to 0.",
+                        new TargetRuleSet(resolveCard), 
+                        new ModifyDoer(f => 0, never, ModifiableStats.Movement),
+                        new Foo(),
+                        new TypedGameEventFilter<DamageEvent>(e => e.source != this && e.target == this),
+                        0,
+                        PileLocation.Field,
+                        false
+                        );
+
+                        addActivatedAbility(
+                            "Exhaust: set base movement to 5.",
+                            new Effect(resolveCard, new ModifyDoer(f => 5, never, ModifiableStats.Movement)),
+                            new Foo(exhaustThis),
+                            0,
+                            PileLocation.Field,
+                            CastSpeed.Channel);          
+                    }
+                    break;
+                #endregion
                 #region AOE_EXHAUST
                 case CardTemplate.AOE_sEXHAUST:
                     {
+                        /*
                         cardType = CardType.Creature;
                         rarity = Rarity.Uncommon;
                         baseRace = Race.Human;
@@ -2752,7 +2788,7 @@ namespace stonerkart
                             new Foo(exhaustThis, manaCostEffect(ManaColour.Death)),//new Foo(new Effect(new TargetRuleSet(new ChooseRule<Card>(c => !c.isHeroic)), new MoveToPileDoer(PileLocation.Graveyard))),
                             -1,
                             PileLocation.Field,
-                            CastSpeed.Interrupt);
+                            CastSpeed.Interrupt);*/
                     }
                     break;
                 #endregion

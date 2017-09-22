@@ -441,6 +441,7 @@ namespace stonerkart
                         tile => options.Select(p => p.to).Contains(tile),
                         "Choose where to move.", 
                         ButtonOption.Cancel);
+                    highlight(options.Select(p => p.to), Color.Green);
                     clearHighlights();
                     if (to == null) continue;
                     if (to == from) break;
