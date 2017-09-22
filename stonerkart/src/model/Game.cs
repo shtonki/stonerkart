@@ -10,8 +10,6 @@ namespace stonerkart
 {
     class Game
     {
-        public GameController gameController;
-
         public int gameid { get; }
         
         private GameConnection connection;

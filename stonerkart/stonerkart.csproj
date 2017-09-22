@@ -88,7 +88,6 @@
     <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />
     <Compile Include="src\controller\DeckController.cs" />
-    <Compile Include="src\controller\GameController.cs" />
     <Compile Include="src\controller\ScreenController.cs" />
     <Compile Include="src\pws\Designer.cs">
       <SubType>Form</SubType>

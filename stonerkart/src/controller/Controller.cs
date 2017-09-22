@@ -20,6 +20,8 @@ namespace stonerkart
         public static IEnumerable<Packs> OwnedPacks => ownedPacks;
         public static IEnumerable<CardTemplate> OwnedCards => ownedCards;
 
+        public static List<Game> ActiveGames { get; } = new List<Game>();
+
         public static User user { get; private set; }
 
         public static void launchGame()
@@ -103,7 +105,7 @@ namespace stonerkart
             GameScreen gsc = new GameScreen(gsi);
             GUI.transitionToScreen(gsc);
             g.coupleToScreen(gsc);
-            Controller.user.AddGame(g);
+            ActiveGames.Add(g);
             g.start();
             return g;
         }

@@ -82,11 +82,9 @@ namespace stonerkart
         private List<Product> productCollection;
 
         private List<ChallengeMessage> pendingChallenges;
-        private List<Game> activeGames;
 
         public IEnumerable<User> Friends => friends;
         public IEnumerable<ChallengeMessage> PendingChallenges => pendingChallenges;
-        IEnumerable<Game> ActiveGames => activeGames;
 
         public User(string name, CardTemplate icon, Title title, UserStatus status, IEnumerable<User> friends, int rating, int shekels, IEnumerable<CardTemplate> cardCollection, IEnumerable<Product> productCollection)
         {
@@ -165,12 +163,6 @@ namespace stonerkart
         {
             friends.Add(friend);
         }
-
-        public void AddGame(Game g)
-        {
-            activeGames.Add(g);
-        }
-
     }
 
     public struct UserChanged

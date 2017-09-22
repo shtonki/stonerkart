@@ -53,7 +53,7 @@ namespace stonerkart
                 Player p = new Player(this, gsi.playerNames[i]);
 
                 players.Add(p);
-                if (i == gsi.heroIndex) hero = p;
+                if (gsi.playerNames[i] == Controller.user.Name) hero = p;
                 else
                 {
                     if (villain != null) throw new Exception();
