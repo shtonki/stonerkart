@@ -27,8 +27,6 @@ namespace stonerkart
         public Game(GameSetupInfo gsi)
         {
             gameid = gsi.gameid;
-            
-            gameController = new GameController(null, null);
 
             gameState = new GameState(gsi);
 
@@ -173,13 +171,6 @@ namespace stonerkart
             return r;
         }
 
-        public Path pathTo(Card c, Tile t)
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            return map.path(c, t);*/
-        }
-
         public void start()
         {
             Thread t = new Thread(gameLoop);
@@ -276,7 +267,6 @@ namespace stonerkart
 
         private void gameLoop()
         {
-            gameController.setPrompt("Game starting");
             initGame();
 
             while (true)
@@ -1185,16 +1175,35 @@ namespace stonerkart
         }
     }
 
+    [Serializable]
     public class GameSetupInfo
     {
+        public GameRules GameRules { get; }
         public int gameid { get; }
         public int randSeed { get; }
         public bool local { get; }
+        public string[] playerNames { get; }
 
+        public GameSetupInfo(GameRules gameRules, int gameid, int randSeed, bool local, string[] playerNames)
+        {
+            GameRules = gameRules;
+            this.gameid = gameid;
+            this.randSeed = randSeed;
+            this.local = local;
+            this.playerNames = playerNames;
+        }
+    }
+
+    [Serializable]
+    public class GameRules
+    {
         public MapConfiguration mapConfiguration { get; }
 
-        public string[] playerNames { get; }
-        public int heroIndex { get;  }
+
+        public GameRules(MapConfiguration mapConfiguration)
+        {
+            this.mapConfiguration = mapConfiguration;
+        }
     }
 
     class StackWrapper

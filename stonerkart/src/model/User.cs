@@ -18,12 +18,13 @@ namespace stonerkart
         {
         }
 
-        public FullUserJist(string name, CardTemplate icon, Title title, UserStatus status, BasicUserJist[] friends, int shekels, IEnumerable<CardTemplate> cards, IEnumerable<Product> products) : base(name, icon, title, status)
+        public FullUserJist(User user) : base(user)
         {
-            this.friends = friends;
-            this.shekels = shekels;
-            this.cards = cards.ToArray();
-            this.products = products.ToArray();
+            friends = user.Friends.Select(u => new BasicUserJist(u)).ToArray();
+            shekels = user.Shekels;
+            rating = user.Rating;
+            cards = user.CardCollection.ToArray();
+            products = user.ProductCollection.ToArray();
         }
 
         public override User ToUser()
@@ -52,17 +53,17 @@ namespace stonerkart
         {
         }
 
-        public BasicUserJist(string name, CardTemplate icon, Title title, UserStatus status)
+        public BasicUserJist(User user)
         {
-            this.name = name;
-            this.icon = icon;
-            this.title = title;
-            this.status = status;
+            name = user.Name;
+            icon = user.Icon;
+            title = user.Title;
+            status = user.Status;
         }
 
         public virtual User ToUser()
         {
-            return new User(name, icon, title, status, null);
+            return new User(name, icon, title, status, new User[0]);
         }
     }
 
@@ -80,30 +81,33 @@ namespace stonerkart
         private List<CardTemplate> cardCollection;
         private List<Product> productCollection;
 
-
+        private List<ChallengeMessage> pendingChallenges;
+        private List<Game> activeGames;
 
         public IEnumerable<User> Friends => friends;
+        public IEnumerable<ChallengeMessage> PendingChallenges => pendingChallenges;
+        IEnumerable<Game> ActiveGames => activeGames;
 
-        public User(string name, CardTemplate icon, Title title, UserStatus status, List<User> friends, int rating, int shekels, List<CardTemplate> cardCollection, List<Product> productCollection)
+        public User(string name, CardTemplate icon, Title title, UserStatus status, IEnumerable<User> friends, int rating, int shekels, IEnumerable<CardTemplate> cardCollection, IEnumerable<Product> productCollection)
         {
             this.name = name;
             this.icon = icon;
             this.title = title;
             this.status = status;
-            this.friends = friends;
+            this.friends = friends.ToList();
             this.rating = rating;
             this.shekels = shekels;
-            this.cardCollection = cardCollection;
-            this.productCollection = productCollection;
+            this.cardCollection = cardCollection.ToList();
+            this.productCollection = productCollection.ToList();
         }
 
-        public User(string name, CardTemplate icon, Title title, UserStatus status, List<User> friends)
+        public User(string name, CardTemplate icon, Title title, UserStatus status, IEnumerable<User> friends)
         {
             this.name = name;
             this.icon = icon;
             this.title = title;
             this.status = status;
-            this.friends = friends;
+            this.friends = friends.ToList();
         }
 
         public string Name
@@ -121,7 +125,7 @@ namespace stonerkart
             get { return title; }
         }
 
-        public UserStatus Status
+        public virtual UserStatus Status
         {
             get { return status; }
             set
@@ -156,10 +160,17 @@ namespace stonerkart
             get { return rating; }
         }
 
+
         public void addFriend(User friend)
         {
             friends.Add(friend);
         }
+
+        public void AddGame(Game g)
+        {
+            activeGames.Add(g);
+        }
+
     }
 
     public struct UserChanged

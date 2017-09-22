@@ -71,6 +71,11 @@ namespace stonerkart
     }
 
     [Serializable]
+    public class StartGameMessage : Message
+    {
+        public GameSetupInfo GameSetupInfo { get; set; }
+    }
+    [Serializable]
     public class GameMessage : Message
     {
         public int gameid { get; set; }
@@ -100,12 +105,15 @@ namespace stonerkart
     [Serializable]
     public class ChallengeMessage : Message
     {
-        public string challengee { get; set; }
+        public string ChallengerName { get; set; }
+        public string ChallengeeName { get; set; }
+        public GameRules GameRules { get; set; }
     }
     [Serializable]
-    public class AcceptChallengeMessage : Message
+    public class ChallengeResponseMessage : Message
     {
-        public string challenger { get; set; }
+        public ChallengeMessage Challenge { get; set; }
+        public bool Accept { get; set; }
     }
 
     [Serializable]

@@ -43,17 +43,24 @@ namespace stonerkart
                 messageReceived.Set();
                 return;
             }
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            else if (m is UserStatusChangedMessage)
+            {
+                UserStatusChangedMessage msg = (UserStatusChangedMessage)m;
+                Controller.user.Friends.First(f => f.Name == msg.username).Status = msg.newStatus;
+            }
+            else if (m is ChallengeMessage)
+            {
+                ChallengeMessage msg = (ChallengeMessage)m;
+                Controller.GetChallenged(msg);
+            }
+            else if (m is StartGameMessage)
+            {
+                StartGameMessage msg = (StartGameMessage)m;
+                Controller.StartGame(msg.GameSetupInfo);
+            }
+            else throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
 
             /*
-                case Message.MessageType.CHALLENGE:
-                {
-                    ChallengeBody cb = new ChallengeBody(m.body);
-                    var option = GUI.promptUser(cb.challengee + " challenges you to a battle to the death. Do you wish to accept this challenge?", 
-                        ButtonOption.Yes, ButtonOption.No);
-                    if (option == ButtonOption.Yes) serverConnection.send(new Message("_server", Message.MessageType.ACCEPTCHALLENGE, new ChallengeBody(cb.challengee)));
-                } break;
 
                 case Message.MessageType.NEWGAME:
                 {
@@ -179,12 +186,21 @@ namespace stonerkart
             tellServer(respondToFriendRequestMessage);
         }
 
-        public static bool challenge(string challengee)
+        public static bool challenge(string challengee, GameRules gameRules)
         {
             ChallengeMessage b = new ChallengeMessage();
-            b.challengee = challengee;
+            b.ChallengeeName = challengee;
+            b.GameRules = gameRules;
             ResponseMessage rm = (ResponseMessage)askServer(b);
             return rm.code == ResponseMessage.Code.OK;
+        }
+
+        public static void AcceptChallenge(ChallengeMessage cm, bool accept)
+        {
+            var acm = new ChallengeResponseMessage();
+            acm.Challenge = cm;
+            acm.Accept = accept;
+            tellServer(acm);
         }
 
         /*public static User queryMyUser()

@@ -20,18 +20,6 @@ namespace stonerkart
         public static IEnumerable<Packs> OwnedPacks => ownedPacks;
         public static IEnumerable<CardTemplate> OwnedCards => ownedCards;
 
-        private static List<Game> activeGames { get; } = new List<Game>();
-
-        public static Game GetActiveGame(int id)
-        {
-            return activeGames.First(g => g.gameid == id);
-        }
-
-        private static void addActiveGame(Game g)
-        {
-            activeGames.Add(g);
-        }
-
         public static User user { get; private set; }
 
         public static void launchGame()
@@ -109,12 +97,13 @@ namespace stonerkart
         }
 
 
-        public static Game startGame(GameSetupInfo gsi)
+        public static Game StartGame(GameSetupInfo gsi)
         {
             Game g = new Game(gsi);
             GameScreen gsc = new GameScreen(gsi);
             GUI.transitionToScreen(gsc);
-            addActiveGame(g);
+            g.coupleToScreen(gsc);
+            Controller.user.AddGame(g);
             g.start();
             return g;
         }
@@ -127,8 +116,23 @@ namespace stonerkart
 
         public static void challengePlayer(string username)
         {
-            Network.challenge(username);
+            GameRules rules = new GameRules(MapConfiguration.Default);
+
+            Network.challenge(username, rules);
         }
+
+        public static void GetChallenged(ChallengeMessage cm)
+        {
+            var option = GUI.promptUser(cm.ChallengeeName + " challenges you to a battle to the death. Do you wish to accept this challenge?",
+                ButtonOption.Yes, ButtonOption.No);
+            Network.AcceptChallenge(cm, option == ButtonOption.Yes);
+        }
+
+        public static void AnswerChallenge(ChallengeResponseMessage acm)
+        {
+            
+        }
+
 
     }
 }
