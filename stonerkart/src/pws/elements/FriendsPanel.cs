@@ -20,8 +20,9 @@ namespace stonerkart
 
         public void notify(object o, UserChanged t)
         {
+            User user = (User)o;
             //todo 210917 this leaves dead observers in friends
-            var newfriends = t.user.Friends;
+            var newfriends = user.Friends;
             clearChildren();
             friends.Clear();
             addFriends(newfriends);
@@ -61,7 +62,6 @@ namespace stonerkart
 
     class FriendBar : Square, Observer<UserChanged>
     {
-        public User friend { get; }
         private PlayerFlarePanel playerflare;
         private Button challenge;
 
@@ -69,8 +69,6 @@ namespace stonerkart
         {
             if (width < height) throw new Exception();
 
-            this.friend = friend;
-            friend.addObserver(this);
 
             Backcolor = backcolorFromStatus(friend.Status);
 
@@ -85,12 +83,15 @@ namespace stonerkart
             playerflare = new PlayerFlarePanel(width - height, height);
             friend.addObserver(playerflare);
             addChild(playerflare);
+
+            friend.addObserver(this);
         }
 
         public void notify(object o, UserChanged t)
         {
-            Backcolor = backcolorFromStatus(friend.Status);
-            challenge.Visible = t.user.Status != UserStatus.Offline;
+            User user = (User)o;
+            Backcolor = backcolorFromStatus(user.Status);
+            challenge.Visible = user.Status != UserStatus.Offline;
         }
 
         private static Color backcolorFromStatus(UserStatus status)

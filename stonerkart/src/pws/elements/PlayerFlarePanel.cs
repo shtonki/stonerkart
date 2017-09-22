@@ -38,7 +38,7 @@ namespace stonerkart
 
         public void notify(object o, UserChanged t)
         {
-            updatestuff(t.user);
+            updatestuff((User)o);
         }
     }
 }

@@ -112,7 +112,7 @@ namespace stonerkart
 
         public void notify(object o, ManaPoolChanged t)
         {
-            ManaPool pool = t.manaPool;
+            ManaPool pool = (ManaPool)o;
             for (int i = 0; i < columns; i++)
             {
                 var cur = pool.currentMana(G.orbOrder[i]);

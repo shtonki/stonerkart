@@ -35,6 +35,10 @@ namespace stonerkart
             Backimege = new MemeImege(Textures.buttonbg2, 1);
             Y = Frame.BACKSCREENHEIGHT - Frame.MENUHEIGHT;
 
+            playerFlarePanel = new PlayerFlarePanel(playerFlareWidth, Height);
+            playerFlarePanel.X = playerFlareX;
+            addChild(playerFlarePanel);
+
             menuButton = new Button(90, Height);
             addChild(menuButton);
             menuButton.X = menuButtonX;
@@ -68,7 +72,8 @@ namespace stonerkart
 
         public void notify(object o, UserChanged t)
         {
-            setPrice(t.user.Shekels);
+            int shekels = ((User)o).Shekels;
+            setPrice(shekels);
         }
     }
 }
