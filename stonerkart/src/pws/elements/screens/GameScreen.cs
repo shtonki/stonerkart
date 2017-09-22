@@ -86,7 +86,7 @@ namespace stonerkart
         {
             gameID = gsi.gameid;
 
-            var map = Map.MapFromConfiguration(gsi.GameRules.mapConfiguration);
+            var map = Map.MapFromConfiguration(gsi.GameRules.MapConfiguration);
             int hexColumns = map.width;
             int hexRows = map.height;
             int hexSize = (int)Math.Round((hexPanelHeight) / (hexRows + 0.5));

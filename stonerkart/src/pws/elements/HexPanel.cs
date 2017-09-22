@@ -281,6 +281,7 @@ namespace stonerkart
 
         public void notify(object o, PileChangedMessage t)
         {
+            if (t == null) return;
             lock (drawme)
             {
                 switch (t.arg)

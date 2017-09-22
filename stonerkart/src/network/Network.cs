@@ -43,6 +43,12 @@ namespace stonerkart
                 messageReceived.Set();
                 return;
             }
+            else if (m is GameMessage)
+            {
+                var msg = (GameMessage)m;
+                Game game = Controller.ActiveGames.Find(g => g.gameid == msg.gameid);
+                game.enqueueGameMessage(msg);
+            }
             else if (m is UserStatusChangedMessage)
             {
                 UserStatusChangedMessage msg = (UserStatusChangedMessage)m;

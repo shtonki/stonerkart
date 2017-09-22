@@ -36,8 +36,6 @@ namespace stonerkart
             {
                 connection = new MultiplayerConnection(this);
             }
-
-            observe();
         }
 
         public void coupleToScreen(GameScreen gsc)
@@ -1167,9 +1165,9 @@ namespace stonerkart
             return rt;
         }
 
-        public void enqueueGameMessage(string gmb)
+        public void enqueueGameMessage(GameMessage gmb)
         {
-            connection.enqueueGameMessage(gmb);
+            connection.enqueueGameMessage(gmb.message);
         }
     }
 
@@ -1195,12 +1193,12 @@ namespace stonerkart
     [Serializable]
     public class GameRules
     {
-        public MapConfiguration mapConfiguration { get; }
+        public MapConfiguration MapConfiguration { get; }
 
 
         public GameRules(MapConfiguration mapConfiguration)
         {
-            this.mapConfiguration = mapConfiguration;
+            this.MapConfiguration = mapConfiguration;
         }
     }
 

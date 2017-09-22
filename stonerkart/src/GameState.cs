@@ -44,7 +44,7 @@ namespace stonerkart
 
 
             random = new Random(gsi.randSeed);
-            this.map = map;
+            map = Map.MapFromConfiguration(gsi.GameRules.MapConfiguration);
             cards = new List<Card>();
             players = new List<Player>();
 
