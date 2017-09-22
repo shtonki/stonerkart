@@ -26,7 +26,7 @@ namespace stonerkart
             botgame.clicked += a =>
             {
                 Map map = Map.DefaultMap;
-                GameScreen gs = new GameScreen(map);
+                GameScreen gs = new GameScreen(map, -1);
                 Game g = new Game(
                     new NewGameStruct(0, 420,  new [] {"hero", "villain"}, 0), 
                     true, 
@@ -35,6 +35,11 @@ namespace stonerkart
                 GUI.transitionToScreen(gs);
                 g.start();
             };
+        }
+
+        protected override IEnumerable<MenuEntry> generateMenuEntries()
+        {
+            return new MenuEntry[] { };
         }
     }
 }

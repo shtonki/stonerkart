@@ -1619,10 +1619,10 @@ namespace stonerkart
                     baseRace = Race.Human;
                     rarity = Rarity.Common;
 
-                    natureCost = 2;
+                    natureCost = 3;
                     greyCost = 2;
 
-                    basePower = 3;
+                    basePower = 2;
                     baseToughness = 5;
                     baseMovement = 3;
 

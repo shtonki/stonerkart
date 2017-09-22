@@ -94,6 +94,7 @@
     </Compile>
     <Compile Include="src\pws\DrawerMaym.cs" />
     <Compile Include="src\pws\elements\base\Button.cs" />
+    <Compile Include="src\pws\elements\base\FreezePanel.cs" />
     <Compile Include="src\pws\elements\base\GuiElement.cs" />
     <Compile Include="src\pws\elements\base\InputBox.cs" />
     <Compile Include="src\pws\elements\base\Square.cs" />
@@ -107,16 +108,19 @@
     <Compile Include="src\pws\elements\Line.cs" />
     <Compile Include="src\pws\elements\MemeButton.cs" />
     <Compile Include="src\model\User.cs" />
+    <Compile Include="src\pws\elements\MenuPanel.cs" />
     <Compile Include="src\pws\elements\PileView.cs" />
     <Compile Include="src\pws\elements\PlayerFlarePanel.cs" />
     <Compile Include="src\pws\elements\PlayerPanel.cs" />
     <Compile Include="src\pws\elements\PricePanel.cs" />
-    <Compile Include="src\pws\elements\PromptPanel.cs" />
+    <Compile Include="src\pws\elements\UserPromptPanel.cs" />
+    <Compile Include="src\pws\elements\GamePromptPanel.cs" />
     <Compile Include="src\pws\elements\screens\DeckEditorScreen.cs" />
     <Compile Include="src\pws\elements\screens\GameScreen.cs" />
     <Compile Include="src\pws\elements\screens\LoginScreen.cs" />
     <Compile Include="src\pws\elements\screens\MainMenuScreen.cs" />
     <Compile Include="src\pws\elements\screens\PlayScreen.cs" />
+    <Compile Include="src\pws\elements\screens\PostGameScreen.cs" />
     <Compile Include="src\pws\elements\screens\Screen.cs" />
     <Compile Include="src\pws\elements\screens\ShopScreen.cs" />
     <Compile Include="src\pws\elements\TextLayout.cs" />

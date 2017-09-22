@@ -20,7 +20,13 @@ namespace stonerkart
         private bool hoverable = true;
         private bool visible = true;
 
-        public Screen screen { get; set; }
+        private Screen screen { get; set; }
+
+        public Screen Screen
+        {
+            get { return screen ?? parent.Screen; }
+            set { screen = value; }
+        }
 
         public List<GuiElement> children { get; private set; }= new List<GuiElement>();
         public GuiElement parent { get; private set; }
@@ -136,6 +142,7 @@ namespace stonerkart
             if (children.Contains(child)) throw new Exception();
             children.Insert(index, child);
             child.parent = this;
+            child.screen = screen;
         }
 
         public void removeChild(GuiElement child)

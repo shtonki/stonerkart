@@ -9,18 +9,22 @@ namespace stonerkart
 {
     abstract class Screen
     {
+        protected abstract IEnumerable<MenuEntry> generateMenuEntries();
+        public IEnumerable<MenuEntry> menuEntries => generateMenuEntries();
+
+
         public Imege background { get; }
 
         public Screen()
         {
         }
 
-        public Screen(Imege background)
+        public Screen(Imege background) : this()
         {
             this.background = background;
         }
 
-        public List<GuiElement> elements { get; } = new List<GuiElement>();
+        private List<GuiElement> elements { get; } = new List<GuiElement>();
 
         public IEnumerable<GuiElement> Elements => elements;
         
@@ -30,7 +34,7 @@ namespace stonerkart
             {
                 elements.Add(element);
             }
-            element.screen = this;
+            element.Screen = this;
         }
 
         public void removeElement(GuiElement element)
@@ -45,6 +49,22 @@ namespace stonerkart
         {
             addElement(winduh);
             winduh.moveTo(MoveTo.Center, MoveTo.Center);
+        }
+
+        private bool frozen => freezePanel != null;
+        private FreezePanel freezePanel;
+        public void freeze(GuiElement content)
+        {
+            if (frozen) throw new Exception();
+            freezePanel = new FreezePanel(content);
+            addElement(freezePanel);
+        }
+
+        public void unfreeze()
+        {
+            if (!frozen) throw new Exception();
+            removeElement(freezePanel);
+            freezePanel = null;
         }
     }
 }

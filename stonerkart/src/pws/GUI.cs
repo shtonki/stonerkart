@@ -22,38 +22,13 @@ namespace stonerkart
         {
             if (options.Length == 0) throw new Exception();
 
-            int width = 500;
-            int height = 250;
-            int buttonheight = 80;
-            int buttonwidth = width/options.Length;
-
-            Square allofit = new Square(width, height);
-            allofit.Backimege = new MemeImege(Textures.buttonbg0);
-
-            Square text = new Square(width, height - buttonheight);
-            text.TextLayout = new MultiLineFitLayout(50);
-            text.Text = question;
-            allofit.addChild(text);
-
             PublicSaxophone sax = new PublicSaxophone(o => true);
+            UserPromptPanel userPromptPanel = new UserPromptPanel(500, 250, 80, question, options, sax);
 
-            for (int i = 0; i < options.Length; i++)
-            {
-                int i1 = i;
-                Button b = new Button(buttonwidth, buttonheight);
-                allofit.addChild(b);
-                b.Text = options[i].ToString();
-                b.X = i*buttonwidth;
-                b.Y = height - buttonheight;
-                b.clicked += a => sax.answer(options[i1]);
-                b.Backcolor = Color.Silver;
-                b.Border = new SolidBorder(4, Color.Black);
-            }
-
-            Winduh w = new Winduh(allofit);
+            Winduh w = new Winduh(userPromptPanel);
             frame.activeScreen.addWinduh(w);
-
             var v = (ButtonOption)sax.call();
+
             w.close();
             return v;
         }
@@ -76,6 +51,7 @@ namespace stonerkart
         public static void transitionToScreen(Screen s)
         {
             frame.setScreen(s);
+            frame.menuPanel.setEntries(frame.DefaultMenuEntries.Concat(s.menuEntries));
         }
     }
 }

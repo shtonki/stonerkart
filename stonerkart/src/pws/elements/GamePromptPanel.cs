@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class PromptPanel : Square
+    class GamePromptPanel : Square
     {
-
         private Square promptText { get; }
         private Button[] buttons { get; }
         private Button[] manaButtons { get; }
 
-        public PromptPanel(int width, int height) : base(width, height)
+        public GamePromptPanel(int width, int height) : base(width, height)
         {
             //Backcolor = Color.Chocolate;
             promptText = new Square();

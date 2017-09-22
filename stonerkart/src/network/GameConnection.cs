@@ -25,6 +25,7 @@ namespace stonerkart
 
         public override void sendChoices(int [] choices)
         {
+            if (closed) return;
             StringBuilder sb = new StringBuilder();
             foreach (var choice in choices) sb.Append(choice.ToString() + intsplitter);
             if (sb.Length > 0) sb.Length--;
@@ -63,10 +64,12 @@ namespace stonerkart
             return decks;
         }
 
+        private bool closed;
+
         public override void surrender(GameEndStateReason reason)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            Network.surrender(game.gameid, reason);*/
+            Network.surrender(game.gameid, reason);
+            closed = true;
         }
 
         private char intsplitter = ',';
@@ -156,10 +159,7 @@ namespace stonerkart
 
         public override void surrender(GameEndStateReason rn)
         {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            ScreenController.transitionToMainMenu();
-            */
+            Network.surrender(-1, rn);
         }
     }
 

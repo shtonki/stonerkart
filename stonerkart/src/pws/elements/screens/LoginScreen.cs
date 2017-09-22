@@ -59,5 +59,10 @@ namespace stonerkart
             registerButton.Text = "Register";
             registerButton.Border = new AnimatedBorder(Textures.border0, 5);
         }
+
+        protected override IEnumerable<MenuEntry> generateMenuEntries()
+        {
+            return new MenuEntry[] { };
+        }
     }
 }

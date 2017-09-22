@@ -594,6 +594,9 @@ namespace stonerkart
             setupStatsThingy();
         }
 
-        
+        protected override IEnumerable<MenuEntry> generateMenuEntries()
+        {
+            return new MenuEntry[] { };
+        }
     }
 }

@@ -24,32 +24,28 @@ namespace stonerkart
         private TextLayout textLayout = new SingleLineFitLayout();
         public Color textColor { get; set; } = Color.Black;
 
-        public virtual void setSize(int width, int height, TextLayout layout = null)
+        private Square tintPanel;
+        private Color tintColor = Color.Transparent;
+
+        public virtual void setSize(int newWidth, int newHeight, TextLayout layout = null)
         {
-            base.Height = height;
-            base.Width = width;
+            resizeEventStruct args = new resizeEventStruct(newWidth, newHeight, width, height);
+            base.Height = newHeight;
+            base.Width = newWidth;
             if (layout != null) textLayout = layout;
-            onResize();
+            onResize(args);
         }
 
         public override int Height
         {
             get { return base.Height; }
-            set
-            {
-                base.Height = value;
-                onResize();
-            }
+            set { setSize(Width, value); }
         }
 
         public override int Width
         {
             get { return base.Width; }
-            set
-            {
-                base.Width = value;
-                onResize();
-            }
+            set { setSize(value, Height); }
         }
 
         public Color Backcolor
@@ -125,15 +121,21 @@ namespace stonerkart
             }
         }
 
-        public Square() : base(0, 0, 100, 100)
+        public Color TintColor
+        {
+            get { return tintColor; }
+            set
+            {
+                tintColor = value;
+                redoTint();
+            }
+        }
+
+        public Square() : this(100, 100)
         {
         }
 
-        public Square(int x, int y, int width, int height) : base(x, y, width, height)
-        {
-        }
-
-        public Square(int width, int height) : base(0, 0, width, height)
+        public Square(int width, int height) : this(0, 0, width, height, Color.Transparent)
         {
         }
 
@@ -142,25 +144,33 @@ namespace stonerkart
             Backcolor = backgroundColor;
         }
 
-        public Square(int width, int height, Color backgroundColor) : base(0, 0, width, height)
-        {
-            Backcolor = backgroundColor;
-        }
-
-        public Square(int width, int height, string text) : base(0, 0, width, height)
-        {
-            Text = text;
-        }
-
         public override void onResize(resizeEventStruct args)
         {
             base.onResize(args);
+            redoTint();
             layoutText();
         }
 
-        private void onResize()
+        private void redoTint()
         {
-            layoutText();
+            if (tintPanel == null)
+            {
+                if (tintColor == Color.Transparent) return;
+                tintPanel = new Square(0, 0, Width, Height, tintColor);
+                tintPanel.Hoverable = false;
+                addChild(tintPanel);
+            }
+            else if (tintColor == Color.Transparent)
+            {
+                if (tintPanel == null) return;
+                removeChild(tintPanel);
+                tintPanel = null;
+            }
+            else
+            {
+                tintPanel.setSize(Width, Height);
+                tintPanel.Backcolor = tintColor;
+            }
         }
 
         private void layoutText()

@@ -300,7 +300,7 @@ namespace stonerkart
             }
         }
 
-        public override void setSize(int width, int height, TextLayout layout = null)
+        public override void setSize(int newWidth, int newHeight, TextLayout layout = null)
         {
             throw new Exception("Use Height or Width to prevent misshaped cards");
         }

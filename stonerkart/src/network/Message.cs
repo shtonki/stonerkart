@@ -375,13 +375,13 @@ namespace stonerkart
             sb.Append(ges.reason);
             sb.Append(";");
 
-            if (ges.yourRating > 0)
+            if (ges.yourOriginalRating > 0)
             {
                 sb.Append(ges.ratingChange);
                 sb.Append(";");
-                sb.Append(ges.yourRating);
+                sb.Append(ges.yourOriginalRating);
                 sb.Append(";");
-                sb.Append(ges.theirRating);
+                sb.Append(ges.theirOriginalRating);
             }
             else
             {
@@ -405,16 +405,16 @@ namespace stonerkart
         public string winningPlayer { get; }
         public GameEndStateReason reason { get; }
         public int ratingChange { get; }
-        public int yourRating { get; }
-        public int theirRating { get; }
+        public int yourOriginalRating { get; }
+        public int theirOriginalRating { get; }
 
-        public GameEndStruct(string winningPlayer, GameEndStateReason reason, int ratingChange, int yourRating, int theirRating)
+        public GameEndStruct(string winningPlayer, GameEndStateReason reason, int ratingChange, int yourOriginalRating, int theirOriginalRating)
         {
             this.winningPlayer = winningPlayer;
             this.reason = reason;
             this.ratingChange = ratingChange;
-            this.yourRating = yourRating;
-            this.theirRating = theirRating;
+            this.yourOriginalRating = yourOriginalRating;
+            this.theirOriginalRating = theirOriginalRating;
         }
 
         public GameEndStruct(string winningPlayer, GameEndStateReason reason) : this()
