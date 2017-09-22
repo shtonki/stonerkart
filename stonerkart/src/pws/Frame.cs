@@ -116,8 +116,8 @@ namespace stonerkart
             user.addObserver(menuBar.shekelsCount);
             user.addObserver(friendsPanel);
 
-            //menuBar.setFlare(user);
-            //menuBar.setShekelCount(user.Shekels);
+            GUI.shopScreen.couple(user); //todo 220917 seems fucked, like it'd be depencdency inversion if I knew what that was
+
             menuBar.Visible = true;
         }
 

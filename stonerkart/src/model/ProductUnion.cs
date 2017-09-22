@@ -15,18 +15,18 @@ namespace stonerkart
     [Serializable]
     public class Pack : Product
     {
-        public Packs pack { get; }
+        public Packs Template { get; }
 
-        public Pack(Packs pack)
+        public Pack(Packs template)
         {
-            this.pack = pack;
+            this.Template = template;
         }
 
         public int Price
         {
             get
             {
-                switch (pack)
+                switch (Template)
                 {
                     case Packs.FirstEdition12Pack:
                         return 420;

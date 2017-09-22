@@ -163,6 +163,12 @@ namespace stonerkart
         {
             friends.Add(friend);
         }
+
+        public void AddOwnedProduct(Product product)
+        {
+            productCollection.Add(product);
+            notify(new UserChanged(this));
+        }
     }
 
     public struct UserChanged

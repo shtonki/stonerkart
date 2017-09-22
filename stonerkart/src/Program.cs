@@ -19,7 +19,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace stonerkart
 {
-
     class Program
     {
         public static bool design = false;
@@ -29,14 +28,7 @@ namespace stonerkart
         static void Main(string[] args)
         {
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
-            /*
-            var msg = new GameMessage();
-            msg.gameid = 420;
-            msg.message = "walla";
 
-            var bytes = msg.GetBytes();
-            var msgc = Message.FromBytes(bytes);
-            */
             Controller.launchGame();
         }
     }

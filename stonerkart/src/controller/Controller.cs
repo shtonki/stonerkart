@@ -95,6 +95,7 @@ namespace stonerkart
             int newbalance = Network.makePurchase(product);
             if (newbalance == -1) return false; //purchase failed
             user.Shekels = newbalance;
+            user.AddOwnedProduct(product);
             return true;
         }
 

@@ -97,6 +97,7 @@
     <Compile Include="src\pws\elements\base\FreezePanel.cs" />
     <Compile Include="src\pws\elements\base\GuiElement.cs" />
     <Compile Include="src\pws\elements\base\InputBox.cs" />
+    <Compile Include="src\pws\elements\base\SelectorPanel.cs" />
     <Compile Include="src\pws\elements\base\Square.cs" />
     <Compile Include="src\pws\elements\base\ToggleButton.cs" />
     <Compile Include="src\pws\elements\base\Winduh.cs" />
