@@ -24,7 +24,7 @@ namespace stonerkart
             this.diameter = diameter;
             this.hexsize = hexsize;
 
-            /*bordercolors = new Color[xcount][];
+            bordercolors = new Color[xcount][];
             for (int i = 0; i < width; i++)
             {
             get { return map; }
