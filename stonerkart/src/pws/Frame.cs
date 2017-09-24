@@ -112,9 +112,10 @@ namespace stonerkart
 
             //GUI.shopScreen.populate(user.ProductCollection.Where(p => p is Pack).Cast<Pack>());
 
-            user.addObserver(menuBar.playerFlarePanel);
-            user.addObserver(menuBar.shekelsCount);
-            user.addObserver(friendsPanel);
+            user.AddObserver(menuBar.playerFlarePanel);
+            user.AddObserver(menuBar.shekelsCount);
+            user.AddObserver(friendsPanel);
+            user.AddObserver(addFriendsPanel);
 
             GUI.shopScreen.couple(user); //todo 220917 seems fucked, like it'd be depencdency inversion if I knew what that was
 
@@ -253,7 +254,7 @@ namespace stonerkart
         {
             base.OnKeyDown(e);
 
-            if (e.Key == Key.W) { Console.WriteLine("{0} at {1}:{2}", hovered?.GetType(), hovered?.X, hovered?.Y); }
+            //if (e.Key == Key.W) { Console.WriteLine("{0} at {1}:{2}", hovered?.GetType(), hovered?.X, hovered?.Y); }
 
             focused?.onKeyDown(e);
         }

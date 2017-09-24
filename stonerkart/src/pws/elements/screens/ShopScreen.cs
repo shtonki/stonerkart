@@ -69,7 +69,7 @@ namespace stonerkart
 
         public void couple(User user)
         {
-            user.addObserver(packsSquare);
+            user.AddObserver(packsSquare);
         }
 
         protected override IEnumerable<MenuEntry> generateMenuEntries()
@@ -91,7 +91,7 @@ namespace stonerkart
             Backimege = new MemeImege(Textures.buttonbg0, 4357987);
 
             viewed = new PileView();
-            viewedlist.addObserver(viewed);
+            viewedlist.AddObserver(viewed);
             addChild(viewed);
             viewed.Width = Width - cardWidth;
             viewed.Height = Height;

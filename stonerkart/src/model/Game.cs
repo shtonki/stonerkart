@@ -46,31 +46,31 @@ namespace stonerkart
 
         private void observe()
         {
-            gameState.hero.hand.addObserver(screen.handView);
-            gameState.hero.manaPool.addObserver(screen.heroPanel);
+            gameState.hero.hand.AddObserver(screen.handView);
+            gameState.hero.manaPool.AddObserver(screen.heroPanel);
 
-            gameState.villain.manaPool.addObserver(screen.villainPanel);
+            gameState.villain.manaPool.AddObserver(screen.villainPanel);
 
-            gameState.stack.addObserver(screen.stackWinduh);
+            gameState.stack.AddObserver(screen.stackWinduh);
 
-            gameState.hero.field.addObserver(screen.hexPanel);
-            gameState.villain.field.addObserver(screen.hexPanel);
+            gameState.hero.field.AddObserver(screen.hexPanel);
+            gameState.villain.field.AddObserver(screen.hexPanel);
 
-            gameState.hero.graveyard.addObserver(screen.heroGraveyard);
+            gameState.hero.graveyard.AddObserver(screen.heroGraveyard);
             screen.heroGraveyardWinduh.Title = String.Format("{0}'s Graveyard", gameState.hero.name);
 
-            gameState.villain.graveyard.addObserver(screen.villainGraveyard);
+            gameState.villain.graveyard.AddObserver(screen.villainGraveyard);
             screen.villainGraveyardWinduh.Title = String.Format("{0}'s Graveyard", gameState.villain.name);
 
-            gameState.hero.hand.addObserver(screen.heroPanel);
-            gameState.hero.deck.addObserver(screen.heroPanel);
-            gameState.hero.graveyard.addObserver(screen.heroPanel);
-            gameState.hero.displaced.addObserver(screen.heroPanel);
+            gameState.hero.hand.AddObserver(screen.heroPanel);
+            gameState.hero.deck.AddObserver(screen.heroPanel);
+            gameState.hero.graveyard.AddObserver(screen.heroPanel);
+            gameState.hero.displaced.AddObserver(screen.heroPanel);
 
-            gameState.villain.hand.addObserver(screen.villainPanel);
-            gameState.villain.deck.addObserver(screen.villainPanel);
-            gameState.villain.graveyard.addObserver(screen.villainPanel);
-            gameState.villain.displaced.addObserver(screen.villainPanel);
+            gameState.villain.hand.AddObserver(screen.villainPanel);
+            gameState.villain.deck.AddObserver(screen.villainPanel);
+            gameState.villain.graveyard.AddObserver(screen.villainPanel);
+            gameState.villain.displaced.AddObserver(screen.villainPanel);
 
             screen.stackView.mouseMove += a =>
             {

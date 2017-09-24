@@ -13,6 +13,8 @@ namespace stonerkart
         public int rating { get; set; }
         public CardTemplate[] cards { get; set; }
         public Product[] products { get; set; }
+        public BasicUserJist[] friendRequests { get; set; }
+
 
         public FullUserJist()
         {
@@ -21,6 +23,7 @@ namespace stonerkart
         public FullUserJist(User user) : base(user)
         {
             friends = user.Friends.Select(u => new BasicUserJist(u)).ToArray();
+            friendRequests = user.FriendRequests.Select(u => new BasicUserJist(u)).ToArray();
             shekels = user.Shekels;
             rating = user.Rating;
             cards = user.CardCollection.ToArray();
@@ -29,10 +32,22 @@ namespace stonerkart
 
         public override User ToUser()
         {
-            List<User> fs = friends.Select(f => f.ToUser()).ToList();
-            List<CardTemplate> cs = cards.ToList();
-            List<Product> ps = products.ToList();
-            return new User(name, icon, title, status, fs, rating, shekels, cs, ps);
+            List<User> friendList = friends.Select(f => f.ToUser()).ToList();
+            List<User> friendRequestList = friendRequests.Select(f => f.ToUser()).ToList();
+            List<CardTemplate> cardList = cards.ToList();
+            List<Product> productList = products.ToList();
+            return new User(
+                name, 
+                icon, 
+                title, 
+                status, 
+                friendList, 
+                friendRequestList, 
+                rating, 
+                shekels, 
+                cardList,
+                productList
+                );
         }
     }
 
@@ -75,6 +90,7 @@ namespace stonerkart
 
         private UserStatus status;
         private List<User> friends;
+        private List<User> friendRequests;
 
         private int rating;
         private int shekels;
@@ -86,13 +102,14 @@ namespace stonerkart
         public IEnumerable<User> Friends => friends;
         public IEnumerable<ChallengeMessage> PendingChallenges => pendingChallenges;
 
-        public User(string name, CardTemplate icon, Title title, UserStatus status, IEnumerable<User> friends, int rating, int shekels, IEnumerable<CardTemplate> cardCollection, IEnumerable<Product> productCollection)
+        public User(string name, CardTemplate icon, Title title, UserStatus status, IEnumerable<User> friends, IEnumerable<User> friendRequests, int rating, int shekels, IEnumerable<CardTemplate> cardCollection, IEnumerable<Product> productCollection)
         {
             this.name = name;
             this.icon = icon;
             this.title = title;
             this.status = status;
             this.friends = friends.ToList();
+            this.friendRequests = friendRequests.ToList();
             this.rating = rating;
             this.shekels = shekels;
             this.cardCollection = cardCollection.ToList();
@@ -156,6 +173,11 @@ namespace stonerkart
         public int Rating
         {
             get { return rating; }
+        }
+
+        public List<User> FriendRequests
+        {
+            get { return friendRequests; }
         }
 
 

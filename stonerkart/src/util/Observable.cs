@@ -16,7 +16,7 @@ namespace stonerkart
     {
         private List<WeakReference<Observer<T>>> observers = new List<WeakReference<Observer<T>>>();
 
-        public void addObserver(Observer<T> o)
+        public void AddObserver(Observer<T> o)
         {
             foreach (var v in observers)
             {

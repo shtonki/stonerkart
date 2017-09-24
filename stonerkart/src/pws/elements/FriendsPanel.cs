@@ -33,7 +33,7 @@ namespace stonerkart
             foreach (var friend in newFriends)
             {
                 FriendBar fb = new FriendBar(Width, friendBarHeight, friend);
-                friend.addObserver(fb);
+                friend.AddObserver(fb);
                 friends.Add(fb);
                 addChild(fb);
             }
@@ -81,10 +81,10 @@ namespace stonerkart
             challenge.clicked += a => Controller.challengePlayer(friend.Name);
 
             playerflare = new PlayerFlarePanel(width - height, height);
-            friend.addObserver(playerflare);
+            friend.AddObserver(playerflare);
             addChild(playerflare);
 
-            friend.addObserver(this);
+            friend.AddObserver(this);
         }
 
         public void notify(object o, UserChanged t)
@@ -105,7 +105,7 @@ namespace stonerkart
         }
     }
 
-    class PendingFriendsPanel : Square
+    class PendingFriendsPanel : Square, Observer<UserChanged>
     {
         private const int okbtnsize = 40;
         private const int requestHeight = 50;
@@ -169,6 +169,13 @@ namespace stonerkart
             Controller.respondToFriendRequest(username, accept);
             pendingRequests.RemoveAll(pnl => pnl.Name == username);
             layoutStuff();
+        }
+
+        public void notify(object o, UserChanged t)
+        {
+            User usr = (User)o;
+            pendingRequests.Clear();
+            addRequests(usr.FriendRequests.Select(u => u.Name));
         }
     }
 
