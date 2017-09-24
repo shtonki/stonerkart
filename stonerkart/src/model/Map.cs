@@ -37,7 +37,6 @@ namespace stonerkart
 
         private static Map JasinMap()
         {
-
             throw new NotImplementedException("jasin implement me pls");
             Map map = new Map(9, 9);
 

@@ -190,6 +190,7 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artBigMonkey.png" />
     <None Include="Resources\AberrantSacrifice.png" />
     <None Include="Resources\font1.png" />
     <None Include="Resources\artGreatWhiteBuffalo.png" />

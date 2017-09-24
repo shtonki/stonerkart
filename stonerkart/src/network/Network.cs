@@ -18,8 +18,18 @@ namespace stonerkart
         private static ManualResetEvent messageReceived = new ManualResetEvent(false);
         private static Message receivedMessage;
 
+        public static bool Connected => connected;
 
-        public static bool connectToServer()
+        private static bool connected;
+
+
+        public static void TryConnect()
+        {
+            if (Connected) return;
+            if (ConnectToServer()) connected = true;
+        }
+
+        private static bool ConnectToServer()
         {
             if (serverConnection != null) return true;
 
@@ -30,7 +40,6 @@ namespace stonerkart
             }
             catch (Exception e)
             {
-                System.Console.WriteLine(e);
                 return false;
             }
         }
