@@ -12,21 +12,9 @@ namespace stonerkart
 {
     class HexPanel : Square
     {
-        private int diameter;
-        public HexPanel(int diameter, int hexsize) : base()
-        {
-            colormeshocked = new Map(diameter);
 
         public Map Map
-            width = hexsize + (int)((xcount - 1) * hexsizethreequarters);
-            height = ycount * hexsize + hexsize / 2;
-
-            this.diameter = diameter;
-            this.hexsize = hexsize;
-
-            bordercolors = new Color[xcount][];
-            for (int i = 0; i < width; i++)
-            {
+        {
             get { return map; }
             set
             {
@@ -49,11 +37,11 @@ namespace stonerkart
 
         private void setMap(Map map)
         {
-            int widthinhexquarters = 1 + map.width*3;
-            var hs1 = 4*Width/widthinhexquarters;
+            int widthinhexquarters = 1 + map.width * 3;
+            var hs1 = 4 * Width / widthinhexquarters;
 
-            int heightinhexquarters = 2 + map.height*4;
-            int hs2 = 4*Height/heightinhexquarters;
+            int heightinhexquarters = 2 + map.height * 4;
+            int hs2 = 4 * Height / heightinhexquarters;
 
             hexsize = Math.Min(hs1, hs2);
             hexsizethreequarters = (int)Math.Round(hexsize * 0.75);
@@ -125,7 +113,6 @@ namespace stonerkart
 
         private Tuple<int, int> findHexagon(int mousex, int mousey)
         {
-            throw new NotImplementedException();
             int cx = 0;
             int cy = 0;
 
@@ -134,8 +121,8 @@ namespace stonerkart
                 for (int j = 0; j < ycount; j++)
                 {
                     var p = hexCoords(i, j);
-                    int hexX = x + p.X + hexsize/2;
-                    int hexY = y + p.Y + hexsize/2;
+                    int hexX = x + p.X + hexsize / 2;
+                    int hexY = y + p.Y + hexsize / 2;
 
                     int dx = hexX - mousex;
                     int dy = hexY - mousey;
@@ -170,36 +157,19 @@ namespace stonerkart
             return new Point(hexX, hexY);
         }
 
-        public Point hexCoordsJazine(int column, int row)
-        { 
-            int os = hexsize * (diameter - diameter / 2);
-
-            if (column > diameter / 2 + 1) os += (hexsize / 2 )* (column - diameter);
-            else os -= hexsize / 2 * row;
-
-            int hexX = os + hexsize * column;// - row*hexsize/2;
-            int hexY = row * hexsize;// / 2;//hexsize * (diameter - diameter / 2) + hexsize * (row % 2) + row * hexsize;
-
-            //if (column == 0 || column == 1 || column == 2) hexX += os;
-
-            
-            return new Point(-hexX, hexY);
-        }
-
         protected override void draw(DrawerMaym dm)
         {
             base.draw(dm);
-            //todo add edge and bordercolors
-            int height = diameter;
-            int rowWidth = diameter / 2 + 1;
 
             if (Map == null) return;
 
             var drawme = GetMapCards();
+
+            for (int i = 0; i < xcount; i++)
             {
-                for (int x = 0; x < rowWidth; x++)
+                for (int j = 0; j < ycount; j++)
                 {
-                    var p = hexCoordsJazine(y, x); //hexCoords(i,j); 
+                    var p = hexCoords(i, j);
                     int hexX = p.X;
                     int hexY = p.Y;
 
@@ -208,31 +178,35 @@ namespace stonerkart
                     Color bordercolor;
                     Color fillcolor;
 
-                    switch (tile.JasinPls)
+                    switch (tile.tileType)
                     {
-                        case Tile.JasinNameMePls.Invisible:
-                        {
-                            bordercolor = Color.Transparent;
-                            fillcolor = Color.Transparent;
-                        } break;
+                        case Tile.TileType.Invisible:
+                            {
+                                bordercolor = Color.Transparent;
+                                fillcolor = Color.Transparent;
+                            }
+                            break;
 
-                        case Tile.JasinNameMePls.Normie:
-                        {
-                            bordercolor = Color.DarkSlateGray;
-                            fillcolor = Color.MintCream;
-                        } break;
+                        case Tile.TileType.Normie:
+                            {
+                                bordercolor = Color.DarkSlateGray;
+                                fillcolor = Color.MintCream;
+                            }
+                            break;
 
-                        case Tile.JasinNameMePls.NoSummon:
-                        {
-                            bordercolor = Color.Maroon;
-                            fillcolor = Color.Silver;
-                        } break;
+                        case Tile.TileType.NoSummon:
+                            {
+                                bordercolor = Color.Maroon;
+                                fillcolor = Color.Silver;
+                            }
+                            break;
 
-                        case Tile.JasinNameMePls.UnpassableOUTOFORDER:
-                        {
-                            bordercolor = Color.Black;
-                            fillcolor = Color.Black;
-                        } break;
+                        case Tile.TileType.UnpassableOUTOFORDER:
+                            {
+                                bordercolor = Color.Black;
+                                fillcolor = Color.Black;
+                            }
+                            break;
 
                         default: throw new Exception();
                     }
@@ -241,10 +215,6 @@ namespace stonerkart
 
                     dm.fillHexagon(hexX, hexY, hexsize, bordercolor, fillcolor);
                 }
-                
-                if (y > (height / 2 - 1)) rowWidth--;
-                else rowWidth++;
-                
             }
 
             foreach (var c in drawme)
@@ -259,7 +229,7 @@ namespace stonerkart
 
                 dm.fillHexagon(hexX, hexY, hexsize, Color.Transparent, TextureLoader.cardArt(c.template));
 
-                int statTextSize = (int)(hexsize*0.20);
+                int statTextSize = (int)(hexsize * 0.20);
                 TextLayout tl = new SingleLineFitLayout(Justify.Middle);
                 Color clr = c.owner.isHero ? Color.DarkGreen : Color.DarkRed;
 
@@ -267,17 +237,17 @@ namespace stonerkart
                 var powerText = tl.Layout(c.power.ToString(), statTextSize, statTextSize, ff);
                 var movementText = tl.Layout(c.movement.ToString(), statTextSize, statTextSize, ff);
 
-                int movementX = hexX + (int)(hexsize*0.76);
-                int movementY = hexY + (int)(hexsize*0.41);
+                int movementX = hexX + (int)(hexsize * 0.76);
+                int movementY = hexY + (int)(hexsize * 0.41);
 
                 dm.fillHexagon(movementX, movementY, statTextSize, clr, clr);
                 movementText.draw(dm, movementX, movementY, 0, Color.Black, true);
 
                 if (c.hasPT)
                 {
-                    int toughnessX = hexX + ((int)(hexsize*0.58));
-                    int toughnessY = hexY + ((int)(hexsize*0.765));
-                    int powerX = hexX + ((int)(hexsize*0.22));
+                    int toughnessX = hexX + ((int)(hexsize * 0.58));
+                    int toughnessY = hexY + ((int)(hexsize * 0.765));
+                    int powerX = hexX + ((int)(hexsize * 0.22));
                     int powerY = toughnessY;
 
                     dm.fillHexagon(toughnessX, toughnessY, statTextSize, clr, clr);
@@ -310,7 +280,7 @@ namespace stonerkart
         {
             var p1 = hexCoords(xorg, yorg);
             var p2 = hexCoords(xend, yend);
-            int hsd2 = hexsize/2;
+            int hsd2 = hexsize / 2;
             dm.drawLine(p1.X + hsd2, p1.Y + hsd2, p2.X + hsd2, p2.Y + hsd2, c);
         }
 

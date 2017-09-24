@@ -25,11 +25,11 @@ namespace stonerkart
                 if (tile.x > 1 && tile.x < map.width - 2 &&
                     tile.y > 1 && tile.y < map.height - 2)
                 {
-                    tile.JasinPls = Tile.JasinNameMePls.Normie;
+                    tile.tileType = Tile.TileType.Normie;
                 }
                 else
                 {
-                    tile.JasinPls = Tile.JasinNameMePls.NoSummon;
+                    tile.tileType = Tile.TileType.NoSummon;
                 }
             }
             return map;
@@ -37,14 +37,19 @@ namespace stonerkart
 
         private static Map JasinMap()
         {
-
-            throw new NotImplementedException("jasin implement me pls");
-            Map map = new Map(9, 9);
-
+            Map map = new Map(9, 7);
             foreach (var tile in map.Tiles)
             {
+                if (tile.x > 1 && tile.x < map.width - 2 &&
+                    tile.y > 1 && tile.y < map.height - 2)
+                {
+                    tile.tileType = Tile.TileType.Normie;
+                }
+                else
+                {
+                    tile.tileType = Tile.TileType.NoSummon;
+                }
             }
-
             return map;
         }
 
@@ -79,7 +84,7 @@ namespace stonerkart
 
         public Tile tileAt(int x, int y)
         {
-            return rows[x][y];
+            return cols[x][y];
         }
 
         public Tile tileAt(int p)

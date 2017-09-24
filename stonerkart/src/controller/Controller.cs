@@ -28,7 +28,7 @@ namespace stonerkart
         {
             //if (!Network.connectToServer()) throw new Exception("Server down for more or less routine maintenance.");
             GUI.launch();
-            GUI.transitionToScreen(GUI.mainMenuScreen);
+            GUI.transitionToScreen(GUI.loginScreen);
         }
 
         public static void attemptLogin(string username, string password)
