@@ -25,17 +25,9 @@ namespace stonerkart
             botgame.Text = "botgame";
             botgame.clicked += a =>
             {
-
-                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-                Map map = Map.DefaultMap;
-                GameScreen gs = new GameScreen(map, -1);
-                Game g = new Game(
-                    new NewGameStruct(0, 420,  new [] {"hero", "villain"}, 0), 
-                    true, 
-                    gs, 
-                    map);
-                GUI.transitionToScreen(gs);
-                g.start();*/
+                GameRules grs = new GameRules(MapConfiguration.Default);
+                var gsi = new GameSetupInfo(grs, -1, 420, true, new[] {Controller.user.Name, "Skurk"});
+                Controller.StartGame(gsi);
             };
         }
 
