@@ -382,7 +382,7 @@ namespace stonerkart
                         new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                             new ChooseRule<Tile>(
                                 ChooseRule<Tile>.ChooseAt.Resolve,
-                                t => t.passable && !t.isEdgy)),
+                                t => t.summonable)),
                         new SummonToTileDoer(),
                         new Foo(manaCostEffect(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
                         2,
@@ -1151,7 +1151,7 @@ namespace stonerkart
                     new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                         new ChooseRule<Tile>(
                             ChooseRule<Tile>.ChooseAt.Resolve,
-                            t => t.passable && !t.isEdgy)),
+                            t => t.summonable)),
                     new SummonToTileDoer(),
                     new Foo(manaCostEffect(new ManaSet(ManaColour.Colourless, ManaColour.Death))),
                     2,
@@ -1472,7 +1472,7 @@ namespace stonerkart
                             c => c.cardType == CardType.Creature),
                         new ChooseRule<Tile>(
                             ChooseRule<Tile>.ChooseAt.Resolve,
-                            t => t.passable && !t.isEdgy)),
+                            t => t.summonable)),
                         new SummonToTileDoer());
                 } break;
                 #endregion
@@ -2315,7 +2315,7 @@ namespace stonerkart
                     new ModifyRule<Card, Card>(0, 0, c => c),
                     new ChooseRule<Tile>(
                         ChooseRule<Tile>.ChooseAt.Resolve,
-                        t => t.passable && !t.isEdgy)),
+                        t => t.passable)),
                     new SummonToTileDoer(),
                     true
                     );
@@ -2983,7 +2983,7 @@ namespace stonerkart
                 castRange = 2;
                 castEffect = new Effect(new TargetRuleSet(
                     new CardResolveRule(CardResolveRule.Rule.ResolveCard),
-                    new ChooseRule<Tile>(ChooseRule<Tile>.ChooseAt.Resolve,t => t.passable && !t.isEdgy)),
+                    new ChooseRule<Tile>(ChooseRule<Tile>.ChooseAt.Resolve,t => t.summonable)),
                     new SummonToTileDoer());
             }
             else throw new Exception();

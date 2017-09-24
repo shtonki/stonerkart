@@ -24,7 +24,7 @@ namespace stonerkart
 
         public void send(Message m)
         {
-            socket.Send(encrypt(m.getBytes()));
+            socket.Send(encrypt(m.GetBytes()));
         }
 
         protected abstract void handle(Message m);
@@ -119,8 +119,7 @@ namespace stonerkart
 
             if (read < buffer.Length)
             {
-                string s = Encoding.ASCII.GetString(decrypt(bz.ToArray()));
-                Message m = new Message(s);
+                Message m = Message.FromBytes(decrypt(bz.ToArray()));
                 bz = new List<byte>();
                 handle(m);
             }

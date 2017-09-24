@@ -106,11 +106,20 @@ namespace stonerkart
             activeScreen = screen;
         }
 
-        public void loginAs(User user)
+        public void SetUser(User user)
         {
-            menuBar.setFlare(user);
+            //todo 210917 make all this observe
+
+            //GUI.shopScreen.populate(user.ProductCollection.Where(p => p is Pack).Cast<Pack>());
+
+            user.AddObserver(menuBar.playerFlarePanel);
+            user.AddObserver(menuBar.shekelsCount);
+            user.AddObserver(friendsPanel);
+            user.AddObserver(addFriendsPanel);
+
+            GUI.shopScreen.couple(user); //todo 220917 seems fucked, like it'd be depencdency inversion if I knew what that was
+
             menuBar.Visible = true;
-            user.addObserver(friendsPanel);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -245,7 +254,7 @@ namespace stonerkart
         {
             base.OnKeyDown(e);
 
-            if (e.Key == Key.W) { Console.WriteLine("{0} at {1}:{2}", hovered?.GetType(), hovered?.X, hovered?.Y); }
+            //if (e.Key == Key.W) { Console.WriteLine("{0} at {1}:{2}", hovered?.GetType(), hovered?.X, hovered?.Y); }
 
             focused?.onKeyDown(e);
         }

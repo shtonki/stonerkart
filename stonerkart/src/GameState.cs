@@ -38,22 +38,22 @@ namespace stonerkart
 
         private GameEventHandlerBuckets baseHandler = new GameEventHandlerBuckets();
 
-        public GameState(NewGameStruct ngs, Map map)
+        public GameState(GameSetupInfo gsi)
         {
             //gameid = ngs.gameid;
 
 
-            random = new Random(ngs.randomSeed);
-            this.map = map;
+            random = new Random(gsi.randSeed);
+            map = Map.MapFromConfiguration(gsi.GameRules.MapConfiguration);
             cards = new List<Card>();
             players = new List<Player>();
 
-            for (int i = 0; i < ngs.playerNames.Length; i++)
+            for (int i = 0; i < gsi.playerNames.Length; i++)
             {
-                Player p = new Player(this, ngs.playerNames[i]);
+                Player p = new Player(this, gsi.playerNames[i]);
 
                 players.Add(p);
-                if (i == ngs.heroIndex) hero = p;
+                if (gsi.playerNames[i] == Controller.user.Name) hero = p;
                 else
                 {
                     if (villain != null) throw new Exception();

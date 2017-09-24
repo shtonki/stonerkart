@@ -20,19 +20,7 @@ namespace stonerkart
         public static IEnumerable<Packs> OwnedPacks => ownedPacks;
         public static IEnumerable<CardTemplate> OwnedCards => ownedCards;
 
-        private static List<Game> activeGames { get; } = new List<Game>();
-
-        public static Game GetActiveGame(int id)
-        {
-            return activeGames.First(g => g.gameid == id);
-        }
-
-        private static void addActiveGame(Game g)
-        {
-            activeGames.Add(g);
-        }
-
-
+        public static List<Game> ActiveGames { get; } = new List<Game>();
 
         public static User user { get; private set; }
 
@@ -45,8 +33,20 @@ namespace stonerkart
 
         public static void attemptLogin(string username, string password)
         {
-            if (Network.login(username, password))
+            var lrm = Network.login(username, password);
+            if (lrm.Success)
             {
+                var myUser = lrm.loggedInUserFullJist.ToUser();
+
+                if (user != null) throw new Exception();
+                user = myUser;
+                GUI.frame.SetUser(user);
+                GUI.transitionToScreen(GUI.mainMenuScreen);
+
+                return;
+
+                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+                /*
                 user = Network.queryMyUser();
                 GUI.frame.loginAs(user);
 
@@ -65,7 +65,7 @@ namespace stonerkart
                 var ownedPacks = Network.queryOwnedPacks();
                 GUI.shopScreen.populate(ownedPacks);
 
-                GUI.transitionToScreen(GUI.mainMenuScreen);
+                */
             }
             else
             {
@@ -90,26 +90,23 @@ namespace stonerkart
             }
         }
 
-        public static bool makePurchase(ProductUnion product)
+        public static bool makePurchase(Product product)
         {
             int newbalance = Network.makePurchase(product);
             if (newbalance == -1) return false; //purchase failed
-            setShekelBalance(newbalance);
+            user.Shekels = newbalance;
+            user.AddOwnedProduct(product);
             return true;
         }
 
-        public static void setShekelBalance(int i)
-        {
-            GUI.frame.menuBar.setShekelCount(i);
-        }
 
-        public static Game startGame(NewGameStruct ngs)
+        public static Game StartGame(GameSetupInfo gsi)
         {
-            Map map = new Map(7);
-            GameScreen gsc = new GameScreen(map, ngs.gameid);
-            Game g = new Game(ngs, false, gsc, map);
+            Game g = new Game(gsi);
+            GameScreen gsc = new GameScreen(gsi);
             GUI.transitionToScreen(gsc);
-            addActiveGame(g);
+            g.coupleToScreen(gsc);
+            ActiveGames.Add(g);
             g.start();
             return g;
         }
@@ -122,8 +119,23 @@ namespace stonerkart
 
         public static void challengePlayer(string username)
         {
-            Network.challenge(username);
+            GameRules rules = new GameRules(MapConfiguration.Default);
+
+            Network.challenge(username, rules);
         }
+
+        public static void GetChallenged(ChallengeMessage cm)
+        {
+            var option = GUI.promptUser(cm.ChallengeeName + " challenges you to a battle to the death. Do you wish to accept this challenge?",
+                ButtonOption.Yes, ButtonOption.No);
+            Network.AcceptChallenge(cm, option == ButtonOption.Yes);
+        }
+
+        public static void AnswerChallenge(ChallengeResponseMessage acm)
+        {
+            
+        }
+
 
     }
 }

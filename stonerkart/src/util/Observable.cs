@@ -16,7 +16,7 @@ namespace stonerkart
     {
         private List<WeakReference<Observer<T>>> observers = new List<WeakReference<Observer<T>>>();
 
-        public void addObserver(Observer<T> o)
+        public void AddObserver(Observer<T> o)
         {
             foreach (var v in observers)
             {
@@ -25,6 +25,8 @@ namespace stonerkart
                 if (w != null && w == o) return;
             }
             observers.Add(new WeakReference<Observer<T>>(o));
+
+            o.notify(this, default(T));
         }
 
         public void removeObserver(Observer<T> o)

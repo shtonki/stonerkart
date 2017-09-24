@@ -18,7 +18,14 @@ namespace stonerkart
 
         public int this[T t]    // Indexer declaration  
         {
-            get { return d[t]; }
+            get
+            {
+                if (!values.Any(val => t.Equals(val)))
+                {
+                    return 0;
+                }
+                return d[t];
+            }
         }
 
         private Dictionary<T, int> d = new Dictionary<T, int>();

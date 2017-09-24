@@ -8,7 +8,6 @@ namespace stonerkart
 {
     internal class Map
     {
-
         public readonly int width;
         public readonly int height;
         public int size => tiles.Length;
@@ -18,41 +17,45 @@ namespace stonerkart
         private Tile[] tiles;
         private Tile[][] cols;
 
-        private Tile[][] rows;
-
-        public static Map DefaultMap => new Map(11, 7);
-        public static int HexCount (int diameter) => 2*(((diameter - 1) * (diameter) / 2) - (diameter / 2) * ((diameter / 2) + 1) / 2) + diameter;
-
-        public Map(int diameter)
+        private static Map DefaultMap()
         {
-            this.width = diameter;
-            this.height = diameter;
-
-            /*int a = ((diameter-1) * (diameter) / 2);
-            int b = (diameter / 2) * ((diameter / 2) + 1) / 2;
-            int ce = a - b;
-            int totalNumberOfHexagons = 2 * ce + diameter;*/
-            int totalNumberOfHexagons = HexCount(diameter);
-            tiles = new Tile[totalNumberOfHexagons];
-            rows = new Tile[diameter][];
-            int c = 0;
-            int width = diameter / 2 + 1;
-            for (int y = 0; y < diameter; y++)
+            Map map = new Map(9, 7);
+            foreach (var tile in map.Tiles)
             {
-                var row = new Tile[width];
-                for (int x = 0; x < width; x++)
+                if (tile.x > 1 && tile.x < map.width - 2 &&
+                    tile.y > 1 && tile.y < map.height - 2)
                 {
-                    row[x] = tiles[c] = new Tile(this, x, y);
-                    Console.WriteLine("(" + x + "," + y + ")");
-                    c++;
+                    tile.JasinPls = Tile.JasinNameMePls.Normie;
                 }
-                rows[y] = row;
-                if (y > (diameter / 2 - 1)) width--;
-                else width++;
+                else
+                {
+                    tile.JasinPls = Tile.JasinNameMePls.NoSummon;
+                }
             }
-            Console.WriteLine(c+ "\n");
-            //var erf = rows.SelectMany(rows => rows.ToList());
-            //foreach (var e in erf) Console.WriteLine(e);
+            return map;
+        }
+
+        private static Map JasinMap()
+        {
+
+            throw new NotImplementedException("jasin implement me pls");
+            Map map = new Map(9, 9);
+
+            foreach (var tile in map.Tiles)
+            {
+            }
+
+            return map;
+        }
+
+        public static Map MapFromConfiguration(MapConfiguration mc)
+        {
+            switch (mc)
+            {
+                case MapConfiguration.Default: return DefaultMap();
+                case MapConfiguration.JasinHex: return JasinMap();
+                default: throw new Exception();
+            }
         }
 
         public Map(int width, int height)
@@ -73,7 +76,6 @@ namespace stonerkart
                 cols[x] = col;
             }
         }
-
 
         public Tile tileAt(int x, int y)
         {
@@ -157,6 +159,12 @@ namespace stonerkart
         {
             return Array.IndexOf(tiles, t);
         }
+    }
+
+    public enum MapConfiguration
+    {
+        Default,
+        JasinHex,
     }
 
     class Path

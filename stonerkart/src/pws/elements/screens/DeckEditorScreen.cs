@@ -397,7 +397,7 @@ namespace stonerkart
         private CardList setupCardList(PileView pv)
         {
             CardList cardList = new CardList();
-            cardList.addObserver(pv);
+            cardList.AddObserver(pv);
             return cardList;
         }
 

@@ -10,8 +10,6 @@ namespace stonerkart
 {
     class Game
     {
-        public GameController gameController;
-
         public int gameid { get; }
         
         private GameConnection connection;
@@ -24,55 +22,54 @@ namespace stonerkart
 
         private const string waiterPrompt = "Waiting for opponent.";
 
-        public Game(NewGameStruct ngs, bool local, GameScreen gameScreen, Map map)
+        public Game(GameSetupInfo gsi)
         {
-            screen = gameScreen;
+            gameid = gsi.gameid;
 
-            gameid = ngs.gameid;
-            
-            gameController = new GameController(null, null);
+            gameState = new GameState(gsi);
 
-            gameState = new GameState(ngs, map);
-
-            if (local)
+            if (gsi.local)
             {
                 connection = new DummyConnection();
             }
             else
             {
-                connection = new MultiplayerConnection(this, ngs);
+                connection = new MultiplayerConnection(this);
             }
+        }
 
+        public void coupleToScreen(GameScreen gsc)
+        {
+            screen = gsc;
             observe();
         }
 
         private void observe()
         {
-            gameState.hero.hand.addObserver(screen.handView);
-            gameState.hero.manaPool.addObserver(screen.heroPanel);
+            screen.hexPanel.Map = gameState.map;
 
-            gameState.villain.manaPool.addObserver(screen.villainPanel);
+            gameState.hero.hand.AddObserver(screen.handView);
+            gameState.hero.manaPool.AddObserver(screen.heroPanel);
 
-            gameState.stack.addObserver(screen.stackWinduh);
+            gameState.villain.manaPool.AddObserver(screen.villainPanel);
 
-            gameState.hero.field.addObserver(screen.hexPanel);
-            gameState.villain.field.addObserver(screen.hexPanel);
+            gameState.stack.AddObserver(screen.stackWinduh);
 
-            gameState.hero.graveyard.addObserver(screen.heroGraveyard);
+            gameState.hero.graveyard.AddObserver(screen.heroGraveyard);
             screen.heroGraveyardWinduh.Title = String.Format("{0}'s Graveyard", gameState.hero.name);
 
-            gameState.villain.graveyard.addObserver(screen.villainGraveyard);
+            gameState.villain.graveyard.AddObserver(screen.villainGraveyard);
             screen.villainGraveyardWinduh.Title = String.Format("{0}'s Graveyard", gameState.villain.name);
 
-            gameState.hero.hand.addObserver(screen.heroPanel);
-            gameState.hero.deck.addObserver(screen.heroPanel);
-            gameState.hero.graveyard.addObserver(screen.heroPanel);
-            gameState.hero.displaced.addObserver(screen.heroPanel);
+            gameState.hero.hand.AddObserver(screen.heroPanel);
+            gameState.hero.deck.AddObserver(screen.heroPanel);
+            gameState.hero.graveyard.AddObserver(screen.heroPanel);
+            gameState.hero.displaced.AddObserver(screen.heroPanel);
 
-            gameState.villain.hand.addObserver(screen.villainPanel);
-            gameState.villain.deck.addObserver(screen.villainPanel);
-            gameState.villain.graveyard.addObserver(screen.villainPanel);
-            gameState.villain.displaced.addObserver(screen.villainPanel);
+            gameState.villain.hand.AddObserver(screen.villainPanel);
+            gameState.villain.deck.AddObserver(screen.villainPanel);
+            gameState.villain.graveyard.AddObserver(screen.villainPanel);
+            gameState.villain.displaced.AddObserver(screen.villainPanel);
 
             screen.stackView.mouseMove += a =>
             {
@@ -167,13 +164,6 @@ namespace stonerkart
             Card r = a.createDummy();
             gameState.cards.Add(r);
             return r;
-        }
-
-        public Path pathTo(Card c, Tile t)
-        {
-
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");/*
-            return map.path(c, t);*/
         }
 
         public void start()
@@ -273,7 +263,6 @@ namespace stonerkart
 
         private void gameLoop()
         {
-            gameController.setPrompt("Game starting");
             initGame();
 
             while (true)
@@ -385,12 +374,12 @@ namespace stonerkart
 
         public void highlight(IEnumerable<Tile> ts, Color c)
         {
-            foreach (var t in ts) screen.hexPanel.highlight(t.x, t.y, c);
+            foreach (var t in ts) t.RimHighlight = c;
         }
 
         public void clearHighlights()
         {
-            screen.hexPanel.clearHighlights();
+            foreach (var t in gameState.map.Tiles) t.RimHighlight = null;
         }
 
         private void moveStep()
@@ -431,11 +420,11 @@ namespace stonerkart
                         path.length <= mover.movement - pth.length //card can reach the tile
                         &&
                         (
-                            path.to.card == null || // tile is empty
-                            mover.canAttack(path.to.card) || //card can attack the card in the target tile
-                            (path.to.card.controller == mover.controller && !occupado.Contains(path.to))
-                            //we want to move to a tile occupied by a friendly creature that's moving somewhere else
+                            path.to.passable ||
+                            (path.to.card != null &&
+                                (mover.canAttack(path.to.card) || (path.to.card.controller == mover.controller && !occupado.Contains(path.to)))
                             )
+                        )
                         &&
                         !occupado.Any(p => p == path.last) //there isn't a card in the tile we want to move to
                         ).ToList();
@@ -918,11 +907,6 @@ namespace stonerkart
             handleTransaction(gt);
         }
 
-        public void endGame(GameEndStruct ras)
-        {
-            GUI.transitionToScreen(new PostGameScreen(this, ras));
-        }
-
         private Card chooseCardUnsynced(Func<Card, bool> filter)
         {
             PublicSaxophone sax = new PublicSaxophone(o =>
@@ -948,7 +932,7 @@ namespace stonerkart
             screen.gamePromptPanel.sub(sax);
             screen.handView.sub(sax);
             screen.stackView.sub(sax);
-            screen.hexPanel.subTile(sax, gameState.map.tileAt);
+            screen.hexPanel.SubToTiles(sax, gameState.map.tileAt);
 
             var v = sax.call();
             if (v is ButtonOption)
@@ -1040,7 +1024,7 @@ namespace stonerkart
         private Tile chooseTileUnsynced(Func<Tile, bool> filter)
         {
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Tile && filter((Tile)o)));
-            screen.hexPanel.subTile(sax, gameState.map.tileAt);
+            screen.hexPanel.SubToTiles(sax, gameState.map.tileAt);
             screen.gamePromptPanel.sub(sax);
             var v = sax.call();
 
@@ -1182,12 +1166,42 @@ namespace stonerkart
             return rt;
         }
 
-        public void enqueueGameMessage(string gmb)
+        public void enqueueGameMessage(GameMessage gmb)
         {
-            connection.enqueueGameMessage(gmb);
+            connection.enqueueGameMessage(gmb.message);
         }
     }
 
+    [Serializable]
+    public class GameSetupInfo
+    {
+        public GameRules GameRules { get; }
+        public int gameid { get; }
+        public int randSeed { get; }
+        public bool local { get; }
+        public string[] playerNames { get; }
+
+        public GameSetupInfo(GameRules gameRules, int gameid, int randSeed, bool local, string[] playerNames)
+        {
+            GameRules = gameRules;
+            this.gameid = gameid;
+            this.randSeed = randSeed;
+            this.local = local;
+            this.playerNames = playerNames;
+        }
+    }
+
+    [Serializable]
+    public class GameRules
+    {
+        public MapConfiguration MapConfiguration { get; }
+
+
+        public GameRules(MapConfiguration mapConfiguration)
+        {
+            this.MapConfiguration = mapConfiguration;
+        }
+    }
 
     class StackWrapper
     {

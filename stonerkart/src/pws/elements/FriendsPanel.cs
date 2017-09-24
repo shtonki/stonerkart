@@ -20,17 +20,20 @@ namespace stonerkart
 
         public void notify(object o, UserChanged t)
         {
-            var newfriends = t.user.Friends;
+            User user = (User)o;
+            //todo 210917 this leaves dead observers in friends
+            var newfriends = user.Friends;
             clearChildren();
             friends.Clear();
             addFriends(newfriends);
         }
 
-        public void addFriends(IEnumerable<User> newFriends)
+        private void addFriends(IEnumerable<User> newFriends)
         {
             foreach (var friend in newFriends)
             {
                 FriendBar fb = new FriendBar(Width, friendBarHeight, friend);
+                friend.AddObserver(fb);
                 friends.Add(fb);
                 addChild(fb);
             }
@@ -59,7 +62,6 @@ namespace stonerkart
 
     class FriendBar : Square, Observer<UserChanged>
     {
-        public User friend { get; }
         private PlayerFlarePanel playerflare;
         private Button challenge;
 
@@ -67,8 +69,6 @@ namespace stonerkart
         {
             if (width < height) throw new Exception();
 
-            this.friend = friend;
-            friend.addObserver(this);
 
             Backcolor = backcolorFromStatus(friend.Status);
 
@@ -80,14 +80,18 @@ namespace stonerkart
             challenge.Visible = friend.Status != UserStatus.Offline;
             challenge.clicked += a => Controller.challengePlayer(friend.Name);
 
-            playerflare = new PlayerFlarePanel(friend, width - height, height);
+            playerflare = new PlayerFlarePanel(width - height, height);
+            friend.AddObserver(playerflare);
             addChild(playerflare);
+
+            friend.AddObserver(this);
         }
 
         public void notify(object o, UserChanged t)
         {
-            Backcolor = backcolorFromStatus(friend.Status);
-            challenge.Visible = t.user.Status != UserStatus.Offline;
+            User user = (User)o;
+            Backcolor = backcolorFromStatus(user.Status);
+            challenge.Visible = user.Status != UserStatus.Offline;
         }
 
         private static Color backcolorFromStatus(UserStatus status)
@@ -101,7 +105,7 @@ namespace stonerkart
         }
     }
 
-    class PendingFriendsPanel : Square
+    class PendingFriendsPanel : Square, Observer<UserChanged>
     {
         private const int okbtnsize = 40;
         private const int requestHeight = 50;
@@ -165,6 +169,13 @@ namespace stonerkart
             Controller.respondToFriendRequest(username, accept);
             pendingRequests.RemoveAll(pnl => pnl.Name == username);
             layoutStuff();
+        }
+
+        public void notify(object o, UserChanged t)
+        {
+            User usr = (User)o;
+            pendingRequests.Clear();
+            addRequests(usr.FriendRequests.Select(u => u.Name));
         }
     }
 

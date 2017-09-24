@@ -7,46 +7,37 @@ using System.Threading.Tasks;
 namespace stonerkart
 {
 
-    public class ProductUnion
+    public interface Product
     {
-        private Packs? pack { get; }
-        public bool isPack => pack.HasValue;
-        public Packs Pack => pack.Value;
-        
+        int Price { get; }
+    }
 
-        public int price => priceEx();
+    [Serializable]
+    public class Pack : Product
+    {
+        public Packs Template { get; }
 
-        public ProductUnion(Packs pack)
+        public Pack(Packs template)
         {
-            this.pack = pack;
+            this.Template = template;
         }
 
-        protected int priceEx()
+        public int Price
         {
-            if (isPack)
+            get
             {
-                switch (Pack)
+                switch (Template)
                 {
                     case Packs.FirstEdition12Pack:
                         return 420;
 
                     case Packs.FirstEdition40Pack:
                         return 1420;
+
+                    default:
+                        throw new Exception();
                 }
             }
-            throw new Exception();
-        }
-
-        public override string ToString()
-        {
-            return pack.ToString();
-        }
-
-        public static ProductUnion FromString(string s)
-        {
-            Packs p;
-            if (!Packs.TryParse(s, out p)) throw new Exception();
-            return new ProductUnion(p);
         }
     }
 

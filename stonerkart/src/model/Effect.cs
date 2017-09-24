@@ -115,7 +115,7 @@ namespace stonerkart
                     templates),
                 new ChooseRule<Tile>(
                     ChooseRule<Tile>.ChooseAt.Resolve,
-                    t => t.passable && !t.isEdgy,
+                    t => t.summonable,
                     templates.Length, 
                     false)),
                 new SummonToTileDoer(),

@@ -9,7 +9,7 @@ namespace stonerkart
 {
     class GameScreen : Screen
     {
-        public int gameID { get; }
+        private int gameID { get; }
 
         public GamePromptPanel gamePromptPanel { get; }
 
@@ -58,6 +58,7 @@ namespace stonerkart
         private const int handViewX = leftPanelWidth + leftPanelX + handXPadding;
 
         private const int hexPanelHeight = leftPanelHeight - handViewHeight - handAndHexPaddingY * 2;
+        private const int hexPanelWidth = 700;
         private const int hexPanelXPaddingToRightPanel = 100;
         private const int hexPanelY = 25;
 
@@ -83,10 +84,11 @@ namespace stonerkart
         private const int toggledviewWidth = 200;
         private const int toggledHeight = 600;
 
-        public GameScreen(Map map, int gameID) : base(new Imege(Textures.table0))
+        public GameScreen(GameSetupInfo gsi) : base(new Imege(Textures.table0))
         {
-            this.gameID = gameID;
+            gameID = gsi.gameid;
 
+            var map = Map.MapFromConfiguration(gsi.GameRules.MapConfiguration);
             int hexColumns = map.width;
             int hexRows = map.height;
             int hexSize = (int)Math.Round((hexPanelHeight) / (hexRows + 0.5));
@@ -124,7 +126,7 @@ namespace stonerkart
             rightPanel.addChild(villainPanel);
             villainPanel.setLocation(villainPanelX, villainPanelY);
 
-            hexPanel = new HexPanel(7, hexSize - 2);//new HexPanel(hexColumns, hexRows, hexSize - 2);
+            hexPanel = new HexPanel(hexPanelWidth, hexPanelHeight);
             addElement(hexPanel);
             hexPanel.X = rightPanel.X - hexPanel.Width - hexPanelXPaddingToRightPanel;
             hexPanel.Y = hexPanelY;

@@ -7,6 +7,16 @@ namespace stonerkart
 {
     class Tile : Stuff, Targetable
     {
+        public enum JasinNameMePls
+        {
+            Invisible,
+            Normie,
+            NoSummon,
+            UnpassableOUTOFORDER,
+        }
+
+        public Color? RimHighlight { get; set; }
+        public JasinNameMePls JasinPls { get; set; }
         public Map map { get; }
         public int x => xyCoord.x;
         public int y => xyCoord.y;
@@ -15,14 +25,11 @@ namespace stonerkart
         public int c => abcCoord.c;
         public int ord => map.ord(this);
 
-        public bool isEdgy => x < edgelordLimit || x >= map.width - edgelordLimit ||
-                              y < edgelordLimit + 1 || y >= map.height - edgelordLimit - 1;
-
-        public const int edgelordLimit = 1;
-
         public Card card { get; private set; }
 
-        public bool passable => card == null;
+        public bool passable => card == null && (JasinPls == JasinNameMePls.Normie || JasinPls == JasinNameMePls.NoSummon);
+        public bool summonable => passable && JasinPls == JasinNameMePls.Normie;
+
 
         private readonly XYCoord xyCoord;
         private readonly ABCCoord abcCoord;

@@ -25,15 +25,9 @@ namespace stonerkart
             botgame.Text = "botgame";
             botgame.clicked += a =>
             {
-                Map map = new Map(7);
-                GameScreen gs = new GameScreen(map, -1);
-                Game g = new Game(
-                    new NewGameStruct(0, 420,  new [] {"hero", "villain"}, 0), 
-                    true, 
-                    gs, 
-                    map);
-                GUI.transitionToScreen(gs);
-                g.start();
+                GameRules grs = new GameRules(MapConfiguration.JasinHex);
+                var gsi = new GameSetupInfo(grs, -1, 420, true, new[] {Controller.user.Name, "Skurk"});
+                Controller.StartGame(gsi);
             };
         }
 

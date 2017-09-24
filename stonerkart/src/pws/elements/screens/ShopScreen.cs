@@ -7,33 +7,57 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
+    class ProductPackPanel : Square, Observer<UserChanged>
+    {
+        private static IEnumerable<Packs> displayedPacks { get; }= Enum.GetValues(typeof(Packs)).Cast<Packs>();
+        private Packs[] DisplayedPacks = displayedPacks.ToArray();
+
+        private PackPanel[] PackPanels;
+
+        private const int packWidth = 250;
+        private const int packPadding = 25;
+
+        public ProductPackPanel(int width, int height) : base(width, height)
+        {
+            PackPanels = new PackPanel[DisplayedPacks.Length];
+
+            for (int i = 0; i < DisplayedPacks.Length; i++)
+            {
+                if (i >= DisplayedPacks.Length) break;
+                Packs pack = DisplayedPacks[i];
+                var pp = PackPanels[i] = new PackPanel(packWidth, Height, new Pack(DisplayedPacks[i]));
+                addChild(pp);
+                pp.X = packPadding + i * (packWidth + packPadding);
+            }
+        }
+
+        public void notify(object o, UserChanged t)
+        {
+            User user = (User)o;
+            ReduceResult<Packs> rr = user.ProductCollection.Where(p => p is Pack).Cast<Pack>().Select(p => p.Template).Reduce();
+
+            foreach (var packpanel in PackPanels)
+            {
+                packpanel.OwnedCount = rr[packpanel.Pack.Template];
+            }
+        }
+    }
+
     class ShopScreen : Screen
     {
-        private Square packsSquare { get; }
+        private ProductPackPanel packsSquare { get; }
         private Button backButton { get; }
 
         private const int packSquareWidth = 1200;
         private const int packSquareHeight = 600;
-        private const int packWidth = 250;
-        private const int packPadding = 25;
 
-        private Packs[] displayedPacks = Enum.GetValues(typeof (Packs)).Cast<Packs>().ToArray();
 
         public ShopScreen() : base(new Imege(Textures.background0))
         {
-            packsSquare = new Square(packSquareWidth, packSquareHeight);
+            packsSquare = new ProductPackPanel(packSquareWidth, packSquareHeight);
             addElement(packsSquare);
             packsSquare.X = 200;
             packsSquare.Y = 200;
-
-            backButton = new Button(120, 40);
-            addElement(backButton);
-            backButton.Backimege = new MemeImege(Textures.buttonbg2, 43985);
-            backButton.Border = new AnimatedBorder(Textures.border0, 4);
-            backButton.X = 20;
-            backButton.Y = 20;
-            backButton.Text = "Back";
-            backButton.clicked += a => GUI.transitionToScreen(GUI.mainMenuScreen);
         }
 
         public void ripPack(IEnumerable<CardTemplate> ripped)
@@ -43,19 +67,9 @@ namespace stonerkart
             freeze(ripper);
         }
 
-        public void populate(IEnumerable<Packs> ownedPacks)
+        public void couple(User user)
         {
-            packsSquare.clearChildren();
-
-            for (int i = 0; i < packSquareWidth/(packWidth); i++)
-            {
-                if (i >= displayedPacks.Length) break;
-                Packs pack = displayedPacks[i];
-                var pp = new PackProductPanel(packWidth, packSquareHeight, new ProductUnion(displayedPacks[i]), ownedPacks.Count(p => p == pack));
-                packsSquare.addChild(pp);
-                pp.X = packPadding + i*(packWidth + packPadding);
-            }
-
+            user.AddObserver(packsSquare);
         }
 
         protected override IEnumerable<MenuEntry> generateMenuEntries()
@@ -77,7 +91,7 @@ namespace stonerkart
             Backimege = new MemeImege(Textures.buttonbg0, 4357987);
 
             viewed = new PileView();
-            viewedlist.addObserver(viewed);
+            viewedlist.AddObserver(viewed);
             addChild(viewed);
             viewed.Width = Width - cardWidth;
             viewed.Height = Height;
@@ -108,20 +122,34 @@ namespace stonerkart
         }
     }
 
-    class PackProductPanel : Square
+    class PackPanel : Square
     {
         private Square productImege { get; }
-        private PricePanel pricePanel { get; }
+        private ShekelPanel pricePanel { get; }
         private Button buyButton { get; }
         private Square ownedCounter { get; }
         private Button ripem { get; }
 
-        private int ownedCount;
+        public Pack Pack { get; }
 
-        public PackProductPanel(int width, int height, ProductUnion product, int initialCount) : base(width, height)
+        public int OwnedCount
         {
-            if (!product.isPack) throw new Exception();
-            ownedCount = initialCount;
+            get { return ownedCount; }
+            set
+            {
+                ownedCount = value;
+                ownedCounter.Text = ownedCount.ToString();
+            }
+        }
+
+        private int ownedCount { get; set; }
+
+
+
+        public PackPanel(int width, int height, Pack pack) : base(width, height)
+        {
+            this.Pack = pack;
+            ownedCount = 0;
             //Backimege = new MemeImege(Textures.buttonbg0, 23579485);
 
             int paddings = 10;
@@ -131,9 +159,9 @@ namespace stonerkart
             int priceHeight = (int)Math.Round(height/10.0);
             int priceWidth = (int)Math.Round(width/1.5);
 
-            pricePanel = new PricePanel(priceWidth, priceHeight);
+            pricePanel = new ShekelPanel(priceWidth, priceHeight);
             addChild(pricePanel);
-            pricePanel.setPrice(product.price);
+            pricePanel.setPrice(pack.Price);
             pricePanel.Backcolor = backer;
 
             buyButton = new Button(width - priceWidth, priceHeight);
@@ -144,22 +172,18 @@ namespace stonerkart
             buyButton.X = pricePanel.Width;
             buyButton.clicked += a =>
             {
-                if (Controller.makePurchase(product))
-                {
-                    ownedCount++;
-                    ownedCounter.Text = ownedCount.ToString();
-                }
+                Controller.makePurchase(pack);
             };
             
             productImege = new Square(width, height - priceHeight*2 - paddings*2);
             addChild(productImege);
             productImege.Y = pricePanel.Height + paddings;
-            productImege.Backimege = new Imege(TextureLoader.packDisplayImage(product.Pack));
+            productImege.Backimege = new Imege(TextureLoader.packDisplayImage(pack.Template));
 
             ownedCounter = new Square(width - priceWidth, priceHeight);
             addChild(ownedCounter);
             ownedCounter.Backcolor = backer;
-            ownedCounter.Text = ownedCount.ToString();
+            ownedCounter.Text = OwnedCount.ToString();
             ownedCounter.Y = height - pricePanel.Height;
 
             ripem = new Button(priceWidth, priceHeight);
@@ -169,10 +193,10 @@ namespace stonerkart
             ripem.Text = "Rip One";
             ripem.clicked += a =>
             {
-                if (Controller.ripPack(product.Pack))
+                if (Controller.ripPack(pack.Template))
                 {
-                    ownedCount--;
-                    ownedCounter.Text = ownedCount.ToString();
+                    OwnedCount--;
+                    ownedCounter.Text = OwnedCount.ToString();
                 }
             };
             ripem.Y = height - pricePanel.Height;
