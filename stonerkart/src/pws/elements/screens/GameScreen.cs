@@ -57,6 +57,7 @@ namespace stonerkart
         private const int handViewX = leftPanelWidth + leftPanelX + handXPadding;
 
         private const int hexPanelHeight = leftPanelHeight - handViewHeight - handAndHexPaddingY * 2;
+        private const int hexPanelWidth = 700;
         private const int hexPanelXPaddingToRightPanel = 100;
         private const int hexPanelY = 25;
 
@@ -124,7 +125,7 @@ namespace stonerkart
             rightPanel.addChild(villainPanel);
             villainPanel.setLocation(villainPanelX, villainPanelY);
 
-            hexPanel = new HexPanel(hexColumns, hexRows, hexSize - 2);
+            hexPanel = new HexPanel(hexPanelWidth, hexPanelHeight);
             addElement(hexPanel);
             hexPanel.X = rightPanel.X - hexPanel.Width - hexPanelXPaddingToRightPanel;
             hexPanel.Y = hexPanelY;

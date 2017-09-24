@@ -17,11 +17,43 @@ namespace stonerkart
         private Tile[] tiles;
         private Tile[][] cols;
 
+        private static Map DefaultMap()
+        {
+            Map map = new Map(9, 7);
+            foreach (var tile in map.Tiles)
+            {
+                if (tile.x > 1 && tile.x < map.width - 2 &&
+                    tile.y > 1 && tile.y < map.height - 2)
+                {
+                    tile.JasinPls = Tile.JasinNameMePls.Normie;
+                }
+                else
+                {
+                    tile.JasinPls = Tile.JasinNameMePls.NoSummon;
+                }
+            }
+            return map;
+        }
+
+        private static Map JasinMap()
+        {
+
+            throw new NotImplementedException("jasin implement me pls");
+            Map map = new Map(9, 9);
+
+            foreach (var tile in map.Tiles)
+            {
+            }
+
+            return map;
+        }
+
         public static Map MapFromConfiguration(MapConfiguration mc)
         {
             switch (mc)
             {
-                case MapConfiguration.Default: return new Map(9, 7);
+                case MapConfiguration.Default: return DefaultMap();
+                case MapConfiguration.JasinHex: return JasinMap();
                 default: throw new Exception();
             }
         }
@@ -132,6 +164,7 @@ namespace stonerkart
     public enum MapConfiguration
     {
         Default,
+        JasinHex,
     }
 
     class Path

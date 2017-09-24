@@ -46,15 +46,14 @@ namespace stonerkart
 
         private void observe()
         {
+            screen.hexPanel.Map = gameState.map;
+
             gameState.hero.hand.AddObserver(screen.handView);
             gameState.hero.manaPool.AddObserver(screen.heroPanel);
 
             gameState.villain.manaPool.AddObserver(screen.villainPanel);
 
             gameState.stack.AddObserver(screen.stackWinduh);
-
-            gameState.hero.field.AddObserver(screen.hexPanel);
-            gameState.villain.field.AddObserver(screen.hexPanel);
 
             gameState.hero.graveyard.AddObserver(screen.heroGraveyard);
             screen.heroGraveyardWinduh.Title = String.Format("{0}'s Graveyard", gameState.hero.name);
@@ -374,12 +373,12 @@ namespace stonerkart
 
         public void highlight(IEnumerable<Tile> ts, Color c)
         {
-            foreach (var t in ts) screen.hexPanel.highlight(t.x, t.y, c);
+            foreach (var t in ts) t.RimHighlight = c;
         }
 
         public void clearHighlights()
         {
-            screen.hexPanel.clearHighlights();
+            foreach (var t in gameState.map.Tiles) t.RimHighlight = null;
         }
 
         private void moveStep()
@@ -420,11 +419,11 @@ namespace stonerkart
                         path.length <= mover.movement - pth.length //card can reach the tile
                         &&
                         (
-                            path.to.card == null || // tile is empty
-                            mover.canAttack(path.to.card) || //card can attack the card in the target tile
-                            (path.to.card.controller == mover.controller && !occupado.Contains(path.to))
-                            //we want to move to a tile occupied by a friendly creature that's moving somewhere else
+                            path.to.passable ||
+                            (path.to.card != null &&
+                                (mover.canAttack(path.to.card) || (path.to.card.controller == mover.controller && !occupado.Contains(path.to)))
                             )
+                        )
                         &&
                         !occupado.Any(p => p == path.last) //there isn't a card in the tile we want to move to
                         ).ToList();
@@ -931,7 +930,7 @@ namespace stonerkart
             screen.gamePromptPanel.sub(sax);
             screen.handView.sub(sax);
             screen.stackView.sub(sax);
-            screen.hexPanel.subTile(sax, gameState.map.tileAt);
+            screen.hexPanel.SubToTiles(sax, gameState.map.tileAt);
 
             var v = sax.call();
             if (v is ButtonOption)
@@ -1023,7 +1022,7 @@ namespace stonerkart
         private Tile chooseTileUnsynced(Func<Tile, bool> filter)
         {
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Tile && filter((Tile)o)));
-            screen.hexPanel.subTile(sax, gameState.map.tileAt);
+            screen.hexPanel.SubToTiles(sax, gameState.map.tileAt);
             screen.gamePromptPanel.sub(sax);
             var v = sax.call();
 

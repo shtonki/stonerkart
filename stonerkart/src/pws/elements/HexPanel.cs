@@ -10,39 +10,44 @@ using OpenTK.Input;
 
 namespace stonerkart
 {
-    class HexPanel : Square, Observer<PileChangedMessage>
+    class HexPanel : Square
     {
-        private int xcount;
-        private int ycount;
-        public int hexsize { get; }
-        private int hexsizethreequarters;
 
-        private Color[][] bordercolors;
-
-        private Map colormeshocked;
-
-        public HexPanel(int xcount, int ycount, int hexsize) : base()
+        public Map Map
         {
-            colormeshocked = new Map(xcount, ycount);
-
-            hexsizethreequarters = (int)Math.Round(hexsize*0.75);
-            width = hexsize+(int)((xcount-1)* hexsizethreequarters);
-            height = ycount*hexsize + hexsize/2;
-
-            this.xcount = xcount;
-            this.ycount = ycount;
-            this.hexsize = hexsize;
-
-            bordercolors = new Color[xcount][];
-            for (int i = 0; i < xcount; i++)
+            get { return map; }
+            set
             {
-                bordercolors[i] = new Color[ycount];
+                map = value;
+                setMap(map);
             }
-
-            clearHighlights();
         }
 
-        public void subTile(PublicSaxophone sax, Func<int, int, Tile> tileFromXY)
+        public int hexsize { get; private set; }
+        private int hexsizethreequarters;
+        private int xcount => map.width;
+        private int ycount => map.height;
+
+        private Map map { get; set; }
+        private List<Card> GetMapCards() { return map.Tiles.Where(t => t.card != null).Select(t => t.card).ToList(); }
+
+        public HexPanel(int width, int height) : base(width, height)
+        {
+        }
+
+        private void setMap(Map map)
+        {
+            int widthinhexquarters = 1 + map.width*3;
+            var hs1 = 4*Width/widthinhexquarters;
+
+            int heightinhexquarters = 2 + map.height*4;
+            int hs2 = 4*Height/heightinhexquarters;
+
+            hexsize = Math.Min(hs1, hs2);
+            hexsizethreequarters = (int)Math.Round(hexsize * 0.75);
+        }
+
+        public void SubToTiles(PublicSaxophone sax, Func<int, int, Tile> tileFromXY)
         {
             sax.sub(this, (a, g) =>
             {
@@ -53,47 +58,42 @@ namespace stonerkart
         }
 
         private CardView rightclickview;
-
         public override void onMouseDown(MouseButtonEventArgs args)
         {
             base.onMouseDown(args);
 
             if (args.Button == MouseButton.Right)
             {
-                if (drawme == null || drawme.Count == 0) return;
+                if (map == null) return;
                 var v = findHexagon(args.Position.X, args.Position.Y);
                 if (v != null)
                 {
-                    lock (drawme)
+                    var drawme = GetMapCards();
+                    foreach (var c in drawme)
                     {
-                        foreach (var c in drawme)
+                        if (c.tile.x == v.Item1 && c.tile.y == v.Item2)
                         {
-                            if (c.tile.x == v.Item1 && c.tile.y == v.Item2)
-                            {
-                                memeon(c, args.X - AbsoluteX, args.Y - AbsoluteY);
-                            }
+                            ShowRightClickCard(c, args.X - AbsoluteX, args.Y - AbsoluteY);
                         }
                     }
                 }
             }
         }
-
         public override void onMouseUp(MouseButtonEventArgs args)
         {
             base.onMouseUp(args);
 
-            memeoff();
+            HideRightClickCard();
         }
-
         public override void onMouseExit(MouseMoveEventArgs args)
         {
             base.onMouseExit(args);
 
-            memeoff();
+            HideRightClickCard();
         }
 
 
-        private void memeon(Card c, int x, int y)
+        private void ShowRightClickCard(Card c, int x, int y)
         {
             if (rightclickview != null) throw new Exception();
             rightclickview = new CardView(Card.fromTemplate(c.template));
@@ -103,8 +103,7 @@ namespace stonerkart
             rightclickview.Hoverable = false;
             addChild(rightclickview);
         }
-
-        private void memeoff()
+        private void HideRightClickCard()
         {
             if (rightclickview == null) return;
             removeChild(rightclickview);
@@ -162,6 +161,9 @@ namespace stonerkart
         {
             base.draw(dm);
 
+            if (Map == null) return;
+
+            var drawme = GetMapCards();
 
             for (int i = 0; i < xcount; i++)
             {
@@ -170,56 +172,85 @@ namespace stonerkart
                     var p = hexCoords(i, j);
                     int hexX = p.X;
                     int hexY = p.Y;
-                    
-                    Color hl = bordercolors[i][j];
 
-                    var edgy = colormeshocked.tileAt(i, j).isEdgy;
+                    Tile tile = map.tileAt(i, j);
 
-                    dm.fillHexagon(hexX, hexY, hexsize, hl, edgy ? Color.Silver : Color.AntiqueWhite);
+                    Color bordercolor;
+                    Color fillcolor;
+
+                    switch (tile.JasinPls)
+                    {
+                        case Tile.JasinNameMePls.Invisible:
+                        {
+                            bordercolor = Color.Transparent;
+                            fillcolor = Color.Transparent;
+                        } break;
+
+                        case Tile.JasinNameMePls.Normie:
+                        {
+                            bordercolor = Color.DarkSlateGray;
+                            fillcolor = Color.MintCream;
+                        } break;
+
+                        case Tile.JasinNameMePls.NoSummon:
+                        {
+                            bordercolor = Color.Maroon;
+                            fillcolor = Color.Silver;
+                        } break;
+
+                        case Tile.JasinNameMePls.UnpassableOUTOFORDER:
+                        {
+                            bordercolor = Color.Black;
+                            fillcolor = Color.Black;
+                        } break;
+
+                        default: throw new Exception();
+                    }
+
+                    if (tile.RimHighlight.HasValue) bordercolor = tile.RimHighlight.Value;
+
+                    dm.fillHexagon(hexX, hexY, hexsize, bordercolor, fillcolor);
                 }
             }
 
-            lock (drawme)
+            foreach (var c in drawme)
             {
-                foreach (var c in drawme)
+                if (c.tile == null) continue;
+                var i = c.tile.x;
+                var j = c.tile.y;
+
+                var p = hexCoords(i, j);
+                int hexX = p.X;
+                int hexY = p.Y;
+
+                dm.fillHexagon(hexX, hexY, hexsize, Color.Transparent, TextureLoader.cardArt(c.template));
+
+                int statTextSize = (int)(hexsize*0.20);
+                TextLayout tl = new SingleLineFitLayout(Justify.Middle);
+                Color clr = c.owner.isHero ? Color.DarkGreen : Color.DarkRed;
+
+                var toughnessText = tl.Layout(c.toughness.ToString(), statTextSize, statTextSize, ff);
+                var powerText = tl.Layout(c.power.ToString(), statTextSize, statTextSize, ff);
+                var movementText = tl.Layout(c.movement.ToString(), statTextSize, statTextSize, ff);
+
+                int movementX = hexX + (int)(hexsize*0.76);
+                int movementY = hexY + (int)(hexsize*0.41);
+
+                dm.fillHexagon(movementX, movementY, statTextSize, clr, clr);
+                movementText.draw(dm, movementX, movementY, 0, Color.Black, true);
+
+                if (c.hasPT)
                 {
-                    if (c.tile == null) continue;
-                    var i = c.tile.x;
-                    var j = c.tile.y;
+                    int toughnessX = hexX + ((int)(hexsize*0.58));
+                    int toughnessY = hexY + ((int)(hexsize*0.765));
+                    int powerX = hexX + ((int)(hexsize*0.22));
+                    int powerY = toughnessY;
 
-                    var p = hexCoords(i, j);
-                    int hexX = p.X;
-                    int hexY = p.Y;
+                    dm.fillHexagon(toughnessX, toughnessY, statTextSize, clr, clr);
+                    toughnessText.draw(dm, toughnessX, toughnessY, 0, Color.Black, true);
 
-                    dm.fillHexagon(hexX, hexY, hexsize, Color.Transparent, TextureLoader.cardArt(c.template));
-
-                    int statTextSize = (int)(hexsize*0.20);
-                    TextLayout tl = new SingleLineFitLayout(Justify.Middle);
-                    Color clr = c.owner.isHero ? Color.DarkGreen : Color.DarkRed;
-
-                    var toughnessText = tl.Layout(c.toughness.ToString(), statTextSize, statTextSize, ff);
-                    var powerText = tl.Layout(c.power.ToString(), statTextSize, statTextSize, ff);
-                    var movementText = tl.Layout(c.movement.ToString(), statTextSize, statTextSize, ff);
-
-                    int movementX = hexX + (int)(hexsize*0.76);
-                    int movementY = hexY + (int)(hexsize*0.41);
-
-                    dm.fillHexagon(movementX, movementY, statTextSize, clr, clr);
-                    movementText.draw(dm, movementX, movementY, 0, Color.Black, true);
-
-                    if (c.hasPT)
-                    {
-                        int toughnessX = hexX + ((int)(hexsize * 0.58));
-                        int toughnessY = hexY + ((int)(hexsize * 0.765));
-                        int powerX = hexX + ((int)(hexsize * 0.22));
-                        int powerY = toughnessY;
-
-                        dm.fillHexagon(toughnessX, toughnessY, statTextSize, clr, clr);
-                        toughnessText.draw(dm, toughnessX, toughnessY, 0, Color.Black, true);
-
-                        dm.fillHexagon(powerX, powerY, statTextSize, clr, clr);
-                        powerText.draw(dm, powerX, powerY, 0, Color.Black, true);
-                    }
+                    dm.fillHexagon(powerX, powerY, statTextSize, clr, clr);
+                    powerText.draw(dm, powerX, powerY, 0, Color.Black, true);
                 }
             }
 
@@ -239,7 +270,6 @@ namespace stonerkart
                     }
                 }
             }
-
         }
 
         private void arrow(int xorg, int yorg, int xend, int yend, Color c, DrawerMaym dm)
@@ -277,42 +307,5 @@ namespace stonerkart
         }
 
         FontFamille ff = FontFamille.font1;
-        private List<Card> drawme = new List<Card>();
-
-        public void notify(object o, PileChangedMessage t)
-        {
-            if (t == null) return;
-            lock (drawme)
-            {
-                switch (t.arg)
-                {
-                    case PileChangedArg.Add:
-                    {
-                        foreach (var c in t.cards) drawme.Add(c);
-                    } break;
-
-                    case PileChangedArg.Remove:
-                    {
-                        foreach (var c in t.cards) drawme.Remove(c);
-                    } break;
-                }
-            }
-        }
-
-        public void highlight(int x, int y, Color c)
-        {
-            bordercolors[x][y] = c;
-        }
-
-        public void clearHighlights()
-        {
-            for (int i = 0; i < xcount; i++)
-            {
-                for (int j = 0; j < ycount; j++)
-                {
-                    highlight(i, j, Color.Black);
-                }
-            }
-        }
     }
 }
