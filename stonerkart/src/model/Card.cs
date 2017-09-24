@@ -811,7 +811,8 @@ namespace stonerkart
         Water_sBolt,
         Lone_sRanger,
         AOE_sEXHAUST,
-        Charging_sBull
+        Charging_sBull,
+        Ent
     }
 
 

@@ -38,6 +38,7 @@ namespace stonerkart
         private const int panelMargin = 30;
         private const int panelWidthPreMargin = 500;
 
+        private const int hexPanelDiameter = 7;
 
         private const int leftPanelWidth = panelWidthPreMargin - panelMargin;
         private const int leftPanelHeight = Frame.AVAILABLEHEIGHT - panelMargin * 2;
@@ -123,7 +124,7 @@ namespace stonerkart
             rightPanel.addChild(villainPanel);
             villainPanel.setLocation(villainPanelX, villainPanelY);
 
-            hexPanel = new HexPanel(hexColumns, hexRows, hexSize - 2);
+            hexPanel = new HexPanel(7, hexSize - 2);//new HexPanel(hexColumns, hexRows, hexSize - 2);
             addElement(hexPanel);
             hexPanel.X = rightPanel.X - hexPanel.Width - hexPanelXPaddingToRightPanel;
             hexPanel.Y = hexPanelY;

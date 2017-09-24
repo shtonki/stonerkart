@@ -105,7 +105,7 @@ namespace stonerkart
 
         public static Game startGame(NewGameStruct ngs)
         {
-            Map map = Map.DefaultMap;
+            Map map = new Map(7);
             GameScreen gsc = new GameScreen(map, ngs.gameid);
             Game g = new Game(ngs, false, gsc, map);
             GUI.transitionToScreen(gsc);

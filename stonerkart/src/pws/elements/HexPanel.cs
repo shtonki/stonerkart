@@ -14,17 +14,37 @@ namespace stonerkart
     {
         private int xcount;
         private int ycount;
+        private int diameter;
         public int hexsize { get; }
         private int hexsizethreequarters;
 
         private Color[][] bordercolors;
 
         private Map colormeshocked;
+        public HexPanel(int diameter, int hexsize) : base()
+        {
+            colormeshocked = new Map(diameter);
+
+            hexsizethreequarters = (int)Math.Round(hexsize * 0.75);
+            width = hexsize + (int)((xcount - 1) * hexsizethreequarters);
+            height = ycount * hexsize + hexsize / 2;
+
+            this.diameter = diameter;
+            this.hexsize = hexsize;
+
+            /*bordercolors = new Color[xcount][];
+            for (int i = 0; i < width; i++)
+            {
+                bordercolors[i] = new Color[ycount];
+            }*/
+
+            clearHighlights();
+        }
 
         public HexPanel(int xcount, int ycount, int hexsize) : base()
         {
-            colormeshocked = new Map(xcount, ycount);
-
+            //colormeshocked = new Map(xcount, ycount);
+            colormeshocked = new Map(xcount);
             hexsizethreequarters = (int)Math.Round(hexsize*0.75);
             width = hexsize+(int)((xcount-1)* hexsizethreequarters);
             height = ycount*hexsize + hexsize/2;
@@ -114,6 +134,7 @@ namespace stonerkart
 
         private Tuple<int, int> findHexagon(int mousex, int mousey)
         {
+            throw new NotImplementedException();
             int cx = 0;
             int cy = 0;
 
@@ -158,25 +179,49 @@ namespace stonerkart
             return new Point(hexX, hexY);
         }
 
+        public Point hexCoordsJazine(int column, int row)
+        { 
+            int os = hexsize * (diameter - diameter / 2);
+
+            if (column > diameter / 2 + 1) os += (hexsize / 2 )* (column - diameter);
+            else os -= hexsize / 2 * row;
+
+            int hexX = os + hexsize * column;// - row*hexsize/2;
+            int hexY = row * hexsize;// / 2;//hexsize * (diameter - diameter / 2) + hexsize * (row % 2) + row * hexsize;
+
+            //if (column == 0 || column == 1 || column == 2) hexX += os;
+
+            
+            return new Point(-hexX, hexY);
+        }
+
         protected override void draw(DrawerMaym dm)
         {
             base.draw(dm);
+            //todo add edge and bordercolors
+            int height = diameter;
+            int rowWidth = diameter / 2 + 1;
 
-
-            for (int i = 0; i < xcount; i++)
+            int ce = 0;
+            for (int y = 0; y < height; y++)
             {
-                for (int j = 0; j < ycount; j++)
+                for (int x = 0; x < rowWidth; x++)
                 {
-                    var p = hexCoords(i, j);
+                    var p = hexCoordsJazine(y, x); //hexCoords(i,j); 
                     int hexX = p.X;
                     int hexY = p.Y;
-                    
-                    Color hl = bordercolors[i][j];
 
-                    var edgy = colormeshocked.tileAt(i, j).isEdgy;
+                    Color hl = Color.Beige;
+
+                    var edgy = false;//var edgy = colormeshocked.tileAt(i, j).isEdgy;
 
                     dm.fillHexagon(hexX, hexY, hexsize, hl, edgy ? Color.Silver : Color.AntiqueWhite);
+                    dm.fillHexagon(hexY, hexX, hexsize, hl, edgy ? Color.Silver : Color.Red);
                 }
+                
+                if (y > (height / 2 - 1)) rowWidth--;
+                else rowWidth++;
+                
             }
 
             lock (drawme)
@@ -187,7 +232,7 @@ namespace stonerkart
                     var i = c.tile.x;
                     var j = c.tile.y;
 
-                    var p = hexCoords(i, j);
+                    var p = hexCoordsJazine(i, j);
                     int hexX = p.X;
                     int hexY = p.Y;
 

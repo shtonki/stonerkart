@@ -216,8 +216,9 @@ namespace stonerkart
 
             Tile[] ts = new[]
             {
-                gameState.map.tileAt(2, 2),
-                gameState.map.tileAt(gameState.map.width - 3, gameState.map.height - 3),
+                gameState.map.tileAt(4, 4),
+                gameState.map.tileAt(4, 3),
+               // gameState.map.tileAt(gameState.map.width - 3, gameState.map.height - 3),
             };
             int ix = 0;
             foreach (Player p in gameState.players)

@@ -2744,12 +2744,46 @@ namespace stonerkart
                         );
 
                         addActivatedAbility(
-                            "Exhaust: set base movement to 5.",
+                            String.Format("{0}: set base movement to 5.", G.exhaustGhyph),
                             new Effect(resolveCard, new ModifyDoer(f => 5, never, ModifiableStats.Movement)),
                             new Foo(exhaustThis),
                             0,
                             PileLocation.Field,
                             CastSpeed.Channel);          
+                    }
+                    break;
+                #endregion
+                #region Ent
+                case CardTemplate.Ent:
+                    {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        baseRace = Race.Elemental;
+
+                        natureCost = 0;
+                        basePower = 1;
+                        baseToughness = 1;
+                        baseMovement = 0;
+
+   
+                        keywordAbilities.Add(KeywordAbility.Fervor);
+                        addActivatedAbility(
+                        String.Format("{0}: Ent gets +1/+1.", G.colouredGlyph(ManaColour.Nature)),
+                        new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new ModifyDoer(add(1), never, ModifiableStats.Power, ModifiableStats.Toughness)),
+                        new Foo(manaCostEffect(ManaColour.Nature)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
+
+                        addActivatedAbility(
+                            String.Format("{0}: set base movement to 2.", G.exhaustGhyph),
+                            new Effect(resolveCard, new ModifyDoer(f => 2, never, ModifiableStats.Movement)),
+                            new Foo(exhaustThis),
+                            0,
+                            PileLocation.Field,
+                            CastSpeed.Channel);
                     }
                     break;
                 #endregion

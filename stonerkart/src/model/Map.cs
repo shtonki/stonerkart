@@ -18,7 +18,42 @@ namespace stonerkart
         private Tile[] tiles;
         private Tile[][] cols;
 
-        public static Map DefaultMap => new Map(9, 7);
+        private Tile[][] rows;
+
+        public static Map DefaultMap => new Map(11, 7);
+        public static int HexCount (int diameter) => 2*(((diameter - 1) * (diameter) / 2) - (diameter / 2) * ((diameter / 2) + 1) / 2) + diameter;
+
+        public Map(int diameter)
+        {
+            this.width = diameter;
+            this.height = diameter;
+
+            /*int a = ((diameter-1) * (diameter) / 2);
+            int b = (diameter / 2) * ((diameter / 2) + 1) / 2;
+            int ce = a - b;
+            int totalNumberOfHexagons = 2 * ce + diameter;*/
+            int totalNumberOfHexagons = HexCount(diameter);
+            tiles = new Tile[totalNumberOfHexagons];
+            rows = new Tile[diameter][];
+            int c = 0;
+            int width = diameter / 2 + 1;
+            for (int y = 0; y < diameter; y++)
+            {
+                var row = new Tile[width];
+                for (int x = 0; x < width; x++)
+                {
+                    row[x] = tiles[c] = new Tile(this, x, y);
+                    Console.WriteLine("(" + x + "," + y + ")");
+                    c++;
+                }
+                rows[y] = row;
+                if (y > (diameter / 2 - 1)) width--;
+                else width++;
+            }
+            Console.WriteLine(c+ "\n");
+            //var erf = rows.SelectMany(rows => rows.ToList());
+            //foreach (var e in erf) Console.WriteLine(e);
+        }
 
         public Map(int width, int height)
         {
@@ -42,7 +77,7 @@ namespace stonerkart
 
         public Tile tileAt(int x, int y)
         {
-            return cols[x][y];
+            return rows[x][y];
         }
 
         public Tile tileAt(int p)
