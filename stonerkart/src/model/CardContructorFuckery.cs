@@ -2718,7 +2718,114 @@ namespace stonerkart
                         ));
                     } break;
                 #endregion
+                #region Charging Bull
+                case CardTemplate.Charging_sBull:
+                    {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        baseRace = Race.Beast;
 
+                        natureCost = 2;
+                        basePower = 4;
+                        baseToughness = 3;
+                        baseMovement = 0;
+
+                        keywordAbilities.Add(KeywordAbility.Fervor);
+
+                        addTriggeredAbility(
+                        "Whenever Charging Bull takes damage set Charging Bull's movement to 0.",
+                        new TargetRuleSet(resolveCard), 
+                        new ModifyDoer(f => 0, never, ModifiableStats.Movement),
+                        new Foo(),
+                        new TypedGameEventFilter<DamageEvent>(e => e.source != this && e.target == this),
+                        0,
+                        PileLocation.Field,
+                        false
+                        );
+
+                        addActivatedAbility(
+                            String.Format("{0}: set base movement to 5.", G.exhaustGhyph),
+                            new Effect(resolveCard, new ModifyDoer(f => 5, never, ModifiableStats.Movement)),
+                            new Foo(exhaustThis),
+                            0,
+                            PileLocation.Field,
+                            CastSpeed.Channel);          
+                    }
+                    break;
+                #endregion
+                #region Ent
+                case CardTemplate.Ent:
+                    {
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        baseRace = Race.Elemental;
+
+                        natureCost = 0;
+                        basePower = 1;
+                        baseToughness = 1;
+                        baseMovement = 0;
+
+   
+                        keywordAbilities.Add(KeywordAbility.Fervor);
+                        addActivatedAbility(
+                        String.Format("{0}: Ent gets +1/+1.", G.colouredGlyph(ManaColour.Nature)),
+                        new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                            new ModifyDoer(add(1), never, ModifiableStats.Power, ModifiableStats.Toughness)),
+                        new Foo(manaCostEffect(ManaColour.Nature)),
+                        0,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
+
+                        addActivatedAbility(
+                            String.Format("{0}: set base movement to 2.", G.exhaustGhyph),
+                            new Effect(resolveCard, new ModifyDoer(f => 2, never, ModifiableStats.Movement)),
+                            new Foo(exhaustThis),
+                            0,
+                            PileLocation.Field,
+                            CastSpeed.Channel);
+                    }
+                    break;
+                #endregion
+                #region AOE_EXHAUST
+                case CardTemplate.AOE_sEXHAUST:
+                    {
+                        /*
+                        cardType = CardType.Creature;
+                        rarity = Rarity.Uncommon;
+                        baseRace = Race.Human;
+                        subtype = Subtype.Hunter;
+                        natureCost = 1;
+
+                        basePower = 0;
+                        baseToughness = 3;
+                        baseMovement = 0;
+
+                        etbLambda("Deal 2 damage to self.", new Effect(new TargetRuleSet(resolveCard, resolveCard), new PingDoer(2)), 0);
+
+                        addTriggeredAbility(
+                            "Exhaust: Heal AOE EXHAUST one hp at the end of your turn. "//{0} Whenever a creature enters the graveyard from the battlefield under your control, Sanguine Artisan deals 1 damage to target heroic creature.",
+                            new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
+                                player),
+                            new PingDoer(1),
+                            new Foo(),
+                            new TypedGameEventFilter<MoveToPileEvent>(moveEvent =>
+                                moveEvent.card.controller == controller &&
+                                moveEvent.to.location.pile == PileLocation.Graveyard &&
+                                moveEvent.card.location.pile == PileLocation.Field),
+                            -1,
+                            PileLocation.Field,
+                            false
+                            );
+                        addActivatedAbility(String.Format("{0}, Exhaust: Target non-Heroic creature becomes Undead and gets -1/-1. Count Fera II gets +1/+1.", G.colouredGlyph(ManaColour.Death)),
+                            new Effect[] { e1, e2, e3, e4 },
+                            new Foo(exhaustThis, manaCostEffect(ManaColour.Death)),//new Foo(new Effect(new TargetRuleSet(new ChooseRule<Card>(c => !c.isHeroic)), new MoveToPileDoer(PileLocation.Graveyard))),
+                            -1,
+                            PileLocation.Field,
+                            CastSpeed.Interrupt);*/
+                    }
+                    break;
+                #endregion
 
                 #region tokens
 

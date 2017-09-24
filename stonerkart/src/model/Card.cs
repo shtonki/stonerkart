@@ -810,6 +810,9 @@ namespace stonerkart
         Ravaging_sGreed,
         Water_sBolt,
         Lone_sRanger,
+        AOE_sEXHAUST,
+        Charging_sBull,
+        Ent
     }
 
 
