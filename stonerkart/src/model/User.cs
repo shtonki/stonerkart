@@ -184,11 +184,18 @@ namespace stonerkart
         public void addFriend(User friend)
         {
             friends.Add(friend);
+            notify(new UserChanged(this));
         }
 
         public void AddOwnedProduct(Product product)
         {
             productCollection.Add(product);
+            notify(new UserChanged(this));
+        }
+
+        public void AddFriendRequest(User requester)
+        {
+            friendRequests.Add(requester);
             notify(new UserChanged(this));
         }
     }

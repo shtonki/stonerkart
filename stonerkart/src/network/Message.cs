@@ -119,12 +119,17 @@ namespace stonerkart
     [Serializable]
     public class FriendRequestMessage : Message
     {
-        public string username { get; set; }
+        public string user { get; set; }
+    }
+    [Serializable]
+    public class NewFriendRequestMessage : Message
+    {
+        public BasicUserJist requester { get; set; }
     }
     [Serializable]
     public class RespondToFriendRequestMessage : Message
     {
-        public string requester { get; set; }
+        public string RequesterName { get; set; }
         public bool accept { get; set; }
     }
     [Serializable]
@@ -132,6 +137,24 @@ namespace stonerkart
     {
         public string username { get; set; }
         public UserStatus newStatus { get; set; }
+    }
+    [Serializable]
+    public class NewFriendMessage : Message
+    {
+        public BasicUserJist friend1 { get; set; }
+        public BasicUserJist friend2 { get; set; }
+
+        public BasicUserJist WhosNotMe(User me)
+        {
+            bool friend1isme = friend1.name == me.Name;
+            bool friend2isme = friend2.name == me.Name;
+
+            //todo get fancy with xor
+            if (friend1isme && friend2isme) throw new Exception();
+            if (friend1isme) return friend1;
+            if (friend2isme) return friend2;
+            throw new Exception();
+        }
     }
 
     [Serializable]
@@ -144,5 +167,16 @@ namespace stonerkart
     {
         public bool Success => newBalance >= 0;
         public int newBalance { get; set; }
+    }
+
+    [Serializable]
+    public class ClientCrashedMessage : Message
+    {
+        public Exception Exception { get; set; }
+    }
+    [Serializable]
+    public class ClientCrashedResponseMessage : Message
+    {
+        public int TrackerNumber { get; set; }
     }
 }

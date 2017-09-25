@@ -73,6 +73,17 @@ namespace stonerkart
                 StartGameMessage msg = (StartGameMessage)m;
                 Controller.StartGame(msg.GameSetupInfo);
             }
+            else if (m is NewFriendMessage)
+            {
+                NewFriendMessage msg = (NewFriendMessage)m;
+                var friend = msg.WhosNotMe(Controller.user).ToUser();
+                Controller.user.addFriend(friend);
+            }
+            else if (m is NewFriendRequestMessage)
+            {
+                NewFriendRequestMessage msg = (NewFriendRequestMessage)m;
+                Controller.user.AddFriendRequest(msg.requester.ToUser());
+            }
             else throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
 
             /*
@@ -188,7 +199,7 @@ namespace stonerkart
         public static bool sendFriendRequest(string username)
         {
             var addFriendMessage = new FriendRequestMessage();
-            addFriendMessage.username = username;
+            addFriendMessage.user = username;
             var response = (ResponseMessage)askServer(addFriendMessage);
             return response.code == ResponseMessage.Code.OK;
         }
@@ -196,7 +207,7 @@ namespace stonerkart
         public static void respondToFriendRequest(string requester, bool accept)
         {
             var respondToFriendRequestMessage = new RespondToFriendRequestMessage();
-            respondToFriendRequestMessage.requester = requester;
+            respondToFriendRequestMessage.RequesterName = requester;
             respondToFriendRequestMessage.accept = accept;
             tellServer(respondToFriendRequestMessage);
         }
@@ -281,7 +292,6 @@ namespace stonerkart
             */
         }
 
-
         public static void surrender(int gameid, GameEndStateReason reason)
         {
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
@@ -289,6 +299,15 @@ namespace stonerkart
             SurrenderMessageBody egmb = new SurrenderMessageBody(gameid, reason);
             serverConnection.send(new Message(servername, Message.MessageType.SURRENDER, egmb));
             */
+        }
+
+        public static int SendCrashReport(Exception e)
+        {
+            ClientCrashedMessage msg = new ClientCrashedMessage();
+            msg.Exception = e;
+            var response = askServer(msg);
+            ClientCrashedResponseMessage castresponse = (ClientCrashedResponseMessage)response;
+            return castresponse.TrackerNumber;
         }
     }
     public enum GameEndStateReason { Flop, Surrender, }

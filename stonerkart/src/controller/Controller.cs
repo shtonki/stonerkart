@@ -56,6 +56,8 @@ namespace stonerkart
 
         public static void respondToFriendRequest(string username, bool accept)
         {
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            //user.RemovePendingFriendRequest
             Network.respondToFriendRequest(username, accept);
         }
 

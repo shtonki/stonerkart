@@ -29,7 +29,20 @@ namespace stonerkart
         {
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
 
+            AppDomain.CurrentDomain.UnhandledException += CrashHandler;
+
             Controller.launchGame();
+        }
+
+        public static void CrashHandler(object o, UnhandledExceptionEventArgs args)
+        {
+            if (Network.Connected)
+            {
+                var trackernr = Network.SendCrashReport((Exception)args.ExceptionObject);
+                Console.WriteLine(trackernr);
+            }
+
+            Controller.quit();
         }
     }
 }
