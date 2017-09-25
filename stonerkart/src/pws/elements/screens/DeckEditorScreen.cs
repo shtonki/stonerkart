@@ -42,7 +42,7 @@ namespace stonerkart
         private const int HOVER_VIEW_Y = CARD_VIEW_PANEL_Y;
         private const int PILE_VIEW_X = 0;
         private const int PILE_VIEW_Y = 0;
-        private const int PILE_VIEW_WIDTH = CARD_VIEW_PANEL_WIDTH + DOWN_PAGE_BUTTON_WIDTH-HERO_VIEW_WIDTH;
+        private const int PILE_VIEW_WIDTH = CARD_VIEW_PANEL_WIDTH + DOWN_PAGE_BUTTON_WIDTH - HERO_VIEW_WIDTH;
         private const int PILE_VIEW_HEIGHT = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT - MANA_BUTTON_HEIGHT <= 0 ? CARD_VIEW_PANEL_HEIGHT : FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT - MANA_BUTTON_HEIGHT;//FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT <= 0 ? CARD_VIEW_PANEL_HEIGHT : FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT;
         private const int CARD_VIEW_PANEL_X = 0;
         private const int CARD_VIEW_PANEL_Y = FRAME_HEIGHT - CARD_VIEW_PANEL_HEIGHT;
@@ -59,7 +59,7 @@ namespace stonerkart
         private const int NR_OF_MANA_BUTTONS = 7;
         private const int MANA_BUTTON_X = 0;//CARD_VIEW_PANEL_WIDTH + HERO_VIEW_WIDTH;
         private const int MANA_BUTTON_Y = CARD_VIEW_PANEL_Y - MANA_BUTTON_WIDTH;
-        private const int MANA_BUTTON_WIDTH = CARD_VIEW_HEIGHT/4;//(FRAME_WIDTH - PILE_VIEW_WIDTH - HERO_VIEW_WIDTH)/NR_OF_MANA_BUTTONS;
+        private const int MANA_BUTTON_WIDTH = CARD_VIEW_HEIGHT / 4;//(FRAME_WIDTH - PILE_VIEW_WIDTH - HERO_VIEW_WIDTH)/NR_OF_MANA_BUTTONS;
         private const int MANA_BUTTON_HEIGHT = MANA_BUTTON_WIDTH;
 
         //private const int CARD_VIEW_PANEL_HEIGHT = CARD_VIEW_PANEL_NUMBER_OF_ROWS * CARD_VIEW_HEIGHT;
@@ -120,19 +120,28 @@ namespace stonerkart
             deckConstraints = new DeckContraints(Format.Standard);
 
 
-            //initTest();
-            
+            initTest();
+
         }
 
         private void initTest()
         {
-            Square panel = new Square(0, 0, FRAME_WIDTH, FRAME_HEIGHT, Color.AliceBlue);
+            Square panel = new Square(0, 0, FRAME_WIDTH, FRAME_HEIGHT, Color.Blue);
             addElement(panel);
+            
 
             //TimerSetting ts = new TimerSetting(15, 40, Color.Black, Color.IndianRed);
             //panel.addChild(new Taimer(500, 0, 800, 400, ts));
+        }
+
+        private void addCardTarget(Card source, params Card[] ts)
+        {
 
         }
+
+        
+
+
         private void updateTimer(Square s)
         {
             /*s.X += 1;
@@ -188,41 +197,6 @@ namespace stonerkart
             addElement(statsBox);
         }
 
-        private void setupStatsThingy()
-        {
-            barChartPanel.clearChildren();
-
-            //todo bolshevik revolution
-            int[] nrOfCardsOfEachMana = new int[NR_OF_MANA_BUTTONS];
-            foreach(var c in cardList)
-            {
-                nrOfCardsOfEachMana[(int)c.colours.Max()] += 1; //this aint doin it 
-            }
-
-            Square[] bars = new Square[NR_OF_MANA_BUTTONS];
-            for(int i = 0; i < NR_OF_MANA_BUTTONS; i++)
-            {
-                int totalNumberOfCards = nrOfCardsOfEachMana.Aggregate((a, b) => a + b);
-                int relativeBarHeight = 0;
-                if (totalNumberOfCards != 0)
-                {
-                    relativeBarHeight = -((STATS_MAX_BAR_HEIGHT - STATS_TEXT_SPACING - STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / totalNumberOfCards;
-                }
-
-                bars[i] = new Square(i * (STATS_BAR_WIDTH + STATS_BAR_SPACING), barChartPanel.Height - STATS_MANA_BUTTON_HEIGHT - STATS_BAR_SPACING, STATS_BAR_WIDTH, relativeBarHeight, Color.Black);
-                barChartPanel.addChild(bars[i]);
-                Button mb = new Button(STATS_BAR_WIDTH, STATS_BAR_WIDTH);
-                mb.Backimege = new Imege(TextureLoader.orbTexture((ManaColour)i));
-                mb.setLocation(bars[i].X, bars[i].Y);
-                barChartPanel.addChild(mb);
-
-                Button tb = new Button(STATS_MANA_BUTTON_HEIGHT, STATS_MANA_BUTTON_HEIGHT);
-                tb.Text = nrOfCardsOfEachMana[i].ToString();
-                tb.setLocation(bars[i].X, bars[i].Y + bars[i].Height - STATS_TEXT_SPACING);
-                barChartPanel.addChild(tb);
-
-            }
-        }
 
         private void refilter()
         {
@@ -247,6 +221,41 @@ namespace stonerkart
         }
 
         #region setups
+        private void setupStatsThingy()
+        {
+            barChartPanel.clearChildren();
+
+            //todo bolshevik revolution
+            int[] nrOfCardsOfEachMana = new int[NR_OF_MANA_BUTTONS];
+            foreach (var c in cardList)
+            {
+                nrOfCardsOfEachMana[(int)c.colours.Max()] += 1; //this aint doin it 
+            }
+
+            Square[] bars = new Square[NR_OF_MANA_BUTTONS];
+            for (int i = 0; i < NR_OF_MANA_BUTTONS; i++)
+            {
+                int totalNumberOfCards = nrOfCardsOfEachMana.Aggregate((a, b) => a + b);
+                int relativeBarHeight = 0;
+                if (totalNumberOfCards != 0)
+                {
+                    relativeBarHeight = -((STATS_MAX_BAR_HEIGHT - STATS_TEXT_SPACING - STATS_MANA_BUTTON_HEIGHT) * nrOfCardsOfEachMana[i]) / totalNumberOfCards;
+                }
+
+                bars[i] = new Square(i * (STATS_BAR_WIDTH + STATS_BAR_SPACING), barChartPanel.Height - STATS_MANA_BUTTON_HEIGHT - STATS_BAR_SPACING, STATS_BAR_WIDTH, relativeBarHeight, Color.Black);
+                barChartPanel.addChild(bars[i]);
+                Button mb = new Button(STATS_BAR_WIDTH, STATS_BAR_WIDTH);
+                mb.Backimege = new Imege(TextureLoader.orbTexture((ManaColour)i));
+                mb.setLocation(bars[i].X, bars[i].Y);
+                barChartPanel.addChild(mb);
+
+                Button tb = new Button(STATS_MANA_BUTTON_HEIGHT, STATS_MANA_BUTTON_HEIGHT);
+                tb.Text = nrOfCardsOfEachMana[i].ToString();
+                tb.setLocation(bars[i].X, bars[i].Y + bars[i].Height - STATS_TEXT_SPACING);
+                barChartPanel.addChild(tb);
+
+            }
+        }
 
         private void setupCards()
         {
@@ -404,10 +413,8 @@ namespace stonerkart
         private PileView setupPileView()
         {
             PileView pv = new PileView();
-            pv.Backimege = new Imege(Textures.artDeath);
-            pv.Width = (int)(Frame.BACKSCREENWIDTH * 0.80);
-            pv.Height = Frame.BACKSCREENHEIGHT / 4;
-            pv.Height = (int)(PILE_VIEW_HEIGHT);
+            pv.Backimege = new Imege(Textures.artFamine);
+            pv.Height = PILE_VIEW_HEIGHT;
             pv.Width = PILE_VIEW_WIDTH;
             pv.setLocation(PILE_VIEW_X, PILE_VIEW_Y);
             //pv.Columns = 1;

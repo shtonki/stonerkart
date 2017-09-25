@@ -209,7 +209,37 @@ namespace stonerkart
 
         public int totalDamageDealt()
         {
-            return events.Where(e => e is DamageEvent).Cast<DamageEvent>().Sum(e => e.amount);
+            return events.Where(e => e is DamageEvent).Cast<DamageEvent>().Where(e => e.amount < 0).Sum(e => e.amount);
+        }
+
+        public int totalHealingDone()
+        {
+            return events.Where(e => e is DamageEvent).Cast<DamageEvent>().Where(e => e.amount < 0).Sum(e => e.amount);
+        }
+
+        public int totalCardsDrawn()
+        {
+            return events.Where(e => e is DrawEvent).Cast<DrawEvent>().Sum(e => e.cards);
+        }
+
+        public int totalCardsPlayed()
+        {
+            return events.Where(e => e is PlaceOnTileEvent).Cast<PlaceOnTileEvent>().Count();
+        }
+
+        public int totalTurns()
+        {
+            return events.Where(e => e is EndOfStepEvent).Cast<EndOfStepEvent>().Where(t => t.step == Steps.End).Count();
+        }
+
+        public int totalCardsMovedToGraveyard()
+        {
+            return events.Where(e => e is MoveToPileEvent).Cast<MoveToPileEvent>().Where(p => p.to.location.pile == PileLocation.Graveyard).Count();
+        }
+
+        public int totalCardsDisplaced()
+        {
+            return events.Where(e => e is MoveToPileEvent).Cast<MoveToPileEvent>().Where(p => p.to.location.pile == PileLocation.Displaced).Count();
         }
     }
 }
