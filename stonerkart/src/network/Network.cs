@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 namespace stonerkart
 {
 
-    static class Network
+    internal static class Network
     {
-        private static ServerConnection serverConnection;
+        private static ServerConnection serverConnection { get; set; }
+
         private const string servername = "_server";
 
         //todo change this

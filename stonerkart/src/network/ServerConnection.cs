@@ -11,8 +11,8 @@ namespace stonerkart
     class ServerConnection : AsyncConnection
     {
         private const string serverIp =
-            "127.0.0.1";
-            //"46.239.124.155";
+            //"127.0.0.1";
+            "46.239.124.155";
 
         public ServerConnection() : base(generateSocket())
         {
