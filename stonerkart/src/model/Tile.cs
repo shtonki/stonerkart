@@ -7,7 +7,7 @@ namespace stonerkart
 {
     class Tile : Stuff, Targetable
     {
-        public enum JasinNameMePls
+        public enum TileType
         {
             Invisible,
             Normie,
@@ -16,7 +16,7 @@ namespace stonerkart
         }
 
         public Color? RimHighlight { get; set; }
-        public JasinNameMePls JasinPls { get; set; }
+        public TileType tileType { get; set; }
         public Map map { get; }
         public int x => xyCoord.x;
         public int y => xyCoord.y;
@@ -27,8 +27,8 @@ namespace stonerkart
 
         public Card card { get; private set; }
 
-        public bool passable => card == null && (JasinPls == JasinNameMePls.Normie || JasinPls == JasinNameMePls.NoSummon);
-        public bool summonable => passable && JasinPls == JasinNameMePls.Normie;
+        public bool passable => card == null && (tileType == TileType.Normie || tileType == TileType.NoSummon);
+        public bool summonable => passable && tileType == TileType.Normie;
 
 
         private readonly XYCoord xyCoord;

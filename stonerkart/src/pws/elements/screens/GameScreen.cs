@@ -38,6 +38,7 @@ namespace stonerkart
         private const int panelMargin = 30;
         private const int panelWidthPreMargin = 500;
 
+        private const int hexPanelDiameter = 7;
 
         private const int leftPanelWidth = panelWidthPreMargin - panelMargin;
         private const int leftPanelHeight = Frame.AVAILABLEHEIGHT - panelMargin * 2;

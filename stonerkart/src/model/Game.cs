@@ -203,18 +203,13 @@ namespace stonerkart
                 gameState.shuffle(p.deck);
             }
 
-
-            Tile[] ts = new[]
-            {
-                gameState.map.tileAt(2, 2),
-                gameState.map.tileAt(gameState.map.width - 3, gameState.map.height - 3),
-            };
             int ix = 0;
             foreach (Player p in gameState.players)
             {
-                if (ix >= ts.Length) throw new Exception();
+                //if (ix >= ts.Length) throw new Exception();
 
-                ts[ix++].place(p.heroCard);
+                //ts[ix++].place(p.heroCard);
+                gameState.map.getSpawnTile(ix++).place(p.heroCard);
             }
 
             int xi = gameState.random.Next();
@@ -446,6 +441,7 @@ namespace stonerkart
                         tile => options.Select(p => p.to).Contains(tile),
                         "Choose where to move.", 
                         ButtonOption.Cancel);
+                    highlight(options.Select(p => p.to), Color.Green);
                     clearHighlights();
                     if (to == null) continue;
                     if (to == from) break;
