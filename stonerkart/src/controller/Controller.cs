@@ -26,50 +26,31 @@ namespace stonerkart
 
         public static void launchGame()
         {
-            //if (!Network.connectToServer()) throw new Exception("Server down for more or less routine maintenance.");
+            Network.TryConnect();
             GUI.launch();
             GUI.transitionToScreen(GUI.loginScreen);
         }
 
+
+        public static void LoginAs(User myUser)
+        {
+            if (user != null) throw new Exception();
+            user = myUser;
+            GUI.frame.SetUser(user);
+            GUI.transitionToScreen(GUI.mainMenuScreen);
+        }
+        public static void LoginOffline()
+        {
+            User user = new User("jasindrul", CardTemplate.Big_sMonkey, Title.Memelord, UserStatus.Offline, new User[0], new User[0], 420, 69, new CardTemplate[0], new Product[0]);
+            LoginAs(user);
+        }
         public static void attemptLogin(string username, string password)
         {
             var lrm = Network.login(username, password);
             if (lrm.Success)
             {
                 var myUser = lrm.loggedInUserFullJist.ToUser();
-
-                if (user != null) throw new Exception();
-                user = myUser;
-                GUI.frame.SetUser(user);
-                GUI.transitionToScreen(GUI.mainMenuScreen);
-
-                return;
-
-                throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
-                /*
-                user = Network.queryMyUser();
-                GUI.frame.loginAs(user);
-
-                var friends = Network.queryFriends();
-                user.setFriends(friends);
-
-                var friendrequests = Network.queryFriendRequests();
-                GUI.frame.addFriendsPanel.addRequests(friendrequests);
-
-                var collection = Network.queryCollection();
-                ownedCards = collection.ToList();
-
-                var shekels = Network.queryShekels();
-                setShekelBalance(shekels);
-
-                var ownedPacks = Network.queryOwnedPacks();
-                GUI.shopScreen.populate(ownedPacks);
-
-                */
-            }
-            else
-            {
-                
+                LoginAs(myUser);
             }
         }
 

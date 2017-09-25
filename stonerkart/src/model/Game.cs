@@ -203,19 +203,13 @@ namespace stonerkart
                 gameState.shuffle(p.deck);
             }
 
-
-            Tile[] ts = new[]
-            {
-                gameState.map.tileAt(4, 4),
-                gameState.map.tileAt(4, 3),
-               // gameState.map.tileAt(gameState.map.width - 3, gameState.map.height - 3),
-            };
             int ix = 0;
             foreach (Player p in gameState.players)
             {
-                if (ix >= ts.Length) throw new Exception();
+                //if (ix >= ts.Length) throw new Exception();
 
-                ts[ix++].place(p.heroCard);
+                //ts[ix++].place(p.heroCard);
+                gameState.map.getSpawnTile(ix++).place(p.heroCard);
             }
 
             int xi = gameState.random.Next();
@@ -256,6 +250,17 @@ namespace stonerkart
                     else
                     {
                         break;
+                    }
+                }
+            }
+
+            if (connection is DummyConnection)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    for (int j = 0; j < 6; j++)
+                    {
+                        gameState.hero.gainMana(G.orbOrder[i]);
                     }
                 }
             }

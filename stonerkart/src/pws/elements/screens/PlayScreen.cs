@@ -26,7 +26,7 @@ namespace stonerkart
             botgame.clicked += a =>
             {
                 GameRules grs = new GameRules(MapConfiguration.JasinHex);
-                var gsi = new GameSetupInfo(grs, -1, 420, true, new[] {"jasin", "Skurk"});
+                var gsi = new GameSetupInfo(grs, -1, 420, true, new[] { Controller.user.Name, "Skurk" });
                 Controller.StartGame(gsi);
             };
         }

@@ -17,6 +17,8 @@ namespace stonerkart
 
         private Button loginButton;
         private Button registerButton;
+        private Button playOffline;
+
 
         public LoginScreen() : base(new Imege(Textures.background3))
         {
@@ -58,6 +60,13 @@ namespace stonerkart
             registerButton.moveTo(MoveTo.Center, 850);
             registerButton.Text = "Register";
             registerButton.Border = new AnimatedBorder(Textures.border0, 5);
+
+            playOffline = new Button(300, 80);
+            addElement(playOffline);
+            playOffline.setLocation(30, 30);
+            playOffline.Text = "Fuck bitches offline";
+            playOffline.clicked += a => Controller.LoginOffline();
+
         }
 
         protected override IEnumerable<MenuEntry> generateMenuEntries()

@@ -45,6 +45,34 @@ namespace stonerkart
 
             switch (ct)
             {
+                case CardTemplate.Big_sMonkey:
+                {
+                    cardType = CardType.Creature;
+                    rarity = Rarity.Common;
+
+                    deathCost = 3;
+
+                    basePower = 3;
+                    baseToughness = 2;
+                    baseMovement = 3;
+
+                    keywordAbilities.Add(KeywordAbility.Flying);
+
+                    addActivatedAbility(
+                        String.Format("{0}{0}, {1}: Big Monkey Gives Another Target Creature +1/+1.", G.colouredGlyph(ManaColour.Life), G.exhaustGhyph),
+                        new TargetRuleSet(new ChooseRule<Card>(ChooseRule<Card>.ChooseAt.Cast,
+                            c => IsAnother(c) && c.IsNonHeroicCreature)),
+                        new ModifyDoer(add(1), never, ModifiableStats.Toughness, ModifiableStats.Power),
+                        new Foo(manaCostEffect(ManaColour.Life, ManaColour.Life), exhaustThis),
+                        3,
+                        PileLocation.Field,
+                        CastSpeed.Interrupt
+                        );
+
+                    flavourText = "Big monkey -- big money.";
+
+                } break;
+
                 #region Great White Buffalo
                 case CardTemplate.Great_sWhite_sBuffalo:
                 {
@@ -312,9 +340,10 @@ namespace stonerkart
                         Effect e1 = new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard),
                             new ModifyDoer(add(2), never, ModifiableStats.Power, ModifiableStats.Toughness));
 
-                        addTriggeredAbility("Whenever a Black creature enters the Field under your control Archfather gets +2/+2.", e1, 
+                        addTriggeredAbility(String.Format("Whenever Another {0} Creature Enters The Field Under Your Control Archfather Gets +2/+2.", G.colouredGlyph(ManaColour.Death)),
+                            e1, 
                             new Foo(),
-                            new TypedGameEventFilter<MoveToPileEvent>(e => e.card.colours.Contains(ManaColour.Death) && e.card.controller.isHero && e.to.location.pile == PileLocation.Field),
+                            new TypedGameEventFilter<MoveToPileEvent>(e => e.card.colours.Contains(ManaColour.Death) && e.card.controller.isHero && e.to.location.pile == PileLocation.Field && IsAnother(e.card)),
                             -1,
                             PileLocation.Field,
                             false, 

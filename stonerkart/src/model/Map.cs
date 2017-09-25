@@ -17,6 +17,8 @@ namespace stonerkart
         private Tile[] tiles;
         private Tile[][] cols;
 
+        private List<Tile> spawns { get; }
+
         private static Map DefaultMap()
         {
             Map map = new Map(9, 7);
@@ -37,21 +39,44 @@ namespace stonerkart
 
         private static Map JasinMap()
         {
-            Map map = new Map(9, 7);
+            const int diameter = 11;
+            Map map = new Map(diameter, diameter);
+
+
+
+            bool boostHighNotLow = ((diameter - 1) / 2) % 2 == 1;
             foreach (var tile in map.Tiles)
             {
-                if (tile.x > 1 && tile.x < map.width - 2 &&
-                    tile.y > 1 && tile.y < map.height - 2)
+                tile.tileType = Tile.TileType.Normie;
+                int x = tile.x;
+                int y = tile.y;
+
+
+                int distanceFromMiddle = Math.Abs(diameter / 2 - x);
+
+                int hi = (distanceFromMiddle + (boostHighNotLow ? 1 : 0)) / 2;
+                int lo = (distanceFromMiddle + (boostHighNotLow ? 0 : 1)) / 2;
+
+                if(y >= lo && y < diameter - hi)
                 {
                     tile.tileType = Tile.TileType.Normie;
                 }
                 else
                 {
-                    tile.tileType = Tile.TileType.NoSummon;
+                    tile.tileType = Tile.TileType.Invisible;
                 }
             }
+
+            map.spawns.Add(map.tiles.Last(c => c.tileType != Tile.TileType.Invisible && c.tileType != Tile.TileType.NoSummon));
+            map.spawns.Add(map.tiles.First(c => c.tileType != Tile.TileType.Invisible && c.tileType != Tile.TileType.NoSummon));
             return map;
         }
+
+        public Tile getSpawnTile(int i)
+        {
+            return spawns[i];
+        }
+        
 
         public static Map MapFromConfiguration(MapConfiguration mc)
         {
@@ -63,12 +88,13 @@ namespace stonerkart
             }
         }
 
+
         public Map(int width, int height)
         {
             this.width = width;
             this.height = height;
             tiles = new Tile[width*height];
-
+            spawns = new List<Tile>();
             cols = new Tile[width][];
             int c = 0;
             for (int x = 0; x < width; x++)

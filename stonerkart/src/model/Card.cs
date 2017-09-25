@@ -36,6 +36,8 @@ namespace stonerkart
         public CardTemplate template { get; }
         public bool isDummy { get; private set; }
         public bool isToken { get; private set; }
+        public bool IsNonHeroicCreature => cardType == CardType.Creature && !isHeroic;
+        public bool IsAnother(Card perhapsOther) { return perhapsOther != this; }
         public CardType cardType { get; }
         public Rarity rarity { get; set; }
         public CardSet set { get; }
@@ -690,6 +692,7 @@ namespace stonerkart
 
     public enum CardTemplate
     {
+        Big_sMonkey,
     	Great_sWhite_sBuffalo,
     	Alter_sFate,
         Count_sFera_sII,
