@@ -40,7 +40,8 @@ namespace stonerkart
             {
                 if (glyph.Length == 1)
                 {
-                    return characters[glyph];
+                    if (characters.ContainsKey(glyph)) return characters[glyph];
+                    else return characters[" "];
                 }
                 else
                 {

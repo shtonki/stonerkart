@@ -85,7 +85,7 @@ namespace stonerkart
         public QuitEntry()
         {
             goodstuff = new UserPromptPanel(400, 200, 80, "Really quit Stonerkart?", new [] {ButtonOption.Yes, ButtonOption.No, });
-            goodstuff.buttons[0].clicked += a => Controller.quit();
+            goodstuff.buttons[0].clicked += a => Controller.quit(ExitStatus.Normal);
             goodstuff.buttons[1].clicked += a => doneWithMyBusiness?.Invoke();
 
         }

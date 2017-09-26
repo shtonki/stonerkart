@@ -36,13 +36,17 @@ namespace stonerkart
 
         public static void CrashHandler(object o, UnhandledExceptionEventArgs args)
         {
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
             if (Network.Connected)
             {
                 var trackernr = Network.SendCrashReport((Exception)args.ExceptionObject);
                 Console.WriteLine(trackernr);
             }
 
-            Controller.quit();
+            Logger.WriteLine(args.ExceptionObject.ToString());
+            GUI.promptUser("rip based flopnik", ButtonOption.Nigra);
+
+            Controller.quit(ExitStatus.Fucked);
         }
     }
 }

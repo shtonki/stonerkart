@@ -94,9 +94,12 @@ namespace stonerkart
             return g;
         }
 
-        public static void quit()
+        public static void quit(ExitStatus es)
         {
             Settings.saveSettings();
+            Logger.WriteLine("Exiting with status '{0}'", (int)es);
+            Logger.DumpLog();
+
             Environment.Exit(1);
         }
 
@@ -120,5 +123,11 @@ namespace stonerkart
         }
 
 
+    }
+
+    public enum ExitStatus
+    {
+        Normal,
+        Fucked,
     }
 }

@@ -156,6 +156,7 @@
     <Compile Include="src\pws\PublicSaxophone.cs" />
     <Compile Include="src\pws\TextureLoader.cs" />
     <Compile Include="src\util\ImageLoaderx.cs" />
+    <Compile Include="src\util\Logger.cs" />
     <Compile Include="src\util\Observable.cs" />
     <Compile Include="src\util\Settings.cs" />
     <Compile Include="src\util\G.cs" />

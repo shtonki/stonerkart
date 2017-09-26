@@ -262,7 +262,7 @@ namespace stonerkart
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            Controller.quit();
+            Controller.quit(ExitStatus.Normal);
         }
 
         private void focus(GuiElement f)
