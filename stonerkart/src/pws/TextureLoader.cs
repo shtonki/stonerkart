@@ -643,7 +643,7 @@ namespace stonerkart
                 case CardTemplate.Warp: return Textures.artWarp;
                 case CardTemplate.Hosro: return Textures.artHosro;
                 case CardTemplate.Iradj: return Textures.artIradj;
-                case CardTemplate.Jabroni: return Textures.artJabroni;
+                case CardTemplate.Jabroncho: return Textures.artJabroni;
                 case CardTemplate.Makaroni: return Textures.artMakaroni;
                 case CardTemplate.Archfather: return Textures.artArchfather;
                 case CardTemplate.Hungry_sFelhound: return Textures.artHungry_sFelhound;

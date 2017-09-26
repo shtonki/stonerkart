@@ -1,14 +1,7 @@
-﻿card ideas:
-solid:
-aoe exhaust
-mana leak/spell pierce
-
-loose:
-CC1 5/2/1, N: +1 mvmt til eot
-
-martin loose:
-
-missing features:
+﻿missing features:
+ManaSet.ToGlyphs would make some sense if we foxed some things
+baller ass single player games
+stacks of stun, silence, cripple,
 ranked play
 enforce deck rules when choosing decks
 enforce hero colour rule

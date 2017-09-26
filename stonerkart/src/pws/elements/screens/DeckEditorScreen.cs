@@ -256,11 +256,14 @@ namespace stonerkart
                 var colourcountdiff = Math.Min(2, c1.colours.Count) - Math.Min(2, c2.colours.Count);
                 if (colourcountdiff != 0) return colourcountdiff;
 
+
+
                 if (c1.colours.Count < 2)
                 {
                     var colourdiff = c1.colours[0] - c2.colours[0];
                     if (colourdiff != 0) return colourdiff;
                 }
+
 
                 var cmcdiff = c1.convertedManaCost - c2.convertedManaCost;
                 return cmcdiff;
