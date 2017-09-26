@@ -226,8 +226,14 @@ namespace stonerkart
                         default: throw new Exception();
                     }
 
-                    if (tile.RimHighlight.HasValue) bordercolor = tile.RimHighlight.Value;
-
+                    try
+                    {
+                        if (tile.RimHighlight.HasValue) bordercolor = tile.RimHighlight.Value;
+                    }
+                    catch (InvalidOperationException e)
+                    {
+                        //someone fucked with rimhighlighting on us so fuck'em we highlight nothing
+                    }
                     dm.fillHexagon(hexX, hexY, hexsize, bordercolor, fillcolor);
                 }
             }
