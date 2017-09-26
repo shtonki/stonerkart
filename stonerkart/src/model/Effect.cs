@@ -155,6 +155,26 @@ namespace stonerkart
         
     }
 
+    class ApplyStacksDoer : SimpleDoer
+    {
+        private StacksWords stacks;
+        private int count;
+
+        public ApplyStacksDoer(StacksWords stacks, int count) : base(typeof(Card))
+        {
+            this.stacks = stacks;
+            this.count = count;
+        }
+
+
+        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        {
+            Card card = (Card)row[0];
+            ApplyStacksEvent e = new ApplyStacksEvent(card, stacks, count);
+            return new GameEvent[] {e};
+        }
+    }
+
     class ShuffleDoer : SimpleDoer
     {
         public ShuffleDoer() : base(typeof(Player))

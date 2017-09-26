@@ -44,7 +44,6 @@ namespace stonerkart
             }
 
             Logger.WriteLine(args.ExceptionObject.ToString());
-            GUI.promptUser("rip based flopnik", ButtonOption.Nigra);
 
             Controller.quit(ExitStatus.Fucked);
         }

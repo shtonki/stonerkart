@@ -68,6 +68,7 @@ namespace stonerkart
         orbColourless11,
         orbColourless12,
 
+        artConfuse,
         artBigMonkey,
         artSinisterPact,
         artGreatWhiteBuffalo,
@@ -268,6 +269,7 @@ namespace stonerkart
             images[Textures.setFirstedition] = Resources.setFirstedition;
 
             images[Textures.orbChaos] = Resources.orbChaos;
+            images[Textures.artConfuse] = Resources.artConfuse;
             images[Textures.artBigMonkey] = Resources.artBigMonkey;
             images[Textures.orbNature] = Resources.orbNature;
             images[Textures.orbOrder] = Resources.orbOrder;
@@ -528,6 +530,7 @@ namespace stonerkart
         {
             switch (ct)
             {
+                case CardTemplate.Confuse: return Textures.artConfuse;
                 case CardTemplate.Big_sMonkey: return Textures.artBigMonkey;
                 case CardTemplate.Commander_sSparryz: return Textures.artSparryz;
                 case CardTemplate.Flamekindler: return Textures.artFlamekindler;

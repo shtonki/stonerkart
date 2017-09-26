@@ -9,43 +9,28 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    class DeckController
+    static class DeckController
     {
-        public static void saveDeck(Deck d, string name)
+        private static List<Deck> decks;
+        public static IEnumerable<Deck> Decks => decks;
+
+        static DeckController()
         {
-            using (FileStream f = File.Create(Settings.decksPath + name + ".jas"))
-            {
-                byte[] xd = Encoding.ASCII.GetBytes(d.toSaveText());
-                f.Write(xd, 0, xd.Length);
-                f.Close();
-            }
+            decks = new List<Deck>();
+            decks.AddRange(Deck.basicDecks);
         }
 
-        public static IEnumerable<Deck> getDecks()
+        public static void saveDeck(Deck deck, string deckname)
         {
-            var localdecks = Directory.EnumerateFiles(Settings.decksPath)
-                .Where(s => s.EndsWith(".jas"))
-                .Select(s => s.Substring(s.LastIndexOf('/') + 1, s.Length - 6)).Select(loadDeck);
-            return localdecks.Concat(Deck.basicDecks);
-
-        }
-
-        public static Deck loadDeck(string name)
-        {
-            using (StreamReader r = new StreamReader(File.Open(Settings.decksPath + name + ".jas", FileMode.Open)))
-            {
-                string s = r.ReadToEnd();
-                Deck d =  new Deck(s);
-                d.name = name;
-                r.Close();
-                return d;
-            }
-            
+            //todo 260917 confirm before overwriting
+            deck.name = deckname;
+            if (1 < decks.RemoveAll(d => d.name == deckname)) throw new Exception();
+            decks.Add(deck);
         }
 
         public static Deck chooseDeck()
         {
-            Deck[] decks = getDecks().ToArray();
+            Deck[] decks = Decks.ToArray();
             PublicSaxophone sax = new PublicSaxophone(o => o is Deck);
 
             int panelheight = 800;

@@ -45,6 +45,19 @@ namespace stonerkart
 
             switch (ct)
             {
+                #region Confuse
+                case CardTemplate.Confuse:
+                {
+                    cardType = CardType.Interrupt;
+                    rarity = Rarity.Common;
+
+                    orderCost = 1;
+
+                    castRange = 4;
+                    castDescription = "Apply 1 stack of stunned to target creature.";
+                    castEffect = new Effect(new ChooseRule<Card>(), new ApplyStacksDoer(StacksWords.Stunned, 1));
+                } break;
+                #endregion
                 #region Big Monkey
                 case CardTemplate.Big_sMonkey:
                 {
@@ -1424,10 +1437,10 @@ namespace stonerkart
                     lifeCost = 1;
                     greyCost = 2;
 
-                    castDescription = "Set target non-life creatures movement to 1.";
+                    castDescription = "Apply 3 stacks of crippled to target non-white creature.";
                     castEffect = new Effect(nonColouredCreature(ManaColour.Life),
-                        new ModifyDoer(setTo(1), never, ModifiableStats.Movement));
-                    castRange = 4;
+                            new ApplyStacksDoer(StacksWords.Crippled, 3));
+                        castRange = 4;
                 } break;
                 #endregion
                 #region Chains of Sin
@@ -1439,9 +1452,9 @@ namespace stonerkart
                         deathCost = 1;
                         greyCost = 1;
 
-                        castDescription = "Reduce target non-death creatures movement by 2. This cannot reduce the targets movement below 1.";
+                        castDescription = "Apply 3 stacks of crippled to target non-black creature.";
                         castEffect = new Effect(nonColouredCreature(ManaColour.Death),
-                            new ModifyDoer(v => Math.Max(Math.Min(v, 1), v - 2), never, ModifiableStats.Movement));
+                            new ApplyStacksDoer(StacksWords.Crippled, 3));
                         castRange = 4;
                     }
                     break;
@@ -3021,7 +3034,7 @@ namespace stonerkart
             additionalCastCosts.Add(manaCostEffect(castManaCost));
 
             castAbility = new ActivatedAbility(this, PileLocation.Hand, castRange, new Foo(additionalCastCosts.ToArray()), castSpeed, castDescription, es.ToArray());
-            abilities.Add(castAbility);
+            activatedAbilities.Add(castAbility);
 
             this.owner = owner;
             controller = owner;
@@ -3040,13 +3053,13 @@ namespace stonerkart
         private void addTriggeredAbility(string description, Effect e, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, bool optional, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
         {
             TriggeredAbility ta = new TriggeredAbility(this, activeIn, new[] { e }, castRange, cost, filter, optional, timing, description);
-            abilities.Add(ta);
+            triggeredAbilities.Add(ta);
         }
 
         private void addTriggeredAbility(string description, Effect[] es, Foo cost, GameEventFilter filter, int castRange, PileLocation activeIn, bool optional, TriggeredAbility.Timing timing = TriggeredAbility.Timing.Pre)
         {
             TriggeredAbility ta = new TriggeredAbility(this, activeIn, es, castRange, cost, filter, optional, timing, description);
-            abilities.Add(ta);
+            triggeredAbilities.Add(ta);
         }
 
         private void addActivatedAbility(string description, TargetRuleSet trs, Doer doer, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed, bool alternateCast = false)
@@ -3058,14 +3071,14 @@ namespace stonerkart
         private void addActivatedAbility(string description, Effect e, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed, bool alternateCast = false)
         {
             ActivatedAbility aa = new ActivatedAbility(this, activeIn, castRange, cost, castSpeed, description, e);
-            abilities.Add(aa);
+            activatedAbilities.Add(aa);
             if (alternateCast) alternateCasts.Add(aa);
         }
 
         private void addActivatedAbility(string description, Effect[] es, Foo cost, int castRange, PileLocation activeIn, CastSpeed castSpeed, bool alternateCast = false)
         {
             ActivatedAbility aa = new ActivatedAbility(this, activeIn, castRange, cost, castSpeed, description, es);
-            abilities.Add(aa);
+            activatedAbilities.Add(aa);
             if (alternateCast) alternateCasts.Add(aa);
         }
 

@@ -83,6 +83,7 @@
     </Compile>
     <Compile Include="src\GameState.cs" />
     <Compile Include="src\model\ProductUnion.cs" />
+    <Compile Include="src\model\StacksAbility.cs" />
     <Compile Include="src\network\Controller.cs" />
     <Compile Include="src\pws\Border.cs" />
     <Compile Include="src\controller\Console.cs" />
@@ -191,6 +192,7 @@
   <ItemGroup>
     <Content Include="musings.txt" />
     <Content Include="Namnl_s.ico" />
+    <None Include="Resources\artConfuse.png" />
     <None Include="Resources\artBigMonkey.png" />
     <None Include="Resources\AberrantSacrifice.png" />
     <None Include="Resources\font1.png" />

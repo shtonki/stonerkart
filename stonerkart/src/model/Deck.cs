@@ -75,16 +75,16 @@ namespace stonerkart
 
         private static CardTemplate[] test = new[]
         {
-            CardTemplate.Alter_sFate, 
-            CardTemplate.Alter_sFate, 
-            CardTemplate.Alter_sFate, 
-            CardTemplate.Alter_sFate, 
-            CardTemplate.Primal_sChopter, 
-            CardTemplate.Overgrow, 
-            CardTemplate.Marilith, 
-            CardTemplate.One_sWith_sNature, 
-            CardTemplate.Water_sBolt, 
-            CardTemplate.Wilt, 
+            CardTemplate.Confuse, 
+            CardTemplate.Confuse, 
+            CardTemplate.Confuse, 
+            CardTemplate.Confuse, 
+            CardTemplate.Confuse, 
+            CardTemplate.Confuse, 
+            CardTemplate.Hungry_sFelhound, 
+            CardTemplate.Hungry_sFelhound, 
+            CardTemplate.Hungry_sFelhound, 
+            CardTemplate.Hungry_sFelhound, 
         };
 
         #region basicDNZombies

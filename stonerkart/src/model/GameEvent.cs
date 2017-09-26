@@ -15,6 +15,25 @@ namespace stonerkart
         Card getCard();
     }
 
+    struct ApplyStacksEvent : GameEvent, CardedEvent
+    {
+        public Card card { get; }
+        public StacksWords stack { get; }
+        public int count { get; }
+
+        public ApplyStacksEvent(Card card, StacksWords stack, int count)
+        {
+            this.card = card;
+            this.stack = stack;
+            this.count = count;
+        }
+
+        public Card getCard()
+        {
+            return card;
+        }
+    }
+
     struct FatigueEvent : GameEvent, CardedEvent
     {
         public Card card { get; }

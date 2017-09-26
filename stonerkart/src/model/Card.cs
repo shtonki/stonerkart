@@ -75,14 +75,12 @@ namespace stonerkart
         public Card dummyFor => dummiedAbility.card;
         public Ability dummiedAbility { get; private set; }
 
-        public IEnumerable<ActivatedAbility> activatedAbilities
-            => abilities.Where(a => a is ActivatedAbility).Cast<ActivatedAbility>();
-
-        public IEnumerable<TriggeredAbility> triggeredAbilities
-            => abilities.Where(a => a is TriggeredAbility).Cast<TriggeredAbility>();
-
-        private List<Ability> abilities = new List<Ability>();
-        public ActivatedAbility[] usableHere => activatedAbilities.Where(a => a.activeIn == location.pile).ToArray();
+        private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
+        private List<TriggeredAbility> triggeredAbilities = new List<TriggeredAbility>();
+        public IEnumerable<Ability> abilities => activatedAbilities.Cast<Ability>().Concat(triggeredAbilities);
+        //private List<Ability> abilities { get; }= new List<Ability>();
+        private IEnumerable<ActivatedAbility> usable => usableEx();
+        public IEnumerable<ActivatedAbility> usableHere => usable.Where(a => a.activeIn == location.pile);
 
         public List<ManaColour> colours => coloursEx();
 
@@ -95,7 +93,7 @@ namespace stonerkart
 
         public int power => Power;
         public int toughness => Toughness - damageTaken;
-        public int movement => Movement - fatigue;
+        public int movement => movementEx();
 
         private Modifiable Power { get; }
         private Modifiable Toughness { get; }
@@ -108,6 +106,12 @@ namespace stonerkart
         private Modifiable[] modifiables;
 
         private List<KeywordAbility> keywordAbilities;
+
+        private StacksCounter stacksCounter { get; } = new StacksCounter();
+
+        public int StacksCount(StacksWords sw) => stacksCounter[sw];
+        public bool Is(StacksWords sw) => StacksCount(sw) > 0;
+
 
         private GameEventHandlerBuckets eventHandler;
 
@@ -188,6 +192,28 @@ namespace stonerkart
 
             return hs.ToList();
         }
+        private int movementEx()
+        {
+            var val = Movement.value;
+
+            val -= StacksCount(StacksWords.Crippled);
+            val = Math.Max(val, 1);
+
+            if (Is(StacksWords.Stunned)) val = 0;
+
+            val -= fatigue;
+
+            val = Math.Max(val, 0);
+
+            return val;
+        }
+
+        private IEnumerable<ActivatedAbility> usableEx()
+        {
+            if (Is(StacksWords.Stunned)) return new ActivatedAbility[0];
+
+            return activatedAbilities;
+        }
 
         public bool hasAbility(KeywordAbility kwa)
         {
@@ -197,20 +223,6 @@ namespace stonerkart
         public bool isCastAbility(Ability a)
         {
             return castAbility == a || alternateCasts.Contains(a);
-        }
-
-        public int abilityOrd(Ability a)
-        {
-            if (abilities.IndexOf(a) < 0)
-            {
-                int i = 2;
-            }
-            return abilities.IndexOf(a);
-        }
-
-        public Ability abilityFromOrd(int v)
-        {
-            return abilities[v];
         }
 
         public IEnumerable<TriggeredAbility> abilitiesTriggeredBy(GameEvent e)
@@ -295,6 +307,17 @@ namespace stonerkart
                 sb.Append(a.description);
                 sb.Append(G.newlineGlyph);
 
+            }
+
+            var counts = stacksCounter.Counts;
+            for (int i = 0; i < counts.Length; i++)
+            {
+                if (counts[i] > 0)
+                {
+                    StacksWords sw = (StacksWords)i;
+                    sb.Append(sw + ": " + counts[i]);
+                    sb.Append(G.newlineGlyph);
+                }
             }
 
             return sb.ToString();
@@ -385,8 +408,17 @@ namespace stonerkart
             shitterhack =
                 new TypedGameEventHandler<StartOfStepEvent>(
                     new TypedGameEventFilter<StartOfStepEvent>(
-                        a => a.step == Steps.Replenish && a.activePlayer == controller
-                        ), e => fatigue = 0);
+                        a => a.step == Steps.Replenish && a.activePlayer == controller),
+                    e =>
+                    {
+                        fatigue = 0;
+                        stacksCounter.TickDown();
+                    });
+
+            r.add(new TypedGameEventHandler<ApplyStacksEvent>(e =>
+            {
+                e.card.stacksCounter[e.stack] += e.count;
+            }));
 
             r.add(new TypedGameEventHandler<RaceModifyEvent>(e =>
             {
@@ -692,6 +724,7 @@ namespace stonerkart
 
     public enum CardTemplate
     {
+        Confuse,
         Big_sMonkey,
     	Great_sWhite_sBuffalo,
     	Alter_sFate,

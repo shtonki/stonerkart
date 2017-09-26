@@ -834,7 +834,7 @@ namespace stonerkart
         private ActivatedAbility chooseAbilitySynced(Card c)
         {
             ActivatedAbility r;
-            ActivatedAbility[] activatableAbilities = c.usableHere;
+            ActivatedAbility[] activatableAbilities = c.usableHere.ToArray();
 
             bool canCastSlow = gameState.stack.Count == 0 && gameState.activePlayer == c.controller && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
             if (!canCastSlow)

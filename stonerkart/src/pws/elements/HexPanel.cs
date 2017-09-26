@@ -57,7 +57,8 @@ namespace stonerkart
             });
         }
 
-        private CardView rightclickview;
+        private CardView rightclickviewcurrent;
+        private CardView rightclickviewbase;
         public override void onMouseDown(MouseButtonEventArgs args)
         {
             base.onMouseDown(args);
@@ -95,19 +96,33 @@ namespace stonerkart
 
         private void ShowRightClickCard(Card c, int x, int y)
         {
-            if (rightclickview != null) throw new Exception();
-            rightclickview = new CardView(Card.fromTemplate(c.template));
-            rightclickview.Height = 400;
-            rightclickview.X = x;
-            rightclickview.Y = y;
-            rightclickview.Hoverable = false;
-            addChild(rightclickview);
+            if (rightclickviewcurrent != null) throw new Exception();
+            rightclickviewcurrent = new CardView(c);
+            rightclickviewcurrent.Height = 400;
+            rightclickviewcurrent.X = x;
+            rightclickviewcurrent.Y = y;
+            rightclickviewcurrent.Hoverable = false;
+            addChild(rightclickviewcurrent);
+
+
+            if (rightclickviewbase != null) throw new Exception();
+            rightclickviewbase = new CardView(Card.fromTemplate(c.template));
+            rightclickviewbase.Height = 400;
+            rightclickviewbase.X = x - rightclickviewcurrent.Width;
+            rightclickviewbase.Y = y;
+            rightclickviewbase.Hoverable = false;
+            addChild(rightclickviewbase);
         }
         private void HideRightClickCard()
         {
-            if (rightclickview == null) return;
-            removeChild(rightclickview);
-            rightclickview = null;
+            if (rightclickviewcurrent == null) return;
+            removeChild(rightclickviewcurrent);
+            rightclickviewcurrent = null;
+
+
+            if (rightclickviewbase == null) return;
+            removeChild(rightclickviewbase);
+            rightclickviewbase = null;
         }
 
 
