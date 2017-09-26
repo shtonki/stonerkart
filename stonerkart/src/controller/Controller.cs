@@ -56,7 +56,7 @@ namespace stonerkart
 
         public static void respondToFriendRequest(string username, bool accept)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
             //user.RemovePendingFriendRequest
             Network.respondToFriendRequest(username, accept);
         }
@@ -102,7 +102,7 @@ namespace stonerkart
 
         public static void challengePlayer(string username)
         {
-            GameRules rules = new GameRules(MapConfiguration.Default);
+            GameRules rules = new GameRules(MapConfiguration.JasinHex);
 
             Network.challenge(username, rules);
         }

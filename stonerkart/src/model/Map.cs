@@ -39,7 +39,7 @@ namespace stonerkart
 
         private static Map JasinMap()
         {
-            const int diameter = 11;
+            const int diameter = 7;
             Map map = new Map(diameter, diameter);
 
 
