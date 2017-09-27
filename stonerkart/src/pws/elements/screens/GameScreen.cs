@@ -55,8 +55,8 @@ namespace stonerkart
         private const int handViewY = Frame.AVAILABLEHEIGHT - panelMargin - handViewHeight - handAndHexPaddingY;
         private const int handViewX = leftPanelWidth + leftPanelX + handXPadding;
 
-        private const int hexPanelHeight = 300 + Frame.AVAILABLEHEIGHT - handViewHeight - handAndHexPaddingY * 2;
-        private const int hexPanelWidth = 495;
+        private const int hexPanelHeight = Frame.AVAILABLEHEIGHT + handViewHeight - handViewY + 35;
+        private const int hexPanelWidth = 550;
         private const int hexPanelXPaddingToRightPanel = 100;
         private const int hexPanelY = 0;
 
