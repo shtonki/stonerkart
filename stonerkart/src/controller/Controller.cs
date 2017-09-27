@@ -96,7 +96,7 @@ namespace stonerkart
 
         public static void quit(ExitStatus es)
         {
-            Settings.saveSettings();
+            Settings.SaveSettings();
             Logger.WriteLine("Exiting with status '{0}'", (int)es);
             Logger.DumpLog();
 
