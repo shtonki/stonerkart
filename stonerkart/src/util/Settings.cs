@@ -33,7 +33,7 @@ namespace stonerkart
     {
         private static Setting[] settings;
         private static BinaryFormatter bf = new BinaryFormatter();
-        public static DecksSetting DecksSetting => (DecksSetting)settings.First(setting => setting is DecksSetting);
+        public static DecksSetting DecksSetting => (DecksSetting)settings.FirstOrDefault(setting => setting is DecksSetting);
 
         private static string saveFileName = "settings";
 
@@ -45,10 +45,22 @@ namespace stonerkart
                 return;
             }
 
-            var bytes = File.ReadAllBytes(saveFileName);
-            MemoryStream ms = new MemoryStream(bytes);
-            var settingsarray = (Setting[])bf.Deserialize(ms);
-            settings = settingsarray;
+            if (File.Exists(saveFileName))
+            {
+                settings = new Setting[0];
+            }
+            else
+            {
+                var bytes = File.ReadAllBytes(saveFileName);
+                MemoryStream ms = new MemoryStream(bytes);
+                var settingsarray = (Setting[])bf.Deserialize(ms);
+                settings = settingsarray;
+            }
+
+            if (DecksSetting == null)
+            {
+                settings = settings.Concat(new[] {new DecksSetting()}).ToArray();
+            }
         }
 
         public static void SaveSettings()
