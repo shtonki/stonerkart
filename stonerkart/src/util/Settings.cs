@@ -45,7 +45,7 @@ namespace stonerkart
                 return;
             }
 
-            if (File.Exists(saveFileName))
+            if (!File.Exists(saveFileName))
             {
                 settings = new Setting[0];
             }

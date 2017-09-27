@@ -39,7 +39,7 @@ namespace stonerkart
 
         private static Map JasinMap()
         {
-            const int diameter = 7;
+            const int diameter = 9;
             Map map = new Map(diameter, diameter);
 
 
@@ -57,9 +57,16 @@ namespace stonerkart
                 int hi = (distanceFromMiddle + (boostHighNotLow ? 1 : 0)) / 2;
                 int lo = (distanceFromMiddle + (boostHighNotLow ? 0 : 1)) / 2;
 
-                if(y >= lo && y < diameter - hi)
+                if(
+                    (y - 1 >= lo && y + 1 < diameter - hi)
+                    && distanceFromMiddle < diameter/2
+                    )
                 {
                     tile.tileType = Tile.TileType.Normie;
+                }
+                else if (y >= lo && y <diameter - hi)
+                {
+                    tile.tileType = Tile.TileType.NoSummon;
                 }
                 else
                 {
