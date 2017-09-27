@@ -38,8 +38,6 @@ namespace stonerkart
         private const int panelMargin = 30;
         private const int panelWidthPreMargin = 500;
 
-        private const int hexPanelDiameter = 7;
-
         private const int leftPanelWidth = panelWidthPreMargin - panelMargin;
         private const int leftPanelHeight = Frame.AVAILABLEHEIGHT - panelMargin * 2;
         private const int leftPanelX = panelMargin;
@@ -50,17 +48,17 @@ namespace stonerkart
         private const int rightPanelX = Frame.BACKSCREENWIDTH - rightPanelWidth - panelMargin;
         private const int rightPanelY = panelMargin;
 
-        private const int handAndHexPaddingY = 25;
+        private const int handAndHexPaddingY = 5;
         private const int handXPadding = 20;
         private const int handViewHeight = 300;
         private const int handViewWidth = rightPanelX - (leftPanelX + leftPanelWidth) - handXPadding * 2;
         private const int handViewY = Frame.AVAILABLEHEIGHT - panelMargin - handViewHeight - handAndHexPaddingY;
         private const int handViewX = leftPanelWidth + leftPanelX + handXPadding;
 
-        private const int hexPanelHeight = leftPanelHeight - handViewHeight - handAndHexPaddingY * 2;
-        private const int hexPanelWidth = 700;
+        private const int hexPanelHeight = 300 + Frame.AVAILABLEHEIGHT - handViewHeight - handAndHexPaddingY * 2;
+        private const int hexPanelWidth = 495;
         private const int hexPanelXPaddingToRightPanel = 100;
-        private const int hexPanelY = 25;
+        private const int hexPanelY = 0;
 
         private const int stackViewWidth = 200;
         private const int stackViewHeight = 400;

@@ -12,3 +12,4 @@ autopass/turn stops
 timers
 hover card in movestep to see its path(and also highlight its destination)
 flowers meme abilities don't appear to be channels but they be
+rotate hexagons one click 
