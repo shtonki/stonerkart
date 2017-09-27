@@ -22,10 +22,7 @@ namespace stonerkart
 
         public List<TriggerGlueHack> pendingTriggeredAbilities { get; } = new List<TriggerGlueHack>();
 
-        public int activePlayerIndex { get; set; }
-        public Player activePlayer => players[activePlayerIndex];
-
-        public StepCounter stepCounter;
+        public TurnCounter TurnCounter { get; private set; }
 
         public Stack<StackWrapper> wrapperStack { get; } = new Stack<StackWrapper>();
 
@@ -40,9 +37,6 @@ namespace stonerkart
 
         public GameState(GameSetupInfo gsi)
         {
-            //gameid = ngs.gameid;
-
-
             random = new Random(gsi.randSeed);
             map = Map.MapFromConfiguration(gsi.GameRules.MapConfiguration);
             cards = new List<Card>();
@@ -61,7 +55,7 @@ namespace stonerkart
                 }
             }
 
-            stepCounter = new StepCounter();
+            TurnCounter = new TurnCounter(players);
 
             setupHandlers();
         }

@@ -219,8 +219,8 @@ namespace stonerkart
             ButtonOption bopt = chooseButtonSynced(flipwinner,
                 "Do you wish to go first?",
                 ButtonOption.Yes, ButtonOption.No);
-            
-            gameState.activePlayerIndex = (xi + (bopt == ButtonOption.Yes ? 0 : 1)) % gameState.players.Count;
+
+            gameState.TurnCounter.ActivePlayer = bopt == ButtonOption.Yes ? flipwinner : flipwinner.Opponent;
 
             int[] draws = { 5, 5, 4, 3, 2, 1 };
 
@@ -228,7 +228,7 @@ namespace stonerkart
             {
                 for (int j = 0; j < draws.Length; j++)
                 {
-                    Player p = gameState.players[(i + gameState.activePlayerIndex) % gameState.players.Count];
+                    Player p = gameState.TurnCounter.APNAP.ElementAt(i);
                     int cards = draws[j];
                     handleTransaction(new DrawEvent(p, cards));
 
@@ -272,15 +272,15 @@ namespace stonerkart
 
             while (true)
             {
-                screen.turnIndicator.setActive(gameState.stepCounter.step, gameState.activePlayer.isHero);
-                doStep(gameState.stepCounter.step);
-                gameState.stepCounter.nextStep();
+                screen.turnIndicator.setActive(gameState.TurnCounter.Step, gameState.TurnCounter.ActivePlayer.isHero);
+                doStep(gameState.TurnCounter.Step);
+                gameState.TurnCounter.NextStep();
             }
         }
 
         private void doStep(Steps step)
         {
-            handleTransaction(new StartOfStepEvent(gameState.activePlayer, step));
+            handleTransaction(new StartOfStepEvent(gameState.TurnCounter.ActivePlayer, step));
             switch (step)
             {
                 case Steps.Replenish:
@@ -309,7 +309,7 @@ namespace stonerkart
                 } break;
             }
 
-            handleTransaction(new EndOfStepEvent(gameState.activePlayer, step));
+            handleTransaction(new EndOfStepEvent(gameState.TurnCounter.ActivePlayer, step));
 
             foreach (Player p in gameState.players)
             {
@@ -322,23 +322,23 @@ namespace stonerkart
             screen.passUntilEOT.Toggled = false;
             screen.passUntilEOTOnEmptyStack.Toggled = false;
 
-            gameState.activePlayer.resetMana();
+            gameState.TurnCounter.ActivePlayer.resetMana();
 
             if (!skipFirstDraw)
             {
-                handleTransaction(new DrawEvent(gameState.activePlayer, 1));
+                handleTransaction(new DrawEvent(gameState.TurnCounter.ActivePlayer, 1));
             }
             else
             {
                 skipFirstDraw = false;
             }
 
-            if (gameState.activePlayer.manaPool.maxCount < 12)
+            if (gameState.TurnCounter.ActivePlayer.manaPool.maxCount < 12)
             {
-                Player addingPlayer = gameState.activePlayer;
+                Player addingPlayer = gameState.TurnCounter.ActivePlayer;
                 var mc = chooseManaColourSynced(addingPlayer, o => addingPlayer.manaPool.currentMana(o) != 6,
                     "Choose which mana colour to add to your mana pool.");
-                gameState.activePlayer.gainMana(mc.Value);
+                gameState.TurnCounter.ActivePlayer.gainMana(mc.Value);
             }
 
             priority();
@@ -391,7 +391,7 @@ namespace stonerkart
         {
             List<Tuple<Card, Path>> paths;
 
-            Player movingPlayer = gameState.activePlayer;
+            Player movingPlayer = gameState.TurnCounter.ActivePlayer;
             var movers = movingPlayer.field.Where(c => c.canMove);
 
             var unpathed = movers.ToList();
@@ -503,8 +503,6 @@ namespace stonerkart
         private void endStep()
         {
             priority();
-
-            gameState.activePlayerIndex = (gameState.activePlayerIndex + 1)% gameState.players.Count;
         }
 
         private void handleTransaction(GameEvent e)
@@ -718,7 +716,7 @@ namespace stonerkart
             while (true)
             {
                 enforceRules();
-                Player playerWithPriority = gameState.players[(gameState.activePlayerIndex + c)% gameState.players.Count];
+                Player playerWithPriority = gameState.TurnCounter.APNAP.ElementAt(c);
 
                 bool playerCastSomething = givePriority(playerWithPriority);
 
@@ -836,7 +834,11 @@ namespace stonerkart
             ActivatedAbility r;
             ActivatedAbility[] activatableAbilities = c.usableHere.ToArray();
 
-            bool canCastSlow = gameState.stack.Count == 0 && gameState.activePlayer == c.controller && (gameState.stepCounter.step == Steps.Main1 || gameState.stepCounter.step == Steps.Main2);
+            bool canCastSlow = 
+                gameState.stack.Count == 0 
+                && gameState.TurnCounter.ActivePlayer == c.controller 
+                && (gameState.TurnCounter.Step == Steps.Main1 || gameState.TurnCounter.Step == Steps.Main2);
+
             if (!canCastSlow)
             {
                 activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
@@ -1227,21 +1229,60 @@ namespace stonerkart
     }
 
 
-    class StepCounter : Observable<Steps>
+    internal class TurnCounter : Observable<Steps>
     {
-        public Steps step { get; private set; }
+        private Player[] players { get; }
+        private int activePlayerIndex { get; set; }
 
-        public void nextStep()
+        public int Turn { get; private set; }
+        public Steps Step { get; private set; }
+        public IEnumerable<Player> APNAP => apnapEx();
+
+        public Player ActivePlayer
         {
-            if (step == Steps.End)
+            get { return players[activePlayerIndex]; }
+            set
             {
-                step = Steps.Replenish;
+                if (Turn != 0 || Step != Steps.Replenish) throw new Exception();
+                for (int i = 0; i < players.Length; i++)
+                {
+                    if (players[i] == value)
+                    {
+                        activePlayerIndex = i;
+                        return;
+                    }
+                }
+                throw new Exception();
+            }
+        } 
+
+        public TurnCounter(IEnumerable<Player> players)
+        {
+            this.players = players.ToArray();
+        }
+
+        public void NextStep()
+        {
+            if (Step == Steps.End)
+            {
+                Step = Steps.Replenish;
+                activePlayerIndex++;
+                activePlayerIndex %= players.Length;
+                Turn++;
             }
             else
             {
-                step = (Steps)(((int)step) + 1);
+                Step++;
             }
-            notify(step);
+            notify(Step);
+        }
+
+        private IEnumerable<Player> apnapEx()
+        {
+            for (int i = 0; i < players.Length; i++)
+            {
+                yield return players[(activePlayerIndex + i)%players.Length];
+            }
         }
     }
 

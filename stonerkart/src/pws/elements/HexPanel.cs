@@ -232,7 +232,7 @@ namespace stonerkart
                     }
                     catch (InvalidOperationException e)
                     {
-                        //someone fucked with rimhighlighting on us so fuck'em we highlight nothing
+                        Logger.WriteLine("someone fucked with rimhighlighting on us so fuck'em we highlight nothing.");
                     }
                     dm.fillHexagon(hexX, hexY, hexsize, bordercolor, fillcolor);
                 }

@@ -18,6 +18,12 @@ namespace stonerkart
             log.AppendLine(logstring);
         }
 
+        public static void ShoutLine(string s, params object[] args)
+        {
+            Console.WriteLine(s, args);
+            WriteLine(s, args);
+        }
+
         public static void DumpLog()
         {
             File.WriteAllText(dumplogFileName, log.ToString());

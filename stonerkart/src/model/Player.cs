@@ -23,6 +23,8 @@ namespace stonerkart
         public ManaPool manaPool { get; private set; }
 
         public bool isHero => this == game.hero;
+        public Player Opponent => isHero ? game.villain : game.hero;
+
 
         public Player(GameState g, string name)
         {
