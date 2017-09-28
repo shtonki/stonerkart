@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Input;
 
 namespace stonerkart
 {
@@ -145,9 +146,9 @@ namespace stonerkart
             }
         }
 
-        public void clear()
+        public void PassIfPossible()
         {
-            prompt("");
+            if (buttons[0].Text == "Pass") buttons[0].onClick(new MouseButtonEventArgs());
         }
     }
 }

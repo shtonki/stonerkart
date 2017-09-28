@@ -150,6 +150,8 @@ namespace stonerkart
             addWinduh(stackWinduh);
             stackWinduh.Visible = false;
 
+            
+
             passUntilEOT = new ToggleButton(turnIndicatorWidth, passUntilHeight);
             passUntilEOT.X = turnIndicatorX;
             passUntilEOT.Y = passUntilEOTY;
@@ -169,6 +171,13 @@ namespace stonerkart
             passUntilEOTOnEmptyStack.Backcolor = Color.FloralWhite;
             passUntilEOTOnEmptyStack.Border = new SolidBorder(2, Color.Black);
             passUntilEOTOnEmptyStack.Toggled = false;
+
+            Action act = () =>
+            {
+                gamePromptPanel.PassIfPossible();
+            };
+            passUntilEOT.clicked += a => act();
+            passUntilEOTOnEmptyStack.clicked += a => act();
         }
 
         private void makePanel(out PileView pileview, out Winduh winduh)
