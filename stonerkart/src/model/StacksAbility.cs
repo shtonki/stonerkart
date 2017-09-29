@@ -6,27 +6,27 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    enum StacksWords
+    enum Counter
     {
         Stunned,
         Crippled,
     }
 
-    class StacksCounter
+    class CounterCounter
     {
-        private static int wordscount { get; }= Enum.GetValues(typeof(StacksWords)).Cast<StacksWords>().Count();
+        private static int wordscount { get; }= Enum.GetValues(typeof(Counter)).Cast<Counter>().Count();
 
         private int[] counts;
         public int[] Counts => (int[])counts.Clone();
 
 
-        public int this[StacksWords ix]
+        public int this[Counter ix]
         {
             get { return counts[(int)ix]; }
             set { counts[(int)ix] = value; }
         }
 
-        public StacksCounter()
+        public CounterCounter()
         {
             counts = new int[wordscount];
         }

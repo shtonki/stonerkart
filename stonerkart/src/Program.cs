@@ -19,8 +19,17 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace stonerkart
 {
+    
+
     class Program
     {
+
+        static void premain()
+        {
+        }
+
+
+
         public static bool design = false;
 
         
@@ -29,6 +38,7 @@ namespace stonerkart
         {
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
 
+            premain();
             //AppDomain.CurrentDomain.UnhandledException += CrashHandler;
 
             Controller.launchGame();

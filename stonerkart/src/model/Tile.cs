@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace stonerkart
 {
-    class Tile : Stuff, Targetable
+    class Tile : Stuff
     {
         public enum TileType
         {
@@ -27,8 +27,8 @@ namespace stonerkart
 
         public Card card { get; private set; }
 
-        public bool passable => card == null && (tileType == TileType.Normie || tileType == TileType.NoSummon);
-        public bool summonable => passable && tileType == TileType.Normie;
+        public bool Passable => card == null && (tileType == TileType.Normie || tileType == TileType.NoSummon);
+        public bool Summonable => Passable && tileType == TileType.Normie;
 
 
         private readonly XYCoord xyCoord;
@@ -95,11 +95,6 @@ namespace stonerkart
                 }
             }
             return ta;
-        }
-
-        public int stateCtr()
-        {
-            return 0;
         }
 
         #region Coordnonsense

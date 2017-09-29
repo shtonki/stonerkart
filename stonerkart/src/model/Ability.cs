@@ -88,7 +88,7 @@ namespace stonerkart
 
         private CastSpeed castSpeed;
 
-        public ActivatedAbility(Card card, PileLocation activeIn, int castRange, Foo cost, CastSpeed castSpeed, string description, params Effect[] effects) : base(card, activeIn, new Foo(effects), castRange, cost, description)
+        public ActivatedAbility(Card card, PileLocation activeIn, int castRange, Foo effect, Foo cost, CastSpeed castSpeed, string description) : base(card, activeIn, effect, castRange, cost, description)
         {
             this.castSpeed = castSpeed;
         }
@@ -103,7 +103,7 @@ namespace stonerkart
 
         private GameEventFilter filter;
 
-        public TriggeredAbility(Card card, PileLocation activeIn, Effect[] effects, int castRange, Foo cost, GameEventFilter trigger, bool isOptional, Timing timing, string description) : base(card, activeIn, new Foo(effects), castRange, cost, description)
+        public TriggeredAbility(Card card, PileLocation activeIn, Foo effects, int castRange, Foo cost, GameEventFilter trigger, bool isOptional, Timing timing, string description) : base(card, activeIn, effects, castRange, cost, description)
         {
             this.card = card;
             filter = trigger;

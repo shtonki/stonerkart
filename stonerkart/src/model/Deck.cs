@@ -108,7 +108,7 @@ namespace stonerkart
 
         public bool testLegal(CardTemplate heroic, CardTemplate[] deck, bool checkSize = true)
         {
-            if (!Card.fromTemplate(heroic).isHeroic) return false;
+            if (!Card.fromTemplate(heroic).IsHeroic) return false;
             if (checkSize && deck.Length < cardMin) return false;
 
             ReduceResult<CardTemplate> rr = deck.Reduce();
@@ -118,7 +118,7 @@ namespace stonerkart
                 int cc = rr[ct];
                 Card card = Card.fromTemplate(ct);
 
-                if (card.isHeroic) return false;
+                if (card.IsHeroic) return false;
                 if (this[card.rarity] < cc) return false;
             }
 

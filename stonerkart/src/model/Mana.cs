@@ -242,18 +242,13 @@ namespace stonerkart
     /// <summary>
     /// Nothing fancier than a wrapper around ManaColour allowing ManaOrb to implement Stuff and Targetable
     /// </summary>
-    class ManaOrb : Stuff, Targetable
+    class ManaOrb : Stuff
     {
         public ManaColour colour { get; }
 
         public ManaOrb(ManaColour colour)
         {
             this.colour = colour;
-        }
-
-        public int stateCtr()
-        {
-            return 0;
         }
     }
 

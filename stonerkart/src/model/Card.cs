@@ -11,8 +11,21 @@ using System.Text;
 
 namespace stonerkart
 {
-    partial class Card : Observable<CardChangedMessage>, Stuff, Targetable, Observer<int>
+    partial class Card : Observable<CardChangedMessage>, Stuff, Observer<int>
     {
+
+        public bool IsCreature => cardType == CardType.Creature;
+        public bool IsHeroic => isHeroic;
+        public bool IsExhausted => movement == 0;
+        public bool IsDamaged => damageTaken > 0;
+        public bool Is(Counter sw) => StacksCount(sw) > 0;
+        public bool Is(ManaColour mc) => colours.Contains(mc);
+        public bool Is(CardType ct) => cardType == ct;
+        public bool HasKeyword(KeywordAbility kwa) => keywordAbilities.Contains(kwa);
+        public bool canExhaust => fatigue == 0 && movement > 0;
+
+
+
         public string name { get; }
         public Pile pile { get; private set; }
 
@@ -32,12 +45,10 @@ namespace stonerkart
         public Tile lastSeenAt { get; private set; }
         public int moveCount { get; private set; }
         public Player owner { get; }
-        public Player controller { get; }
+        public Player Controller { get; }
         public CardTemplate template { get; }
         public bool isDummy { get; private set; }
         public bool isToken { get; private set; }
-        public bool IsNonHeroicCreature => cardType == CardType.Creature && !isHeroic;
-        public bool IsAnother(Card perhapsOther) { return perhapsOther != this; }
         public CardType cardType { get; }
         public Rarity rarity { get; set; }
         public CardSet set { get; }
@@ -55,8 +66,7 @@ namespace stonerkart
         public Subtype? subtype { get; }
         public int convertedManaCost => castManaCost.colours.Count();
 
-        public bool isExhausted => movement == 0;
-        public bool canRetaliate => !isHeroic;
+        public bool canRetaliate => !IsHeroic;
 
         public string breadText => breadTextEx();
         public string flavourText { get; }
@@ -86,7 +96,7 @@ namespace stonerkart
 
         public List<Aura> auras { get; } = new List<Aura>();
 
-        public bool isHeroic { get; }
+        private bool isHeroic { get; }
 
         public bool hasPT => cardType == CardType.Creature;
         public bool hasMovenemt => cardType == CardType.Creature || cardType == CardType.Relic;
@@ -107,10 +117,9 @@ namespace stonerkart
 
         private List<KeywordAbility> keywordAbilities;
 
-        private StacksCounter stacksCounter { get; } = new StacksCounter();
+        private CounterCounter counterCounter { get; } = new CounterCounter();
 
-        public int StacksCount(StacksWords sw) => stacksCounter[sw];
-        public bool Is(StacksWords sw) => StacksCount(sw) > 0;
+        public int StacksCount(Counter sw) => counterCounter[sw];
 
 
         private GameEventHandlerBuckets eventHandler;
@@ -123,7 +132,7 @@ namespace stonerkart
         public int combatDamageTo(Card defender)
         {
             int d = power;
-            if (defender.isHeroic && hasAbility(KeywordAbility.Kingslayer)) d = d*2;
+            if (defender.IsHeroic && HasKeyword(KeywordAbility.Kingslayer)) d = d*2;
             return d;
         }
 
@@ -132,8 +141,8 @@ namespace stonerkart
         public bool canAttack(Card defender)
         {
             if (defender.cardType != CardType.Creature) return false;
-            if (defender.hasAbility(KeywordAbility.Flying) &&
-                !(this.hasAbility(KeywordAbility.Flying) || this.hasAbility(KeywordAbility.Wingclipper))) return false;
+            if (defender.HasKeyword(KeywordAbility.Flying) &&
+                !(this.HasKeyword(KeywordAbility.Flying) || this.HasKeyword(KeywordAbility.Wingclipper))) return false;
             return true;
         }
 
@@ -144,11 +153,10 @@ namespace stonerkart
 
         public bool canTarget(Card target)
         {
-            if (target.hasAbility(KeywordAbility.Elusion)) return false;
+            if (target.HasKeyword(KeywordAbility.Elusion)) return false;
             return true;
         }
 
-        public bool canExhaust => fatigue == 0;
 
         public void moveTo(Pile p)
         {
@@ -196,10 +204,10 @@ namespace stonerkart
         {
             var val = Movement.value;
 
-            val -= StacksCount(StacksWords.Crippled);
+            val -= StacksCount(Counter.Crippled);
             val = Math.Max(val, 1);
 
-            if (Is(StacksWords.Stunned)) val = 0;
+            if (Is(Counter.Stunned)) val = 0;
 
             val -= fatigue;
 
@@ -210,15 +218,11 @@ namespace stonerkart
 
         private IEnumerable<ActivatedAbility> usableEx()
         {
-            if (Is(StacksWords.Stunned)) return new ActivatedAbility[0];
+            if (Is(Counter.Stunned)) return new ActivatedAbility[0];
 
             return activatedAbilities;
         }
 
-        public bool hasAbility(KeywordAbility kwa)
-        {
-            return keywordAbilities.Contains(kwa);
-        }
 
         public bool isCastAbility(Ability a)
         {
@@ -262,7 +266,7 @@ namespace stonerkart
         {
             if (cardType == CardType.Creature)
             {
-                string s = isHeroic ? "Heroic " : "";
+                string s = IsHeroic ? "Heroic " : "";
                 s += race.ToString();
                 if (subtype.HasValue) s += ' ' + subtype.Value.ToString();
                 return s;
@@ -309,12 +313,12 @@ namespace stonerkart
 
             }
 
-            var counts = stacksCounter.Counts;
+            var counts = counterCounter.Counts;
             for (int i = 0; i < counts.Length; i++)
             {
                 if (counts[i] > 0)
                 {
-                    StacksWords sw = (StacksWords)i;
+                    Counter sw = (Counter)i;
                     sb.Append(sw + ": " + counts[i]);
                     sb.Append(G.newlineGlyph);
                 }
@@ -408,24 +412,21 @@ namespace stonerkart
             shitterhack =
                 new TypedGameEventHandler<StartOfStepEvent>(
                     new TypedGameEventFilter<StartOfStepEvent>(
-                        a => a.step == Steps.Replenish && a.activePlayer == controller),
+                        a => a.step == Steps.Replenish && a.activePlayer == Controller),
                     e =>
                     {
                         fatigue = 0;
-                        stacksCounter.TickDown();
+                        counterCounter.TickDown();
                     });
 
             r.add(new TypedGameEventHandler<ApplyStacksEvent>(e =>
             {
-                e.card.stacksCounter[e.stack] += e.count;
+                e.card.counterCounter[e.stack] += e.count;
             }));
 
             r.add(new TypedGameEventHandler<RaceModifyEvent>(e =>
             {
-                e.card.forceRace.modify(new ModifierStruct(setTo((int)e.race), e.filter));
-                int i = (int)e.card.forceRace.value;
-                int j = (int)e.card.race;
-                int xd = setTo((int)e.race)(0);
+                e.card.forceRace.modify(new ModifierStruct(Set((int)e.race), e.filter));
             }));
 
             r.add(new TypedGameEventHandler<ModifyEvent>(e =>
@@ -448,7 +449,7 @@ namespace stonerkart
                 if (e.tile.card != null) throw new Exception();
 
                 moveTo(e.tile);
-                if (!e.dontExhaust && (cardType == CardType.Creature && !hasAbility(KeywordAbility.Fervor))) exhaust();
+                if (!e.dontExhaust && (cardType == CardType.Creature && !HasKeyword(KeywordAbility.Fervor))) exhaust();
             }));
 
             r.add(new TypedGameEventHandler<FatigueEvent>(e =>
@@ -497,204 +498,50 @@ namespace stonerkart
         //can't see me
         public TriggerGlueHack tghack { get; set; }
 
-        #region helpers
 
-        #region Foos
+        #region legallambdas
 
-        private static Foo emptyFoo => new Foo();
+        private static Func<int, int> Add(int val) => a => a + val;
+        private static Func<int, int> Set(int val) => a => val;
 
-        private static Foo manaCostFoo(params ManaColour[] cs)
+        private static GameEventFilter Forever => new StaticGameEventFilter(() => false);
+        private static GameEventFilter EndOfTurn => new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.Replenish);
+        private static GameEventFilter StartOfHeros(Steps step) => new TypedGameEventFilter<StartOfStepEvent>(e => e.activePlayer.IsHero && e.step == step);
+
+
+        private static StaticGenerator<T> sg<T>(params T[] ts)
         {
-            return new Foo(manaCostEffect(cs));
+            return new StaticGenerator<T>(ts);
         }
-        #endregion
+        private static Generator<Player> ResolveController => new ResolvePlayerRule(ResolvePlayerRule.Rule.ResolveController);
+        private static Generator<Card> ResolveCard => new ResolveCardRule(ResolveCardRule.Rule.ResolveCard);
+        private static Generator<Card> ResolveControllerCard => new ResolveCardRule(ResolveCardRule.Rule.ResolveControllerCard);
+        private static Generator<Card> VillainsCard => new ResolveCardRule(ResolveCardRule.Rule.VillansCard);
 
-        #region Effects
-
-        public static Effect exhaustThis => new 
-            Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard, c => c.canExhaust)), 
-            new FatigueDoer(true));
-        public Effect sacThisLambda => new Effect(new CardResolveRule(CardResolveRule.Rule.ResolveCard), new MoveToPileDoer(PileLocation.Graveyard));
-        public Effect sacCostLambda
-            =>
-                new Effect(
-                    new ChooseRule<Card>(
-                        c => !c.isHeroic && c.controller == this.controller && c.cardType == CardType.Creature),
-                    new MoveToPileDoer(PileLocation.Graveyard));
-
-        public Effect zepLambda(int damage)
+        private static Effect ResolverPaysManaEffect(params ManaColour[] colours)
         {
-            return
-                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), creature()),
-                    new PingDoer(damage));
+            return ResolverPaysManaEffect(new ManaSet(colours));
+        }
+        private static Effect ResolverPaysManaEffect(ManaSet set)
+        {
+            return new PayManaEffect(ResolveController, sg(new [] { set }));
         }
 
-
-        public static Effect manaCostEffect(ManaSet castManaCost)
+        private static Effect SummonTokensEffect(Generator<Player> playersgen, params CardTemplate[] cts)
         {
-            return new Effect(
-                new TargetRuleSet(new PlayerResolveRule(PlayerResolveRule.Rule.ResolveController),
-                    new ManaCostRule(castManaCost)), new PayManaDoer());
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
+        private static Effect ExhaustThis => new FatigueEffect(new ResolveCardRule(ResolveCardRule.Rule.ResolveCard, c => c.canExhaust), c => c.Movement);
 
-        public static Effect manaCostEffect(params ManaColour[] ms)
+
+        private void AddDiesLambda(string description, Foo foo, int range = -1, bool optional = false)
         {
-            return manaCostEffect(new ManaSet(ms));
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
-
-
-        public Effect zepNonHeroicLambda(int damage)
+        private void AddEtBLambda(string description, Foo foo, int range = -1, bool optional = false)
         {
-            return
-                new Effect(new TargetRuleSet(new CardResolveRule(CardResolveRule.Rule.ResolveCard), nonheroicCreature()),
-                    new PingDoer(damage));
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
-
-        public static Effect displaceFromGraveyard(Func<Card, bool> filter = null)
-        {
-            filter = filter ?? (c => true);
-            return new Effect(new ChooseRule<Card>(
-                new SelectCardRule(PileLocation.Graveyard, SelectCardRule.Mode.PlayerLooksAtPlayer),
-                ChooseRule<Card>.ChooseAt.Cast,
-                filter),
-                new MoveToPileDoer(PileLocation.Displaced));
-        }
-
-        public Effect playerSacLambda(TargetRule sacrificer)
-        {
-            return new Effect(new ChooseRule<Card>(
-                new SelectCardRule(PileLocation.Field, SelectCardRule.Mode.PlayerLooksAtPlayer),
-                sacrificer,
-                ChooseRule<Card>.ChooseAt.Resolve,
-                c => c.cardType == CardType.Creature && !c.isHeroic),
-                new MoveToPileDoer(PileLocation.Graveyard));
-        }
-
-        #endregion
-
-        #region addTriggeredAbility lambdas
-        public void etbLambda(String description, Effect e, int range = -1, bool optional = false)
-        {
-            addTriggeredAbility(
-                        description,
-                        e,
-                        new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(
-                            moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
-                        range,
-                        PileLocation.Field,
-                        optional,
-                        TriggeredAbility.Timing.Post
-                        );
-        }
-
-        public void etbLambda(String description, Effect[] es, int range = -1, bool optional = false)
-        {
-            addTriggeredAbility(
-                        description,
-                        es,
-                        new Foo(),
-                        new TypedGameEventFilter<MoveToPileEvent>(
-                            moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
-                        range,
-                        PileLocation.Field,
-                        optional,
-                        TriggeredAbility.Timing.Post
-                        );
-        }
-
-        public void diesLambda(String description, Effect e, int range = -1, bool optional = false)
-        {
-            addTriggeredAbility(
-                description,
-                e,
-                new Foo(),
-                new TypedGameEventFilter<MoveToPileEvent>(
-                    moveEvent =>
-                        moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard &&
-                        location.pile == PileLocation.Field),
-                range,
-                PileLocation.Field,
-                optional
-                );
-        }
-
-        public void deathtouchLambda()
-        {
-            addTriggeredAbility(
-                        "Whenever this creature deals damage to a non-heroic creature destroy it.",
-                        new TargetRuleSet(new TriggeredTargetRule<DamageEvent, Card>(de => de.target)),
-                        new MoveToPileDoer(PileLocation.Graveyard),
-                        new Foo(),
-                        new TypedGameEventFilter<DamageEvent>(de => de.source == this && !de.target.isHeroic),
-                        0,
-                        PileLocation.Field,
-                        false
-                        );
-        }
-
-        #endregion
-
-        #region ModifyFunctions
-
-        public static Func<int, int> add(int i)
-        {
-            return v => v + i;
-        }
-
-        public static Func<int, int> setTo(int i)
-        {
-            return v => i;
-        }
-
-        #endregion
-
-        #region TargetRule
-
-        private static TargetRule resolveCard => new CardResolveRule(CardResolveRule.Rule.ResolveCard);
-        public static TargetRule player => new ChooseRule<Card>(c => c.isHeroic);
-        public static TargetRule relic => new ChooseRule<Card>(c => c.cardType == CardType.Relic);
-        private static TargetRule enemyHeroicCreatures => new CardsRule(c => c.isHeroic && !c.owner.isHero);
-
-
-        public static TargetRule creature(Func<Card, bool> filter = null)
-        {
-            filter = filter ?? (c => true);
-            return new ChooseRule<Card>(c => c.cardType == CardType.Creature && filter(c));
-        }
-
-        public static TargetRule nonheroicCreature(Func<Card, bool> filter = null)
-        {
-            filter = filter ?? (c => true);
-            return new ChooseRule<Card>(c => c.cardType == CardType.Creature && !c.isHeroic && filter(c));
-        }
-
-        public static TargetRule nonColouredCreature(ManaColour notAllowed)
-        {
-            return new ChooseRule<Card>(c => c.cardType == CardType.Creature && !c.isColour(notAllowed));
-        }
-
-        #endregion
-
-        #region GameEventFilter
-
-        public static GameEventFilter never { get; } = new StaticGameEventFilter(() => false);
-        public static GameEventFilter endOfTurn { get; } = new TypedGameEventFilter<EndOfStepEvent>((e) => e.step == Steps.End);
-        public static GameEventFilter clearAura { get; } = new TypedGameEventFilter<ClearAurasEvent>();
-
-        public static GameEventFilter thisEnters(Card c, PileLocation pl)
-        {
-            return new TypedGameEventFilter<MoveToPileEvent>(
-                e => e.card == c && e.to.location.pile == pl);
-        }
-
-        private GameEventFilter startOfHerosStep(Steps step)
-        {
-            return new TypedGameEventFilter<StartOfStepEvent>(e => e.step == step && e.activePlayer == controller);
-        }
-
-        #endregion
-
         #endregion
     }
 
@@ -707,7 +554,9 @@ namespace stonerkart
 
         private Func<int, int> fn;
 
-        public ModifierStruct modifer => new ModifierStruct(fn, Card.clearAura);
+        private static GameEventFilter clearaura => new TypedGameEventFilter<ClearAurasEvent>();
+
+        public ModifierStruct modifer => new ModifierStruct(fn, clearaura);
 
         public Aura(string description, Func<int, int> fn, ModifiableStats stat, Func<Card, bool> filter, PileLocation activeIn)
         {

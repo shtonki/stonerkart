@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
-    internal class Player : Observable<PlayerChangedArgs>, Targetable
+    internal class Player : Observable<PlayerChangedArgs>
     {
         public Card heroCard { get; private set; }
         public GameState game { get; }
@@ -22,8 +22,8 @@ namespace stonerkart
 
         public ManaPool manaPool { get; private set; }
 
-        public bool isHero => this == game.hero;
-        public Player Opponent => isHero ? game.villain : game.hero;
+        public bool IsHero => this == game.hero;
+        public Player Opponent => IsHero ? game.villain : game.hero;
 
 
         public Player(GameState g, string name)
@@ -76,11 +76,6 @@ namespace stonerkart
                 default:
                     throw new Exception();
             }
-        }
-
-        public int stateCtr()
-        {
-            return 0;
         }
 
         #region mana voodoo

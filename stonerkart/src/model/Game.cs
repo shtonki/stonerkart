@@ -272,7 +272,7 @@ namespace stonerkart
 
             while (true)
             {
-                screen.turnIndicator.setActive(gameState.TurnCounter.Step, gameState.TurnCounter.ActivePlayer.isHero);
+                screen.turnIndicator.setActive(gameState.TurnCounter.Step, gameState.TurnCounter.ActivePlayer.IsHero);
                 doStep(gameState.TurnCounter.Step);
                 gameState.TurnCounter.NextStep();
             }
@@ -308,8 +308,6 @@ namespace stonerkart
                     endStep();
                 } break;
             }
-
-            handleTransaction(new EndOfStepEvent(gameState.TurnCounter.ActivePlayer, step));
 
             foreach (Player p in gameState.players)
             {
@@ -360,7 +358,7 @@ namespace stonerkart
             Color.PaleVioletRed, 
         };
 
-        public void highlight(IEnumerable<Targetable> ts, Color c)
+        public void highlight(IEnumerable<object> ts, Color c)
         {
             List<Tile> tiles = new List<Tile>();
             foreach (var t in ts)
@@ -425,17 +423,17 @@ namespace stonerkart
                         path.length <= mover.movement - pth.length //card can reach the tile
                         &&
                         (
-                            path.to.passable ||
+                            path.to.Passable ||
                             (path.to.card != null &&
-                                (mover.canAttack(path.to.card) || (path.to.card.controller == mover.controller && !occupado.Contains(path.to)))
+                                (mover.canAttack(path.to.card) || (path.to.card.Controller == mover.Controller && !occupado.Contains(path.to)))
                             )
                         )
                         &&
                         !occupado.Any(p => p == path.last) //there isn't a card in the tile we want to move to
                         ).ToList();
                     if (options.Count == 1) break;
-                    var v = gameState.map.Tiles.Where(t => t.card?.controller == mover.controller).ToArray();
-                    if (movingPlayer.isHero) highlight(options.Select(p => p.to), Color.Green);
+                    var v = gameState.map.Tiles.Where(t => t.card?.Controller == mover.Controller).ToArray();
+                    if (movingPlayer.IsHero) highlight(options.Select(p => p.to), Color.Green);
                     Tile to = chooseTileSynced(
                         movingPlayer, 
                         tile => options.Select(p => p.to).Contains(tile),
@@ -483,7 +481,7 @@ namespace stonerkart
                 {
                     gt.addEvent(new DamageEvent(mover, defender, mover.combatDamageTo(defender)));
 
-                    if (!mover.hasAbility(KeywordAbility.Ambush) && defender.canRetaliate)
+                    if (!mover.HasKeyword(KeywordAbility.Ambush) && defender.canRetaliate)
                     {
                         gt.addEvent(new DamageEvent(defender, mover, defender.combatDamageTo(mover)));
                     }
@@ -569,7 +567,7 @@ namespace stonerkart
                 trashcanDeadCreatures();
             } while (gameState.pendingTriggeredAbilities.Count > 0);
 
-            if (!gameState.hero.field.Any(c => c.isHeroic))
+            if (!gameState.hero.field.Any(c => c.IsHeroic))
             {
                 concede(GameEndStateReason.Flop);
             }
@@ -584,7 +582,7 @@ namespace stonerkart
 
                 foreach (TriggerGlueHack pending in gameState.pendingTriggeredAbilities)
                 {
-                    int ix = gameState.ord(pending.ta.card.controller);
+                    int ix = gameState.ord(pending.ta.card.Controller);
                     abilityArrays[ix].Add(pending);
                 }
 
@@ -778,7 +776,7 @@ namespace stonerkart
             do
             {
                 bool autopass;
-                if (playerWithPriority.isHero)
+                if (playerWithPriority.IsHero)
                 {
                     autopass = screen.passUntilEOT.Toggled ||
                                screen.passUntilEOTOnEmptyStack.Toggled && !gameState.stack.Any();
@@ -801,7 +799,7 @@ namespace stonerkart
 
                 var card = chooseCardSynced(
                     playerWithPriority, 
-                    c => c.controller == playerWithPriority && !c.isDummy,
+                    c => c.Controller == playerWithPriority && !c.isDummy,
                     "You may cast a card.",
                     ButtonOption.Pass);
                 if (card == null) return false;
@@ -836,7 +834,7 @@ namespace stonerkart
 
             bool canCastSlow = 
                 gameState.stack.Count == 0 
-                && gameState.TurnCounter.ActivePlayer == c.controller 
+                && gameState.TurnCounter.ActivePlayer == c.Controller 
                 && (gameState.TurnCounter.Step == Steps.Main1 || gameState.TurnCounter.Step == Steps.Main2);
 
             if (!canCastSlow)
@@ -849,7 +847,7 @@ namespace stonerkart
             {
                 var dummyCards = activatableAbilities.Select(a => a.createDummy()).ToList();
                 var selectedCard = chooseCardsFromCardsSynced(
-                    c.controller, 
+                    c.Controller, 
                     dummyCards, _ => true, 
                     "Choose which ability to activate.", 
                     ButtonOption.Cancel);
@@ -877,7 +875,7 @@ namespace stonerkart
             Ability ability = wrapper.ability;
             if (stackpopped.isDummy && stackpopped.dummyFor != card) throw new Exception();
 
-            HackStruct hs = new HackStruct(this, ability, card.controller);
+            HackStruct hs = new HackStruct(this, ability, card.Controller);
 
             //fill resolve targets first
             //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
@@ -904,7 +902,7 @@ namespace stonerkart
             }
             else if ((finalTargets.Fizzled) && (stackpopped.cardType == CardType.Creature || stackpopped.cardType == CardType.Relic))
             {
-                gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.controller.field, false));
+                gt.addEvent(new MoveToPileEvent(stackpopped, stackpopped.Controller.field, false));
             }
             else if (stackpopped.cardType == CardType.Channel || stackpopped.cardType == CardType.Interrupt)
             {
@@ -961,7 +959,7 @@ namespace stonerkart
         public Card chooseCardSynced(Player chooser, Func<Card, bool> filter, string chooserPrompt, ButtonOption? button = null)
         {
             Card rt;
-            if (chooser.isHero)
+            if (chooser.IsHero)
             {
                 screen.gamePromptPanel.prompt(chooserPrompt);
                 if (button.HasValue) screen.gamePromptPanel.promptButtons(button.Value);
@@ -982,7 +980,7 @@ namespace stonerkart
         public ButtonOption chooseButtonSynced(Player chooser, string chooserPrompt, params ButtonOption[] options)
         {
             ButtonOption rt;
-            if (chooser.isHero)
+            if (chooser.IsHero)
             {
                 screen.gamePromptPanel.prompt(chooserPrompt);
                 screen.gamePromptPanel.promptButtons(options);
@@ -1010,7 +1008,7 @@ namespace stonerkart
         public Tile chooseTileSynced(Player chooser, Func<Tile, bool> filter, string chooserPrompt, ButtonOption? button = null)
         {
             Tile rt;
-            if (chooser.isHero)
+            if (chooser.IsHero)
             {
                 screen.gamePromptPanel.prompt(chooserPrompt);
                 if (button.HasValue) screen.gamePromptPanel.promptButtons(button.Value);
@@ -1080,7 +1078,7 @@ namespace stonerkart
         {
             List<Card> cardList = cards.ToList();
             Card rt;
-            if (chooser.isHero)
+            if (chooser.IsHero)
             {
                 screen.gamePromptPanel.prompt(chooserPrompt);
                 if (button.HasValue) screen.gamePromptPanel.promptButtons(button.Value);
@@ -1150,7 +1148,7 @@ namespace stonerkart
         {
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
-
+        /*
         private static IEnumerable<Tile> tilesFromTargetables(Targetable[] ts)
         {
             List<Tile> rt = new List<Tile>();
@@ -1172,7 +1170,7 @@ namespace stonerkart
             }
             return rt;
         }
-
+        */
         public void enqueueGameMessage(GameMessage gmb)
         {
             connection.enqueueGameMessage(gmb.message);

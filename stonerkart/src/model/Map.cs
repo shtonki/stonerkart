@@ -186,7 +186,7 @@ namespace stonerkart
         private int cost(Tile from, Tile to, Card card)
         {
             if (card == null) return 1;
-            if (from.card != null && from.card.controller != card.controller)
+            if (from.card != null && from.card.Controller != card.Controller)
             {
                 return 10000;
             }
@@ -211,7 +211,7 @@ namespace stonerkart
         public Tile from => tiles[0];
         public Tile last => tiles[Math.Max(0, tiles.Count - (attacking ? 2 : 1))];
         public Tile to => tiles[tiles.Count - 1];
-        public bool attacking => to.card != null && to.card.controller != from.card?.controller;
+        public bool attacking => to.card != null && to.card.Controller != from.card?.Controller;
 
         public Color colorHack { get; set; } = Color.ForestGreen;
 

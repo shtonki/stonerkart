@@ -252,7 +252,7 @@ namespace stonerkart
 
                 int statTextSize = (int)(hexsize * 0.20);
                 TextLayout tl = new SingleLineFitLayout(Justify.Middle);
-                Color clr = c.owner.isHero ? Color.DarkGreen : Color.DarkRed;
+                Color clr = c.owner.IsHero ? Color.DarkGreen : Color.DarkRed;
 
                 var toughnessText = tl.Layout(c.toughness.ToString(), statTextSize, statTextSize, ff);
                 var powerText = tl.Layout(c.power.ToString(), statTextSize, statTextSize, ff);

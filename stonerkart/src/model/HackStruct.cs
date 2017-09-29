@@ -13,9 +13,9 @@ namespace stonerkart
 
         public Tile castFrom => !resolveAbility.isCastAbility
                     ? (resolveAbility.card.tile ?? resolveAbility.card.lastSeenAt)
-                    : resolveCard.controller.heroCard.tile;
+                    : resolveCard.Controller.heroCard.tile;
         public int castRange => resolveAbility.castRange;
-        public Player resolveController => resolveCard.controller;
+        public Player resolveController => resolveCard.Controller;
         public bool heroIsResolver => hero == resolveController;
         public Card resolveCard => resolveAbility.card;
         public Ability resolveAbility { get; }

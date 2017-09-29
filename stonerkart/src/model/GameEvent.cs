@@ -18,10 +18,10 @@ namespace stonerkart
     struct ApplyStacksEvent : GameEvent, CardedEvent
     {
         public Card card { get; }
-        public StacksWords stack { get; }
+        public Counter stack { get; }
         public int count { get; }
 
-        public ApplyStacksEvent(Card card, StacksWords stack, int count)
+        public ApplyStacksEvent(Card card, Counter stack, int count)
         {
             this.card = card;
             this.stack = stack;
@@ -226,7 +226,7 @@ namespace stonerkart
             this.step = step;
         }
     }
-
+    /*
     struct EndOfStepEvent : GameEvent
     {
         public Player activePlayer { get; }
@@ -238,7 +238,7 @@ namespace stonerkart
             this.step = step;
         }
     }
-
+    */
     struct DrawEvent : GameEvent
     {
         public Player player { get; }

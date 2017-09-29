@@ -239,7 +239,7 @@ namespace stonerkart
                 (c.castManaCost[ManaColour.Life] > 0 && manaButtons[4].Toggled) ||
                 (c.castManaCost[ManaColour.Nature] > 0 && manaButtons[5].Toggled) ||
                 (c.castManaCost[ManaColour.Colourless] == c.convertedManaCost && manaButtons[6].Toggled) ||
-                (c.isHeroic);
+                (c.IsHeroic);
 
             bool tokentest = c.isToken == false;
 
@@ -562,7 +562,7 @@ namespace stonerkart
                     int i1 = i;
                     cardViews[i].clicked += (__) =>
                     {
-                        if (cardViews[i1].card.isHeroic)
+                        if (cardViews[i1].card.IsHeroic)
                         {
                             setupHeroCardView(cardViews[i1].card);
                         }

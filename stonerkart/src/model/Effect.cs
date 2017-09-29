@@ -6,6 +6,136 @@ using System.Threading.Tasks;
 
 namespace stonerkart
 {
+    interface Generator
+    {
+        TargetSet GenerateCast(HackStruct hs);
+        TargetSet GenerateResolve(HackStruct hs, TargetSet cache);
+    }
+
+    abstract class Generator<T> : Generator
+    {
+        protected abstract TargetSet GenerateCastTS(HackStruct hs);
+        protected abstract TargetSet GenerateResolveTS(HackStruct hs, TargetSet cache);
+
+        public TargetSet GenerateCast(HackStruct hs)
+        {
+            return GenerateCastTS(hs);
+        }
+
+        public TargetSet GenerateResolve(HackStruct hs, TargetSet cache)
+        {
+            return GenerateResolveTS(hs, cache);
+        }
+
+        
+    }
+
+    class StaticGenerator<T> : Generator<T>
+    {
+        private T[] ts;
+
+        public StaticGenerator(params T[] ts)
+        {
+            this.ts = ts;
+        }
+
+        public static implicit operator StaticGenerator<T>(T t)  // explicit byte to digit conversion operator
+        {
+            return new StaticGenerator<T>(t);
+        }
+
+        public StaticGenerator(IEnumerable<T> ts)
+        {
+            this.ts = ts.ToArray();
+        }
+
+        protected override TargetSet GenerateCastTS(HackStruct hs)
+        {
+            return new TargetSet(ts);
+        }
+
+        protected override TargetSet GenerateResolveTS(HackStruct hs, TargetSet cache)
+        {
+            return cache;
+        }
+    }
+
+    class TargetAdapter
+    {
+        private Generator[] generators { get; }
+
+        public TargetAdapter(Generator[] generators)
+        {
+            this.generators = generators;
+        }
+
+        public TargetVector GenerateCast(HackStruct hs)
+        {
+            return new TargetVector(generators.Select(generator => generator.GenerateCast(hs)));
+        }
+
+        public TargetVector GenerateResolve(HackStruct hs, TargetVector cache)
+        {
+            return new TargetVector(generators.Select((gen, i) => gen.GenerateResolve(hs, cache.targetSets[i])));
+        }
+
+        public IEnumerable<TargetRow> GenerateRows(TargetVector vector)
+        {
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+        }
+
+        /*
+        protected IEnumerable<Tuple<T1, T2>> rowsfrom2<T1, T2>(HackStruct hs)
+        {
+            List<Tuple<T1, T2>> rtval = new List<Tuple<T1, T2>>();
+
+
+            var vs1 = generators[0].Generate(hs).Cast<T1>();
+            var vs2 = generators[1].Generate(hs).Cast<T2>();
+
+            foreach (var v1 in vs1)
+            {
+                foreach (var v2 in vs2)
+                {
+                    rtval.Add(new Tuple<T1, T2>(v1, v2));
+                }
+            }
+
+            return rtval;
+        }
+        */
+    }
+
+    abstract class Effect
+    {
+        private TargetAdapter ta { get; }
+
+        public Effect(params Generator[] generators)
+        {
+            ta = new TargetAdapter(generators);
+        }
+
+        public abstract IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row);
+
+        public TargetVector fillCast(HackStruct hs)
+        {
+            return ta.GenerateCast(hs);
+        }
+
+        public TargetVector fillResolve(HackStruct hs, TargetVector cache)
+        {
+            return ta.GenerateResolve(hs, cache);
+        }
+
+        public IEnumerable<GameEvent> resolve(HackStruct hs, TargetVector cache)
+        {
+            var rows = ta.GenerateRows(cache);
+            return rows.SelectMany(row => Do(hs, row));
+        }
+    }
+
+
+    /*
     class Effect
     {
         public TargetRuleSet ts;
@@ -134,7 +264,7 @@ namespace stonerkart
         public abstract GameEvent[] act(HackStruct dkt, TargetRow[] ts);
         
     }
-
+    
     abstract class SimpleDoer : Doer
     {
         public SimpleDoer(params Type[] typeSignatureTypes) : base(typeSignatureTypes)
@@ -154,221 +284,178 @@ namespace stonerkart
         protected abstract GameEvent[] simpleAct(HackStruct dkt, TargetRow row);
         
     }
-
-    class ApplyStacksDoer : SimpleDoer
+    */
+    class ApplyStacksEffect : Effect
     {
-        private StacksWords stacks;
-        private int count;
-
-        public ApplyStacksDoer(StacksWords stacks, int count) : base(typeof(Card))
+        public ApplyStacksEffect(Generator<Card> cardgen, Generator<Counter> stackgen) : base(cardgen, stackgen)
         {
-            this.stacks = stacks;
-            this.count = count;
+
         }
 
-
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
             Card card = (Card)row[0];
-            ApplyStacksEvent e = new ApplyStacksEvent(card, stacks, count);
-            return new GameEvent[] {e};
+            Counter counter = (Counter)row[1];
+            return new GameEvent[]
+            {
+                new ApplyStacksEvent(card, counter, 1),
+            };
         }
     }
 
-    class ShuffleDoer : SimpleDoer
+    class ShuffleEffect : Effect
     {
-        public ShuffleDoer() : base(typeof(Player))
+        public ShuffleEffect(Generator<Player> playergen) : base(playergen)
         {
         }
 
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
-            Player p = (Player)row[0];
-            return new GameEvent[] { new ShuffleDeckEvent(p), };
+            Player shuffler = (Player)row[0];
+            return new GameEvent[]
+            {
+                new ShuffleDeckEvent(shuffler), 
+            };
         }
     }
 
-    class FatigueDoer : SimpleDoer
+    class FatigueEffect : Effect
     {
-        private int fatigueBy;
-        private bool exhaust;
-        private bool invigorate;
+        private Func<Card, int> fatigueCalculator;
 
-        /// <summary>
-        /// Exhausts if passed paramater is true, else invigorates.
-        /// </summary>
-        /// <param name="fatigue"></param>
-        public FatigueDoer(bool exhaust) : base(typeof(Card))
+        public FatigueEffect(Generator<Card> cardgen, Func<Card, int> fatigueCalculator) : base(cardgen)
         {
-            if (exhaust)
-            {
-                this.exhaust = true;
-            }
-            else
-            {
-                invigorate = true;
-            }
+            this.fatigueCalculator = fatigueCalculator;
         }
 
-        public FatigueDoer(int fatigueBy) : base(typeof(Card))
-        {
-            this.fatigueBy = fatigueBy;
-        }
-
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
             Card c = (Card)row[0];
-            int v;
-            if (exhaust)
-            {
-                v = c.movement;
-            }
-            else if (invigorate)
-            {
-                v = -c.fatigue;
-            }
-            else
-            {
-                v = fatigueBy;
-            }
+            int v = fatigueCalculator(c);
             return new GameEvent[] {new FatigueEvent(c, v)};
         }
         
     }
 
-    class ModifyDoer : SimpleDoer
+
+    class ModifyEffect : Effect
     {
-        public ModifiableStats[] modifiableStats;
         public ModifierStruct modifier;
 
-        public ModifyDoer(Func<int, int> f, GameEventFilter until, params ModifiableStats[] modifiableStats) : base(typeof(Card))
+        public ModifyEffect(Func<int, int> f, GameEventFilter until, Generator<Card> cardgen, Generator<ModifiableStats> statsgen) : base(cardgen, statsgen)
         {
-            this.modifiableStats = modifiableStats;
             modifier = new ModifierStruct(f, until);
         }
 
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
             Card card = (Card)row[0];
-            return modifiableStats.Select(s => new ModifyEvent(card, s, modifier)).Cast<GameEvent>().ToArray();
+            ModifiableStats stats = (ModifiableStats)row[1];
+
+            return new GameEvent[]
+            {
+                new ModifyEvent(card, stats, modifier), 
+            };
         }
     }
 
-    class ForceStaticModifyDoer : SimpleDoer
+    class GainBonusManaEffect : Effect
     {
-        public ModifiableStats modifiableStats;
-        private Func<Func<int, int>> f;
-        private GameEventFilter until;
-
-        public ForceStaticModifyDoer(ModifiableStats modifiableStats, Func<Func<int, int>> f, GameEventFilter until) : base(typeof(Card))
+        public GainBonusManaEffect(Generator<Player> playergen, Generator<ManaColour> orbgen) : base(playergen, orbgen)
         {
-            this.modifiableStats = modifiableStats;
-            this.f = f;
-            this.until = until;
         }
 
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
-            Card card = (Card)row[0];
-            var fn = f();
-            return new GameEvent[] { new ModifyEvent(card, modifiableStats, new ModifierStruct(fn, until)) };
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            //it's a manacolour not a manaorb now and it's going to break
+            Player player = (Player)row[0];
+            ManaOrb orb = (ManaOrb)row[1];
+            return new GameEvent[] { new GainBonusManaEvent(player, orb) };
         }
     }
 
-    class GainBonusManaDoer : SimpleDoer
-    {
-        public GainBonusManaDoer() : base(typeof(Player), typeof(ManaOrb))
-        {
-        }
-
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow ts)
-        {
-            Player p = (Player)ts[0];
-            ManaOrb o = (ManaOrb)ts[1];
-            return new GameEvent[] { new GainBonusManaEvent(p, o) };
-        }
-    }
-
-    class RaceChangeDoer : SimpleDoer
+    class RaceChangeEffect : Effect
     {
         public Race race;
-        public RaceChangeDoer(Race race) : base(typeof(Card))
+
+        public RaceChangeEffect(Race race, Generator<Card> cardgen) : base(cardgen)
         {
             this.race = race;
         }
 
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
             Card card = (Card)row[0];
             return new GameEvent[] { new RaceModifyEvent(card, new RaceModifierStruct(race, new StaticGameEventFilter(() => false))) };
         }
     }
 
-    class PayManaDoer : Doer
+    class PayManaEffect : Effect
     {
-        public PayManaDoer() : base(typeof(Player), typeof(ManaOrb))
+        public PayManaEffect(Generator<Player> playergen, Generator<ManaSet> costgen) : base(playergen, costgen)
         {
 
         }
 
-        public override GameEvent[] act(HackStruct dkt, TargetRow[] rows)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
-            if (rows.Length == 0) return new GameEvent[0];
-            Player p = (Player)rows[0][0];
-            var v = rows.Select(r => ((ManaOrb)r[1]).colour);
-            return new GameEvent[] { new PayManaEvent(p, new ManaSet(v)) };
+            Player player = (Player)row[0];
+            ManaSet cost = (ManaSet)row[1];
+            return new GameEvent[]
+            {
+                new PayManaEvent(player, cost), 
+            };
         }
     }
 
-    class DrawCardsDoer : SimpleDoer
+    class DrawCardsEffect : Effect
     {
         public int cards;
 
-        public DrawCardsDoer(int cards) : base(typeof(Player))
+        public DrawCardsEffect(int cards, Generator<Player> playergen) : base(playergen)
         {
             this.cards = cards;
         }
 
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
             Player player = (Player)row[0];
             return new GameEvent[] {new DrawEvent(player, cards)};
         }
     }
     
-    class MoveToTileDoer : SimpleDoer
+    class MoveToTileEffect : Effect
     {
-        private bool dontExhaust; //whats wrong with private bool exhaust
 
-        public MoveToTileDoer(bool dontExhaust = false) : base(typeof(Card), typeof(Tile))
+        public MoveToTileEffect(Generator<Card> cardgen, Generator<Tile> tilegen) : base(cardgen, tilegen)
         {
-            this.dontExhaust = dontExhaust;
         }
 
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
             Card moved = (Card)row[0];
             Tile moveTo = (Tile)row[1];
-            return new GameEvent[] {new PlaceOnTileEvent(moved, moveTo, dontExhaust)};
+            return new GameEvent[] {new PlaceOnTileEvent(moved, moveTo, true)};
         }
     }
 
-    class SummonToTileDoer : SimpleDoer
+    class SummonToTileEffect : Effect
     {
-
-        public SummonToTileDoer() : base(typeof(Card), typeof(Tile))
+        //todo 280917 merge this class with MoveToTileDoer
+        public SummonToTileEffect(Generator<Card> cardgen, Generator<Tile> tilegen) : base(cardgen, tilegen)
         {
         }
 
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
             Card moved = (Card)row[0];
             Tile moveTo = (Tile)row[1];
-            return new GameEvent[] { new MoveToPileEvent(moved, moved.controller.field), new PlaceOnTileEvent(moved, moveTo, false)  };
+            return new GameEvent[] { new MoveToPileEvent(moved, moved.Controller.field), new PlaceOnTileEvent(moved, moveTo, false)  };
         }
     }
 
-    class PingDoer : SimpleDoer
+    class PingEffect : Effect
     {
         public int damage;
 
@@ -376,12 +463,12 @@ namespace stonerkart
         /// Card source, Card victim
         /// </summary>
         /// <param name="damage"></param>
-        public PingDoer(int damage) : base(typeof(Card), typeof(Card))
+        public PingEffect(int damage, Generator<Card> sourcegen, Generator<Card> targetgen) : base(sourcegen, targetgen)
         {
             this.damage = damage;
         }
 
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
             Card damager = (Card)row[0];
             Card damaged = (Card)row[1];
@@ -389,25 +476,19 @@ namespace stonerkart
         }
     }
 
-    class MoveToPileDoer : SimpleDoer
+    class MoveToPileEffect : Effect
     {
         public PileLocation pileLocation;
 
-        public MoveToPileDoer(PileLocation pileLocation) : base(typeof(Card))
+        public MoveToPileEffect(PileLocation pileLocation, Generator<Card> cardgen) : base(cardgen)
         {
             this.pileLocation = pileLocation;
         }
 
-        protected override GameEvent[] simpleAct(HackStruct dkt, TargetRow row)
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
         {
             Card c = (Card)row[0];
-
-            var e = new MoveToPileEvent(c, c.owner.pileFrom(pileLocation));
-            return c.pile.location.pile == PileLocation.Deck
-                ? new GameEvent[] {new ShuffleDeckEvent(c.owner), e}
-                : new GameEvent[] {e};
-
+            return new GameEvent[] { new MoveToPileEvent(c, c.owner.pileFrom(pileLocation)) };
         }
     }
-    
 }
