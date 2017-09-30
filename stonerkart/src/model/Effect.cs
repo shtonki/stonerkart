@@ -12,10 +12,20 @@ namespace stonerkart
         TargetSet GenerateResolve(HackStruct hs, TargetSet cache);
     }
 
+
     abstract class Generator<T> : Generator
     {
-        protected abstract TargetSet GenerateCastTS(HackStruct hs);
-        protected abstract TargetSet GenerateResolveTS(HackStruct hs, TargetSet cache);
+        public enum Timing { Cast, Resolve, Both }
+
+        protected Func<T, bool> filter { get; }
+
+        private Timing timing { get; }
+
+        public Generator(Timing timing = Timing.Cast, Func<T, bool> filter = null)
+        {
+            this.timing = timing;
+            this.filter = filter;
+        }
 
         public TargetSet GenerateCast(HackStruct hs)
         {
@@ -30,14 +40,34 @@ namespace stonerkart
             return v;
         }
 
-        
+
+        protected TargetSet GenerateCastTS(HackStruct hs)
+        {
+            if (timing == Timing.Cast || timing == Timing.Both) return Generate(hs);
+            else return TargetSet.CreateEmpty();
+        }
+        protected TargetSet GenerateResolveTS(HackStruct hs, TargetSet cache)
+        {
+
+            if (timing == Timing.Resolve || timing == Timing.Both) return Generate(hs);
+            else return cache;
+        }
+        public abstract TargetSet Generate(HackStruct hs);
+        public abstract IEnumerable<T> Candidates(Player chooser, HackStruct hs);
+
+        public IEnumerable<T> FilteredCandidates(Player chooser, HackStruct hs) => Candidates(chooser, hs).Where(filter);
+
+        public T[] Generate<T>(HackStruct hs)
+        {
+            return Generate(hs).targets.Cast<T>().ToArray();
+        }
     }
 
     class StaticGenerator<T> : Generator<T>
     {
         private T[] ts;
 
-        public StaticGenerator(params T[] ts)
+        public StaticGenerator(params T[] ts) : base(Timing.Both)
         {
             this.ts = ts;
         }
@@ -47,14 +77,14 @@ namespace stonerkart
             return new StaticGenerator<T>(t);
         }
 
-        protected override TargetSet GenerateCastTS(HackStruct hs)
+        public override TargetSet Generate(HackStruct hs)
         {
             return new TargetSet(ts.Cast<object>());
         }
 
-        protected override TargetSet GenerateResolveTS(HackStruct hs, TargetSet cache)
+        public override IEnumerable<T> Candidates(Player chooser, HackStruct hs)
         {
-            return cache;
+            return ts;
         }
     }
 

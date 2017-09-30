@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
+using OpenTK.Input;
 
 namespace stonerkart
 {
@@ -633,7 +634,7 @@ namespace stonerkart
 
             while (handled.Count < cards.Count)
             {
-                Card dummyCard = chooseCardsFromCardsSynced(
+                Card dummyCard = chooseCardFromCardsSynced(
                     triggerOwner, 
                     cards.Except(handled), _ => true,
                     "Choose which ability to place on the stack next.",
@@ -708,60 +709,35 @@ namespace stonerkart
             handleTransaction(gt);
         }
 
+        /// <summary>
+        /// Gives every player priority and resolves shit until stack is empty 
+        /// </summary>
         private void priority()
         {
-            int c = 0;
+            var v = gameState.TurnCounter.APNAP.ToArray();
+
             while (true)
             {
-                enforceRules();
-                Player playerWithPriority = gameState.TurnCounter.APNAP.ElementAt(c);
-
-                bool playerCastSomething = givePriority(playerWithPriority);
-
-                if (playerCastSomething)
+                //each player gets a turn to cast
+                for (int c = 0; c < v.Length; c++)
                 {
-                    c = 0;
-                }
-                else //pass
-                {
-                    c++;
-                    if (c == gameState.players.Count) //if it was passed all the way around
+                    enforceRules();
+
+                    Player playerWithPriority = v[c];
+                    bool playerCastSomething = givePriority(playerWithPriority);
+
+                    if (playerCastSomething)
                     {
-                        if (gameState.wrapperStack.Count == 0)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            resolveTopCardOnStack();
-                            c = 0;
-                        }
+                        if (c > 0) c = 0;
                     }
                 }
+                
+                //if an empty stack was passed around we're done
+                if (gameState.wrapperStack.Count == 0) { return; }
+
+                //otherwise we resolve the topmost card and keep giving players priority
+                resolveTopCardOnStack();
             }
-        }
-
-        private void resolveTopCardOnStack()
-        {
-            StackWrapper wrapper = gameState.wrapperStack.Pop();
-            if (wrapper.castingCard != gameState.stack.peekTop() && wrapper.castingCard != gameState.stack.peekTop().dummyFor) throw new Exception();
-            resolve(wrapper);
-        }
-        
-        private void cast(StackWrapper w, IEnumerable<GameEvent> costEvents)
-        {
-            if (!w.isCastAbility)
-            {
-                w = new StackWrapper(w.ability.createDummy(), w.ability, w.cachedTargets);
-            }
-
-            GameTransaction gt = new GameTransaction();
-            gt.addEvents(costEvents);
-            handleTransaction(gt);
-
-            gt = new GameTransaction();
-            gt.addEvent(new CastEvent(w));
-            handleTransaction(gt);
         }
 
         /// <summary>
@@ -770,7 +746,7 @@ namespace stonerkart
         /// <param name="playerWithPriority"></param>
         /// <returns>True if the player cast a spell or used an ability, false if he passed. </returns>
         private bool givePriority(Player playerWithPriority)
-        { 
+        {
             //gameController.setHeroActive(b);
 
             do
@@ -798,7 +774,7 @@ namespace stonerkart
                 */
 
                 var card = chooseCardSynced(
-                    playerWithPriority, 
+                    playerWithPriority,
                     c => c.Controller == playerWithPriority && !c.isDummy,
                     "You may cast a card.",
                     ButtonOption.Pass);
@@ -806,7 +782,7 @@ namespace stonerkart
 
                 var ability = chooseAbilitySynced(card);
                 if (ability == null) continue;
-
+                
                 HackStruct hs = new HackStruct(this, ability, playerWithPriority);
 
                 var costTargets = ability.targetCosts(hs);
@@ -827,6 +803,30 @@ namespace stonerkart
             } while (true);
         }
 
+        private void resolveTopCardOnStack()
+        {
+            StackWrapper wrapper = gameState.wrapperStack.Pop();
+            if (wrapper.castingCard != gameState.stack.peekTop() && wrapper.castingCard != gameState.stack.peekTop().dummyFor) throw new Exception();
+            resolve(wrapper);
+        }
+        
+        private void cast(StackWrapper w, IEnumerable<GameEvent> costEvents)
+        {
+            if (!w.isCastAbility)
+            {
+                w = new StackWrapper(w.ability.createDummy(), w.ability, w.cachedTargets);
+            }
+
+            GameTransaction gt = new GameTransaction();
+            gt.addEvents(costEvents);
+            handleTransaction(gt);
+
+            gt = new GameTransaction();
+            gt.addEvent(new CastEvent(w));
+            handleTransaction(gt);
+        }
+
+
         private ActivatedAbility chooseAbilitySynced(Card c)
         {
             ActivatedAbility r;
@@ -846,7 +846,7 @@ namespace stonerkart
             if (activatableAbilities.Length > 1 || c.location.pile == PileLocation.Field)
             {
                 var dummyCards = activatableAbilities.Select(a => a.createDummy()).ToList();
-                var selectedCard = chooseCardsFromCardsSynced(
+                var selectedCard = chooseCardFromCardsSynced(
                     c.Controller, 
                     dummyCards, _ => true, 
                     "Choose which ability to activate.", 
@@ -1076,7 +1076,17 @@ namespace stonerkart
             throw new Exception();
         }
 
-        public Card chooseCardsFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter,
+        public IEnumerable<Card> chooseCardsFromCardsSynced(Player chooser, int count, IEnumerable<Card> cards,
+            Func<Card, bool> filter,
+            string chooserPrompt, ButtonOption button, string title)
+        {
+            if (count != 1) throw new Exception();
+            var v = chooseCardFromCardsSynced(chooser, cards, filter, chooserPrompt, button, title);
+            if (v == null) return null;
+            return new Card[] {v};
+            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+        }
+        public Card chooseCardFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter,
             string chooserPrompt, ButtonOption? button, string title = "")
         {
             List<Card> cardList = cards.ToList();
