@@ -24,7 +24,10 @@ namespace stonerkart
 
         public TargetSet GenerateResolve(HackStruct hs, TargetSet cache)
         {
-            return GenerateResolveTS(hs, cache);
+            var v =  GenerateResolveTS(hs, cache);
+            if (v.Cancelled || v.Fizzled) return v;
+            if (v.targets.Any(t => !(t is T))) throw new Exception();
+            return v;
         }
 
         
@@ -44,14 +47,9 @@ namespace stonerkart
             return new StaticGenerator<T>(t);
         }
 
-        public StaticGenerator(IEnumerable<T> ts)
-        {
-            this.ts = ts.ToArray();
-        }
-
         protected override TargetSet GenerateCastTS(HackStruct hs)
         {
-            return new TargetSet(ts);
+            return new TargetSet(ts.Cast<object>());
         }
 
         protected override TargetSet GenerateResolveTS(HackStruct hs, TargetSet cache)
@@ -81,9 +79,30 @@ namespace stonerkart
 
         public IEnumerable<TargetRow> GenerateRows(TargetVector vector)
         {
+            if (vector.targetSets.Length == 0) throw new Exception();
+            if (vector.targetSets.Length == 1) return rowsfrom1(vector);
+            if (vector.targetSets.Length == 2) return rowsfrom2(vector);
             throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
         }
 
+        private IEnumerable<TargetRow> rowsfrom1(TargetVector vec)
+        {
+            foreach (var v1 in vec.targetSets[0].targets)
+            {
+                yield return new TargetRow(v1);
+            }
+        }
+
+        private IEnumerable<TargetRow> rowsfrom2(TargetVector vec)
+        {
+            foreach (var v1 in vec.targetSets[0].targets)
+            {
+                foreach (var v2 in vec.targetSets[1].targets)
+                {
+                    yield return new TargetRow(v1, v2);
+                }
+            }
+        }
         /*
         protected IEnumerable<Tuple<T1, T2>> rowsfrom2<T1, T2>(HackStruct hs)
         {
@@ -285,6 +304,20 @@ namespace stonerkart
         
     }
     */
+
+    class DisplayEffect : Effect
+    {
+        public DisplayEffect(Generator<Card> cardgen, Generator<Player> viewergen) : base(cardgen, viewergen)
+        {
+
+        }
+
+        public override IEnumerable<GameEvent> Do(HackStruct hs, TargetRow row)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     class ApplyStacksEffect : Effect
     {
         public ApplyStacksEffect(Generator<Card> cardgen, Generator<Counter> stackgen) : base(cardgen, stackgen)

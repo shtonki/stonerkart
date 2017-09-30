@@ -8,11 +8,8 @@ namespace stonerkart
 {
     class MultiplayerConnection : GameConnection
     {
-        private Game game;
-
-        public MultiplayerConnection(Game g)
+        public MultiplayerConnection(Game g) : base(g)
         {
-            game = g;
         }
 
         public override int[] receiveChoices()
@@ -95,6 +92,10 @@ namespace stonerkart
 
     class DummyConnection : GameConnection
     {
+        public DummyConnection(Game g) : base(g)
+        {
+        }
+
         public override void sendChoices(int[] choices)
         {
             
@@ -159,7 +160,7 @@ namespace stonerkart
 
         public override void surrender(GameEndStateReason rn)
         {
-            Network.surrender(-1, rn);
+            GUI.transitionToScreen(new PostGameScreen(game));
         }
     }
 
@@ -170,6 +171,14 @@ namespace stonerkart
         public abstract void enqueueGameMessage(string s);
         public abstract Deck[] deckify(Deck myDeck, int myIndex);
         public abstract void surrender(GameEndStateReason r);
+
+
+        protected Game game;
+
+        protected GameConnection(Game g)
+        {
+            game = g;
+        }
 
         public void sendChoice(int? choice)
         {

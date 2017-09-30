@@ -30,7 +30,7 @@ namespace stonerkart
 
             if (gsi.local)
             {
-                connection = new DummyConnection();
+                connection = new DummyConnection(this);
             }
             else
             {
@@ -1031,7 +1031,10 @@ namespace stonerkart
             PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Tile && filter((Tile)o)));
             screen.hexPanel.SubToTiles(sax, gameState.map.tileAt);
             screen.gamePromptPanel.sub(sax);
+
+            highlight(gameState.map.Tiles.Where(filter), Color.ForestGreen);
             var v = sax.call();
+            clearHighlights();
 
             if (v is ButtonOption) return null;
             return (Tile)v;

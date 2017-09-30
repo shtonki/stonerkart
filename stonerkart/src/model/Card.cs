@@ -524,23 +524,54 @@ namespace stonerkart
         }
         private static Effect ResolverPaysManaEffect(ManaSet set)
         {
-            return new PayManaEffect(ResolveController, sg(new [] { set }));
+            return new PayManaEffect(ResolveController, sg(set));
         }
 
         private static Effect SummonTokensEffect(Generator<Player> playersgen, params CardTemplate[] cts)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            return new SummonToTileEffect(new CreateTokens(cts), new ChooseHexTile(true, t => t.Summonable, cts.Length));
         }
         private static Effect ExhaustThis => new FatigueEffect(new ResolveCardRule(ResolveCardRule.Rule.ResolveCard, c => c.canExhaust), c => c.Movement);
+        private Effect SacThis => new MoveToPileEffect(PileLocation.Graveyard, new ResolveCardRule(ResolveCardRule.Rule.ResolveCard, c => c.location.pile == PileLocation.Field));
 
-
-        private void AddDiesLambda(string description, Foo foo, int range = -1, bool optional = false)
+        private void AddDiesLambda(string description, Foo effect, int range = -1, bool optional = false)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            AddTriggeredAbility(
+                description,
+                effect,
+                new Foo(),
+                new TypedGameEventFilter<MoveToPileEvent>(
+                    moveEvent =>
+                        moveEvent.card == this && moveEvent.to.location.pile == PileLocation.Graveyard &&
+                        location.pile == PileLocation.Field),
+                range,
+                PileLocation.Field,
+                optional);
         }
-        private void AddEtBLambda(string description, Foo foo, int range = -1, bool optional = false)
+        private void AddEtBLambda(string description, Foo effect, int range = -1, bool optional = false)
         {
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+            AddTriggeredAbility(
+                description,
+                effect,
+                new Foo(),
+                new TypedGameEventFilter<MoveToPileEvent>(moveEvent => moveEvent.card == this && location.pile == PileLocation.Field),
+                range,
+                PileLocation.Field,
+                optional,
+                TriggeredAbility.Timing.Post
+                );
+        }
+        private void AddDeathtouchLambda()
+        {
+            AddTriggeredAbility(
+                        "Whenever this creature deals damage to a non-heroic creature destroy it.",
+                        new Foo(new MoveToPileEffect(PileLocation.Graveyard, new TriggeredRule<DamageEvent, Card>(de => de.target))),
+                        new Foo(),
+                        new TypedGameEventFilter<DamageEvent>(de => de.source == this && !de.target.isHeroic),
+                        0,
+                        PileLocation.Field,
+                        false
+);
         }
         #endregion
     }
