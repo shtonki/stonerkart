@@ -126,7 +126,8 @@ namespace stonerkart
             get { return tintColor; }
             set
             {
-                tintColor = value;
+                if (value == Color.Transparent) tintColor = Color.Transparent;
+                else tintColor = Color.FromArgb(100, value.R, value.G, value.B);
                 redoTint();
             }
         }

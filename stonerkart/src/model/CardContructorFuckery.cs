@@ -120,12 +120,12 @@ namespace stonerkart
                     castEffect = new MoveToPileEffect(
                         PileLocation.Deck,
                         new ChooseCardsFromCards(
-                            new PlayersCardsRule(ResolveController, p => p.deck.Take(3)),
-                            ChooseCardsFromCards.Mode.PlayerLooksAtPlayer,
-                            true,
+                            c => true,
                             ResolveController,
                             3,
-                            c => true));
+                            true,
+                            ChooseCardsFromCards.Mode.PlayerLooksAtPlayer,
+                            p => p.deck.Take(3)));
                     additionalCastEffects.Add(new ShuffleEffect(new OptionRule<Player>("Do you wish to shuffle your deck?", ResolveController)));
                     additionalCastEffects.Add(new DrawCardsEffect(1, ResolveController));
 

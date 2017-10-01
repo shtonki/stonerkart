@@ -1127,6 +1127,7 @@ namespace stonerkart
             pv.sub(sax);
             screen.gamePromptPanel.sub(sax);
 
+            foreach (var c in cards) pv.viewOf(c).TintColor = filter(c) ? Color.ForestGreen : Color.Firebrick;
             var v = sax.call();
 
             screen.removeElement(window);

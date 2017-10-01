@@ -501,40 +501,40 @@ namespace stonerkart
 
         #region legallambdas
 
-        private static Func<int, int> Add(int val) => a => a + val;
-        private static Func<int, int> Set(int val) => a => val;
-
-        private static GameEventFilter Forever => new StaticGameEventFilter(() => false);
-        private static GameEventFilter EndOfTurn => new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.Replenish);
-        private static GameEventFilter StartOfHeros(Steps step) => new TypedGameEventFilter<StartOfStepEvent>(e => e.activePlayer.IsHero && e.step == step);
-
-
-        private static StaticGenerator<T> sg<T>(params T[] ts)
+        public static Func<int, int> Add(int val) => a => a + val;
+        public static Func<int, int> Set(int val) => a => val;
+        
+        public static GameEventFilter Forever => new StaticGameEventFilter(() => false);
+        public static GameEventFilter EndOfTurn => new TypedGameEventFilter<StartOfStepEvent>(e => e.step == Steps.Replenish);
+        public static GameEventFilter StartOfHeros(Steps step) => new TypedGameEventFilter<StartOfStepEvent>(e => e.activePlayer.IsHero && e.step == step);
+        
+        
+        public static StaticGenerator<T> sg<T>(params T[] ts)
         {
             return new StaticGenerator<T>(ts);
         }
-        private static Generator<Player> ResolveController => new ResolvePlayerRule(ResolvePlayerRule.Rule.ResolveController);
-        private static Generator<Card> ResolveCard => new ResolveCardRule(ResolveCardRule.Rule.ResolveCard);
-        private static Generator<Card> ResolveControllerCard => new ResolveCardRule(ResolveCardRule.Rule.ResolveControllerCard);
-        private static Generator<Card> VillainsCard => new ResolveCardRule(ResolveCardRule.Rule.VillansCard);
-
-        private static Effect ResolverPaysManaEffect(params ManaColour[] colours)
+        public static Generator<Player> ResolveController => new ResolvePlayerRule(ResolvePlayerRule.Rule.ResolveController);
+        public static Generator<Card> ResolveCard => new ResolveCardRule(ResolveCardRule.Rule.ResolveCard);
+        public static Generator<Card> ResolveControllerCard => new ResolveCardRule(ResolveCardRule.Rule.ResolveControllerCard);
+        public static Generator<Card> VillainsCard => new ResolveCardRule(ResolveCardRule.Rule.VillansCard);
+        
+        public static Effect ResolverPaysManaEffect(params ManaColour[] colours)
         {
             return ResolverPaysManaEffect(new ManaSet(colours));
         }
-        private static Effect ResolverPaysManaEffect(ManaSet set)
+        public static Effect ResolverPaysManaEffect(ManaSet set)
         {
             return new PayManaEffect(ResolveController, sg(set));
         }
-
-        private static Effect SummonTokensEffect(Generator<Player> playersgen, params CardTemplate[] cts)
+        
+        public static Effect SummonTokensEffect(Generator<Player> playersgen, params CardTemplate[] cts)
         {
             return new SummonToTileEffect(new CreateTokens(cts), new ChooseHexTile(true, t => t.Summonable, cts.Length));
         }
-        private static Effect ExhaustThis => new FatigueEffect(new ResolveCardRule(ResolveCardRule.Rule.ResolveCard, c => c.canExhaust), c => c.Movement);
-        private Effect SacThis => new MoveToPileEffect(PileLocation.Graveyard, new ResolveCardRule(ResolveCardRule.Rule.ResolveCard, c => c.location.pile == PileLocation.Field));
-
-        private void AddDiesLambda(string description, Foo effect, int range = -1, bool optional = false)
+        public static Effect ExhaustThis => new FatigueEffect(new ResolveCardRule(ResolveCardRule.Rule.ResolveCard, c => c.canExhaust), c => c.Movement);
+        public Effect SacThis => new MoveToPileEffect(PileLocation.Graveyard, new ResolveCardRule(ResolveCardRule.Rule.ResolveCard, c => c.location.pile == PileLocation.Field));
+        
+        public void AddDiesLambda(string description, Foo effect, int range = -1, bool optional = false)
         {
             AddTriggeredAbility(
                 description,
@@ -548,7 +548,7 @@ namespace stonerkart
                 PileLocation.Field,
                 optional);
         }
-        private void AddEtBLambda(string description, Foo effect, int range = -1, bool optional = false)
+        public void AddEtBLambda(string description, Foo effect, int range = -1, bool optional = false)
         {
             AddTriggeredAbility(
                 description,
@@ -561,7 +561,7 @@ namespace stonerkart
                 TriggeredAbility.Timing.Post
                 );
         }
-        private void AddDeathtouchLambda()
+        public void AddDeathtouchLambda()
         {
             AddTriggeredAbility(
                         "Whenever this creature deals damage to a non-heroic creature destroy it.",

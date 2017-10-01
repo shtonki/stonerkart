@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace stonerkart
 {
-    class TargetSet
+    internal class TargetSet
     {
         public object[] targets { get; }
         public bool Cancelled { get; private set; }
@@ -24,6 +24,7 @@ namespace stonerkart
 
         public TargetSet(IEnumerable<object> ts)
         {
+            if (ts.Any(t => t == null)) throw new Exception();
             targets = ts.ToArray();
             Fizzled = false;
             Cancelled = false;
@@ -43,8 +44,14 @@ namespace stonerkart
         {
             return new TargetSet(new object[0]);
         }
+
+        public static TargetSet Singleton(object o)
+        {
+            return new TargetSet(new[] {o});
+        }
     }
-    struct TargetVector
+
+    internal struct TargetVector
     {
         public TargetSet[] targetSets { get; }
 
@@ -58,14 +65,16 @@ namespace stonerkart
 
         public static TargetVector CreateCancelled()
         {
-            return new TargetVector(new []{ TargetSet.CreateCancelled() });
+            return new TargetVector(new[] {TargetSet.CreateCancelled()});
         }
+
         public static TargetVector CreateFizzled()
         {
-            return new TargetVector(new[] { TargetSet.CreateFizzled() });
+            return new TargetVector(new[] {TargetSet.CreateFizzled()});
         }
     }
-    struct TargetMatrix
+
+    internal struct TargetMatrix
     {
         public TargetVector[] targetVectors { get; }
 
@@ -93,7 +102,8 @@ namespace stonerkart
             return new TargetMatrix(TargetVector.CreateFizzled());
         }
     }
-    class TargetRow
+
+    internal class TargetRow
     {
         private object[] targets;
 
@@ -109,79 +119,105 @@ namespace stonerkart
 
         public TargetRow(IEnumerable<object> ts) : this(ts.ToArray())
         {
-            
+
         }
     }
 
-    abstract class ChooseRule<T> : Generator<T>
+    internal abstract class ResolveOrCastGenerator<T> : Generator<T>
+    {
+        protected bool generateAtResolveTime { get; }
+
+        public ResolveOrCastGenerator(Func<T, bool> filter, bool generateAtResolveTime) : base(filter)
+        {
+            this.generateAtResolveTime = generateAtResolveTime;
+        }
+
+        public ResolveOrCastGenerator()
+        {
+        }
+
+        protected abstract TargetSet GenerateCache(HackStruct hs);
+        protected abstract TargetSet GenerateRest(HackStruct hs, TargetSet cache);
+
+        protected override TargetSet GenerateCastx(HackStruct hs)
+        {
+            var cache = GenerateCache(hs);
+            if (generateAtResolveTime) return cache;
+            else return GenerateRest(hs, cache);
+        }
+
+        protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
+        {
+            if (generateAtResolveTime) return GenerateRest(hs, cache);
+            return cache;
+        }
+    }
+
+    internal abstract class ChooseRule<T> : ResolveOrCastGenerator<T>
     {
         protected Generator<Player> playergenerator { get; }
         protected int count { get; }
 
-        /// <summary>
-        /// Does what you'd expect. On null inputs it sets corresponding field to a default value decided by me.
-        /// </summary>
-        /// <param name="atResolveTime"></param>
-        /// <param name="playergenerator"></param>
-        /// <param name="count"></param>
-        /// <param name="filter"></param>
-        public ChooseRule(bool? atResolveTime, Generator<Player> playergenerator, int? count, Func<T, bool> filter) : base((atResolveTime ?? false) ? Timing.Resolve : Timing.Cast, filter ?? (t => true))
+        public ChooseRule(Func<T, bool> filter, Generator<Player> playergenerator, int count, bool generateAtResolveTime)
+            : base(filter ?? (t => true), generateAtResolveTime)
         {
-            this.playergenerator = playergenerator ?? new ResolvePlayerRule(ResolvePlayerRule.Rule.ResolveController);
-            this.count = count ?? 1;
+            this.playergenerator = playergenerator;
+            this.count = count;
+        }
+
+        protected override TargetSet GenerateCache(HackStruct hs)
+        {
+            return playergenerator.GenerateCast(hs);
+        }
+
+        protected override TargetSet GenerateRest(HackStruct hs, TargetSet cache)
+        {
+            var v = playergenerator.GenerateResolve(hs, cache);
+            if (v.Fucked) return v;
+            var players = v.targets.Cast<Player>();
+            if (players.Count() != 1) throw new Exception();
+
+            return Choose(players.ElementAt(0), hs);
         }
 
 
-        
-        public override TargetSet Generate(HackStruct hs)
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
         {
-            var choosers = playergenerator.Generate(hs).targets.Cast<Player>();
-            List<T> tlist = new List<T>();
-            foreach (var chooser in choosers)
-            {
-                var generated = Generate(chooser, hs);
-                if (FilteredCandidates(chooser, hs).Count() < count) return TargetSet.CreateFizzled();
-                if (generated.Fizzled || generated.Cancelled) return generated;
-                tlist.AddRange(generated.targets.Cast<T>());
-            }
-            return new TargetSet(tlist.Cast<object>());
+            throw new NotImplementedException();
         }
-
-        protected abstract TargetSet Generate(Player chooser, HackStruct hs);
+        protected abstract TargetSet Choose(Player player, HackStruct hs);
     }
 
-    abstract class ChooseHex<T> : ChooseRule<T>
+    internal abstract class ChooseHex<T> : ChooseRule<T>
     {
-        public ChooseHex(bool? atResolveTime, Generator<Player> playergenerator, int? count, Func<T, bool> filter) : base(atResolveTime ?? false, playergenerator, count, filter)
+        public ChooseHex(bool generateAtResolveTime, Generator<Player> playergenerator, int count, Func<T, bool> filter)
+            : base(filter, playergenerator, count, generateAtResolveTime)
         {
         }
 
-        protected override TargetSet Generate(Player chooser, HackStruct hs)
+        protected override TargetSet Choose(Player player, HackStruct hs)
         {
             if (count != 1) throw new Exception();
-            var v = hs.game.chooseTileSynced(chooser, t => TileFilter(t) && hs.tilesInRange.Contains(t), "choose a tile boy", ButtonOption.Cancel);
+            var v = hs.game.chooseTileSynced(player, t => TileFilter(t) && hs.tilesInRange.Contains(t),
+                "choose a tile boy", ButtonOption.Cancel);
             if (v == null) return TargetSet.CreateCancelled();
-            return new TargetSet(new object[]{ TileTransform(v)});
-        }
-
-        public override IEnumerable<T> Candidates(Player chooser, HackStruct hs)
-        {
-            return hs.tilesInRange.Where(TileFilter).Select(TileTransform);
+            return TargetSet.Singleton(TileTransform(v));
         }
 
         protected abstract bool TileFilter(Tile t);
         protected abstract T TileTransform(Tile t);
     }
-    class ChooseHexCard : ChooseHex<Card>
+
+    internal class ChooseHexCard : ChooseHex<Card>
     {
-        public ChooseHexCard() : base(null, null, null, null)
+        public ChooseHexCard() : base(false, Card.ResolveController, 1, f => true)
         {
-            
+
         }
 
         public ChooseHexCard(
             Func<Card, bool> filter
-            ) : base(null, null, null, filter)
+            ) : base(false, Card.ResolveController, 1, filter)
         {
         }
 
@@ -196,31 +232,32 @@ namespace stonerkart
             return t.card;
         }
     }
-    class ChooseHexTile : ChooseHex<Tile>
+
+    internal class ChooseHexTile : ChooseHex<Tile>
     {
-        public ChooseHexTile() : base(null, null, null, null)
+        public ChooseHexTile() : base(false, Card.ResolveController, 1, t => true)
         {
-            
+
         }
 
         public ChooseHexTile(
             Func<Tile, bool> filter
-            ) : base(null, null, null, filter)
+            ) : base(false, Card.ResolveController, 1, filter)
         {
         }
 
         public ChooseHexTile(
-            bool atResolveTime,
+            bool generateAtResolveTime,
             Func<Tile, bool> filter
-            ) : base(atResolveTime, null, null, filter)
+            ) : base(generateAtResolveTime, Card.ResolveController, 1, filter)
         {
         }
 
         public ChooseHexTile(
-            bool atResolveTime,
+            bool generateAtResolveTime,
             Func<Tile, bool> filter,
             int count
-            ) : base(atResolveTime, null, count, filter)
+            ) : base(generateAtResolveTime, null, count, filter)
         {
         }
 
@@ -235,9 +272,10 @@ namespace stonerkart
         }
 
     }
-    class ChooseHexPlayer : ChooseHex<Player>
+
+    internal class ChooseHexPlayer : ChooseHex<Player>
     {
-        public ChooseHexPlayer() : base(null, null, null, null)
+        public ChooseHexPlayer() : base(false, Card.ResolveController, 1, t => true)
         {
         }
 
@@ -253,42 +291,49 @@ namespace stonerkart
             return t.card.owner;
         }
     }
-    class ChooseAnyCard : ChooseRule<Card>
+
+    internal class ChooseAnyCard : ChooseRule<Card>
     {
-        public ChooseAnyCard(Func<Card, bool> filter) : base(null, null, null, filter)
+        public ChooseAnyCard(Func<Card, bool> filter) : base(filter, Card.ResolveController, 1, false)
         {
         }
 
-        protected override TargetSet Generate(Player chooser, HackStruct hs)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerable<Card> Candidates(Player chooser, HackStruct hs)
+        protected override TargetSet Choose(Player player, HackStruct hs)
         {
             throw new NotImplementedException();
         }
     }
 
-    class ChooseCardsFromCards : ChooseRule<Card>
+    internal class ChooseCardsFromCards : ChooseRule<Card>
     {
-        public enum Mode { PlayerLooksAtPlayer, ResolverLooksAtPlayer, }
-        private Mode mode { get; }
-        private Generator<Card> generator { get; }
-
-        public ChooseCardsFromCards(
-            Generator<Card> generator,
-            Mode mode,
-            bool? atResolveTime,
-            Generator<Player> playerGenerator,
-            int? count, 
-            Func<Card, bool> filter
-            ) : base(atResolveTime, playerGenerator, count, filter)
+        public enum Mode
         {
-            this.generator = generator;
-            this.mode = mode;
+            PlayerLooksAtPlayer,
+            ResolverLooksAtPlayer,
         }
 
+        private Mode mode { get; }
+        private Func<Player, IEnumerable<Card>> transform { get; }
+
+        public ChooseCardsFromCards(Func<Card, bool> filter, Generator<Player> playergenerator, int count, bool generateAtResolveTime, Mode mode, Func<Player, IEnumerable<Card>> transform) : base(filter, playergenerator, count, generateAtResolveTime)
+        {
+            this.mode = mode;
+            this.transform = transform;
+        }
+
+
+        protected override TargetSet Choose(Player player, HackStruct hs)
+        {
+            var cards = transform(player);
+            var chooser = player;
+
+            var v = hs.game.chooseCardsFromCardsSynced(chooser, count, cards, filter, "fuck me xd", ButtonOption.Cancel, "xddd420");
+            if (!cards.Any(filter)) return TargetSet.CreateFizzled();
+            if (v == null) return TargetSet.CreateCancelled();
+            return new TargetSet(v);
+            throw new NotImplementedException();
+            /*
+             * 
         protected override TargetSet Generate(Player chooser, HackStruct hs)
         {
             var cards = generator.Generate<Card>(hs);
@@ -298,23 +343,26 @@ namespace stonerkart
             if (v == null) return TargetSet.CreateCancelled();
             return new TargetSet(v);
         }
+
         public override IEnumerable<Card> Candidates(Player chooser, HackStruct hs)
         {
-            return generator.Candidates(chooser, hs);
+            return generator.UnfilteredCandidates(chooser, hs);
             var v = generator.GenerateResolve(hs, generator.GenerateCast(hs));
             return v.targets.Cast<Card>();
+        }*/
         }
     }
+
     class ChooseCardsFromPile : ChooseCardsFromCards
     {
 
         public ChooseCardsFromPile(Generator<Player> playergen, PileLocation pile, bool? atResolveTime, int? count, Mode mode) 
-            : base(new PlayersCardsRule(playergen, pile), mode, atResolveTime, null, count, null)
+            : this(playergen, pile, atResolveTime, count, null, mode)
         {
         }
 
         public ChooseCardsFromPile(Generator<Player> playergen, PileLocation pile, bool? atResolveTime, int? count, Func<Card, bool> filter, Mode mode)
-            : base(new PlayersCardsRule(playergen, pile), mode, atResolveTime, null, count, filter)
+            : base(filter, playergen, count.Value, atResolveTime ?? false, mode, p => p.pileFrom(pile))
         {
         }
 
@@ -322,42 +370,62 @@ namespace stonerkart
 
     class AllCardsRule : Generator<Card>
     {
-        public AllCardsRule(Func<Card, bool> filter) : base(Timing.Resolve, filter)
+        public AllCardsRule(Func<Card, bool> filter) : base(filter)
         {
         }
 
-        public override TargetSet Generate(HackStruct hs)
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
         {
-            throw new NotImplementedException();
+            return new TargetSet(hs.cards.Where(filter));
         }
 
-        public override IEnumerable<Card> Candidates(Player chooser, HackStruct hs)
+        protected override TargetSet GenerateCastx(HackStruct hs)
         {
-            return hs.gameState.cards.Where(filter);
+            return new TargetSet(hs.cards.Where(filter));
+        }
+
+        protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
+        {
+            return new TargetSet(hs.cards.Where(filter));
         }
     }
+
+    internal enum Timing
+    {
+        Cast,
+        Resolve
+    };
+
+
     class AoERule : Generator<Card>
     {
         private Generator<Tile> tilegen { get; } = new ChooseHexTile();
         private int radius { get; }
 
-        public AoERule(int radius) : base(Timing.Cast)
+        public Timing timing { get; set; }
+
+        public AoERule(int radius)
         {
             this.radius = radius;
         }
 
-        public AoERule(Generator<Tile> tilegen, int radius) : base(Timing.Cast)
+        public AoERule(Generator<Tile> tilegen, int radius) : base(null)
         {
             this.tilegen = tilegen;
             this.radius = radius;
         }
 
-        public override TargetSet Generate(HackStruct hs)
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<Card> Candidates(Player chooser, HackStruct hs)
+        protected override TargetSet GenerateCastx(HackStruct hs)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
         {
             throw new NotImplementedException();
         }
@@ -372,18 +440,23 @@ namespace stonerkart
             this.templates = templates;
         }
 
-        public override TargetSet Generate(HackStruct hs)
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<Card> Candidates(Player chooser, HackStruct hs)
+        protected override TargetSet GenerateCastx(HackStruct hs)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
         {
             throw new NotImplementedException();
         }
     }
 
-    class PlayersCardsRule : Generator<Card>
+    class PlayersCardsRule : ResolveOrCastGenerator<Card>
     {
         Generator<Player> ownergen { get; }
         private Func<Player, IEnumerable<Card>> transform { get; }
@@ -399,17 +472,30 @@ namespace stonerkart
             this.transform = transform;
         }
 
-        public override TargetSet Generate(HackStruct hs)
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
         {
-            var v = ownergen.Generate<Player>(hs);
-            //if (v.)
-            if (v.Count() > 1) throw new Exception();
-            return new TargetSet(transform(v.ElementAt(0)));
+            return new TargetSet(transform(hs.resolveController));
         }
 
-        public override IEnumerable<Card> Candidates(Player chooser, HackStruct hs)
+        protected override TargetSet GenerateCache(HackStruct hs)
         {
-            return transform(chooser);
+            return ownergen.GenerateCast(hs);
+        }
+
+        protected override TargetSet GenerateRest(HackStruct hs, TargetSet cache)
+        {
+            if (generateAtResolveTime)
+            {
+                var v = ownergen.GenerateResolve(hs, cache);
+                var players = v.targets.Cast<Player>();
+                if (players.Count() != 1) throw new Exception();
+
+                return new TargetSet(players.SelectMany(p => transform(p)));
+            }
+            else
+            {
+                return cache;
+            }
         }
     }
 
@@ -417,26 +503,36 @@ namespace stonerkart
     {
         public enum Rule { ResolveController, AllPlayers };
 
-        public Rule rule { get; }
-
         public ResolvePlayerRule(Rule rule)
         {
             this.rule = rule;
         }
 
-        public override TargetSet Generate(HackStruct hs)
+        public Rule rule { get; }
+
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
+        {
+            return g(hs);
+        }
+
+        protected override TargetSet GenerateCastx(HackStruct hs)
+        {
+            return g(hs);
+        }
+
+        protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
+        {
+            return g(hs);
+        }
+
+        private TargetSet g(HackStruct hs)
         {
             switch (rule)
             {
-                case Rule.ResolveController: return new TargetSet(new [] { hs.resolveController});
+                case Rule.ResolveController: return TargetSet.Singleton(hs.resolveController);
             }
 
             throw new Exception();
-        }
-
-        public override IEnumerable<Player> Candidates(Player chooser, HackStruct hs)
-        {
-            throw new NotImplementedException();
         }
     }
     class ResolveCardRule : Generator<Card>
@@ -444,7 +540,6 @@ namespace stonerkart
         public enum Rule { ResolveCard, ResolveControllerCard, VillansCard,}
 
         private Rule rule { get; }
-        private Func<Card, bool> filter { get; } = c => true;
 
 
         public ResolveCardRule(Rule rule)
@@ -452,30 +547,40 @@ namespace stonerkart
             this.rule = rule;
         }
 
-        public ResolveCardRule(Rule rule, Func<Card, bool> filter)
+        public ResolveCardRule(Rule rule, Func<Card, bool> filter) : base(filter)
         {
             this.rule = rule;
-            this.filter = filter;
         }
 
-        public override TargetSet Generate(HackStruct hs)
-        {
-            Card rtval;
-            switch (rule)
-            {
-                case Rule.ResolveCard: rtval = hs.resolveCard; break;
-                case Rule.ResolveControllerCard: rtval = hs.resolveCard.Controller.heroCard; break;
-                case Rule.VillansCard: rtval = hs.gameState.villain.heroCard; break;
-                default: throw new Exception();
-            }
-            if (!filter(rtval)) return TargetSet.CreateFizzled();
-            else return new TargetSet(new [] { rtval});
-        }
-
-        public override IEnumerable<Card> Candidates(Player chooser, HackStruct hs)
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
         {
             throw new NotImplementedException();
         }
+
+        protected override TargetSet GenerateCastx(HackStruct hs)
+        {
+            return g(hs);
+        }
+
+        protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
+        {
+            return g(hs);
+        }
+
+        private TargetSet g(HackStruct hs)
+        {
+            switch (rule)
+            {  
+                case Rule.ResolveCard:
+                    return TargetSet.Singleton(hs.resolveCard);
+                case Rule.ResolveControllerCard:
+                    return TargetSet.Singleton(hs.resolveCard.Controller.heroCard);
+                case Rule.VillansCard:
+                    return TargetSet.Singleton(hs.gameState.villain.heroCard);
+                default: throw new Exception();
+            }
+        }
+
     }
 
     class TriggeredRule<Trigger, Target> : Generator<Target> where Trigger : GameEvent
@@ -487,12 +592,17 @@ namespace stonerkart
             this.transform = transform;
         }
 
-        public override TargetSet Generate(HackStruct hs)
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<Target> Candidates(Player chooser, HackStruct hs)
+        protected override TargetSet GenerateCastx(HackStruct hs)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
         {
             throw new NotImplementedException();
         }
@@ -507,12 +617,17 @@ namespace stonerkart
             this.transform = transform;
         }
 
-        public override TargetSet Generate(HackStruct hs)
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<T> Candidates(Player chooser, HackStruct hs)
+        protected override TargetSet GenerateCastx(HackStruct hs)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
         {
             throw new NotImplementedException();
         }
@@ -529,12 +644,17 @@ namespace stonerkart
             this.basegenerator = basegenerator;
         }
 
-        public override TargetSet Generate(HackStruct hs)
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<T> Candidates(Player chooser, HackStruct hs)
+        protected override TargetSet GenerateCastx(HackStruct hs)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
         {
             throw new NotImplementedException();
         }

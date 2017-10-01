@@ -13,61 +13,59 @@ namespace stonerkart
     }
 
 
-    abstract class Generator<T> : Generator
+    internal abstract class Generator<T> : Generator
     {
-        public enum Timing { Cast, Resolve, Both }
-
         protected Func<T, bool> filter { get; }
 
-        private Timing timing { get; }
+        
 
-        public Generator(Timing timing = Timing.Cast, Func<T, bool> filter = null)
+        public Generator(Func<T, bool> filter)
         {
-            this.timing = timing;
             this.filter = filter;
+        }
+
+        public Generator() : this(t => true)
+        {
+        }
+
+        public TargetSet Generate(HackStruct hs)
+        {
+            var cache = GenerateCast(hs);
+            if (cache.Fucked) return cache;
+            return GenerateResolve(hs, cache);
         }
 
         public TargetSet GenerateCast(HackStruct hs)
         {
-            return GenerateCastTS(hs);
+            return GenerateCastx(hs);
         }
-
         public TargetSet GenerateResolve(HackStruct hs, TargetSet cache)
         {
-            var v =  GenerateResolveTS(hs, cache);
-            if (v.Cancelled || v.Fizzled) return v;
-            if (v.targets.Any(t => !(t is T))) throw new Exception();
-            return v;
+            return GenerateResolvex(hs, cache);
         }
 
 
-        protected TargetSet GenerateCastTS(HackStruct hs)
-        {
-            if (timing == Timing.Cast || timing == Timing.Both) return Generate(hs);
-            else return TargetSet.CreateEmpty();
-        }
-        protected TargetSet GenerateResolveTS(HackStruct hs, TargetSet cache)
-        {
+        public abstract TargetSet UnfilteredCandidates(HackStruct hs);
+        protected abstract TargetSet GenerateCastx(HackStruct hs);
+        protected abstract TargetSet GenerateResolvex(HackStruct hs, TargetSet cache);
 
-            if (timing == Timing.Resolve || timing == Timing.Both) return Generate(hs);
-            else return cache;
-        }
-        public abstract TargetSet Generate(HackStruct hs);
+        /*
         public abstract IEnumerable<T> Candidates(Player chooser, HackStruct hs);
-
         public IEnumerable<T> FilteredCandidates(Player chooser, HackStruct hs) => Candidates(chooser, hs).Where(filter);
+        */
 
-        public T[] Generate<T>(HackStruct hs)
-        {
-            return Generate(hs).targets.Cast<T>().ToArray();
-        }
     }
 
     class StaticGenerator<T> : Generator<T>
     {
         private T[] ts;
 
-        public StaticGenerator(params T[] ts) : base(Timing.Both)
+        public StaticGenerator(Func<T, bool> filter, T[] ts) : base(filter)
+        {
+            this.ts = ts;
+        }
+
+        public StaticGenerator(params T[] ts) : this(t => true, ts)
         {
             this.ts = ts;
         }
@@ -77,14 +75,19 @@ namespace stonerkart
             return new StaticGenerator<T>(t);
         }
 
-        public override TargetSet Generate(HackStruct hs)
+        public override TargetSet UnfilteredCandidates(HackStruct hs)
         {
             return new TargetSet(ts.Cast<object>());
         }
 
-        public override IEnumerable<T> Candidates(Player chooser, HackStruct hs)
+        protected override TargetSet GenerateCastx(HackStruct hs)
         {
-            return ts;
+            return new TargetSet(ts.Cast<object>());
+        }
+
+        protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
+        {
+            return GenerateCast(hs);
         }
     }
 
