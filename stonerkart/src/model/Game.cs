@@ -1081,11 +1081,72 @@ namespace stonerkart
             string chooserPrompt, ButtonOption button, string title)
         {
             if (count != 1) throw new Exception();
-            var v = chooseCardFromCardsSynced(chooser, cards, filter, chooserPrompt, button, title);
-            if (v == null) return null;
-            return new Card[] {v};
-            throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
+
+            var crds = cards.ToList();
+            IEnumerable<Card> cardList;
+            Card rt;
+            if (chooser.IsHero)
+            {
+                screen.gamePromptPanel.prompt(chooserPrompt);
+                screen.gamePromptPanel.promptButtons(button);
+                cardList = chooseCardsFromCardsUnsyncedx(cards, filter, count, title);
+                if (cardList == null) connection.sendChoices(new int[0]);
+                else
+                {
+                    var ixs = cardList.Select(c => crds.IndexOf(c));
+                    connection.sendChoices(ixs.ToArray());
+                }
+            }
+            else
+            {
+                screen.gamePromptPanel.prompt(waiterPrompt);
+                var cs = connection.receiveChoice();
+                if (cs.HasValue)
+                {
+                    rt = cardList[cs.Value];
+                }
+                else
+                {
+                    rt = null;
+                }
+            }
+            return rt;
         }
+
+        private IEnumerable<Card> chooseCardsFromCardsUnsyncedx(IEnumerable<Card> cards, Func<Card, bool> filter, int count, string title)
+        {
+            PileView pv = new PileView(600, 300, cards);
+            pv.Backcolor = Color.Silver;
+            Winduh window = new Winduh(pv);
+            window.Title = title;
+            screen.addWinduh(window);
+
+            PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Card) && filter((Card)o));
+            pv.sub(sax);
+            screen.gamePromptPanel.sub(sax);
+
+            foreach (var c in cards) pv.viewOf(c).TintColor = filter(c) ? Color.ForestGreen : Color.Firebrick;
+
+            var cl = new CardList();
+
+            while (cl.Count < count)
+            {
+                var v = sax.call();
+
+                screen.removeElement(window);
+
+                if (v is ButtonOption) return null;
+                var card = (Card)v;
+
+                if (!cl.Contains(card))
+                {
+                    cl.addTop(card);
+                }
+            }
+
+            return cl;
+        }
+
         public Card chooseCardFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter,
             string chooserPrompt, ButtonOption? button, string title = "")
         {
@@ -1095,7 +1156,7 @@ namespace stonerkart
             {
                 screen.gamePromptPanel.prompt(chooserPrompt);
                 if (button.HasValue) screen.gamePromptPanel.promptButtons(button.Value);
-                rt = chooseCardsFromCardsUnsynced(cardList, filter, title);
+                rt = chooseCardFromCardsUnsynced(cardList, filter, title);
                 if (rt == null) connection.sendChoice(null);
                 else connection.sendChoice(cardList.IndexOf(rt));
             }
@@ -1115,7 +1176,7 @@ namespace stonerkart
             return rt;
         }
 
-        private Card chooseCardsFromCardsUnsynced(IEnumerable<Card> cards, Func<Card, bool> filter, string title)
+        private Card chooseCardFromCardsUnsynced(IEnumerable<Card> cards, Func<Card, bool> filter, string title)
         {
             PileView pv = new PileView(600, 300, cards);
             pv.Backcolor = Color.Silver;
