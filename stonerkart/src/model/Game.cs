@@ -1084,7 +1084,6 @@ namespace stonerkart
 
             var crds = cards.ToList();
             IEnumerable<Card> cardList;
-            Card rt;
             if (chooser.IsHero)
             {
                 screen.gamePromptPanel.prompt(chooserPrompt);
@@ -1100,17 +1099,18 @@ namespace stonerkart
             else
             {
                 screen.gamePromptPanel.prompt(waiterPrompt);
-                var cs = connection.receiveChoice();
-                if (cs.HasValue)
+                var cs = connection.receiveChoices();
+                if (cs.Length > 0)
                 {
-                    rt = cardList[cs.Value];
+                    cardList = cs.Select(i => gameState.cardFromOrd(i));
                 }
                 else
                 {
-                    rt = null;
+                    cardList = null;
                 }
             }
-            return rt;
+
+            return cardList;
         }
 
         private IEnumerable<Card> chooseCardsFromCardsUnsyncedx(IEnumerable<Card> cards, Func<Card, bool> filter, int count, string title)
