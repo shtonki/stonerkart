@@ -54,6 +54,11 @@ namespace stonerkart
             {
                 menuFreezer.Visible = !menuFreezer.Visible;
             };
+            menuBar.backButton.clicked += a =>
+            {
+                GUI.TransitionToPreviousScreen();
+            };
+
 
             friendsPanel = new FriendsPanel(300, 500);
             friendsWinduh = new Winduh(friendsPanel, "Friends", true, true);

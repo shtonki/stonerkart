@@ -14,6 +14,7 @@ namespace stonerkart
         public PlayerFlarePanel playerFlarePanel { get; }
         public PlayerShekelPanel shekelsCount { get; }
         public Button menuButton { get; }
+        public Button backButton { get; }
 
         #region layout
 
@@ -27,6 +28,8 @@ namespace stonerkart
         private const int shekelSquareX = 420;
 
         private const int menuButtonX = Frame.BACKSCREENWIDTH - 100;
+        private const int backButtonX = menuButtonX - buttonWidth - 10;
+        private const int buttonWidth = 90;
 
         #endregion
 
@@ -39,12 +42,19 @@ namespace stonerkart
             playerFlarePanel.X = playerFlareX;
             addChild(playerFlarePanel);
 
-            menuButton = new Button(90, Height);
+            menuButton = new Button(buttonWidth, Height);
             addChild(menuButton);
             menuButton.X = menuButtonX;
             menuButton.Backcolor = Color.PapayaWhip;
             menuButton.Border = new SolidBorder(2, Color.Black);
             menuButton.Text = "Menu";
+
+            backButton = new Button(buttonWidth, Height);
+            addChild(backButton);
+            backButton.X = backButtonX;
+            backButton.Backcolor = Color.PapayaWhip;
+            backButton.Border = new SolidBorder(2, Color.Black);
+            backButton.Text = "Back";
 
             shekelsCount = new PlayerShekelPanel(shekelSquareWidth, Height - 10);
             addChild(shekelsCount);

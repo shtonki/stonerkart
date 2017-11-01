@@ -111,6 +111,7 @@
     <Compile Include="src\pws\elements\MemeButton.cs" />
     <Compile Include="src\model\User.cs" />
     <Compile Include="src\pws\elements\MenuPanel.cs" />
+    <Compile Include="src\pws\elements\MultiButtonPanel.cs" />
     <Compile Include="src\pws\elements\PileView.cs" />
     <Compile Include="src\pws\elements\PlayerFlarePanel.cs" />
     <Compile Include="src\pws\elements\PlayerPanel.cs" />
