@@ -651,12 +651,23 @@ namespace stonerkart
 
         protected override TargetSet GenerateCastx(HackStruct hs)
         {
-            throw new NotImplementedException();
+            return basegenerator.GenerateCast(hs);
         }
 
         protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
         {
-            throw new NotImplementedException();
+            var c = basegenerator.GenerateResolve(hs, cache);
+
+            var button = hs.game.chooseButtonSynced(hs.resolveController, promptstring, ButtonOption.Yes, ButtonOption.No);
+            if (button == ButtonOption.Yes)
+            {
+                return c;
+            }
+            else if (button == ButtonOption.No)
+            {
+                return TargetSet.CreateEmpty(); //todo 051117 this probably isn't correct
+            }
+            else throw new Exception();
         }
     }
 }

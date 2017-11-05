@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace stonerkart
 {
@@ -90,6 +91,14 @@ namespace stonerkart
             GUI.transitionToScreen(gsc);
             g.coupleToScreen(gsc);
             ActiveGames.Add(g);
+            if (Program.MonitorGame)
+            {
+                new Thread(() =>
+                {
+                    var v = new GameMonitor(g);
+                    Application.Run(v);
+                }).Start();
+            }
             g.start();
             return g;
         }

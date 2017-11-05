@@ -157,6 +157,12 @@
     <Compile Include="src\network\ServerConnection.cs" />
     <Compile Include="src\pws\PublicSaxophone.cs" />
     <Compile Include="src\pws\TextureLoader.cs" />
+    <Compile Include="src\util\GameMonitor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="src\util\GameMonitor.Designer.cs">
+      <DependentUpon>GameMonitor.cs</DependentUpon>
+    </Compile>
     <Compile Include="src\util\ImageLoaderx.cs" />
     <Compile Include="src\util\Logger.cs" />
     <Compile Include="src\util\Observable.cs" />
@@ -176,6 +182,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="src\pws\Designer.resx" />
+    <EmbeddedResource Include="src\util\GameMonitor.resx">
+      <DependentUpon>GameMonitor.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="codemap.dgml" />

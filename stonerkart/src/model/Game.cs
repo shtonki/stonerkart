@@ -1080,8 +1080,6 @@ namespace stonerkart
             Func<Card, bool> filter,
             string chooserPrompt, ButtonOption button, string title)
         {
-            if (count != 1) throw new Exception();
-
             var crds = cards.ToList();
             IEnumerable<Card> cardList;
             if (chooser.IsHero)
@@ -1121,30 +1119,51 @@ namespace stonerkart
             window.Title = title;
             screen.addWinduh(window);
 
-            PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Card) && filter((Card)o));
-            pv.sub(sax);
-            screen.gamePromptPanel.sub(sax);
-
-            foreach (var c in cards) pv.viewOf(c).TintColor = filter(c) ? Color.ForestGreen : Color.Firebrick;
-
             var cl = new CardList();
 
             while (cl.Count < count)
             {
+                foreach (var c in cards)
+                {
+                    var view = pv.viewOf(c);
+                    if (cl.Contains(c))
+                    {
+                        view.TintColor = Color.Orange;
+                    }
+                    else if (filter(c))
+                    {
+                        view.TintColor = Color.ForestGreen;
+                    }
+                    else
+                    {
+                        view.TintColor = Color.Firebrick;
+                    }
+                }
+
+                PublicSaxophone sax = new PublicSaxophone(o => o is ButtonOption || (o is Card) && filter((Card)o) && !cl.Contains(o));
+                pv.sub(sax);
+                screen.gamePromptPanel.sub(sax);
                 var v = sax.call();
 
-                screen.removeElement(window);
 
-                if (v is ButtonOption) return null;
-                var card = (Card)v;
-
-                if (!cl.Contains(card))
+                if (v is ButtonOption) break;
+                if (v is Card)
                 {
-                    cl.addTop(card);
-                }
-            }
+                    var card = (Card)v;
 
-            return cl;
+                    if (!cl.Contains(card))
+                    {
+                        cl.addTop(card);
+                    }
+                }
+
+
+                
+            }
+            screen.removeElement(window);
+
+            if (cl.Count == count) return cl;
+            return null;
         }
 
         public Card chooseCardFromCardsSynced(Player chooser, IEnumerable<Card> cards, Func<Card, bool> filter,

@@ -125,7 +125,7 @@ namespace stonerkart
                             3,
                             true,
                             ChooseCardsFromCards.Mode.PlayerLooksAtPlayer,
-                            p => p.deck.Take(3)));
+                            p => p.deck.Reverse().Take(3)));
                     additionalCastEffects.Add(new ShuffleEffect(new OptionRule<Player>("Do you wish to shuffle your deck?", ResolveController)));
                     additionalCastEffects.Add(new DrawCardsEffect(1, ResolveController));
 

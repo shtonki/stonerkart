@@ -19,8 +19,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace stonerkart
 {
-    
-
     class Program
     {
 
@@ -31,6 +29,7 @@ namespace stonerkart
 
 
         public static bool design = false;
+        public static bool MonitorGame = true;
 
         
 
