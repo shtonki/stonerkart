@@ -29,7 +29,7 @@ namespace stonerkart
 
 
         public static bool design = false;
-        public static bool MonitorGame = true;
+        public static bool MonitorGame = false;
 
         
 

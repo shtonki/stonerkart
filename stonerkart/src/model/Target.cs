@@ -175,9 +175,17 @@ namespace stonerkart
             var v = playergenerator.GenerateResolve(hs, cache);
             if (v.Fucked) return v;
             var players = v.targets.Cast<Player>();
-            if (players.Count() != 1) throw new Exception();
 
-            return Choose(players.ElementAt(0), hs);
+            var l = new List<object>();
+
+            foreach (var player in players)
+            {
+                var chosen = Choose(player, hs);
+                if (chosen.Fucked) return chosen;
+                l.AddRange(chosen.targets);
+            }
+
+            return new TargetSet(l);
         }
 
 
@@ -530,6 +538,7 @@ namespace stonerkart
             switch (rule)
             {
                 case Rule.ResolveController: return TargetSet.Singleton(hs.resolveController);
+                case Rule.AllPlayers: return new TargetSet(hs.gameState.allPlayers);
             }
 
             throw new Exception();
