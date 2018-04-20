@@ -455,7 +455,8 @@ namespace stonerkart
 
         protected override TargetSet GenerateCastx(HackStruct hs)
         {
-            throw new NotImplementedException();
+            var tokens = templates.Select(t => hs.game.createToken(t, hs.resolveController));
+            return new TargetSet(tokens);
         }
 
         protected override TargetSet GenerateResolvex(HackStruct hs, TargetSet cache)
