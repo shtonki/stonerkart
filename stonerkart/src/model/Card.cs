@@ -77,12 +77,12 @@ namespace stonerkart
 
         public ActivatedAbility castAbility { get; }
         private List<ActivatedAbility> alternateCasts = new List<ActivatedAbility>();
-        public int castRange => castAbility.castRange;
+        public int castRange => castAbility.CastRange;
         public ManaSet castManaCost { get; }
 
         public string typeText => typeTextEx();
 
-        public Card dummyFor => dummiedAbility.card;
+        public Card dummyFor => dummiedAbility.Card;
         public Ability dummiedAbility { get; private set; }
 
         private List<ActivatedAbility> activatedAbilities = new List<ActivatedAbility>();
@@ -90,7 +90,7 @@ namespace stonerkart
         public IEnumerable<Ability> abilities => activatedAbilities.Cast<Ability>().Concat(triggeredAbilities);
         //private List<Ability> abilities { get; }= new List<Ability>();
         private IEnumerable<ActivatedAbility> usable => usableEx();
-        public IEnumerable<ActivatedAbility> usableHere => usable.Where(a => a.activeIn == location.pile);
+        public IEnumerable<ActivatedAbility> usableHere => usable.Where(a => a.ActiveIn == location.pile);
 
         public List<ManaColour> colours => coloursEx();
 
@@ -224,7 +224,7 @@ namespace stonerkart
         }
 
 
-        public bool isCastAbility(Ability a)
+        public bool IsCastAbility(Ability a)
         {
             return castAbility == a || alternateCasts.Contains(a);
         }
@@ -281,17 +281,17 @@ namespace stonerkart
         {
             if (isDummy)
             {
-                return dummiedAbility.description;
+                return dummiedAbility.Description;
             }
 
             StringBuilder sb = new StringBuilder();
 
             foreach (Ability a in abilities)
             {
-                string s = a.description;
+                string s = a.Description;
                 if (s.Length > 0)
                 {
-                    sb.Append(a.description);
+                    sb.Append(a.Description);
                     sb.Append(G.newlineGlyph);
                 }
             }

@@ -162,7 +162,7 @@ namespace stonerkart
 
         private Card createDummy(Ability a)
         {
-            Card r = a.createDummy();
+            Card r = a.CreateDummy();
             gameState.cards.Add(r);
             return r;
         }
@@ -583,7 +583,7 @@ namespace stonerkart
 
                 foreach (TriggerGlueHack pending in gameState.pendingTriggeredAbilities)
                 {
-                    int ix = gameState.ord(pending.ta.card.Controller);
+                    int ix = gameState.ord(pending.ta.Card.Controller);
                     abilityArrays[ix].Add(pending);
                 }
 
@@ -651,12 +651,12 @@ namespace stonerkart
                 var hs = new HackStruct(this, ability);
                 hs.triggeringEvent = triggeringEvent;
 
-                var costTargets = ability.targetCosts(hs);
+                var costTargets = ability.AquireCostTargets(hs);
                 if (costTargets.Fizzled) { handled.addTop(dummyCard); continue; }
                 if (costTargets.Cancelled) return null;
-                var payCostGameEvents = ability.payCosts(hs, costTargets);
+                var payCostGameEvents = ability.PayCosts(hs, costTargets);
 
-                var castTargets = ability.targetCast(hs);
+                var castTargets = ability.AquireCastTargets(hs);
                 if (castTargets.Fizzled) { handled.addTop(dummyCard); continue; }
                 if (castTargets.Cancelled) return null;
 
@@ -785,13 +785,13 @@ namespace stonerkart
                 
                 HackStruct hs = new HackStruct(this, ability, playerWithPriority);
 
-                var costTargets = ability.targetCosts(hs);
+                var costTargets = ability.AquireCostTargets(hs);
                 if (costTargets.Cancelled || costTargets.Fizzled) continue;
 
-                var payCostGameEvents = ability.payCosts(hs, costTargets);
+                var payCostGameEvents = ability.PayCosts(hs, costTargets);
                 if (payCostGameEvents == null) continue;
 
-                var targets = ability.targetCast(hs);
+                var targets = ability.AquireCastTargets(hs);
                 if (targets.Cancelled || targets.Fizzled) continue;
 
                 //if (!ability.isCastAbility) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
@@ -814,7 +814,7 @@ namespace stonerkart
         {
             if (!w.isCastAbility)
             {
-                w = new StackWrapper(w.ability.createDummy(), w.ability, w.cachedTargets);
+                w = new StackWrapper(w.ability.CreateDummy(), w.ability, w.cachedTargets);
             }
 
             GameTransaction gt = new GameTransaction();
@@ -839,13 +839,13 @@ namespace stonerkart
 
             if (!canCastSlow)
             {
-                activatableAbilities = activatableAbilities.Where(a => a.isInstant).ToArray();
+                activatableAbilities = activatableAbilities.Where(a => a.IsInstant).ToArray();
             }
 
             if (activatableAbilities.Length == 0) return null;
             if (activatableAbilities.Length > 1 || c.location.pile == PileLocation.Field)
             {
-                var dummyCards = activatableAbilities.Select(a => a.createDummy()).ToList();
+                var dummyCards = activatableAbilities.Select(a => a.CreateDummy()).ToList();
                 var selectedCard = chooseCardFromCardsSynced(
                     c.Controller, 
                     dummyCards, _ => true, 
@@ -880,7 +880,7 @@ namespace stonerkart
             //fill resolve targets first
             //throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
 
-            var finalTargets = ability.targetResolve(hs, wrapper.cachedTargets);
+            var finalTargets = ability.AquireResolveTargets(hs, wrapper.cachedTargets);
             if (finalTargets.Cancelled) throw new Exception();
 
             IEnumerable<GameEvent> resolveEvents;
@@ -890,7 +890,7 @@ namespace stonerkart
             }
             else
             {
-                resolveEvents = ability.resolve(hs, finalTargets);
+                resolveEvents = ability.Resolve(hs, finalTargets);
             }
 
             if (resolveEvents == null) throw new NotImplementedException("if you weren't expecting too see this you might be in some trouble son");
@@ -1310,7 +1310,7 @@ namespace stonerkart
 
 
         public Card castingCard => stackCard.isDummy ? stackCard.dummyFor : stackCard;
-        public bool isCastAbility => castingCard.isCastAbility(ability);
+        public bool isCastAbility => castingCard.IsCastAbility(ability);
 
         public StackWrapper(Card stackCard, Ability ability, TargetMatrix cachedTargets)
         {

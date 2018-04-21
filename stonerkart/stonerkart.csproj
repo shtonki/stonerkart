@@ -86,7 +86,6 @@
     <Compile Include="src\model\StacksAbility.cs" />
     <Compile Include="src\network\Controller.cs" />
     <Compile Include="src\pws\Border.cs" />
-    <Compile Include="src\controller\Console.cs" />
     <Compile Include="src\controller\Controller.cs" />
     <Compile Include="src\controller\DeckController.cs" />
     <Compile Include="src\controller\ScreenController.cs" />
